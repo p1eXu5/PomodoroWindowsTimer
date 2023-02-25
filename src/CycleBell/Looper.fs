@@ -12,12 +12,17 @@ type LooperEvent =
     | LoopFinished of TimePoint
 
 
+type private StopPlay =
+    | Stop
+    | Play
+
+
 type private State = 
     {
         ActiveTimePoint: TimePoint option
         StartTime: DateTime
         Subscribers: (LooperEvent -> Async<unit>) list
-        TimeShift: TimeSpan 
+        IsStopped: bool
     }
     with
         static member Default() =
@@ -25,30 +30,16 @@ type private State =
                 ActiveTimePoint = None
                 StartTime = DateTime.Now
                 Subscribers = []
-                TimeShift = TimeSpan.Zero
+                IsStopped = false
             }
 
-        static member Reset(subscribers: (LooperEvent -> Async<unit>) list, startTime: DateTime) =
-            {
-                ActiveTimePoint = None
-                StartTime = startTime
-                Subscribers = subscribers
-                TimeShift = TimeSpan.Zero
-            }
-
-        static member Reset(subscribers: (LooperEvent -> Async<unit>) list, startTime: DateTime, timeShift: TimeSpan) =
-            {
-                ActiveTimePoint = None
-                StartTime = DateTime.Now
-                Subscribers = subscribers
-                TimeShift = timeShift
-            }
 
 type private Msg =
     | Tick
     | Subscribe of (LooperEvent -> Async<unit>)
     | SubscribeMany of (LooperEvent -> Async<unit>) list * AsyncReplyChannel<unit>
     | Stop
+    | Resume
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
@@ -70,7 +61,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
 
                         return! loop ()
                     | _ ->
-                        return ()
+                        return! loop ()
                 }
 
             loop ()
@@ -104,27 +95,32 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                     let! msg = inbox.Receive()
                     // printfn "%A: %A\n" msg state
 
-                    match msg with
-                    | Tick when state.ActiveTimePoint |> Option.isNone ->
-                        let! tpOpt = timePointQueue.Enqueue
+                    let initialize state =
+                        async {
+                            let! tpOpt = timePointQueue.Enqueue
 
-                        let dt = DateTime.Now
+                            let dt = DateTime.Now
 
-                        match tpOpt with
-                        | Some tp ->
-                            tryPostEvent (LooperEvent.TimePointStarted (tp, None))
-                            timer.Change(tickMilliseconds, 0) |> ignore
-                            return! loop { state with ActiveTimePoint = tp |> Some; StartTime = dt; TimeShift = TimeSpan.Zero }
+                            match tpOpt with
+                            | Some tp ->
+                                tryPostEvent (LooperEvent.TimePointStarted (tp, None))
+                                timer.Change(tickMilliseconds, 0) |> ignore
+                                return! loop { state with ActiveTimePoint = tp |> Some; StartTime = dt }
 
-                        | _ ->
-                            let! isStopped = isStopMsgQueued
-                            if isStopped then
-                                return ()
-                            else
+                            | _ ->
                                 timer.Change(tickMilliseconds, 0) |> ignore
                                 return! loop state
+                        }
 
-                    | Tick ->
+
+                    match msg with
+                    | Resume when state.IsStopped ->
+                        return! initialize { state with IsStopped = false; StartTime = DateTime.Now }
+
+                    | Tick when state.ActiveTimePoint |> Option.isNone && not (state.IsStopped) ->
+                        return! initialize state
+
+                    | Tick when not (state.IsStopped) ->
                         let atp = state.ActiveTimePoint |> Option.get
                         let dt = DateTime.Now
                         let atp = { atp with TimeSpan = atp.TimeSpan - (dt - state.StartTime) }
@@ -135,7 +131,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                             match tpOpt with
                             | None ->
                                 timer.Change(tickMilliseconds, 0) |> ignore
-                                return! loop (State.Reset(state.Subscribers, dt))
+                                return! loop { state with StartTime = dt; ActiveTimePoint = None }
                             | Some tp ->
                                 let newAtp = { tp with TimeSpan = tp.TimeSpan + atp.TimeSpan }
                                 tryPostEvent (LooperEvent.TimePointStarted (newAtp, atp |> Some))
@@ -152,8 +148,10 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                         reply.Reply(())
                         return! loop { state with Subscribers = subscribers @ state.Subscribers }
 
-                    | Stop ->
-                        return ()
+                    | Stop when not state.IsStopped ->
+                        return! loop { state with IsStopped = true; ActiveTimePoint = None; StartTime = DateTime.Now }
+
+                    | _ -> return! loop state
                 }
 
             loop (State.Default())
@@ -161,18 +159,34 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
         , defaultArg cancellationToken CancellationToken.None
     )
 
+    member val Subscribers = [] with get, set
+
+    member this.Start() =
+        this.Start(this.Subscribers)
+
+
+    member this.Stop() =
+        agent.Post(Stop)
+
+    member this.Resume() =
+        agent.Post(Resume)
+
+
+    member _.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) =
+        agent.Post(Subscribe subscriber)
 
     member _.Start(subscribers: (LooperEvent -> Async<unit>) list) =
-        timer <-
-            new Timer(fun _ ->
-                agent.Post(Tick)
-            )
+        if timer = null then
+            timer <-
+                new Timer(fun _ ->
+                    agent.Post(Tick)
+                )
 
         timePointQueue.Start()
         invoker.Start()
         agent.Start()
         do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
-        agent.Post(Tick)
+        agent.Post(Stop)
 
 
     member private _.Dispose(isDisposing: bool) =

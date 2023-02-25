@@ -1,0 +1,49 @@
+﻿<Window x:Class="CycleBell.WpfClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:CycleBell.WpfClient"
+        xmlns:vm="clr-namespace:CycleBell.ElmishApp;assembly=CycleBell.ElmishApp"
+        xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+
+        d:DataContext="{x:Static vm:Program.mainModel}"
+        >
+    <DockPanel LastChildFill="True">
+        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+            <TextBlock DockPanel.Dock="Right" 
+                       Text="{Binding AssemblyVersion}" 
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource MaterialDesignDarkForeground}"
+                       Margin="5,5,10,5"/>
+
+            <Border></Border>
+        </DockPanel>
+
+        <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
+            <!-- Content -->
+            <DockPanel LastChildFill="True" Margin="20">
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
+                </StackPanel>
+                <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       Value="{Binding ActiveTime, FallbackValue=00:00:00.00}" Format="mm':'ss"
+                                       />
+            </DockPanel>
+        </materialDesign:ColorZone>
+    </DockPanel>
+</Window>
