@@ -26,6 +26,7 @@ module MainModel =
         | Play
         | Stop
         | OnError of exn
+        | Minimize
 
 
     open Elmish

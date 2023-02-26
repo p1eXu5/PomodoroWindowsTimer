@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="Elmish.Extensions.fs" />
     <Compile Include="Abstractions.fs" />
+    <Compile Include="Infrastructure.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />

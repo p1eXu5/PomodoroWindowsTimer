@@ -31,6 +31,8 @@ let bindings () : Binding<MainModel, Msg> list =
             (=),
             (fun tp -> tp.Name)
         )
+
+        "MinimizeCommand" |> Binding.cmd Minimize
     ]
 
 

@@ -4,6 +4,7 @@
     open CycleBell.ElmishApp.Models
     open CycleBell.ElmishApp.Models.MainModel
     open CycleBell.Looper
+    open CycleBell.ElmishApp
 
 
     let update (looper: Looper) (msg: Msg) (model: MainModel) =
@@ -24,6 +25,9 @@
                 | _ -> model.ActiveTimePoint
 
             { model with ActiveTimePoint = activeTimePoint }, Cmd.none
+
+        | Minimize ->
+            model, Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError
 
         | Msg.OnError ex ->
             model.ErrorQueue.EnqueuError(ex.Message)

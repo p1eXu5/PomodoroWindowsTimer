@@ -68,6 +68,7 @@
                 <DockPanel LastChildFill="True" Margin="0,0,0,20">
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="100">
                         <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
+                        <Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />
                     </StackPanel>
                     <digitPanel:TimerTable HorizontalAlignment="Stretch"
                                        VerticalAlignment="Center"
