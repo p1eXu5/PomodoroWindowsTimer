@@ -48,7 +48,13 @@ let internal main (window, errorQueue, settingsManager) =
             { Name = "6"; TimeSpan = TimeSpan.FromMinutes(10); Kind = Break }
         ]
 
-    let timePointQueue = new TimePointQueue(timePoints)
+    let testTimePoints =
+        [
+            { Name = "1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
+            { Name = "2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Break }
+        ]
+
+    let timePointQueue = new TimePointQueue(testTimePoints)
     let looper = new Looper((timePointQueue :> ITimePointQueue), 200)
 
     let subscribe _ =
@@ -67,7 +73,7 @@ let internal main (window, errorQueue, settingsManager) =
 
 
     WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager errorQueue timePoints) 
+        (fun () -> MainModel.init settingsManager errorQueue testTimePoints) 
         (MainModel.Program.update looper)
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory

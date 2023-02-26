@@ -33,3 +33,9 @@ let minimize () =
         do! Async.Sleep(500)
         showWindow(appWindow, SW_RESTORE) |> ignore
     }
+
+let restore () =
+    async {
+        let shellTrayWnd = findWindow("Shell_TrayWnd", null)
+        sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
+    }

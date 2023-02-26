@@ -95,13 +95,8 @@
                         <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
                         <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
                     </StackPanel>
-                    <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding}" />
-                    <!--<digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                           VerticalAlignment="Center"
-                                           Foreground="#00FF00"
-                                           DigitBackground="#004500"
-                                           Value="{Binding ActiveTime, FallbackValue=00:00:00.00}" Format="mm':'ss"
-                                           />-->
+                    
+                    <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
                 </DockPanel>
             </materialDesign:ColorZone>
         </DockPanel>

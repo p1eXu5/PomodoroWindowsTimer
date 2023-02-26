@@ -27,8 +27,13 @@ let update (looper: Looper) (msg: Msg) (model: MainModel) =
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
             | LooperEvent.TimePointStarted (tp, _) ->
                 match tp.Kind with
-                | Break -> (tp |> Some, Cmd.none) //Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError)
-                | Work -> (tp |> Some, Cmd.none) //Cmd.OfAsync.attempt Infrastructure.restore () Msg.OnError)
+#if DEBUG
+                | Break -> (tp |> Some, Cmd.none)
+                | Work -> (tp |> Some, Cmd.none)
+#else
+                | Break -> (tp |> Some, Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError)
+                | Work -> (tp |> Some, Cmd.OfAsync.attempt Infrastructure.restore () Msg.OnError)
+#endif
             | _ -> (model.ActiveTimePoint, Cmd.none)
 
         { model with ActiveTimePoint = activeTimePoint }, cmd

@@ -35,7 +35,12 @@ let bindings () : Binding<MainModel, Msg> list =
 
         "MinimizeCommand" |> Binding.cmd Minimize
 
-        "IsBreak" |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Kind = Kind.Break) |> Option.defaultValue false)
+        "IsBreak"
+        |> Binding.oneWay (fun m ->
+            m.ActiveTimePoint
+            |> Option.map (fun tp -> tp.Kind |> function Kind.Break -> true | _ -> false)
+            |> Option.defaultValue false
+        )
     ]
 
 

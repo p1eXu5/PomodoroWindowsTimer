@@ -9,10 +9,10 @@
 
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="4.7.1" />
+    <PackageReference Include="p1eXu5.Wpf.DigitPanel" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\CSharp\_wpf\_controls\p1eXu5.Wpf.DigitPanel\src\p1eXu5.Wpf.DigitPanel\p1eXu5.Wpf.DigitPanel.csproj" />
     <ProjectReference Include="..\CycleBell.ElmishApp\CycleBell.ElmishApp.fsproj" />
   </ItemGroup>
 

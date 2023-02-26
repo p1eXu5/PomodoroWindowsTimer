@@ -5,13 +5,13 @@ namespace CycleBell.WpfClient;
 
 public class DigitPanelTemplateSelector : DataTemplateSelector
 {
-    public override DataTemplate? SelectTemplate(object item, DependencyObject container)
+    public override DataTemplate? SelectTemplate(object isBreak, DependencyObject container)
     {
         FrameworkElement? element = container as FrameworkElement;
 
-        if (element != null && item != null)
+        if (element != null && isBreak != null)
         {
-            if (((dynamic)item).IsBreak)
+            if (isBreak is bool b && b)
                 return element.FindResource("gp_Red") as DataTemplate;
 
             return element.FindResource("gp_Green") as DataTemplate;
