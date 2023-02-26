@@ -15,6 +15,7 @@ type MainModel =
         ErrorQueue : IErrorMessageQueue
         ActiveTimePoint : TimePoint option
         LooperState : LooperState
+        TimePoints: TimePoint list
     }
 
 
@@ -29,7 +30,7 @@ module MainModel =
 
     open Elmish
 
-    let init (settingsManager : ISettingsManager) (errorQueue : IErrorMessageQueue) : MainModel * Cmd<Msg> =
+    let init (settingsManager : ISettingsManager) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
 
         let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
@@ -39,6 +40,7 @@ module MainModel =
             ErrorQueue = errorQueue
             ActiveTimePoint = None
             LooperState = Stopped
+            TimePoints = timePoints
         }
         , Cmd.none
 
@@ -50,4 +52,5 @@ module MainModel =
             ErrorQueue = Unchecked.defaultof<_>
             ActiveTimePoint = None
             LooperState = Stopped
+            TimePoints = []
         }

@@ -40,12 +40,12 @@ let internal main (window, errorQueue, settingsManager) =
 
     let timePoints =
         [
-            { Name = "1"; TimeSpan = TimeSpan.FromMinutes(25) }
-            { Name = "2"; TimeSpan = TimeSpan.FromMinutes(5) }
-            { Name = "3"; TimeSpan = TimeSpan.FromMinutes(25) }
-            { Name = "4"; TimeSpan = TimeSpan.FromMinutes(5) }
-            { Name = "5"; TimeSpan = TimeSpan.FromMinutes(25) }
-            { Name = "6"; TimeSpan = TimeSpan.FromMinutes(10) }
+            { Name = "1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Name = "2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Name = "3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Name = "4"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Name = "5"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Name = "6"; TimeSpan = TimeSpan.FromMinutes(10); Kind = Break }
         ]
 
     let timePointQueue = new TimePointQueue(timePoints)
@@ -67,7 +67,7 @@ let internal main (window, errorQueue, settingsManager) =
 
 
     WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager errorQueue) 
+        (fun () -> MainModel.init settingsManager errorQueue timePoints) 
         (MainModel.Program.update looper)
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory

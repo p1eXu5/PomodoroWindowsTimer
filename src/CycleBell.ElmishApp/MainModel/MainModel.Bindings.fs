@@ -25,6 +25,12 @@ let bindings () : Binding<MainModel, Msg> list =
 
         "ActiveTime"
         |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.TimeSpan) |> Option.defaultValue TimeSpan.Zero )
+
+        "TimePoints" |> Binding.oneWaySeq (
+            (fun m -> m.TimePoints),
+            (=),
+            (fun tp -> tp.Name)
+        )
     ]
 
 

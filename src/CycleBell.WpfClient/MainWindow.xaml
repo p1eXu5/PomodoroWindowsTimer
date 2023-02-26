@@ -9,7 +9,7 @@
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="450" Width="800"
+        Height="500" Width="800"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -21,29 +21,60 @@
 
         d:DataContext="{x:Static vm:Program.mainModel}"
         >
-    <DockPanel LastChildFill="True">
-        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Right" 
+    <materialDesign:DrawerHost x:Name="DrawerHost"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                   BorderThickness="2"
+                                   BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
+                                   BottomDrawerCornerRadius="20 20 0 0">
+        <materialDesign:DrawerHost.LeftDrawerContent>
+            <StackPanel Margin="16">
+                <TextBlock Margin="4"
+                               HorizontalAlignment="Center"
+                               Text="TIME POINTS" />
+                <ListBox ItemsSource="{Binding TimePoints}" >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" />
+                                <TextBlock Text="{Binding TimeSpan}" Margin="10,0"/>
+                                <TextBlock Text="{Binding Kind}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
+        </materialDesign:DrawerHost.LeftDrawerContent>
+
+        <DockPanel LastChildFill="True" Margin="10,0,10,0">
+            <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+                <TextBlock DockPanel.Dock="Right" 
                        Text="{Binding AssemblyVersion}" 
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        Foreground="{StaticResource MaterialDesignDarkForeground}"
                        Margin="5,5,10,5"/>
-
-            <Border></Border>
-        </DockPanel>
-
-        <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
-            <!-- Content -->
-            <DockPanel LastChildFill="True" Margin="20">
-                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
-                </StackPanel>
-                <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch"
+                <Button Style="{StaticResource MaterialDesignIconButton}"
+                        ToolTip="MaterialDesignFloatingActionMiniDarkButton"
+                        Content="{materialDesign:PackIcon ClockOutline}"
+                        Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
+                        />
+                <Border></Border>
+            </DockPanel>
+            
+            <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
+                <!-- Content -->
+                <DockPanel LastChildFill="True" Margin="0,0,0,20">
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="100">
+                        <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
+                    </StackPanel>
+                    <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Center"
                                        Value="{Binding ActiveTime, FallbackValue=00:00:00.00}" Format="mm':'ss"
                                        />
-            </DockPanel>
-        </materialDesign:ColorZone>
-    </DockPanel>
+                </DockPanel>
+            </materialDesign:ColorZone>
+        </DockPanel>
+    </materialDesign:DrawerHost>
 </Window>
