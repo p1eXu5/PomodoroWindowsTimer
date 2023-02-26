@@ -124,20 +124,22 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                         let atp = state.ActiveTimePoint |> Option.get
                         let dt = DateTime.Now
                         let atp = { atp with TimeSpan = atp.TimeSpan - (dt - state.StartTime) }
-                        tryPostEvent (LooperEvent.TimePointTimeReduced atp)
 
-                        if atp.TimeSpan <= TimeSpan.Zero then
+                        if MathF.Floor(float32 atp.TimeSpan.TotalSeconds) = 0f then
                             let! tpOpt = timePointQueue.Enqueue
                             match tpOpt with
                             | None ->
+                                tryPostEvent (LooperEvent.TimePointTimeReduced atp)
                                 timer.Change(tickMilliseconds, 0) |> ignore
                                 return! loop { state with StartTime = dt; ActiveTimePoint = None }
+
                             | Some tp ->
                                 let newAtp = { tp with TimeSpan = tp.TimeSpan + atp.TimeSpan }
                                 tryPostEvent (LooperEvent.TimePointStarted (newAtp, atp |> Some))
                                 timer.Change(tickMilliseconds, 0) |> ignore
                                 return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
                         else
+                            tryPostEvent (LooperEvent.TimePointTimeReduced atp)
                             timer.Change(tickMilliseconds, 0) |> ignore
                             return! loop { state with ActiveTimePoint = atp |> Some; StartTime = dt }
 
