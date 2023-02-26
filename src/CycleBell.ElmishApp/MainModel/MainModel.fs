@@ -27,6 +27,7 @@ module MainModel =
         | Stop
         | OnError of exn
         | Minimize
+        | PickFirstTimePoint
 
 
     open Elmish
@@ -43,7 +44,7 @@ module MainModel =
             LooperState = Stopped
             TimePoints = timePoints
         }
-        , Cmd.none
+        , Cmd.ofMsg Msg.PickFirstTimePoint
 
 
     let initForDesign () =

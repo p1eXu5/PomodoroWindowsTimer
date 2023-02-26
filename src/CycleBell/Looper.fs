@@ -190,6 +190,8 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
         do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
         agent.Post(Stop)
 
+    member _.PickFirst() =
+        timePointQueue.Pick
 
     member private _.Dispose(isDisposing: bool) =
         if _isDisposed then ()

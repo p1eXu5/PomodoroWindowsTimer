@@ -10,6 +10,9 @@ open CycleBell.Types
 
 let update (looper: Looper) (msg: Msg) (model: MainModel) =
     match msg with
+    | Msg.PickFirstTimePoint ->
+        let atp = looper.PickFirst()
+        { model with ActiveTimePoint = atp }, Cmd.none
     | Msg.Play ->
         looper.Resume()
         { model with LooperState = Playing }, Cmd.none
@@ -19,19 +22,14 @@ let update (looper: Looper) (msg: Msg) (model: MainModel) =
         { model with LooperState = Stopped }, Cmd.none
 
     | Msg.LooperMsg evt ->
-        let activeTimePoint =
+        let (activeTimePoint, cmd) =
             match evt with
-            | LooperEvent.TimePointTimeReduced tp
-            | LooperEvent.TimePointStarted (tp, _) -> tp |> Some
-            | _ -> model.ActiveTimePoint
-
-        let cmd =
-            match activeTimePoint with
-            | Some tp when tp.Kind = Kind.Break ->
-                Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError
-            | _ ->
-                Cmd.none
-
+            | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
+            | LooperEvent.TimePointStarted (tp, _) ->
+                match tp.Kind with
+                | Break -> (tp |> Some, Cmd.none) //Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError)
+                | Work -> (tp |> Some, Cmd.none) //Cmd.OfAsync.attempt Infrastructure.restore () Msg.OnError)
+            | _ -> (model.ActiveTimePoint, Cmd.none)
 
         { model with ActiveTimePoint = activeTimePoint }, cmd
 

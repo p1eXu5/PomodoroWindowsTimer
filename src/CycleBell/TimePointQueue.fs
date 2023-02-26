@@ -22,6 +22,7 @@ type private Msg =
     | AddMany of TimePoint seq
     | GetTimePointsWithPriority of AsyncReplyChannel<(TimePoint * float32) seq>
     | GetNext of AsyncReplyChannel<TimePoint option>
+    | Pick of AsyncReplyChannel<TimePoint option>
 
 
 type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Threading.CancellationToken) =
@@ -62,6 +63,14 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
                             state.Queue.Enqueue(tp, state.MaxPriority)
                             reply.Reply(tp |> Some)
                             return! loop { state with MaxPriority = state.MaxPriority + 1f }
+
+                    | Pick reply ->
+                        if state.Queue.Count = 0 then
+                            reply.Reply(None)
+                        else
+                            let tp = state.Queue.First
+                            reply.Reply(tp |> Some)
+                            return! loop state
                 }
 
             loop State.Default
@@ -107,7 +116,7 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
     interface ITimePointQueue with
         member this.Start() = this.Start()
         member _.Enqueue = _agent.PostAndAsyncReply(GetNext, 1000)
-            
+        member _.Pick = _agent.PostAndReply(Pick, 1000)
 
     interface IDisposable with
         member this.Dispose() =
