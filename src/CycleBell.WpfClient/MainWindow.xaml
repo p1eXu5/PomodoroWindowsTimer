@@ -9,7 +9,7 @@
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="500" Width="800"
+        Height="320" Width="800"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -66,14 +66,42 @@
             <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
                 <!-- Content -->
                 <DockPanel LastChildFill="True" Margin="0,0,0,20">
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="100">
+                    <DockPanel.Resources>
+                        
+                        <DataTemplate  x:Key="gp_Green">
+                            <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="#00FF00"
+                                                   DigitBackground="#004000"
+                                                   Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                                   Format="mm':'ss"
+                                                   />
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="gp_Red">
+                            <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Center"
+                                               Foreground="#FF0000"
+                                               DigitBackground="#400000"
+                                               Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                               Format="mm':'ss"
+                                               />
+                        </DataTemplate>
+
+                        <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
+                    </DockPanel.Resources>
+                    
+                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="70">
                         <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
-                        <Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />
+                        <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
                     </StackPanel>
-                    <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Center"
-                                       Value="{Binding ActiveTime, FallbackValue=00:00:00.00}" Format="mm':'ss"
-                                       />
+                    <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding}" />
+                    <!--<digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                           VerticalAlignment="Center"
+                                           Foreground="#00FF00"
+                                           DigitBackground="#004500"
+                                           Value="{Binding ActiveTime, FallbackValue=00:00:00.00}" Format="mm':'ss"
+                                           />-->
                 </DockPanel>
             </materialDesign:ColorZone>
         </DockPanel>

@@ -1,6 +1,7 @@
 ﻿module CycleBell.ElmishApp.MainModel.Bindings
 
 open Elmish.WPF
+open CycleBell.Types
 open CycleBell.ElmishApp.Models
 open CycleBell.ElmishApp.Models.MainModel
 open System
@@ -33,6 +34,8 @@ let bindings () : Binding<MainModel, Msg> list =
         )
 
         "MinimizeCommand" |> Binding.cmd Minimize
+
+        "IsBreak" |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Kind = Kind.Break) |> Option.defaultValue false)
     ]
 
 
