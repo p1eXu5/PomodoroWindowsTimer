@@ -11,10 +11,12 @@ open CycleBell.TimePointQueue
 open CycleBell.Looper
 open CycleBell.ElmishApp
 open CycleBell.ElmishApp.Models
+open Telegram.Bot
+open CycleBell.ElmishApp.Abstractions
 
 let mainModel = ViewModel.designInstance (MainModel.initForDesign ()) (MainModel.Bindings.bindings ())
 
-let internal main (window, errorQueue, settingsManager) =
+let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration) =
     let logger =
         LoggerConfiguration()
 #if DEBUG
@@ -40,7 +42,7 @@ let internal main (window, errorQueue, settingsManager) =
 
     let timePoints =
         [
-            { Name = "1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Name = "1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Break }
             { Name = "2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
             { Name = "3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
             { Name = "4"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
@@ -71,10 +73,13 @@ let internal main (window, errorQueue, settingsManager) =
 
     looper.Start()
 
+    let botClient = TelegramBotClient(botConfiguration.BotToken)
+
+    let sendToBot = Infrastructure.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
 
     WpfProgram.mkProgram 
         (fun () -> MainModel.init settingsManager errorQueue timePoints) 
-        (MainModel.Program.update looper)
+        (MainModel.Program.update sendToBot looper)
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.withSubscription subscribe

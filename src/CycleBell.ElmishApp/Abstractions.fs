@@ -11,3 +11,10 @@ type IErrorMessageQueue =
     interface
         abstract EnqueuError : string -> unit
     end
+
+
+type IBotConfiguration =
+    interface
+        abstract BotToken : string
+        abstract MyChatId : string
+    end

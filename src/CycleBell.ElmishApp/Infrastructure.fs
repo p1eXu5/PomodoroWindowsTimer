@@ -2,6 +2,7 @@
 
 open System.Runtime.InteropServices
 open System
+open Telegram.Bot
 
 
 
@@ -38,4 +39,15 @@ let restore () =
     async {
         let shellTrayWnd = findWindow("Shell_TrayWnd", null)
         sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
+    }
+
+
+let sendToBot (botClient: ITelegramBotClient) chatId text =
+    task {
+        let! _ =
+            botClient.SendTextMessageAsync(
+                chatId,
+                text)
+
+        return ()
     }

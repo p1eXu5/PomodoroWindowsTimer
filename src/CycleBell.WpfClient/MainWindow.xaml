@@ -62,7 +62,13 @@
                         />
                 <Border></Border>
             </DockPanel>
-            
+
+            <materialDesign:Snackbar DockPanel.Dock="Bottom" 
+                                     HorizontalAlignment="Stretch"
+                                     MessageQueue="{Binding ErrorMessageQueue}"
+                                     ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                                     />
+
             <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
                 <!-- Content -->
                 <DockPanel LastChildFill="True" Margin="0,0,0,20">
@@ -94,6 +100,7 @@
                     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="70">
                         <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
                         <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
+                        <Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />
                     </StackPanel>
                     
                     <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />

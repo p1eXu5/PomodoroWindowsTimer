@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using CycleBell.ElmishApp.Abstractions;
+using Microsoft.Extensions.Configuration;
 
 namespace CycleBell.WpfClient
 {
@@ -15,6 +16,14 @@ namespace CycleBell.WpfClient
     {
         private readonly IErrorMessageQueue _errorMessageQueue;
 
+        static App()
+        {
+            Configuration =
+                new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", true)
+                    .Build();
+        }
+
         public App()
         {
             CultureInfo ci = CultureInfo.CreateSpecificCulture(CultureInfo.CurrentCulture.Name);
@@ -22,6 +31,8 @@ namespace CycleBell.WpfClient
             Thread.CurrentThread.CurrentCulture = ci;
 
             _errorMessageQueue = new ErrorMessageQueue();
+
+
 
             AppDomain.CurrentDomain.UnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -31,10 +42,12 @@ namespace CycleBell.WpfClient
             this.Activated += StartElmish;
         }
 
+        public static IConfiguration Configuration { get; }
+
         private void StartElmish(object? sender, EventArgs e)
         {
             this.Activated -= StartElmish;
-            CycleBell.ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance);
+            CycleBell.ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance, new BotConfiguration());
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

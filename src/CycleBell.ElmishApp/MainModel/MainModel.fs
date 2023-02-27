@@ -26,8 +26,10 @@ module MainModel =
         | Play
         | Stop
         | OnError of exn
-        | Minimize
         | PickFirstTimePoint
+        // test msgs
+        | Minimize
+        | SendToChatBot
 
 
     open Elmish

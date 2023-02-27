@@ -6,9 +6,10 @@ open CycleBell.ElmishApp.Models.MainModel
 open CycleBell.Looper
 open CycleBell.ElmishApp
 open CycleBell.Types
+open System.Threading.Tasks
 
 
-let update (looper: Looper) (msg: Msg) (model: MainModel) =
+let update (sendToBot: string -> Task<unit>) (looper: Looper) (msg: Msg) (model: MainModel) =
     match msg with
     | Msg.PickFirstTimePoint ->
         let atp = looper.PickFirst()
@@ -29,10 +30,10 @@ let update (looper: Looper) (msg: Msg) (model: MainModel) =
                 match tp.Kind with
 #if DEBUG
                 | Break -> (tp |> Some, Cmd.none)
-                | Work -> (tp |> Some, Cmd.none)
+                | Work -> (tp |> Some, Cmd.ofMsg SendToChatBot)
 #else
                 | Break -> (tp |> Some, Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError)
-                | Work -> (tp |> Some, Cmd.OfAsync.attempt Infrastructure.restore () Msg.OnError)
+                | Work -> (tp |> Some, Cmd.batch [ Cmd.OfAsync.attempt Infrastructure.restore () Msg.OnError; Cmd.ofMsg SendToChatBot ])
 #endif
             | _ -> (model.ActiveTimePoint, Cmd.none)
 
@@ -40,6 +41,9 @@ let update (looper: Looper) (msg: Msg) (model: MainModel) =
 
     | Minimize ->
         model, Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError
+
+    | SendToChatBot ->
+        model, Cmd.OfTask.attempt sendToBot "It's time!!" Msg.OnError
 
     | Msg.OnError ex ->
         model.ErrorQueue.EnqueuError(ex.Message)

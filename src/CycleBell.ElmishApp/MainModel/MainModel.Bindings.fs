@@ -34,6 +34,7 @@ let bindings () : Binding<MainModel, Msg> list =
         )
 
         "MinimizeCommand" |> Binding.cmd Minimize
+        "SendToChatBotCommand" |> Binding.cmd SendToChatBot
 
         "IsBreak"
         |> Binding.oneWay (fun m ->
