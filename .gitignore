@@ -476,3 +476,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 /docs/colors.psd
+/src/CycleBell.WpfClient/appsettings.json
