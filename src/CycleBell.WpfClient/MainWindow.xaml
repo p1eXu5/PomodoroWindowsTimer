@@ -7,9 +7,10 @@
         xmlns:local="clr-namespace:CycleBell.WpfClient"
         xmlns:vm="clr-namespace:CycleBell.ElmishApp;assembly=CycleBell.ElmishApp"
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+        xmlns:usercontrols="clr-namespace:CycleBell.WpfClient.UserControls"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="320" Width="800"
+        Height="400" Width="800"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -18,94 +19,121 @@
         TextOptions.TextRenderingMode="Auto"
         Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-
-        d:DataContext="{x:Static vm:Program.mainModel}"
+        Icon="pomodoro-technique.ico"
         >
-    <materialDesign:DrawerHost x:Name="DrawerHost"
-                                   HorizontalAlignment="Stretch"
-                                   VerticalAlignment="Stretch"
-                                   BorderBrush="{DynamicResource MaterialDesignDivider}"
-                                   BorderThickness="2"
-                                   BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
-                                   BottomDrawerCornerRadius="20 20 0 0">
-        <materialDesign:DrawerHost.LeftDrawerContent>
-            <StackPanel Margin="16">
-                <TextBlock Margin="4"
-                               HorizontalAlignment="Center"
-                               Text="TIME POINTS" />
-                <ListBox ItemsSource="{Binding TimePoints}" >
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text="{Binding TimeSpan}" Margin="10,0"/>
-                                <TextBlock Text="{Binding Kind}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-        </materialDesign:DrawerHost.LeftDrawerContent>
+    <Window.Resources>
+        <DataTemplate x:Key="dt_BotSettingsDialog">
+            <usercontrols:BotSettingsDialog DataContext="{Binding}" />
+        </DataTemplate>
+    </Window.Resources>
+    
+    <materialDesign:DialogHost DialogTheme="Inherit"
+                               Identifier="RootDialog"
+                               SnackbarMessageQueue="{Binding ElementName=ErrorMessageQueue, Path=MessageQueue}"
+                               DialogContentTemplate="{StaticResource dt_BotSettingsDialog}"
+                               >
+        
+        <materialDesign:DrawerHost x:Name="DrawerHost"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                       BorderThickness="2"
+                                       BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
+                                       BottomDrawerCornerRadius="20 20 0 0">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <StackPanel Margin="16">
+                    <TextBlock Margin="4"
+                                   HorizontalAlignment="Center"
+                                   Text="TIME POINTS" />
+                    <ListBox ItemsSource="{Binding TimePoints}" >
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel.InputBindings>
+                                        <MouseBinding MouseAction="LeftDoubleClick"
+                                                      Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                                      CommandParameter="{Binding Id}" />
+                                    </StackPanel.InputBindings>
+                                    <TextBlock Text="{Binding Name}" Width="100" />
+                                    <TextBlock Text="{Binding TimeSpan}" Margin="10,0"/>
+                                    <TextBlock Text="{Binding Kind}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Button Grid.Column="1"
+                            Margin="0,20,0,0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                            CommandParameter="{Binding BotSettingsModel}"
+                            Content="BOT SETTINGS"
+                            />
 
-        <DockPanel LastChildFill="True" Margin="10,0,10,0">
-            <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                <TextBlock DockPanel.Dock="Right" 
-                       Text="{Binding AssemblyVersion}" 
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"
-                       Foreground="{StaticResource MaterialDesignDarkForeground}"
-                       Margin="5,5,10,5"/>
-                <Button Style="{StaticResource MaterialDesignIconButton}"
-                        ToolTip="MaterialDesignFloatingActionMiniDarkButton"
-                        Content="{materialDesign:PackIcon ClockOutline}"
-                        Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                        />
-                <Border></Border>
-            </DockPanel>
+                </StackPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
 
-            <materialDesign:Snackbar DockPanel.Dock="Bottom" 
-                                     HorizontalAlignment="Stretch"
-                                     MessageQueue="{Binding ErrorMessageQueue}"
-                                     ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
-                                     />
+            <DockPanel LastChildFill="True" Margin="10,0,10,0">
+                <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Right" 
+                           Text="{Binding AssemblyVersion}" 
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Foreground="{StaticResource MaterialDesignDarkForeground}"
+                           Margin="5,5,10,5"/>
+                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="MaterialDesignFloatingActionMiniDarkButton"
+                            Content="{materialDesign:PackIcon ClockOutline}"
+                            Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
+                            />
+                    <Border></Border>
+                </DockPanel>
 
-            <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
-                <!-- Content -->
-                <DockPanel LastChildFill="True" Margin="0,0,0,20">
-                    <DockPanel.Resources>
+                <materialDesign:Snackbar DockPanel.Dock="Bottom" 
+                                         HorizontalAlignment="Stretch"
+                                         MessageQueue="{Binding ErrorMessageQueue}"
+                                         ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                                         />
+
+                <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
+                    <!-- Content -->
+                    <DockPanel LastChildFill="True" Margin="0,0,0,20">
+                        <DockPanel.Resources>
                         
-                        <DataTemplate  x:Key="gp_Green">
-                            <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                            <DataTemplate  x:Key="gp_Green">
+                                <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="#00FF00"
+                                                       DigitBackground="#004000"
+                                                       Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                                       Format="mm':'ss"
+                                                       />
+                            </DataTemplate>
+
+                            <DataTemplate x:Key="gp_Red">
+                                <digitPanel:TimerTable HorizontalAlignment="Stretch"
                                                    VerticalAlignment="Center"
-                                                   Foreground="#00FF00"
-                                                   DigitBackground="#004000"
+                                                   Foreground="#FF0000"
+                                                   DigitBackground="#400000"
                                                    Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
                                                    Format="mm':'ss"
                                                    />
-                        </DataTemplate>
+                            </DataTemplate>
 
-                        <DataTemplate x:Key="gp_Red">
-                            <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                               VerticalAlignment="Center"
-                                               Foreground="#FF0000"
-                                               DigitBackground="#400000"
-                                               Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
-                                               Format="mm':'ss"
-                                               />
-                        </DataTemplate>
-
-                        <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
-                    </DockPanel.Resources>
+                            <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
+                        </DockPanel.Resources>
                     
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="70">
-                        <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
-                        <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
-                        <Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />
-                    </StackPanel>
+                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="70">
+                            <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
+                            <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
+                            <Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />
+                        </StackPanel>
                     
-                    <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
-                </DockPanel>
-            </materialDesign:ColorZone>
-        </DockPanel>
-    </materialDesign:DrawerHost>
+                        <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
+                    </DockPanel>
+                </materialDesign:ColorZone>
+            </DockPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
 </Window>

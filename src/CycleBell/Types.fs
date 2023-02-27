@@ -10,6 +10,7 @@ type Kind =
 
 type TimePoint =
     {
+        Id: Guid
         Name: Name
         TimeSpan: TimeSpan
         Kind: Kind

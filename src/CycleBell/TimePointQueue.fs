@@ -23,6 +23,7 @@ type private Msg =
     | GetTimePointsWithPriority of AsyncReplyChannel<(TimePoint * float32) seq>
     | GetNext of AsyncReplyChannel<TimePoint option>
     | Pick of AsyncReplyChannel<TimePoint option>
+    | Scroll of Guid * AsyncReplyChannel<unit>
 
 
 type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Threading.CancellationToken) =
@@ -54,6 +55,20 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
                                     yield (tp, state.Queue.GetPriority(tp))
                             }
                         reply.Reply xtp
+
+                    | Scroll (id, reply) ->
+                        if state.Queue.Count = 0 then
+                            reply.Reply(())
+                            return! loop state
+                        else
+                            while state.Queue.First.Id <> id do
+                                let priority = state.Queue.GetPriority(state.Queue.First)
+                                let tp = state.Queue.Dequeue()
+                                state.Queue.Enqueue(tp, priority + state.MaxPriority)
+
+                            reply.Reply(())
+                            return! loop { state with MaxPriority = state.MaxPriority + (float32 state.Queue.Count) }
+
 
                     | GetNext reply ->
                         if state.Queue.Count = 0 then
@@ -117,6 +132,11 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
         member this.Start() = this.Start()
         member _.Enqueue = _agent.PostAndAsyncReply(GetNext, 1000)
         member _.Pick = _agent.PostAndReply(Pick, 1000)
+        member _.Scroll(id: Guid) =
+            async {
+                let! _ = _agent.PostAndAsyncReply(fun reply -> Scroll (id, reply))
+                return ()
+            }
 
     interface IDisposable with
         member this.Dispose() =

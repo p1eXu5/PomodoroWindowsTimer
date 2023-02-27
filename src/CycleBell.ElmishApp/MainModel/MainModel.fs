@@ -3,6 +3,8 @@
 open CycleBell.ElmishApp.Abstractions
 open CycleBell.Looper
 open CycleBell.Types
+open System
+open Elmish.Extensions
 
 type LooperState =
     | Playing
@@ -16,6 +18,7 @@ type MainModel =
         ActiveTimePoint : TimePoint option
         LooperState : LooperState
         TimePoints: TimePoint list
+        BotSettingsModel: BotSettingsModel
     }
 
 
@@ -27,6 +30,8 @@ module MainModel =
         | Stop
         | OnError of exn
         | PickFirstTimePoint
+        | StartTimePoint of Operation<Guid, unit>
+        | BotSettingsModelMsg of BotSettingsModel.Msg
         // test msgs
         | Minimize
         | SendToChatBot
@@ -34,7 +39,7 @@ module MainModel =
 
     open Elmish
 
-    let init (settingsManager : ISettingsManager) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
+    let init (settingsManager : ISettingsManager) (botConfiguration: IBotConfiguration) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
 
         let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
@@ -45,6 +50,7 @@ module MainModel =
             ActiveTimePoint = None
             LooperState = Stopped
             TimePoints = timePoints
+            BotSettingsModel = BotSettingsModel.init botConfiguration
         }
         , Cmd.ofMsg Msg.PickFirstTimePoint
 
@@ -57,4 +63,5 @@ module MainModel =
             ActiveTimePoint = None
             LooperState = Stopped
             TimePoints = []
+            BotSettingsModel = Unchecked.defaultof<_>
         }

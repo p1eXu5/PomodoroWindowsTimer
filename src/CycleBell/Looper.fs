@@ -163,6 +163,8 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
 
     member val Subscribers = [] with get, set
 
+    member val TimePointQueue = timePointQueue with get
+
     member this.Start() =
         this.Start(this.Subscribers)
 

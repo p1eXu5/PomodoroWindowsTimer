@@ -15,10 +15,10 @@ let ``get test``() =
         looper.Start()
         let xtp =
             [
-                { Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100) }
-                { Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100) }
-                { Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100) }
-                { Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100) }
+                { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
+                { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
+                { Id = Guid.NewGuid(); Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
+                { Id = Guid.NewGuid(); Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
             ]
         looper.AddMany(xtp)
         let! storredTp = looper.GetTimePointsWithPriority()
@@ -38,10 +38,10 @@ let ``asyncSeq test``() =
         looper.Start()
         let xtp =
             [
-                { Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100) }
-                { Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100) }
-                { Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100) }
-                { Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100) }
+                { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
+                { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
+                { Id = Guid.NewGuid(); Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
+                { Id = Guid.NewGuid(); Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work }
             ]
         looper.AddMany(xtp)
 

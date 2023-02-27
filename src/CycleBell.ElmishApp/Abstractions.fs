@@ -15,6 +15,6 @@ type IErrorMessageQueue =
 
 type IBotConfiguration =
     interface
-        abstract BotToken : string
-        abstract MyChatId : string
+        abstract BotToken : string with get, set
+        abstract MyChatId : string with get, set
     end

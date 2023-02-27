@@ -9,3 +9,4 @@ type ITimePointQueue =
     abstract Start : unit -> unit
     abstract Enqueue : Async<TimePoint option>
     abstract Pick : TimePoint option
+    abstract Scroll : Guid -> Async<unit>

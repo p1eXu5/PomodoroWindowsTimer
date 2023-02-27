@@ -9,10 +9,10 @@ let semaphore = new SemaphoreSlim(0, 1)
 
 let timePoints =
     [
-        { Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(1000) }
-        { Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(2000) }
-        { Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(3000) }
-        { Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(4000) }
+        { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(1000); Kind = Kind.Work }
+        { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(2000); Kind = Kind.Break }
+        { Id = Guid.NewGuid(); Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(3000); Kind = Kind.Work }
+        { Id = Guid.NewGuid(); Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(4000); Kind = Kind.Break }
     ]
 
 let program () =

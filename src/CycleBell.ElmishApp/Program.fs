@@ -42,18 +42,20 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
 
     let timePoints =
         [
-            { Name = "1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Break }
-            { Name = "2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Name = "3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Name = "4"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Name = "5"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Name = "6"; TimeSpan = TimeSpan.FromMinutes(10); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Break }
         ]
 
     let testTimePoints =
         [
-            { Name = "1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Name = "2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Break }
         ]
 
     let timePointQueue = new TimePointQueue(timePoints)
@@ -73,13 +75,15 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
 
     looper.Start()
 
-    let botClient = TelegramBotClient(botConfiguration.BotToken)
+    
 
-    let sendToBot = Infrastructure.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
+    let sendToBot (botConfiguration: IBotConfiguration) =
+        let botClient = TelegramBotClient(botConfiguration.BotToken)
+        Infrastructure.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
 
     WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager errorQueue timePoints) 
-        (MainModel.Program.update sendToBot looper)
+        (fun () -> MainModel.init settingsManager botConfiguration errorQueue timePoints) 
+        (MainModel.Program.update botConfiguration sendToBot looper)
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.withSubscription subscribe

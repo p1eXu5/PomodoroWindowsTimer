@@ -47,7 +47,7 @@ namespace CycleBell.WpfClient
         private void StartElmish(object? sender, EventArgs e)
         {
             this.Activated -= StartElmish;
-            CycleBell.ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance, new BotConfiguration());
+            CycleBell.ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance, new BotConfiguration(SettingsManager.Instance));
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
