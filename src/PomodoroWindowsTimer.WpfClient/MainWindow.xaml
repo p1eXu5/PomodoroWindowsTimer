@@ -100,37 +100,51 @@
                     <!-- Content -->
                     <DockPanel LastChildFill="True" Margin="0,0,0,20">
                         <DockPanel.Resources>
-                        
                             <DataTemplate  x:Key="gp_Green">
-                                <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                                       VerticalAlignment="Center"
-                                                       Foreground="#00FF00"
-                                                       DigitBackground="#004000"
-                                                       Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
-                                                       Format="mm':'ss"
-                                                       />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding DataContext.ActiveTimePointName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                               Foreground="#00FF00"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,0,0,20"
+                                               />
+                                    <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="#00FF00"
+                                                           DigitBackground="#004000"
+                                                           Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                                           Format="mm':'ss"
+                                                           />
+                                </StackPanel>
                             </DataTemplate>
 
                             <DataTemplate x:Key="gp_Red">
-                                <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="#FF0000"
-                                                   DigitBackground="#400000"
-                                                   Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
-                                                   Format="mm':'ss"
-                                                   />
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding DataContext.ActiveTimePointName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                               Foreground="#FF0000"
+                                               HorizontalAlignment="Left"
+                                               Margin="0,0,0,20"
+                                               />
+                                    <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                                                       VerticalAlignment="Center"
+                                                       Foreground="#FF0000"
+                                                       DigitBackground="#400000"
+                                                       Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                                       Format="mm':'ss"
+                                                       />
+                                </StackPanel>
                             </DataTemplate>
 
                             <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
                         </DockPanel.Resources>
                     
-                        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="70">
+                        <ContentControl DockPanel.Dock="Top" ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Height="120">
                             <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" />
                             <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
-                            <Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />
+                            <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->
                         </StackPanel>
                     
-                        <ContentControl ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
                     </DockPanel>
                 </materialDesign:ColorZone>
             </DockPanel>

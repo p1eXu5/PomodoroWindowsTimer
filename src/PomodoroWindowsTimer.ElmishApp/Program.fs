@@ -42,14 +42,14 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
 
     let timePoints =
         [
-            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break 3"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 4"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(20); Kind = Break }
         ]
 
     let testTimePoints =

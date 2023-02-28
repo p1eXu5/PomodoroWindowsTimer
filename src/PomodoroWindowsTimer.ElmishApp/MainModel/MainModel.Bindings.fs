@@ -30,6 +30,8 @@ let bindings () : Binding<MainModel, Msg> list =
         "ActiveTime"
         |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.TimeSpan) |> Option.defaultValue TimeSpan.Zero )
 
+        "ActiveTimePointName" |> Binding.oneWayOpt (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Name))
+
         "TimePoints" |> Binding.oneWaySeq (
             (fun m -> m.TimePoints),
             (=),
