@@ -41,4 +41,4 @@ It uses minimizing windows functionality and Telegram Chat Bor for notifications
 
 ## Release 1.0.0 Features
 
-- Double click on time point run it
+- Double click on time point to run it
