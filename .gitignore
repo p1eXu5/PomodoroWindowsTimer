@@ -477,3 +477,4 @@ $RECYCLE.BIN/
 *.lnk
 /docs/colors.psd
 /src/CycleBell.WpfClient/appsettings.json
+/src/PomodoroWindowsTimer.WpfClient/appsettings.json
