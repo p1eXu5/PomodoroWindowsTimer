@@ -27,6 +27,15 @@ let bindings () : Binding<MainModel, Msg> list =
             | Stopped -> Msg.Play
         )
 
+        "ReplayCommand"
+        |> Binding.cmdIf (fun m ->
+            match m.LooperState with
+            | Playing -> None
+            | Stopped ->
+                m.ActiveTimePoint
+                |> Option.map (fun _ -> Msg.Replay)
+        )
+
         "ActiveTime"
         |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.TimeSpan) |> Option.defaultValue TimeSpan.Zero )
 
@@ -38,7 +47,7 @@ let bindings () : Binding<MainModel, Msg> list =
             (fun tp -> tp.Id)
         )
 
-        "MinimizeCommand" |> Binding.cmd Minimize
+        "MinimizeCommand" |> Binding.cmd MinimizeWindows
         "SendToChatBotCommand" |> Binding.cmd SendToChatBot
         "StartTimePointCommand" |> Binding.cmdParam (fun id -> (id :?> Guid) |> Operation.Start |> StartTimePoint)
 

@@ -19,6 +19,7 @@ type MainModel =
         LooperState : LooperState
         TimePoints: TimePoint list
         BotSettingsModel: BotSettingsModel
+        IsMinimized: bool
     }
 
 
@@ -27,35 +28,22 @@ module MainModel =
     type Msg =
         | LooperMsg of LooperEvent
         | Play
+        | Replay
         | Stop
         | OnError of exn
         | PickFirstTimePoint
         | StartTimePoint of Operation<Guid, unit>
         | BotSettingsModelMsg of BotSettingsModel.Msg
         // test msgs
-        | Minimize
+        | MinimizeWindows
+        | SetIsMinimized of bool
+        | RestoreWindows
         | SendToChatBot
 
 
     open Elmish
 
-    let init (settingsManager : ISettingsManager) (botConfiguration: IBotConfiguration) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
-
-        let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
-
-        {
-            AssemblyVersion = assemblyVer
-            SettingsManager = settingsManager
-            ErrorQueue = errorQueue
-            ActiveTimePoint = None
-            LooperState = Stopped
-            TimePoints = timePoints
-            BotSettingsModel = BotSettingsModel.init botConfiguration
-        }
-        , Cmd.ofMsg Msg.PickFirstTimePoint
-
-
-    let initForDesign () =
+    let initDefault () =
         {
             AssemblyVersion = "Asm.v."
             SettingsManager = Unchecked.defaultof<_>
@@ -64,4 +52,18 @@ module MainModel =
             LooperState = Stopped
             TimePoints = []
             BotSettingsModel = Unchecked.defaultof<_>
+            IsMinimized = false
         }
+
+    let init (settingsManager : ISettingsManager) (botConfiguration: IBotConfiguration) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
+
+        let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
+
+        { initDefault () with
+            AssemblyVersion = assemblyVer
+            SettingsManager = settingsManager
+            ErrorQueue = errorQueue
+            TimePoints = timePoints
+            BotSettingsModel = BotSettingsModel.init botConfiguration
+        }
+        , Cmd.ofMsg Msg.PickFirstTimePoint

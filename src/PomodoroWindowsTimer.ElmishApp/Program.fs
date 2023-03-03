@@ -1,9 +1,9 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.Program
 
-open Microsoft.Extensions.Logging
 open System
 open Serilog
 open Serilog.Extensions.Logging
+open Telegram.Bot
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstrractions
@@ -11,10 +11,9 @@ open PomodoroWindowsTimer.TimePointQueue
 open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
-open Telegram.Bot
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 
-let mainModel = ViewModel.designInstance (MainModel.initForDesign ()) (MainModel.Bindings.bindings ())
+let mainModel = ViewModel.designInstance (MainModel.initDefault ()) (MainModel.Bindings.bindings ())
 
 let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration) =
     let logger =
@@ -54,8 +53,10 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
 
     let testTimePoints =
         [
-            { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
+            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
         ]
 
     let timePointQueue = new TimePointQueue(timePoints)

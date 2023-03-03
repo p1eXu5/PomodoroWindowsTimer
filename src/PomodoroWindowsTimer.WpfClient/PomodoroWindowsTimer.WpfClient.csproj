@@ -5,8 +5,20 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    
     <ApplicationIcon>pomodoro-technique.ico</ApplicationIcon>
+    
     <Title>Pomodoro Windows Timer</Title>
+
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>$(VersionPrefix)</Version>
+    
+    <Copyright>2023 Vladimir Likhatskiy</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
+    <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

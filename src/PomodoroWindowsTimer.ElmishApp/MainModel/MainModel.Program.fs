@@ -16,37 +16,51 @@ let update (botConfiguration: IBotConfiguration) (sendToBot: IBotConfiguration -
     | Msg.PickFirstTimePoint ->
         let atp = looper.PickFirst()
         { model with ActiveTimePoint = atp }, Cmd.none
+    
     | Msg.Play ->
         looper.Resume()
         { model with LooperState = Playing }, Cmd.none
 
-    | Msg.Stop ->
+    | Msg.Stop when model.LooperState = LooperState.Playing ->
         looper.Stop()
-        { model with LooperState = Stopped }, Cmd.none
+        { model with LooperState = Stopped }, Cmd.ofMsg Msg.RestoreWindows
+
+    | Msg.Replay when model.ActiveTimePoint |> Option.isSome ->
+        let cmd =
+            Cmd.ofMsg (Msg.StartTimePoint (Operation.Start (model.ActiveTimePoint |> Option.get).Id))
+        model, cmd
 
     | Msg.LooperMsg evt ->
         let (activeTimePoint, cmd) =
             match evt with
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
-            | LooperEvent.TimePointStarted (tp, None) -> (tp |> Some, Cmd.none) // initial start
-            | LooperEvent.TimePointStarted (tp, Some _) ->
-                match tp.Kind with
+            | LooperEvent.TimePointStarted (nextTp, None) -> (nextTp |> Some, Cmd.none) // initial start
+            | LooperEvent.TimePointStarted (nextTp, Some _) ->
+                match nextTp.Kind with
 #if DEBUG
-                | Break -> (tp |> Some, Cmd.none)
-                | Work -> (tp |> Some, Cmd.ofMsg SendToChatBot)
+                | Break -> (nextTp |> Some, Cmd.none)
+                | Work -> (nextTp |> Some, Cmd.ofMsg SendToChatBot)
 #else
-                | Break -> (tp |> Some, Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError)
-                | Work -> (tp |> Some, Cmd.batch [ Cmd.OfAsync.attempt Infrastructure.restore () Msg.OnError; Cmd.ofMsg SendToChatBot ])
+                | Break -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
+                | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows; Cmd.ofMsg SendToChatBot ])
 #endif
             | _ -> (model.ActiveTimePoint, Cmd.none)
 
         { model with ActiveTimePoint = activeTimePoint }, cmd
 
-    | Minimize ->
-        model, Cmd.OfAsync.attempt Infrastructure.minimize () Msg.OnError
+    | MinimizeWindows when not model.IsMinimized ->
+        { model with IsMinimized = true }, Cmd.OfAsync.either Infrastructure.minimize () (fun _ -> Msg.SetIsMinimized true) Msg.OnError
+
+    | RestoreWindows when model.IsMinimized ->
+        { model with IsMinimized = false }, Cmd.OfAsync.either Infrastructure.restore () (fun _ -> Msg.SetIsMinimized false) Msg.OnError
+
+    | SetIsMinimized v ->
+        { model with IsMinimized = v }, Cmd.none
 
     | SendToChatBot ->
-        model, Cmd.OfTask.attempt (sendToBot botConfiguration) "It's time!!" Msg.OnError
+        let messageText =
+            model.ActiveTimePoint |> Option.map (fun tp -> $"It's time to {tp.Name}!!") |> Option.defaultValue "It's time!!"
+        model, Cmd.OfTask.attempt (sendToBot botConfiguration) messageText Msg.OnError
 
     | StartTimePoint (Operation.Start id) ->
         model, Cmd.batch [ Cmd.ofMsg Stop; Cmd.OfAsync.either looper.TimePointQueue.Scroll id (Operation.Finish >> StartTimePoint) OnError ]
@@ -61,3 +75,5 @@ let update (botConfiguration: IBotConfiguration) (sendToBot: IBotConfiguration -
     | Msg.OnError ex ->
         model.ErrorQueue.EnqueuError(ex.Message)
         model, Cmd.none
+
+    | _ -> model, Cmd.none
