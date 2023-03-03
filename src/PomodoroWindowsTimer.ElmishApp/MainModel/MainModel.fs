@@ -38,6 +38,7 @@ module MainModel =
         | MinimizeWindows
         | SetIsMinimized of bool
         | RestoreWindows
+        | RestoreMainWindow
         | SendToChatBot
 
 

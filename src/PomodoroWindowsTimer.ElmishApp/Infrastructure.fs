@@ -41,6 +41,12 @@ let restore () =
         sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
     }
 
+let restoreMainWindow () =
+    async {
+        let appWindow = findWindow(null, "MainWindow")
+        showWindow(appWindow, SW_RESTORE) |> ignore
+    }
+
 
 let sendToBot (botClient: ITelegramBotClient) chatId text =
     task {

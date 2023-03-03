@@ -23,7 +23,11 @@ let update (botConfiguration: IBotConfiguration) (sendToBot: IBotConfiguration -
 
     | Msg.Stop when model.LooperState = LooperState.Playing ->
         looper.Stop()
-        { model with LooperState = Stopped }, Cmd.ofMsg Msg.RestoreWindows
+        { model with LooperState = Stopped }
+        , Cmd.batch [
+            Cmd.ofMsg Msg.RestoreWindows
+            Cmd.ofMsg Msg.RestoreMainWindow
+        ]
 
     | Msg.Replay when model.ActiveTimePoint |> Option.isSome ->
         let cmd =
@@ -53,6 +57,9 @@ let update (botConfiguration: IBotConfiguration) (sendToBot: IBotConfiguration -
 
     | RestoreWindows when model.IsMinimized ->
         { model with IsMinimized = false }, Cmd.OfAsync.either Infrastructure.restore () (fun _ -> Msg.SetIsMinimized false) Msg.OnError
+
+    | RestoreMainWindow ->
+        model, Cmd.OfAsync.attempt Infrastructure.restoreMainWindow () Msg.OnError
 
     | SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none
