@@ -13,9 +13,8 @@ open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 
-let mainModel = ViewModel.designInstance (MainModel.initDefault ()) (MainModel.Bindings.bindings ())
-
 let [<Literal>] tickMilliseconds = 200
+
 
 let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration) =
     let logger =
