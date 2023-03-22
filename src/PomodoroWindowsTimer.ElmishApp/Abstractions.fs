@@ -18,3 +18,11 @@ type IBotConfiguration =
         abstract BotToken : string with get, set
         abstract MyChatId : string with get, set
     end
+
+
+type WindowsMinimizer =
+    {
+        Minimize: unit -> Async<unit>
+        Restore: unit -> Async<unit>
+        RestoreMainWindow: unit -> Async<unit>
+    }

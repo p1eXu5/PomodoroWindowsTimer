@@ -3,7 +3,7 @@
 open System.Runtime.InteropServices
 open System
 open Telegram.Bot
-
+open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 
 [<DllImport("user32.dll", EntryPoint="FindWindow", SetLastError=true, CharSet=CharSet.Auto)>]
@@ -47,6 +47,19 @@ let restoreMainWindow () =
         showWindow(appWindow, SW_RESTORE) |> ignore
     }
 
+let prodWindowsMinimizer =
+    {
+        Minimize = minimize
+        Restore = restore
+        RestoreMainWindow = restoreMainWindow
+    }
+
+let simWindowsMinimizer =
+    {
+        Minimize = async.Return
+        Restore = async.Return
+        RestoreMainWindow = async.Return
+    }
 
 let sendToBot (botClient: ITelegramBotClient) chatId text =
     task {

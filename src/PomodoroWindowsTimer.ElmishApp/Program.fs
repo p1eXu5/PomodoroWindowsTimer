@@ -15,6 +15,8 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 let mainModel = ViewModel.designInstance (MainModel.initDefault ()) (MainModel.Bindings.bindings ())
 
+let [<Literal>] tickMilliseconds = 200
+
 let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration) =
     let logger =
         LoggerConfiguration()
@@ -60,7 +62,7 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
         ]
 
     let timePointQueue = new TimePointQueue(timePoints)
-    let looper = new Looper((timePointQueue :> ITimePointQueue), 200)
+    let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
 
     let subscribe _ =
         let effect dispatch =
@@ -69,22 +71,22 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
                     async {
                         do dispatch (MainModel.Msg.LooperMsg evt)
                     }
-
             looper.AddSubscriber(onLooperEvt)
-
         [ effect ]
 
     looper.Start()
-
-    
 
     let sendToBot (botConfiguration: IBotConfiguration) =
         let botClient = TelegramBotClient(botConfiguration.BotToken)
         Infrastructure.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
 
     WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager botConfiguration errorQueue timePoints) 
-        (MainModel.Program.update botConfiguration sendToBot looper)
+        (fun () -> MainModel.init settingsManager botConfiguration errorQueue timePoints)
+#if DEBUG
+        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.simWindowsMinimizer)
+#else
+        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.prodWindowsMinimizer)
+#endif
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.withSubscription subscribe
