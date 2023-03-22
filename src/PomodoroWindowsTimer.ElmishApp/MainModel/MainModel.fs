@@ -28,8 +28,10 @@ module MainModel =
     type Msg =
         | LooperMsg of LooperEvent
         | Play
+        | Next
         | Replay
         | Stop
+        | Resume
         | OnError of exn
         | PickFirstTimePoint
         | StartTimePoint of Operation<Guid, unit>
