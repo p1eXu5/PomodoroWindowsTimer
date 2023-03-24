@@ -3,7 +3,7 @@
 open System.Runtime.InteropServices
 open System
 open Telegram.Bot
-open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Types
 
 
 [<DllImport("user32.dll", EntryPoint="FindWindow", SetLastError=true, CharSet=CharSet.Auto)>]
