@@ -9,11 +9,12 @@ open PomodoroWindowsTimer.Types
 open System.Threading.Tasks
 open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Types
 
 
 let update
     (botConfiguration: IBotConfiguration)
-    (sendToBot: IBotConfiguration -> string -> Task<unit>)
+    (sendToBot: BotSender)
     (looper: Looper)
     (windowsMinimizer: WindowsMinimizer)
     (msg: Msg) (model: MainModel) =
@@ -21,17 +22,20 @@ let update
     match msg with
     | Msg.PickFirstTimePoint ->
         let atp = looper.PickFirst()
-        { model with ActiveTimePoint = atp }, Cmd.none
+        model |> setActiveTimePoint atp, Cmd.none
     
-    | Msg.Next
+    | Msg.Next ->
+        looper.Next()
+        model |> setLooperState Playing |> setUIInitiator, Cmd.none
+
     | Msg.Play ->
         looper.Next()
-        { model with LooperState = Playing }, Cmd.none
+        model |> setLooperState Playing |> setUIInitiator, Cmd.none
 
     // TODO: logic can be moved into Msg.LooperMsg handler
     | Msg.Resume when model.ActiveTimePoint |> Option.isSome ->
         looper.Resume()
-        let model' = { model with LooperState = Playing }
+        let model' = model |> setLooperState Playing
 
         match model.ActiveTimePoint with
         | Some ({ Kind = Kind.Break }) when not model.IsMinimized ->
@@ -45,7 +49,7 @@ let update
 
     | Msg.Stop when model.LooperState = LooperState.Playing ->
         looper.Stop()
-        { model with LooperState = Stopped }
+        model |> setLooperState Stopped
         , Cmd.batch [
             Cmd.ofMsg Msg.RestoreWindows
             Cmd.ofMsg Msg.RestoreMainWindow
@@ -60,14 +64,14 @@ let update
         let (activeTimePoint, cmd) =
             match evt with
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
-            | LooperEvent.TimePointStarted (nextTp, _) ->
+            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none)
+            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
                 match nextTp.Kind with
                 | Break -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
+                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows ])
                 | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows; Cmd.ofMsg SendToChatBot ])
 
-            | LooperEvent.LoopFinished _ -> (model.ActiveTimePoint, Cmd.batch [ Cmd.ofMsg Msg.RestoreWindows; Cmd.ofMsg Msg.RestoreMainWindow ])
-
-        { model with ActiveTimePoint = activeTimePoint }, cmd
+        model |> setActiveTimePoint activeTimePoint, cmd
 
     | MinimizeWindows when not model.IsMinimized ->
         { model with IsMinimized = true }, Cmd.OfAsync.either windowsMinimizer.Minimize () (fun _ -> Msg.SetIsMinimized true) Msg.OnError

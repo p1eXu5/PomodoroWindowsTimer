@@ -6,9 +6,6 @@ open PomodoroWindowsTimer.Types
 open System
 open Elmish.Extensions
 
-type LooperState =
-    | Playing
-    | Stopped
 
 type MainModel =
     {
@@ -20,8 +17,14 @@ type MainModel =
         TimePoints: TimePoint list
         BotSettingsModel: BotSettingsModel
         IsMinimized: bool
+        LastCommandInitiator: UIInitiator option
     }
-
+and
+    LooperState =
+        | Playing
+        | Stopped
+and
+    UIInitiator = UIInitiator of TimePoint
 
 module MainModel =
 
@@ -56,6 +59,7 @@ module MainModel =
             TimePoints = []
             BotSettingsModel = Unchecked.defaultof<_>
             IsMinimized = false
+            LastCommandInitiator = None
         }
 
     let init (settingsManager : ISettingsManager) (botConfiguration: IBotConfiguration) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
@@ -70,3 +74,20 @@ module MainModel =
             BotSettingsModel = BotSettingsModel.init botConfiguration
         }
         , Cmd.ofMsg Msg.PickFirstTimePoint
+
+
+    let setLooperState state m = { m with LooperState = state }
+
+    let setUIInitiator m  =
+        m.ActiveTimePoint
+        |> Option.map (fun tp ->
+            { m with LastCommandInitiator = tp |> UIInitiator |> Some }
+        )
+        |> Option.defaultValue m
+
+    let setActiveTimePoint tp m = { m with ActiveTimePoint = tp; LastCommandInitiator = None }
+
+    let isUIInitiator tp m =
+        match m.LastCommandInitiator with
+        | Some (UIInitiator atp) -> atp.Id = tp.Id
+        | _ -> false
