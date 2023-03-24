@@ -32,8 +32,6 @@ namespace PomodoroWindowsTimer.WpfClient
 
             _errorMessageQueue = new ErrorMessageQueue();
 
-
-
             AppDomain.CurrentDomain.UnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
@@ -47,7 +45,13 @@ namespace PomodoroWindowsTimer.WpfClient
         private void StartElmish(object? sender, EventArgs e)
         {
             this.Activated -= StartElmish;
-            PomodoroWindowsTimer.ElmishApp.Program.main(MainWindow, _errorMessageQueue, SettingsManager.Instance, new BotConfiguration(SettingsManager.Instance));
+            ElmishApp.Program.main(
+                MainWindow,
+                _errorMessageQueue,
+                SettingsManager.Instance,
+                new BotConfiguration(SettingsManager.Instance),
+                new ThemeSwitcher()
+            );
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

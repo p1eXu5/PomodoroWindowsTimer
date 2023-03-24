@@ -6,9 +6,6 @@ open PomodoroWindowsTimer.Types
 open System
 open Elmish.Extensions
 
-type LooperState =
-    | Playing
-    | Stopped
 
 type MainModel =
     {
@@ -20,16 +17,25 @@ type MainModel =
         TimePoints: TimePoint list
         BotSettingsModel: BotSettingsModel
         IsMinimized: bool
+        LastCommandInitiator: UIInitiator option
     }
-
+and
+    LooperState =
+        | Initialized
+        | Playing
+        | Stopped
+and
+    UIInitiator = UIInitiator of TimePoint
 
 module MainModel =
 
     type Msg =
         | LooperMsg of LooperEvent
         | Play
+        | Next
         | Replay
         | Stop
+        | Resume
         | OnError of exn
         | PickFirstTimePoint
         | StartTimePoint of Operation<Guid, unit>
@@ -40,6 +46,7 @@ module MainModel =
         | RestoreWindows
         | RestoreMainWindow
         | SendToChatBot
+        | SetActiveTimePoint of TimePoint option
 
 
     open Elmish
@@ -50,10 +57,11 @@ module MainModel =
             SettingsManager = Unchecked.defaultof<_>
             ErrorQueue = Unchecked.defaultof<_>
             ActiveTimePoint = None
-            LooperState = Stopped
+            LooperState = Initialized
             TimePoints = []
             BotSettingsModel = Unchecked.defaultof<_>
             IsMinimized = false
+            LastCommandInitiator = None
         }
 
     let init (settingsManager : ISettingsManager) (botConfiguration: IBotConfiguration) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
@@ -68,3 +76,34 @@ module MainModel =
             BotSettingsModel = BotSettingsModel.init botConfiguration
         }
         , Cmd.ofMsg Msg.PickFirstTimePoint
+
+
+    let setLooperState state m = { m with LooperState = state }
+
+    let setUIInitiator m  =
+        m.ActiveTimePoint
+        |> Option.map (fun tp ->
+            { m with LastCommandInitiator = tp |> UIInitiator |> Some }
+        )
+        |> Option.defaultValue m
+
+    let setActiveTimePoint tp m = { m with ActiveTimePoint = tp; LastCommandInitiator = None }
+
+    let isUIInitiator tp m =
+        match m.LastCommandInitiator with
+        | Some (UIInitiator atp) -> atp.Id = tp.Id
+        | _ -> false
+
+    let isLooperRunning m =
+        match m.LooperState with
+        | Initialized -> false
+        | _ -> true
+
+    let timePointKindEnum m =
+        m.ActiveTimePoint
+        |> Option.map (fun tp ->
+            match tp.Kind with
+            | Work -> TimePointKind.Work
+            | Break -> TimePointKind.Break
+        )
+        |> Option.defaultValue TimePointKind.Undefined

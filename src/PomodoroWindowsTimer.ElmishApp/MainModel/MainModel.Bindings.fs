@@ -13,27 +13,34 @@ let bindings () : Binding<MainModel, Msg> list =
         "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
         "ErrorMessageQueue" |> Binding.oneWay (fun m -> m.ErrorQueue)
 
+        "LooperIsRunning" |> Binding.oneWay (isLooperRunning)
+
         "PlayPauseButtonText"
         |> Binding.oneWay (fun m ->
             match m.LooperState with
+            | Initialized -> "Play"
             | Playing -> "Stop"
-            | _ -> "Play"
+            | Stopped -> "Resume"
         )
 
         "PlayStopCommand"
         |> Binding.cmd (fun m ->
             match m.LooperState with
+            | Initialized -> Msg.Play
             | Playing -> Msg.Stop
-            | Stopped -> Msg.Play
+            | Stopped -> Msg.Resume
         )
+
+        "NextCommand" |> Binding.cmd Msg.Next
 
         "ReplayCommand"
         |> Binding.cmdIf (fun m ->
             match m.LooperState with
-            | Playing -> None
+            | Playing
             | Stopped ->
                 m.ActiveTimePoint
                 |> Option.map (fun _ -> Msg.Replay)
+            | _ -> None
         )
 
         "ActiveTime"

@@ -9,13 +9,6 @@ open System.Threading
 type LooperEvent =
     | TimePointStarted of ``new``: TimePoint * old: TimePoint option 
     | TimePointTimeReduced of TimePoint
-    | LoopFinished of TimePoint
-
-
-type private StopPlay =
-    | Stop
-    | Play
-
 
 type private State = 
     {
@@ -40,6 +33,7 @@ type private Msg =
     | SubscribeMany of (LooperEvent -> Async<unit>) list * AsyncReplyChannel<unit>
     | Stop
     | Resume
+    | Next
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
@@ -103,7 +97,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
 
                             match tpOpt with
                             | Some tp ->
-                                tryPostEvent (LooperEvent.TimePointStarted (tp, None))
+                                tryPostEvent (LooperEvent.TimePointStarted (tp, state.ActiveTimePoint))
                                 timer.Change(tickMilliseconds, 0) |> ignore
                                 return! loop { state with ActiveTimePoint = tp |> Some; StartTime = dt }
 
@@ -112,9 +106,13 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                                 return! loop state
                         }
 
-
                     match msg with
-                    | Resume when state.IsStopped ->
+                    | Resume when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
+                        let dt = DateTime.Now
+                        timer.Change(tickMilliseconds, 0) |> ignore
+                        return! loop { state with StartTime = dt; IsStopped = false }
+
+                    | Next ->
                         return! initialize { state with IsStopped = false; StartTime = DateTime.Now }
 
                     | Tick when state.ActiveTimePoint |> Option.isNone && not (state.IsStopped) ->
@@ -151,7 +149,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                         return! loop { state with Subscribers = subscribers @ state.Subscribers }
 
                     | Stop when not state.IsStopped ->
-                        return! loop { state with IsStopped = true; ActiveTimePoint = None; StartTime = DateTime.Now }
+                        return! loop { state with IsStopped = true; StartTime = DateTime.Now }
 
                     | _ -> return! loop state
                 }
@@ -169,12 +167,14 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
         this.Start(this.Subscribers)
 
 
-    member this.Stop() =
+    member _.Stop() =
         agent.Post(Stop)
 
-    member this.Resume() =
+    member _.Resume() =
         agent.Post(Resume)
 
+    member _.Next() =
+        agent.Post(Next)
 
     member _.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) =
         agent.Post(Subscribe subscriber)

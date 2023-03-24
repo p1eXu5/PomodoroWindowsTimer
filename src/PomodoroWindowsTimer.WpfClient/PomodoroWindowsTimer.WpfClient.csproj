@@ -5,13 +5,13 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    
+
     <ApplicationIcon>pomodoro-technique.ico</ApplicationIcon>
     
     <Title>Pomodoro Windows Timer</Title>
 
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
     
     <Copyright>2023 Vladimir Likhatskiy</Copyright>

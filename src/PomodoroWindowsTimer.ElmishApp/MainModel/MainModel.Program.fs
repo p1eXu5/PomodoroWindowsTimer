@@ -9,21 +9,51 @@ open PomodoroWindowsTimer.Types
 open System.Threading.Tasks
 open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Types
 
 
-let update (botConfiguration: IBotConfiguration) (sendToBot: IBotConfiguration -> string -> Task<unit>) (looper: Looper) (msg: Msg) (model: MainModel) =
+let update
+    (botConfiguration: IBotConfiguration)
+    (sendToBot: BotSender)
+    (looper: Looper)
+    (windowsMinimizer: WindowsMinimizer)
+    (themeSwitcher: IThemeSwitcher)
+    (msg: Msg) (model: MainModel) =
+
     match msg with
     | Msg.PickFirstTimePoint ->
         let atp = looper.PickFirst()
-        { model with ActiveTimePoint = atp }, Cmd.none
+        model |> setActiveTimePoint atp, Cmd.none
     
+    | Msg.SetActiveTimePoint atp ->
+        model |> setActiveTimePoint atp, Cmd.OfFunc.attempt themeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
+
+    | Msg.Next ->
+        looper.Next()
+        model |> setLooperState Playing |> setUIInitiator, Cmd.none
+
     | Msg.Play ->
+        looper.Next()
+        model |> setLooperState Playing |> setUIInitiator, Cmd.none
+
+    // TODO: logic can be moved into Msg.LooperMsg handler
+    | Msg.Resume when model.ActiveTimePoint |> Option.isSome ->
         looper.Resume()
-        { model with LooperState = Playing }, Cmd.none
+        let model' = model |> setLooperState Playing
+
+        match model.ActiveTimePoint with
+        | Some ({ Kind = Kind.Break }) when not model.IsMinimized ->
+            model', Cmd.ofMsg MinimizeWindows
+
+        | Some ({ Kind = Kind.Work }) when model.IsMinimized ->
+            model', Cmd.ofMsg RestoreWindows
+
+        | _ ->
+            model', Cmd.none
 
     | Msg.Stop when model.LooperState = LooperState.Playing ->
         looper.Stop()
-        { model with LooperState = Stopped }
+        model |> setLooperState Stopped
         , Cmd.batch [
             Cmd.ofMsg Msg.RestoreWindows
             Cmd.ofMsg Msg.RestoreMainWindow
@@ -38,28 +68,23 @@ let update (botConfiguration: IBotConfiguration) (sendToBot: IBotConfiguration -
         let (activeTimePoint, cmd) =
             match evt with
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
-            | LooperEvent.TimePointStarted (nextTp, None) -> (nextTp |> Some, Cmd.none) // initial start
-            | LooperEvent.TimePointStarted (nextTp, Some _) ->
+            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none)
+            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
                 match nextTp.Kind with
-#if DEBUG
-                | Break -> (nextTp |> Some, Cmd.none)
-                | Work -> (nextTp |> Some, Cmd.ofMsg SendToChatBot)
-#else
                 | Break -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
+                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows ])
                 | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows; Cmd.ofMsg SendToChatBot ])
-#endif
-            | _ -> (model.ActiveTimePoint, Cmd.none)
 
-        { model with ActiveTimePoint = activeTimePoint }, cmd
+        model, Cmd.batch [ Cmd.ofMsg (Msg.SetActiveTimePoint activeTimePoint); cmd ]
 
     | MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfAsync.either Infrastructure.minimize () (fun _ -> Msg.SetIsMinimized true) Msg.OnError
+        { model with IsMinimized = true }, Cmd.OfAsync.either windowsMinimizer.Minimize () (fun _ -> Msg.SetIsMinimized true) Msg.OnError
 
     | RestoreWindows when model.IsMinimized ->
-        { model with IsMinimized = false }, Cmd.OfAsync.either Infrastructure.restore () (fun _ -> Msg.SetIsMinimized false) Msg.OnError
+        { model with IsMinimized = false }, Cmd.OfAsync.either windowsMinimizer.Restore () (fun _ -> Msg.SetIsMinimized false) Msg.OnError
 
     | RestoreMainWindow ->
-        model, Cmd.OfAsync.attempt Infrastructure.restoreMainWindow () Msg.OnError
+        model, Cmd.OfAsync.attempt windowsMinimizer.RestoreMainWindow () Msg.OnError
 
     | SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none

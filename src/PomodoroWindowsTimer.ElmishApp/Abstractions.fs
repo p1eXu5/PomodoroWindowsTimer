@@ -18,3 +18,14 @@ type IBotConfiguration =
         abstract BotToken : string with get, set
         abstract MyChatId : string with get, set
     end
+
+
+type TimePointKind =
+    | Undefined = 0
+    | Work = 1
+    | Break = 2
+
+type IThemeSwitcher =
+    interface
+        abstract SwitchTheme: TimePointKind -> unit
+    end

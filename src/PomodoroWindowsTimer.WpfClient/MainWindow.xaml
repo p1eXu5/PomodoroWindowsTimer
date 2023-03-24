@@ -140,8 +140,27 @@
                         <ContentControl DockPanel.Dock="Top" ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
                         
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Height="120">
-                            <Button Content="Replay" Command="{Binding ReplayCommand}" />
-                            <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" Margin="20,0,0,0" />
+                            <StackPanel.Resources>
+                                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush >
+                                                <GradientStop Color="#A1B1A1" Offset="0"/>
+                                                <GradientStop Color="#637363" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}" />
+                                    <Setter Property="Width" Value="90" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <Button Content="Replay" Command="{Binding ReplayCommand}"
+                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    />
+                            <Button Content="{Binding PlayPauseButtonText, FallbackValue=Resume}" Command="{Binding PlayStopCommand}" Margin="20,0,0,0" />
+                            <Button Content="Next" Command="{Binding NextCommand}" Margin="20,0,0,0"
+                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    />
                             <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
                             <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->
                         </StackPanel>
