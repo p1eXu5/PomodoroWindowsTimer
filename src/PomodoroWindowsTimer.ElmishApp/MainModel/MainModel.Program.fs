@@ -17,6 +17,7 @@ let update
     (sendToBot: BotSender)
     (looper: Looper)
     (windowsMinimizer: WindowsMinimizer)
+    (themeSwitcher: IThemeSwitcher)
     (msg: Msg) (model: MainModel) =
 
     match msg with
@@ -24,6 +25,9 @@ let update
         let atp = looper.PickFirst()
         model |> setActiveTimePoint atp, Cmd.none
     
+    | Msg.SetActiveTimePoint atp ->
+        model |> setActiveTimePoint atp, Cmd.OfFunc.attempt themeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
+
     | Msg.Next ->
         looper.Next()
         model |> setLooperState Playing |> setUIInitiator, Cmd.none
@@ -71,7 +75,7 @@ let update
                 | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows ])
                 | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows; Cmd.ofMsg SendToChatBot ])
 
-        model |> setActiveTimePoint activeTimePoint, cmd
+        model, Cmd.batch [ Cmd.ofMsg (Msg.SetActiveTimePoint activeTimePoint); cmd ]
 
     | MinimizeWindows when not model.IsMinimized ->
         { model with IsMinimized = true }, Cmd.OfAsync.either windowsMinimizer.Minimize () (fun _ -> Msg.SetIsMinimized true) Msg.OnError

@@ -46,6 +46,7 @@ module MainModel =
         | RestoreWindows
         | RestoreMainWindow
         | SendToChatBot
+        | SetActiveTimePoint of TimePoint option
 
 
     open Elmish
@@ -97,3 +98,12 @@ module MainModel =
         match m.LooperState with
         | Initialized -> false
         | _ -> true
+
+    let timePointKindEnum m =
+        m.ActiveTimePoint
+        |> Option.map (fun tp ->
+            match tp.Kind with
+            | Work -> TimePointKind.Work
+            | Break -> TimePointKind.Break
+        )
+        |> Option.defaultValue TimePointKind.Undefined

@@ -101,7 +101,13 @@ module StopResumeScenarios =
                         (TestErrorMessageQueue.create ())
                         timePoints
                 ) 
-                (MainModel.Program.update testBotConfiguration TestBotSender.sendToBot looper Infrastructure.simWindowsMinimizer)
+                (MainModel.Program.update
+                    testBotConfiguration
+                    TestBotSender.sendToBot
+                    looper
+                    Infrastructure.simWindowsMinimizer
+                    (TestThemeSwitcher.create ())
+                )
                 (fun m _ -> model <- m)
             |> Program.withSubscription subscribe
             |> Program.withTrace (fun msg _ -> TestContext.WriteLine(sprintf "%A" msg))
@@ -161,6 +167,10 @@ module StopResumeScenarios =
             model.LooperState
             |> shouldL be (ofCase <@ LooperState.Stopped @>) (nameof ``LooperState is Stopped``)
 
+        let rec ``LooperState is Initialized`` () =
+            model.LooperState
+            |> shouldL be (ofCase <@ LooperState.Initialized @>) (nameof ``LooperState is Initialized``)
+
         let rec ``Windows should be minimized`` () =
             model.IsMinimized
             |> shouldL be True (nameof ``Windows should be minimized``)
@@ -187,7 +197,7 @@ module StopResumeScenarios =
         Given.``Elmish Program with`` timePoints
 
         Then.``Active Point is set on`` timePoints.Head
-        Then.``LooperState is Stopped`` ()
+        Then.``LooperState is Initialized`` ()
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
 
@@ -294,7 +304,7 @@ module StopResumeScenarios =
         Given.``Elmish Program with`` timePoints
 
         Then.``Active Point is set on`` timePoints.Head
-        Then.``LooperState is Stopped`` ()
+        Then.``LooperState is Initialized`` ()
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
 

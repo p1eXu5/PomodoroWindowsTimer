@@ -68,3 +68,12 @@ module TestBotSender =
 
     let create () : BotSender =
         sendToBot
+
+
+[<RequireQualifiedAccess>]
+module TestThemeSwitcher =
+
+    let create () =
+        { new IThemeSwitcher with
+            member _.SwitchTheme _ = ()
+        }

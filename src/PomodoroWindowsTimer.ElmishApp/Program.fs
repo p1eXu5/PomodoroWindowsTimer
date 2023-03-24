@@ -16,7 +16,7 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 let [<Literal>] tickMilliseconds = 200
 
 
-let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration) =
+let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration, themeSwitcher: IThemeSwitcher) =
     let logger =
         LoggerConfiguration()
 #if DEBUG
@@ -82,9 +82,9 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
     WpfProgram.mkProgram 
         (fun () -> MainModel.init settingsManager botConfiguration errorQueue timePoints)
 #if DEBUG
-        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.simWindowsMinimizer)
+        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.simWindowsMinimizer themeSwitcher)
 #else
-        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.prodWindowsMinimizer)
+        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.prodWindowsMinimizer themeSwitcher)
 #endif
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory
