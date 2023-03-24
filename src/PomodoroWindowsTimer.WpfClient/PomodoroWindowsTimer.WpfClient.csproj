@@ -19,10 +19,12 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
     <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
+    <Configurations>Debug;Release;Personal</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="appsettings.json" />
+    <None Remove="appsettings.Personal.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +32,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="pomodoro-technique.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(Configuration)' != 'Release'">
+    <Content Include="appsettings.Personal.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

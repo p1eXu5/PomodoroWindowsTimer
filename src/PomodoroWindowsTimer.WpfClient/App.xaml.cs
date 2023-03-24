@@ -21,6 +21,10 @@ namespace PomodoroWindowsTimer.WpfClient
             Configuration =
                 new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json", true)
+#if RELEASE
+#else
+                    .AddJsonFile($"appsettings.Personal.json", true)
+#endif
                     .Build();
         }
 
