@@ -23,9 +23,9 @@ let ``get test``() =
         looper.AddMany(xtp)
         let! storredTp = looper.GetTimePointsWithPriority()
 
-        storredTp |> Seq.map snd |> should equalSeq  xtp
+        storredTp |> Seq.map fst |> should equalSeq  xtp
         storredTp
-        |> Seq.map fst
+        |> Seq.map snd
         |> Seq.zip [ 0f; 1f; 2f; 3f ]
         |> Seq.iter (fun (expected, actual) -> actual |> shouldL (equalWithin 0.1f) expected $"Actual %A{storredTp |> Seq.map fst}")
     }
@@ -55,11 +55,11 @@ let ``asyncSeq test``() =
 
         let! storredTp = looper.GetTimePointsWithPriority()
 
-        storredTp |> Seq.map snd |> should equivalent xtp
-        storredTp |> Seq.map snd |> should not' (equalSeq xtp)
+        storredTp |> Seq.map fst |> should equivalent xtp
+        storredTp |> Seq.map fst |> should not' (equalSeq xtp)
 
         storredTp
-        |> Seq.map fst
+        |> Seq.map snd
         |> Seq.sort
         |> Seq.zip [ 1f; 2f; 3f; 4f ]
         |> Seq.iter (fun (expected, actual) -> actual |> shouldL (equalWithin 0.1f) expected $"Actual %A{storredTp |> Seq.map fst}")
