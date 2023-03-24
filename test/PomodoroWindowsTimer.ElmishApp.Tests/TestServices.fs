@@ -6,6 +6,10 @@ open Bogus
 open FakerExtensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Types
+open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.MainModel
+open PomodoroWindowsTimer.ElmishApp.MainModel
 
 let faker = Faker("en")
 
@@ -67,6 +71,7 @@ module TestBotSender =
         }
 
     let create () : BotSender =
+        messages.Clear()
         sendToBot
 
 
@@ -77,3 +82,22 @@ module TestThemeSwitcher =
         { new IThemeSwitcher with
             member _.SwitchTheme _ = ()
         }
+
+
+type TestDispatch () =
+    let timeout = Program.tickMilliseconds * 2 + (Program.tickMilliseconds / 2)
+
+    let msgDispatchRequestedEvent = new Event<_>()
+
+    [<CLIEvent>]
+    member this.MsgDispatchRequested : IEvent<Msg> = msgDispatchRequestedEvent.Publish
+
+    member this.Trigger(message: MainModel.Msg) =
+       msgDispatchRequestedEvent.Trigger(message)
+
+    member this.TriggerWithTimeout(message: MainModel.Msg) =
+        async {
+           msgDispatchRequestedEvent.Trigger(message)
+           do! Async.Sleep timeout
+        }
+        |> Async.RunSynchronously

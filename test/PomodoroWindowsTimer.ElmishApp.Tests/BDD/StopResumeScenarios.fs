@@ -16,23 +16,6 @@ open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open ShouldExtensions
 open System.Threading.Tasks
 
-type TestDispatch () =
-    let timeout = Program.tickMilliseconds * 2 + (Program.tickMilliseconds / 2)
-
-    let msgDispatchRequestedEvent = new Event<_>()
-
-    [<CLIEvent>]
-    member this.MsgDispatchRequested = msgDispatchRequestedEvent.Publish
-
-    member this.Trigger(message: MainModel.Msg) =
-       msgDispatchRequestedEvent.Trigger(message)
-
-    member this.TriggerWithTimeout(message: MainModel.Msg) =
-        async {
-           msgDispatchRequestedEvent.Trigger(message)
-           do! Async.Sleep timeout
-        }
-        |> Async.RunSynchronously
 
 module StopResumeScenarios =
     let faker = Faker("en")
@@ -67,7 +50,9 @@ module StopResumeScenarios =
 
     let mutable model = Unchecked.defaultof<_>
     let mutable looper = Unchecked.defaultof<_>
+
     let testDispatch = TestDispatch()
+    let mutable testDispatchSubscriber = Unchecked.defaultof<_>
 
     module Given =
         let ``Elmish Program with`` (timePoints: TimePoint list) =
@@ -85,13 +70,14 @@ module StopResumeScenarios =
                     looper.AddSubscriber(onLooperEvt)
 
                 let sendExtMsgEffect dispatch =
-                    testDispatch.MsgDispatchRequested.Add(fun msg -> dispatch msg)
+                    testDispatchSubscriber <- testDispatch.MsgDispatchRequested.Subscribe(fun msg -> dispatch msg)
 
                 [ looperEffect; sendExtMsgEffect ]
 
             looper.Start()
 
             let testBotConfiguration = TestBotConfiguration.create ()
+            let sendToBot = TestBotSender.create ()
 
             Program.mkProgram 
                 (fun () ->
@@ -103,7 +89,7 @@ module StopResumeScenarios =
                 ) 
                 (MainModel.Program.update
                     testBotConfiguration
-                    TestBotSender.sendToBot
+                    sendToBot
                     looper
                     Infrastructure.simWindowsMinimizer
                     (TestThemeSwitcher.create ())
@@ -112,6 +98,12 @@ module StopResumeScenarios =
             |> Program.withSubscription subscribe
             |> Program.withTrace (fun msg _ -> TestContext.WriteLine(sprintf "%A" msg))
             |> Program.run
+
+
+    [<TearDown>]
+    let disposeLoop () =
+        (looper :> IDisposable).Dispose()
+        testDispatchSubscriber.Dispose()
 
 
     module When =
@@ -188,10 +180,6 @@ module StopResumeScenarios =
         let rec ``Telegrtam bot should be notified`` () =
             TestBotSender.messages |> shouldL not' (be Empty) (nameof ``Telegrtam bot should be notified``)
 
-
-    [<TearDown>]
-    let disposeLoop () =
-        (looper :> IDisposable).Dispose()
 
     [<Test>]
     [<Category("Work TimePoint Scenarios")>]
