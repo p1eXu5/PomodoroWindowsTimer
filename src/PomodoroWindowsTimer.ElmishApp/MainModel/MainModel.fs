@@ -21,6 +21,7 @@ type MainModel =
     }
 and
     LooperState =
+        | Initialized
         | Playing
         | Stopped
 and
@@ -55,7 +56,7 @@ module MainModel =
             SettingsManager = Unchecked.defaultof<_>
             ErrorQueue = Unchecked.defaultof<_>
             ActiveTimePoint = None
-            LooperState = Stopped
+            LooperState = Initialized
             TimePoints = []
             BotSettingsModel = Unchecked.defaultof<_>
             IsMinimized = false
@@ -91,3 +92,8 @@ module MainModel =
         match m.LastCommandInitiator with
         | Some (UIInitiator atp) -> atp.Id = tp.Id
         | _ -> false
+
+    let isLooperRunning m =
+        match m.LooperState with
+        | Initialized -> false
+        | _ -> true
