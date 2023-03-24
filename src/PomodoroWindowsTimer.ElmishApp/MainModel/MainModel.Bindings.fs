@@ -13,7 +13,7 @@ let bindings () : Binding<MainModel, Msg> list =
         "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
         "ErrorMessageQueue" |> Binding.oneWay (fun m -> m.ErrorQueue)
 
-        "LooperIsNotRunning" |> Binding.oneWay (isLooperRunning >> not)
+        "LooperIsRunning" |> Binding.oneWay (isLooperRunning)
 
         "PlayPauseButtonText"
         |> Binding.oneWay (fun m ->
