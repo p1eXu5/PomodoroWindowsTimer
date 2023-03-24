@@ -308,7 +308,6 @@ module StopResumeScenarios =
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
 
-
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
     let ``UC12 - Start Break TimePoint Scenario`` () =
@@ -322,7 +321,6 @@ module StopResumeScenarios =
         Then.``LooperState is Playing`` ()
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
-
 
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
@@ -338,7 +336,6 @@ module StopResumeScenarios =
         Then.``LooperState is Stopped`` ()
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
-
 
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
@@ -356,7 +353,6 @@ module StopResumeScenarios =
         Then.``Windows should be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
 
-
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
     let ``UC15 - Start Break Next Work TimePoint Scenario`` () =
@@ -371,7 +367,6 @@ module StopResumeScenarios =
         Then.``LooperState is Playing`` ()
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
-
 
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
