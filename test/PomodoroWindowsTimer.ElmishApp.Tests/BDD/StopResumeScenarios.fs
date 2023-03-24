@@ -127,6 +127,9 @@ module StopResumeScenarios =
         let ``Looper is playing next`` () =
             testDispatch.TriggerWithTimeout(Msg.Next)
 
+        let ``Looper is replaying`` () =
+            testDispatch.TriggerWithTimeout(Msg.Replay)
+
         let ``TimePoint is changed on`` timePoint =
             let tcs = TaskCompletionSource()
             looper.AddSubscriber(fun ev ->
@@ -292,6 +295,20 @@ module StopResumeScenarios =
         Then.``Windows should be minimized`` ()
         Then.``Telegrtam bot should not be notified`` ()
 
+    [<Test>]
+    [<Category("Work TimePoint Scenarios")>]
+    let ``UC08 - Start-Replay Work TimePoint Scenario`` () =
+        let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+        Given.``Elmish Program with`` timePoints
+
+        When.``Looper starts playing`` ()
+        When.``Looper is replaying`` ()
+
+        Then.``Active Point is set on`` timePoints.Head
+        Then.``Active Point remaining time is equal to or less then`` timePoints.Head
+        Then.``LooperState is Playing`` ()
+        Then.``Windows should not be minimized`` ()
+        Then.``Telegrtam bot should not be notified`` ()
 
     // =====================================
     //               Break
@@ -398,3 +415,18 @@ module StopResumeScenarios =
         Then.``LooperState is Playing`` ()
         Then.``Windows should not be minimized`` ()
         Then.``Telegrtam bot should be notified`` ()
+
+    [<Test>]
+    [<Category("Break TimePoint Scenarios")>]
+    let ``UC18 - Start-Replay Break TimePoint Scenario`` () =
+        let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+        Given.``Elmish Program with`` timePoints
+
+        When.``Looper starts playing`` ()
+        When.``Looper is replaying`` ()
+
+        Then.``Active Point is set on`` timePoints.Head
+        Then.``Active Point remaining time is equal to or less then`` timePoints.Head
+        Then.``LooperState is Playing`` ()
+        Then.``Windows should be minimized`` ()
+        Then.``Telegrtam bot should not be notified`` ()

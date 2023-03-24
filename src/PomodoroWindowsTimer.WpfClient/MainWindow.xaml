@@ -154,9 +154,13 @@
                                     <Setter Property="Width" Value="80" />
                                 </Style>
                             </StackPanel.Resources>
-                            <Button Content="Replay" Command="{Binding ReplayCommand}" />
+                            <Button Content="Replay" Command="{Binding ReplayCommand}"
+                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    />
                             <Button Content="{Binding PlayPauseButtonText, FallbackValue=Play}" Command="{Binding PlayStopCommand}" Margin="20,0,0,0" />
-                            <Button Content="Next" Command="{Binding NextCommand}" Margin="20,0,0,0" Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            <Button Content="Next" Command="{Binding NextCommand}" Margin="20,0,0,0"
+                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    />
                             <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
                             <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->
                         </StackPanel>

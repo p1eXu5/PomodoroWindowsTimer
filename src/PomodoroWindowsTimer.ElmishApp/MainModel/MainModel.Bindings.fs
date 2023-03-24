@@ -35,6 +35,7 @@ let bindings () : Binding<MainModel, Msg> list =
         "ReplayCommand"
         |> Binding.cmdIf (fun m ->
             match m.LooperState with
+            | Playing
             | Stopped ->
                 m.ActiveTimePoint
                 |> Option.map (fun _ -> Msg.Replay)
