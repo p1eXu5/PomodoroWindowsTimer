@@ -18,8 +18,9 @@ let bindings () : Binding<MainModel, Msg> list =
         "PlayPauseButtonText"
         |> Binding.oneWay (fun m ->
             match m.LooperState with
+            | Initialized -> "Play"
             | Playing -> "Stop"
-            | _ -> "Play"
+            | Stopped -> "Resume"
         )
 
         "PlayStopCommand"
