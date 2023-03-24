@@ -9,13 +9,6 @@ open System.Threading
 type LooperEvent =
     | TimePointStarted of ``new``: TimePoint * old: TimePoint option 
     | TimePointTimeReduced of TimePoint
-    | LoopFinished of TimePoint
-
-
-type private StopPlay =
-    | Stop
-    | Play
-
 
 type private State = 
     {
