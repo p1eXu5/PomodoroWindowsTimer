@@ -5,6 +5,7 @@
 
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
+    <Configurations>Debug;Release;Personal</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
