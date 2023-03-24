@@ -5,6 +5,7 @@ open System.Collections.Generic
 open Bogus
 open FakerExtensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Types
 
 let faker = Faker("en")
 
@@ -57,7 +58,13 @@ module TestBotConfiguration =
 [<RequireQualifiedAccess>]
 module TestBotSender =
 
-    let sendToBot _ _ =
+    let messages = List<string>()
+
+    let sendToBot _ message =
         task {
+            messages.Add(message)
             return ()
         }
+
+    let create () : BotSender =
+        sendToBot
