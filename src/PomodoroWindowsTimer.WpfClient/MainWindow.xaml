@@ -10,7 +10,7 @@
         xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="400" Width="800"
+        Height="420" Width="800"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"

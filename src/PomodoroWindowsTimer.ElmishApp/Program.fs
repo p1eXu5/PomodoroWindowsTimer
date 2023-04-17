@@ -20,10 +20,10 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
     let logger =
         LoggerConfiguration()
 #if DEBUG
-            .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Error)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Error)
-            .MinimumLevel.Override("Elmish.WPF.Performance", Events.LogEventLevel.Error)
-            .MinimumLevel.Override(nameof (PomodoroWindowsTimer.ElmishApp), Events.LogEventLevel.Error)
+            .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Verbose)
+            .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Verbose)
+            .MinimumLevel.Override("Elmish.WPF.Performance", Events.LogEventLevel.Debug)
+            .MinimumLevel.Override(nameof (PomodoroWindowsTimer.ElmishApp), Events.LogEventLevel.Debug)
 #else
             .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Information)
             .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Information)

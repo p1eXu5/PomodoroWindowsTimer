@@ -48,10 +48,23 @@ let bindings () : Binding<MainModel, Msg> list =
 
         "ActiveTimePointName" |> Binding.oneWayOpt (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Name))
 
-        "TimePoints" |> Binding.oneWaySeq (
+        "TimePoints" |> Binding.subModelSeq (
             (fun m -> m.TimePoints),
-            (=),
-            (fun tp -> tp.Id)
+            (fun tp -> tp.Id),
+            (fun () -> [
+                "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
+                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan)
+                "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
+                "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
+                "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePoint |> Option.map (fun atp -> atp.Id = e.Id) |> Option.defaultValue false)
+            ])
+        )
+
+        "SelectedTimePoint"
+        |> Binding.subModelSelectedItem (
+            "TimePoints",
+            (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Id))
+            , SelectTimePoint
         )
 
         "MinimizeCommand" |> Binding.cmd MinimizeWindows

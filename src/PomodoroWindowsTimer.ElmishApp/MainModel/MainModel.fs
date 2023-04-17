@@ -47,6 +47,7 @@ module MainModel =
         | RestoreMainWindow
         | SendToChatBot
         | SetActiveTimePoint of TimePoint option
+        | SelectTimePoint of Guid option
 
 
     open Elmish
