@@ -479,3 +479,4 @@ $RECYCLE.BIN/
 /src/CycleBell.WpfClient/appsettings.json
 /src/PomodoroWindowsTimer.WpfClient/appsettings.json
 /src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.json
+/NuGet.Config
