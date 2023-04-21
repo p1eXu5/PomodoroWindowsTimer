@@ -38,15 +38,3 @@ It uses minimizing windows functionality and Telegram Chat Bor for notifications
 ![main window](./images/dialog.png)
 
 <br/>
-
-
-## Release 1.0.2 Features
-
-- Added `Next` button
-- Fixed `Play`/ `Resume` button
-- Refined visuals
-- Behavior fixes
-
-## Release 1.0.0 Features
-
-- Double click on time point to run it
