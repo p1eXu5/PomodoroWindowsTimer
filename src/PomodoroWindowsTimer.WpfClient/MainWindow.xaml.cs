@@ -24,5 +24,26 @@ namespace PomodoroWindowsTimer.WpfClient
         {
             InitializeComponent();
         }
+
+        private void Slider_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ICommand openFileCommand = ((dynamic)DataContext).PreChangeActiveTimeSpanCommand;
+                if (openFileCommand.CanExecute(null))
+                {
+                    openFileCommand.Execute(null);
+                }
+            }
+        }
+
+        private void Slider_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            ICommand openFileCommand = ((dynamic)DataContext).PostChangeActiveTimeSpanCommand;
+            if (openFileCommand.CanExecute(null))
+            {
+                openFileCommand.Execute(null);
+            }
+        }
     }
 }

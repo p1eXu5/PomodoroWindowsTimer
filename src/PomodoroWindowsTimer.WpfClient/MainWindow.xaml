@@ -10,7 +10,7 @@
         xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="400" Width="800"
+        Height="420" Width="800"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
@@ -41,37 +41,7 @@
                                        BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
                                        BottomDrawerCornerRadius="20 20 0 0">
             <materialDesign:DrawerHost.LeftDrawerContent>
-                <StackPanel Margin="16">
-                    <TextBlock Margin="4"
-                                   HorizontalAlignment="Center"
-                                   Text="TIME POINTS" />
-                    <ListBox ItemsSource="{Binding TimePoints}" >
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel.InputBindings>
-                                        <MouseBinding MouseAction="LeftDoubleClick"
-                                                      Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                                      CommandParameter="{Binding Id}" />
-                                    </StackPanel.InputBindings>
-                                    <TextBlock Text="{Binding Name}" Width="100" />
-                                    <TextBlock Text="{Binding TimeSpan}" Margin="10,0"/>
-                                    <TextBlock Text="{Binding Kind}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <Button Grid.Column="1"
-                            Margin="0,20,0,0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                            CommandParameter="{Binding BotSettingsModel}"
-                            Content="BOT SETTINGS"
-                            />
-
-                </StackPanel>
+                <usercontrols:DrawerUserControl DataContext="{Binding}" />
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <DockPanel LastChildFill="True" Margin="10,0,10,0">
@@ -114,6 +84,17 @@
                                                            Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
                                                            Format="mm':'ss"
                                                            />
+                                    <Slider DockPanel.Dock="Top"
+                                            Minimum="0"
+                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Orientation="Horizontal"
+                                            Margin="0,40,0,0"
+                                            Foreground="#00FF00"
+                                            PreviewMouseDown="Slider_MouseDown"
+                                            PreviewMouseUp="Slider_MouseUp"
+                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            />
                                 </StackPanel>
                             </DataTemplate>
 
@@ -131,14 +112,33 @@
                                                        Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
                                                        Format="mm':'ss"
                                                        />
+                                    <Slider DockPanel.Dock="Top"
+                                            Minimum="0"
+                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Orientation="Horizontal"
+                                            Margin="0,40,0,0"
+                                            Foreground="#FF0000"
+                                            PreviewMouseDown="Slider_MouseDown"
+                                            PreviewMouseUp="Slider_MouseUp"
+                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            />
                                 </StackPanel>
                             </DataTemplate>
 
                             <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
                         </DockPanel.Resources>
                     
-                        <ContentControl DockPanel.Dock="Top" ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
-                        
+                        <!-- Digit Panel -->
+                        <ContentControl x:Name="m_DigitPanel"
+                                        DockPanel.Dock="Top"
+                                        ContentTemplateSelector="{StaticResource dts_DigitPanel}"
+                                        Content="{Binding IsBreak}"
+                                        DataContext="{Binding}"
+                                        HorizontalAlignment="Center"
+                                        />
+
+                        <!-- Buttons -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Height="120">
                             <StackPanel.Resources>
                                 <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}">

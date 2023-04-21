@@ -43,15 +43,27 @@ let bindings () : Binding<MainModel, Msg> list =
             | _ -> None
         )
 
-        "ActiveTime"
-        |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.TimeSpan) |> Option.defaultValue TimeSpan.Zero )
+        "ActiveTime" |> Binding.oneWay getActiveTimeSpan
+
+        "ActiveTimeDuration" |> Binding.oneWay getActiveTimeDuration
+
+        "PreChangeActiveTimeSpanCommand" |> Binding.cmd Msg.PreChangeActiveTimeSpan
+        "ActiveTimeSeconds" |> Binding.twoWay (getActiveSpentTime, Msg.ChangeActiveTimeSpan)
+        "PostChangeActiveTimeSpanCommand" |> Binding.cmd Msg.PostChangeActiveTimeSpan
+        "IsActiveTimePointSet" |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.isSome)
 
         "ActiveTimePointName" |> Binding.oneWayOpt (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Name))
 
-        "TimePoints" |> Binding.oneWaySeq (
+        "TimePoints" |> Binding.subModelSeq (
             (fun m -> m.TimePoints),
-            (=),
-            (fun tp -> tp.Id)
+            (fun tp -> tp.Id),
+            (fun () -> [
+                "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
+                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan)
+                "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
+                "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
+                "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePoint |> Option.map (fun atp -> atp.Id = e.Id) |> Option.defaultValue false)
+            ])
         )
 
         "MinimizeCommand" |> Binding.cmd MinimizeWindows

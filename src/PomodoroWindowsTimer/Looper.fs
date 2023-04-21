@@ -28,12 +28,14 @@ type private State =
 
 
 type private Msg =
+    | PreloadTimePoint
     | Tick
     | Subscribe of (LooperEvent -> Async<unit>)
     | SubscribeMany of (LooperEvent -> Async<unit>) list * AsyncReplyChannel<unit>
     | Stop
     | Resume
     | Next
+    | Shift of float
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
@@ -97,9 +99,15 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
 
                             match tpOpt with
                             | Some tp ->
-                                tryPostEvent (LooperEvent.TimePointStarted (tp, state.ActiveTimePoint))
+                                let (newAtp, oldAtp) =
+                                    state.ActiveTimePoint
+                                    |> Option.filter (fun t -> t.Id = tp.Id)
+                                    |> Option.map (fun t -> (t, None))
+                                    |> Option.defaultValue (tp, state.ActiveTimePoint)
+
+                                tryPostEvent (LooperEvent.TimePointStarted (newAtp, oldAtp))
                                 timer.Change(tickMilliseconds, 0) |> ignore
-                                return! loop { state with ActiveTimePoint = tp |> Some; StartTime = dt }
+                                return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
 
                             | _ ->
                                 timer.Change(tickMilliseconds, 0) |> ignore
@@ -107,6 +115,12 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                         }
 
                     match msg with
+                    | PreloadTimePoint when state.ActiveTimePoint |> Option.isNone ->
+                        let tpOpt = timePointQueue.Pick
+                        tpOpt
+                        |> Option.iter (fun atp -> LooperEvent.TimePointStarted (atp, None) |> tryPostEvent)
+                        return! loop { state with ActiveTimePoint = tpOpt }
+
                     | Resume when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
                         let dt = DateTime.Now
                         timer.Change(tickMilliseconds, 0) |> ignore
@@ -151,6 +165,11 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
                     | Stop when not state.IsStopped ->
                         return! loop { state with IsStopped = true; StartTime = DateTime.Now }
 
+                    | Shift v when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
+                        let atp = state.ActiveTimePoint |> Option.map (fun atp -> { atp with TimeSpan = TimeSpan.FromSeconds(v) }) |> Option.get
+                        tryPostEvent (LooperEvent.TimePointTimeReduced atp)
+                        return! loop { state with ActiveTimePoint = atp |> Some }
+
                     | _ -> return! loop state
                 }
 
@@ -169,6 +188,9 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
 
     member _.Stop() =
         agent.Post(Stop)
+
+    member _.Shift(seconds: float) =
+        agent.Post(Shift seconds)
 
     member _.Resume() =
         agent.Post(Resume)
@@ -192,8 +214,8 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int, ?cancellatio
         do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
         agent.Post(Stop)
 
-    member _.PickFirst() =
-        timePointQueue.Pick
+    member _.PreloadTimePoint() =
+        agent.Post(PreloadTimePoint)
 
     member private _.Dispose(isDisposing: bool) =
         if _isDisposed then ()
