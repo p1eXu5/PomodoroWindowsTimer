@@ -48,6 +48,9 @@ module MainModel =
         | SendToChatBot
         | SetActiveTimePoint of TimePoint option
         | SelectTimePoint of Guid option
+        | PreChangeActiveTimeSpan
+        | ChangeActiveTimeSpan of float
+        | PostChangeActiveTimeSpan
 
 
     open Elmish
@@ -108,3 +111,26 @@ module MainModel =
             | Break -> TimePointKind.Break
         )
         |> Option.defaultValue TimePointKind.Undefined
+
+    let getActiveTimeSpan m =
+        m.ActiveTimePoint
+        |> Option.map (fun tp -> tp.TimeSpan)
+        |> Option.defaultValue TimeSpan.Zero
+
+    let getActiveSpentTime m =
+        m.ActiveTimePoint
+        |> Option.bind (fun atp ->
+            m.TimePoints
+            |> List.tryFind (fun tp -> tp.Id = atp.Id)
+            |> Option.map (fun tp -> (tp.TimeSpan - atp.TimeSpan).TotalSeconds)
+        )
+        |> Option.defaultValue 0.0
+
+    let getActiveTimeDuration m =
+        m.ActiveTimePoint
+        |> Option.bind (fun atp ->
+            m.TimePoints
+            |> List.tryFind (fun tp -> tp.Id = atp.Id)
+        )
+        |> Option.map (fun tp -> tp.TimeSpan.TotalSeconds)
+        |> Option.defaultValue 0.0

@@ -1,15 +1,14 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.MainModel.Program
 
 open Elmish
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.MainModel
+open Elmish.Extensions
+open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.Types
-open System.Threading.Tasks
-open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Types
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
 
 let update
@@ -22,8 +21,8 @@ let update
 
     match msg with
     | Msg.PickFirstTimePoint ->
-        let atp = looper.PickFirst()
-        model |> setActiveTimePoint atp, Cmd.none
+        looper.PreloadTimePoint()
+        model, Cmd.none
     
     | Msg.SetActiveTimePoint atp ->
         model |> setActiveTimePoint atp, Cmd.OfFunc.attempt themeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
@@ -61,7 +60,7 @@ let update
 
     | Msg.Replay when model.ActiveTimePoint |> Option.isSome ->
         let cmd =
-            Cmd.ofMsg (Msg.StartTimePoint (Operation.Start (model.ActiveTimePoint |> Option.get).Id))
+            Cmd.batch [Cmd.ofMsg Msg.PreChangeActiveTimeSpan; Cmd.ofMsg (ChangeActiveTimeSpan 0.0); Cmd.ofMsg Msg.Resume]
         model, cmd
 
     | Msg.LooperMsg evt ->
@@ -103,6 +102,19 @@ let update
     | BotSettingsModelMsg bmsg ->
         let botSettingsModel = BotSettingsModel.Program.update botConfiguration bmsg model.BotSettingsModel
         { model with BotSettingsModel = botSettingsModel }, Cmd.none
+
+    | Msg.PreChangeActiveTimeSpan ->
+        looper.Stop()
+        model, Cmd.none
+
+    | Msg.ChangeActiveTimeSpan v ->
+        let duration = model |> getActiveTimeDuration
+        looper.Shift(duration - v)
+        model, Cmd.none
+
+    | Msg.PostChangeActiveTimeSpan ->
+        looper.Resume()
+        model, Cmd.none
 
     | Msg.OnError ex ->
         model.ErrorQueue.EnqueuError(ex.Message)

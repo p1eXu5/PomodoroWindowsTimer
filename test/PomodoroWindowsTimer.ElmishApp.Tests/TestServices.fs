@@ -101,3 +101,9 @@ type TestDispatch () =
            do! Async.Sleep timeout
         }
         |> Async.RunSynchronously
+
+     member this.WaitTimeout() =
+        async {
+           do! Async.Sleep timeout
+        }
+        |> Async.RunSynchronously

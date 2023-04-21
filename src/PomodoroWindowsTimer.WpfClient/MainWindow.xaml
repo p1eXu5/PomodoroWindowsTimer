@@ -84,6 +84,17 @@
                                                            Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
                                                            Format="mm':'ss"
                                                            />
+                                    <Slider DockPanel.Dock="Top"
+                                            Minimum="0"
+                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Orientation="Horizontal"
+                                            Margin="0,40,0,0"
+                                            Foreground="#00FF00"
+                                            PreviewMouseDown="Slider_MouseDown"
+                                            PreviewMouseUp="Slider_MouseUp"
+                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            />
                                 </StackPanel>
                             </DataTemplate>
 
@@ -101,14 +112,33 @@
                                                        Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
                                                        Format="mm':'ss"
                                                        />
+                                    <Slider DockPanel.Dock="Top"
+                                            Minimum="0"
+                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Orientation="Horizontal"
+                                            Margin="0,40,0,0"
+                                            Foreground="#FF0000"
+                                            PreviewMouseDown="Slider_MouseDown"
+                                            PreviewMouseUp="Slider_MouseUp"
+                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            />
                                 </StackPanel>
                             </DataTemplate>
 
                             <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
                         </DockPanel.Resources>
                     
-                        <ContentControl DockPanel.Dock="Top" ContentTemplateSelector="{StaticResource dts_DigitPanel}" Content="{Binding IsBreak}" DataContext="{Binding}" />
-                        
+                        <!-- Digit Panel -->
+                        <ContentControl x:Name="m_DigitPanel"
+                                        DockPanel.Dock="Top"
+                                        ContentTemplateSelector="{StaticResource dts_DigitPanel}"
+                                        Content="{Binding IsBreak}"
+                                        DataContext="{Binding}"
+                                        HorizontalAlignment="Center"
+                                        />
+
+                        <!-- Buttons -->
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Height="120">
                             <StackPanel.Resources>
                                 <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}">

@@ -107,6 +107,9 @@ module StopResumeScenarios =
 
 
     module When =
+        let ``Spent 2.5 ticks time`` () =
+            testDispatch.WaitTimeout()
+
         let ``Looper starts playing`` () =
             testDispatch.TriggerWithTimeout(Msg.Play)
 
@@ -186,6 +189,8 @@ module StopResumeScenarios =
     let ``UC01 - Initialization Work TimePoint Scenario`` () =
         let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
         Given.``Elmish Program with`` timePoints
+
+        When.``Spent 2.5 ticks time`` () // wait when looper preload time point and send event
 
         Then.``Active Point is set on`` timePoints.Head
         Then.``LooperState is Initialized`` ()
@@ -409,6 +414,8 @@ module StopResumeScenarios =
     let ``UC18 - Start-Replay Break TimePoint Scenario`` () =
         let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
         Given.``Elmish Program with`` timePoints
+
+        When.``Spent 2.5 ticks time`` ()
 
         When.``Looper starts playing`` ()
         When.``Looper is replaying`` ()
