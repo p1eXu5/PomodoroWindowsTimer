@@ -313,6 +313,8 @@ module StopResumeScenarios =
         let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
         Given.``Elmish Program with`` timePoints
 
+        When.``Spent 2.5 ticks time`` ()
+
         Then.``Active Point is set on`` timePoints.Head
         Then.``LooperState is Initialized`` ()
         Then.``Windows should not be minimized`` ()
