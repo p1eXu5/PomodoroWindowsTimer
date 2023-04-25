@@ -9,7 +9,7 @@
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
         xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="{Binding Title}"
         Height="420" Width="800"
         WindowStartupLocation="CenterScreen"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"

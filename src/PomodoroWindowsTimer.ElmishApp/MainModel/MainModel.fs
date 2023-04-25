@@ -9,6 +9,7 @@ open Elmish.Extensions
 
 type MainModel =
     {
+        Title: string
         AssemblyVersion: string
         SettingsManager : ISettingsManager
         ErrorQueue : IErrorMessageQueue
@@ -57,6 +58,7 @@ module MainModel =
 
     let initDefault () =
         {
+            Title = "Pomodoro Windows Timer"
             AssemblyVersion = "Asm.v."
             SettingsManager = Unchecked.defaultof<_>
             ErrorQueue = Unchecked.defaultof<_>

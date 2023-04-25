@@ -77,13 +77,13 @@ let update
         model, Cmd.batch [ Cmd.ofMsg (Msg.SetActiveTimePoint activeTimePoint); cmd ]
 
     | MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfAsync.either windowsMinimizer.Minimize () (fun _ -> Msg.SetIsMinimized true) Msg.OnError
+        { model with IsMinimized = true }, Cmd.OfAsync.either windowsMinimizer.Minimize model.Title (fun _ -> Msg.SetIsMinimized true) Msg.OnError
 
     | RestoreWindows when model.IsMinimized ->
         { model with IsMinimized = false }, Cmd.OfAsync.either windowsMinimizer.Restore () (fun _ -> Msg.SetIsMinimized false) Msg.OnError
 
     | RestoreMainWindow ->
-        model, Cmd.OfAsync.attempt windowsMinimizer.RestoreMainWindow () Msg.OnError
+        model, Cmd.OfAsync.attempt windowsMinimizer.RestoreMainWindow model.Title Msg.OnError
 
     | SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none

@@ -6,9 +6,9 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 type WindowsMinimizer =
     {
-        Minimize: unit -> Async<unit>
+        Minimize: string -> Async<unit>
         Restore: unit -> Async<unit>
-        RestoreMainWindow: unit -> Async<unit>
+        RestoreMainWindow: string -> Async<unit>
     }
 
 type Message = string

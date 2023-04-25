@@ -26,9 +26,9 @@ let [<Literal>] SW_SHOW = 5;
 let [<Literal>] SW_MINIMIZE = 6;
 let [<Literal>] SW_RESTORE = 9;
 
-let minimize () =
+let minimize ipWindowName =
     async {
-        let appWindow = findWindow(null, "MainWindow")
+        let appWindow = findWindow(null, ipWindowName)
         let shellTrayWnd = findWindow("Shell_TrayWnd", null)
         sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
         do! Async.Sleep(500)
@@ -41,9 +41,9 @@ let restore () =
         sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
     }
 
-let restoreMainWindow () =
+let restoreMainWindow ipWindowName =
     async {
-        let appWindow = findWindow(null, "MainWindow")
+        let appWindow = findWindow(null, ipWindowName)
         showWindow(appWindow, SW_RESTORE) |> ignore
     }
 
@@ -54,11 +54,12 @@ let prodWindowsMinimizer =
         RestoreMainWindow = restoreMainWindow
     }
 
+/// for debug purpose
 let simWindowsMinimizer =
     {
-        Minimize = async.Return
+        Minimize = fun _ -> async.Return ()
         Restore = async.Return
-        RestoreMainWindow = async.Return
+        RestoreMainWindow = fun _ -> async.Return ()
     }
 
 let sendToBot (botClient: ITelegramBotClient) chatId text =

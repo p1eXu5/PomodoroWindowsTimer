@@ -10,6 +10,7 @@ open Elmish.Extensions
 
 let bindings () : Binding<MainModel, Msg> list =
     [
+        "Title" |> Binding.oneWay (fun m -> m.Title)
         "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
         "ErrorMessageQueue" |> Binding.oneWay (fun m -> m.ErrorQueue)
 
