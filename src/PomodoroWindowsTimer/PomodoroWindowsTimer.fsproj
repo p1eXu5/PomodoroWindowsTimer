@@ -4,16 +4,19 @@
     <TargetFramework>net7.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Configurations>Debug;Release;Personal</Configurations>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="Types.fs" />
-    <Compile Include="Abstrractions.fs" />
+    <Compile Include="Abstractions.fs" />
     <Compile Include="TimePointQueue.fs" />
     <Compile Include="Looper.fs" />
+    <Compile Include="Parser.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FParsec" Version="2.0.0-beta2" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.2.1" />
     <PackageReference Include="OptimizedPriorityQueue" Version="5.1.0" />
   </ItemGroup>

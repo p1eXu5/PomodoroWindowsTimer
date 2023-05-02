@@ -19,7 +19,7 @@ type IBotConfiguration =
         abstract MyChatId : string with get, set
     end
 
-
+/// Used in theme switcher on WPF side
 type TimePointKind =
     | Undefined = 0
     | Work = 1
@@ -28,4 +28,10 @@ type TimePointKind =
 type IThemeSwitcher =
     interface
         abstract SwitchTheme: TimePointKind -> unit
+    end
+
+
+type ITimePointPrototypesSettings =
+    interface
+        abstract TimePointPrototypesSettings : string option with get, set
     end

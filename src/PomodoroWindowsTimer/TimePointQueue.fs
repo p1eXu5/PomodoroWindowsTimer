@@ -5,7 +5,7 @@ open Priority_Queue
 open System.Threading
 open System
 open FSharp.Control
-open PomodoroWindowsTimer.Abstrractions
+open PomodoroWindowsTimer.Abstractions
 
 type private State =
     {

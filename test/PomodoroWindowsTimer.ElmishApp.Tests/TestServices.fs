@@ -4,9 +4,9 @@ open System
 open System.Collections.Generic
 open Bogus
 open FakerExtensions
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-open PomodoroWindowsTimer.ElmishApp.Types
 open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open PomodoroWindowsTimer.ElmishApp.MainModel

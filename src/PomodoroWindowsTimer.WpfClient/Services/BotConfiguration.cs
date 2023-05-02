@@ -7,13 +7,14 @@ namespace PomodoroWindowsTimer.WpfClient;
 
 public class BotConfiguration : IBotConfiguration
 {
-    public const string BotConfigurationSectionName = "BotConfiguration";
+    public const string BOT_CONFIGURATION_SECTION_NAME = "BotConfiguration";
+
     private readonly ISettingsManager _settingsManager;
-    private IConfigurationSection? _configurationSection;
+    private readonly IConfigurationSection _configurationSection;
 
     public BotConfiguration(ISettingsManager settingsManager)
     {
-        _configurationSection = App.Configuration.GetSection(BotConfigurationSectionName);
+        _configurationSection = App.Configuration.GetSection(BOT_CONFIGURATION_SECTION_NAME);
         _settingsManager = settingsManager;
     }
 

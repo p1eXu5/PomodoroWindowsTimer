@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using Microsoft.Extensions.Configuration;
+using PomodoroWindowsTimer.WpfClient.Services;
 
 namespace PomodoroWindowsTimer.WpfClient
 {
@@ -54,7 +55,8 @@ namespace PomodoroWindowsTimer.WpfClient
                 _errorMessageQueue,
                 SettingsManager.Instance,
                 new BotConfiguration(SettingsManager.Instance),
-                new ThemeSwitcher()
+                new ThemeSwitcher(),
+                new TimePointPrototypesSettings(SettingsManager.Instance)
             );
         }
 

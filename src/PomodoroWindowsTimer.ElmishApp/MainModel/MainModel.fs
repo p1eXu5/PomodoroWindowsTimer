@@ -1,6 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.Types
 open System
@@ -16,7 +17,7 @@ type MainModel =
         ActiveTimePoint : TimePoint option
         LooperState : LooperState
         TimePoints: TimePoint list
-        BotSettingsModel: BotSettingsModel
+        SettingsModel: SettingsModel
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
     }
@@ -27,6 +28,18 @@ and
         | Stopped
 and
     UIInitiator = UIInitiator of TimePoint
+
+
+type MainModeConfig =
+    {
+        BotConfiguration: IBotConfiguration
+        SendToBot: BotSender
+        Looper: Looper
+        WindowsMinimizer: WindowsMinimizer
+        ThemeSwitcher: IThemeSwitcher
+        KindAliasesStore: TimePointPrototypeStore
+    }
+
 
 module MainModel =
 
@@ -40,7 +53,7 @@ module MainModel =
         | OnError of exn
         | PickFirstTimePoint
         | StartTimePoint of Operation<Guid, unit>
-        | BotSettingsModelMsg of BotSettingsModel.Msg
+        | SettingsMsg of SettingsModel.Msg
         // test msgs
         | MinimizeWindows
         | SetIsMinimized of bool
@@ -65,12 +78,12 @@ module MainModel =
             ActiveTimePoint = None
             LooperState = Initialized
             TimePoints = []
-            BotSettingsModel = Unchecked.defaultof<_>
+            SettingsModel = Unchecked.defaultof<_>
             IsMinimized = false
             LastCommandInitiator = None
         }
 
-    let init (settingsManager : ISettingsManager) (botConfiguration: IBotConfiguration) (errorQueue : IErrorMessageQueue) timePoints : MainModel * Cmd<Msg> =
+    let init settingsManager errorQueue (cfg: MainModeConfig) timePoints : MainModel * Cmd<Msg> =
 
         let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
@@ -79,7 +92,7 @@ module MainModel =
             SettingsManager = settingsManager
             ErrorQueue = errorQueue
             TimePoints = timePoints
-            BotSettingsModel = BotSettingsModel.init botConfiguration
+            SettingsModel = SettingsModel.init cfg.BotConfiguration cfg.KindAliasesStore
         }
         , Cmd.ofMsg Msg.PickFirstTimePoint
 
@@ -111,6 +124,7 @@ module MainModel =
             match tp.Kind with
             | Work -> TimePointKind.Work
             | Break -> TimePointKind.Break
+            | LongBreak -> TimePointKind.Break
         )
         |> Option.defaultValue TimePointKind.Undefined
 

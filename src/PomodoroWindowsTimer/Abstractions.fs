@@ -1,4 +1,4 @@
-﻿namespace PomodoroWindowsTimer.Abstrractions
+﻿namespace PomodoroWindowsTimer.Abstractions
 
 open FSharp.Control
 open System

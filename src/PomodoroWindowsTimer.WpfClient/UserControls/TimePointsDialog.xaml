@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+            
+            <ListBox Grid.Column="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Name}"/>
+                            <materialDesign:TimePicker Width="100"
+                                                       materialDesign:HintAssist.Hint="Validates"
+                                                       Is24Hours="True"
+                                                       IsInvalidTextAllowed="False"
+                                                       Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}">
+                            </materialDesign:TimePicker>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Service name -->
+            <ComboBox Width="250" Margin="10,0,10,10"
+                      materialDesign:HintAssist.Hint="Pattern"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      IsEditable="True"
+                      IsTextSearchEnabled="True"
+                      Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                      ItemsSource="{Binding Patterns}"
+                      >
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

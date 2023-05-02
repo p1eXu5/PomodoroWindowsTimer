@@ -6,17 +6,18 @@ open Serilog.Extensions.Logging
 open Telegram.Bot
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstrractions
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.TimePointQueue
 open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 let [<Literal>] tickMilliseconds = 200
 
 
-let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration, themeSwitcher: IThemeSwitcher) =
+let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration, themeSwitcher: IThemeSwitcher, timePointKindAliases : ITimePointPrototypesSettings) =
     let logger =
         LoggerConfiguration()
 #if DEBUG
@@ -77,15 +78,28 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
 
     let sendToBot (botConfiguration: IBotConfiguration) =
         let botClient = TelegramBotClient(botConfiguration.BotToken)
-        Infrastructure.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
+        Telegram.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
+
+#if DEBUG
+    let windowsMinimizer = Windows.simWindowsMinimizer
+#else
+    let windowsMinimizer = Windows.prodWindowsMinimizer
+#endif
+
+    let mainModelCfg =
+        {
+            BotConfiguration = botConfiguration
+            SendToBot = sendToBot
+            Looper = looper
+            WindowsMinimizer = windowsMinimizer
+            ThemeSwitcher = themeSwitcher
+            KindAliasesStore = TimePointPrototypeStore.initialize timePointKindAliases
+        }
+
 
     WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager botConfiguration errorQueue timePoints)
-#if DEBUG
-        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.simWindowsMinimizer themeSwitcher)
-#else
-        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.prodWindowsMinimizer themeSwitcher)
-#endif
+        (fun () -> MainModel.init settingsManager errorQueue mainModelCfg timePoints)
+        (MainModel.Program.update mainModelCfg)
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.withSubscription subscribe

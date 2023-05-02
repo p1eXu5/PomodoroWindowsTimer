@@ -1,73 +1,134 @@
-﻿module PomodoroWindowsTimer.ElmishApp.Infrastructure
+﻿namespace PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-open System.Runtime.InteropServices
 open System
-open Telegram.Bot
-open PomodoroWindowsTimer.ElmishApp.Types
+open System.Threading.Tasks
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 
-[<DllImport("user32.dll", EntryPoint="FindWindow", SetLastError=true, CharSet=CharSet.Auto)>]
-extern IntPtr findWindow (string lpClassName, string lpWindowName)
-
-[<DllImport("user32.dll", EntryPoint = "SendMessage", SetLastError = true)>]
-extern IntPtr sendMessage(IntPtr hWnd, Int32 Msg, IntPtr wParam, IntPtr lParam)
-
-[<DllImport("user32.dll", EntryPoint = "ShowWindow")>]
-extern bool showWindow(IntPtr hWnd, int nCmdShow)
-
-let [<Literal>] WM_COMMAND : Int32 = 0x111;
-
-let [<Literal>] MIN_ALL : Int32 = 419;
-let [<Literal>] MIN_ALL_UNDO : Int32 = 416;
-
-let [<Literal>] SW_SHOWNORMAL = 1;
-let [<Literal>] SW_MAXIMIZE = 3;
-let [<Literal>] SW_SHOW = 5;
-let [<Literal>] SW_MINIMIZE = 6;
-let [<Literal>] SW_RESTORE = 9;
-
-let minimize ipWindowName =
-    async {
-        let appWindow = findWindow(null, ipWindowName)
-        let shellTrayWnd = findWindow("Shell_TrayWnd", null)
-        sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
-        do! Async.Sleep(500)
-        showWindow(appWindow, SW_RESTORE) |> ignore
-    }
-
-let restore () =
-    async {
-        let shellTrayWnd = findWindow("Shell_TrayWnd", null)
-        sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
-    }
-
-let restoreMainWindow ipWindowName =
-    async {
-        let appWindow = findWindow(null, ipWindowName)
-        showWindow(appWindow, SW_RESTORE) |> ignore
-    }
-
-let prodWindowsMinimizer =
+type TimePointPrototypeStore =
     {
-        Minimize = minimize
-        Restore = restore
-        RestoreMainWindow = restoreMainWindow
+        Read: unit -> TimePointPrototype list
+        Write: TimePointPrototype list -> unit
     }
 
-/// for debug purpose
-let simWindowsMinimizer =
+module TimePointPrototypeStore =
+    open System.Text.Json
+    open System.Text.Json.Serialization
+
+    let options =
+        JsonFSharpOptions.Default()
+            .WithUnionExternalTag()
+            .WithUnionNamedFields()
+            .WithUnionUnwrapSingleCaseUnions(false)
+            .ToJsonSerializerOptions()
+
+    let read (timePointKindAliases : ITimePointPrototypesSettings) =
+        timePointKindAliases.TimePointPrototypesSettings
+        |> Option.map (fun s ->
+            JsonSerializer.Deserialize<TimePointPrototype list>(s, options)
+        )
+        |> Option.defaultValue TimePointPrototype.defaults
+
+
+    let write (timePointKindAliases : ITimePointPrototypesSettings) (aliases: TimePointPrototype list) =
+        match aliases with
+        | [] ->
+            timePointKindAliases.TimePointPrototypesSettings <- None
+        | _ ->
+            let s = JsonSerializer.Serialize(aliases, options)
+            timePointKindAliases.TimePointPrototypesSettings <- s |> Some
+
+
+    let initialize (timePointKindAliases : ITimePointPrototypesSettings) =
+        {
+            Read = fun () -> read timePointKindAliases
+            Write = write timePointKindAliases
+        }
+
+
+type WindowsMinimizer =
     {
-        Minimize = fun _ -> async.Return ()
-        Restore = async.Return
-        RestoreMainWindow = fun _ -> async.Return ()
+        Minimize: string -> Async<unit>
+        Restore: unit -> Async<unit>
+        RestoreMainWindow: string -> Async<unit>
     }
 
-let sendToBot (botClient: ITelegramBotClient) chatId text =
-    task {
-        let! _ =
-            botClient.SendTextMessageAsync(
-                chatId,
-                text)
+module Windows =
 
-        return ()
-    }
+    open System.Runtime.InteropServices
+
+    [<DllImport("user32.dll", EntryPoint="FindWindow", SetLastError=true, CharSet=CharSet.Auto)>]
+    extern IntPtr findWindow (string lpClassName, string lpWindowName)
+
+    [<DllImport("user32.dll", EntryPoint = "SendMessage", SetLastError = true)>]
+    extern IntPtr sendMessage(IntPtr hWnd, Int32 Msg, IntPtr wParam, IntPtr lParam)
+
+    [<DllImport("user32.dll", EntryPoint = "ShowWindow")>]
+    extern bool showWindow(IntPtr hWnd, int nCmdShow)
+
+    let [<Literal>] WM_COMMAND : Int32 = 0x111;
+
+    let [<Literal>] MIN_ALL : Int32 = 419;
+    let [<Literal>] MIN_ALL_UNDO : Int32 = 416;
+
+    let [<Literal>] SW_SHOWNORMAL = 1;
+    let [<Literal>] SW_MAXIMIZE = 3;
+    let [<Literal>] SW_SHOW = 5;
+    let [<Literal>] SW_MINIMIZE = 6;
+    let [<Literal>] SW_RESTORE = 9;
+
+    let minimize ipWindowName =
+        async {
+            let appWindow = findWindow(null, ipWindowName)
+            let shellTrayWnd = findWindow("Shell_TrayWnd", null)
+            sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
+            do! Async.Sleep(500)
+            showWindow(appWindow, SW_RESTORE) |> ignore
+        }
+
+    let restore () =
+        async {
+            let shellTrayWnd = findWindow("Shell_TrayWnd", null)
+            sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
+        }
+
+    let restoreMainWindow ipWindowName =
+        async {
+            let appWindow = findWindow(null, ipWindowName)
+            showWindow(appWindow, SW_RESTORE) |> ignore
+        }
+
+    let prodWindowsMinimizer =
+        {
+            Minimize = minimize
+            Restore = restore
+            RestoreMainWindow = restoreMainWindow
+        }
+
+    /// for debug purpose
+    let simWindowsMinimizer =
+        {
+            Minimize = fun _ -> async.Return ()
+            Restore = async.Return
+            RestoreMainWindow = fun _ -> async.Return ()
+        }
+
+
+type Message = string
+
+type BotSender = IBotConfiguration -> Message -> Task<unit>
+
+module Telegram =
+
+    open Telegram.Bot
+
+    let sendToBot (botClient: ITelegramBotClient) chatId text =
+        task {
+            let! _ =
+                botClient.SendTextMessageAsync(
+                    chatId,
+                    text)
+
+            return ()
+        }

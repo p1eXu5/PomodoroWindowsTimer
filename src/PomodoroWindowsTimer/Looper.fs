@@ -2,7 +2,7 @@
 
 open FSharp.Control
 open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstrractions
+open PomodoroWindowsTimer.Abstractions
 open System
 open System.Threading
 

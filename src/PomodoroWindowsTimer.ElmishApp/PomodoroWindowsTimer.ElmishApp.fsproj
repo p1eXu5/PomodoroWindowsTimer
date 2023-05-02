@@ -7,13 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="TimePointPrototypeModel\TimePointPrototypeModel.fs" />
+    <Compile Include="TimePointPrototypeModel\TimePointPrototypeModel.Bindings.fs" />
     <Compile Include="Elmish.Extensions.fs" />
     <Compile Include="Abstractions.fs" />
-    <Compile Include="Types.fs" />
     <Compile Include="Infrastructure.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Program.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Bindings.fs" />
+    <Compile Include="TimePointsSettingsModel\TimePointsSettingsModel.fs" />
+    <Compile Include="TimePointsSettingsModel\TimePointsSettingsModel.Program.fs" />
+    <Compile Include="TimePointsSettingsModel\TimePointsSettingsModel.Bindings.fs" />
+    <Compile Include="SettingsModel\SettingsModel.fs" />
+    <Compile Include="SettingsModel\SettingsModel.Program.fs" />
+    <Compile Include="SettingsModel\SettingsModel.Bindings.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />
@@ -22,6 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="Elmish.WPF" Version="4.0.0-beta-45" />
+    <PackageReference Include="FSharp.SystemTextJson" Version="1.1.23" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />

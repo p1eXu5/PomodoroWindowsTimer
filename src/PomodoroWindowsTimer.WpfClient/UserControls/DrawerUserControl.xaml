@@ -72,7 +72,7 @@
                 HorizontalAlignment="Center"
                 Style="{StaticResource MaterialDesignFlatButton}"
                 Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                CommandParameter="{Binding BotSettingsModel}"
+                CommandParameter="{Binding SettingsModel}"
                 Content="BOT SETTINGS"
                 />
 

@@ -25,6 +25,9 @@
         <DataTemplate x:Key="dt_BotSettingsDialog">
             <usercontrols:BotSettingsDialog DataContext="{Binding}" />
         </DataTemplate>
+        <DataTemplate x:Key="dt_settingsDialog">
+            <usercontrols:SettingsDialog DataContext="{Binding}" />
+        </DataTemplate>
     </Window.Resources>
     
     <materialDesign:DialogHost DialogTheme="Inherit"

@@ -1,20 +1,24 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.BDD
 
+open System
+open System.Threading.Tasks
 open NUnit.Framework
 open FsUnit.TopLevelOperators
-open Elmish
+open ShouldExtensions
 open Bogus
+
+open Elmish
 open PomodoroWindowsTimer.Types
-open System
-open PomodoroWindowsTimer.ElmishApp.Tests.TestServices
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.TimePointQueue
 open PomodoroWindowsTimer.Looper
-open PomodoroWindowsTimer.Abstrractions
+
+open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
-open ShouldExtensions
-open System.Threading.Tasks
+
+open PomodoroWindowsTimer.ElmishApp.Tests.TestServices
 
 
 module StopResumeScenarios =
@@ -91,7 +95,7 @@ module StopResumeScenarios =
                     testBotConfiguration
                     sendToBot
                     looper
-                    Infrastructure.simWindowsMinimizer
+                    Windows.simWindowsMinimizer
                     (TestThemeSwitcher.create ())
                 )
                 (fun m _ -> model <- m)

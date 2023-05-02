@@ -78,12 +78,12 @@ let bindings () : Binding<MainModel, Msg> list =
             |> Option.defaultValue false
         )
 
-        "BotSettingsModel"
-            |> Binding.SubModel.required BotSettingsModel.Bindings.bindings
+        "SettingsModel"
+            |> Binding.SubModel.required SettingsModel.Bindings.bindings
             |> Binding.mapModel (fun m ->
-                m.BotSettingsModel
+                m.SettingsModel
             )
-            |> Binding.mapMsg MainModel.Msg.BotSettingsModelMsg
+            |> Binding.mapMsg MainModel.Msg.SettingsMsg
     ]
 
 
