@@ -8,6 +8,7 @@
         xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp;assembly=PomodoroWindowsTimer.ElmishApp"
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
         xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+        xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
         mc:Ignorable="d"
         Title="{Binding Title}"
         Height="420" Width="800"
@@ -22,11 +23,8 @@
         Icon="pomodoro-technique.ico"
         >
     <Window.Resources>
-        <DataTemplate x:Key="dt_BotSettingsDialog">
-            <usercontrols:BotSettingsDialog DataContext="{Binding}" />
-        </DataTemplate>
         <DataTemplate x:Key="dt_SettingsDialog">
-            <usercontrols:SettingsDialog DataContext="{Binding}" />
+            <settings:SettingsDialog DataContext="{Binding}" />
         </DataTemplate>
     </Window.Resources>
     

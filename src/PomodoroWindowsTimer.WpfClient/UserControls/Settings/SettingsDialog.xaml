@@ -1,9 +1,10 @@
-﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.SettingsDialog"
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.SettingsDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
@@ -18,23 +19,17 @@
     
     <DockPanel LastChildFill="True"
                >
-        <Button DockPanel.Dock="Bottom" Margin="10"
-                HorizontalAlignment="Center"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                Content="Close"
-                IsDefault="True"
-                Style="{StaticResource MaterialDesignFlatButton}"
-                />
         
-        <TabControl materialDesign:ColorZoneAssist.Mode="PrimaryDark"
-                    Style="{StaticResource MaterialDesignFilledTabControl}"
+
+        <TabControl materialDesign:ColorZoneAssist.Foreground="Gold"
+                    materialDesign:ColorZoneAssist.Mode="Custom"
                     SelectedIndex="{Binding SelectedSettingsIndex}"
                     >
             <TabItem Header="Time Points">
-                <local:TimePointsDialog DataContext="{Binding TimePointsSettingsModel}" />
+                <settings:TimePointsSettings DataContext="{Binding TimePointsSettingsModel}" />
             </TabItem>
             <TabItem Header="Telegram Bot">
-                <local:BotSettingsDialog DataContext="{Binding BotSettingsModel}" />
+                <settings:BotSettings DataContext="{Binding BotSettingsModel}" />
             </TabItem>
         </TabControl>
 

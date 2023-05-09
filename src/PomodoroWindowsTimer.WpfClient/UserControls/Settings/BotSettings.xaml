@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.BotSettingsDialog"
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.BotSettings"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -20,7 +20,13 @@
                  />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            
+            <Button DockPanel.Dock="Bottom" Margin="10"
+                HorizontalAlignment="Center"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                Content="Close"
+                IsDefault="True"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                />
         </StackPanel>
     </StackPanel>
 </UserControl>

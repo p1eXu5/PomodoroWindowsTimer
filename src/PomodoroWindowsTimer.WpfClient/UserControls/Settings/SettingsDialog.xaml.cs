@@ -13,14 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PomodoroWindowsTimer.WpfClient.UserControls;
-/// <summary>
-/// Interaction logic for BotSettingsDialog.xaml
-/// </summary>
-public partial class BotSettingsDialog : UserControl
+namespace PomodoroWindowsTimer.WpfClient.UserControls.Settings
 {
-    public BotSettingsDialog()
+    /// <summary>
+    /// Interaction logic for SettingsDialog.xaml
+    /// </summary>
+    public partial class SettingsDialog : UserControl
     {
-        InitializeComponent();
+        public SettingsDialog()
+        {
+            InitializeComponent();
+        }
     }
 }
