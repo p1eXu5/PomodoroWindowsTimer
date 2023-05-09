@@ -30,7 +30,7 @@ module TimePointsSettingsModel =
     open Elmish
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-    let [<Literal>] DEFAULT_PATTERN = "(w-b)3-w-lb-"
+    let [<Literal>] DEFAULT_PATTERN = "(w-b)3-w-lb"
 
     let init (timePointPrototypeStore: TimePointPrototypeStore) (patternSettings: IPatternSettings) =
         let (patterns, cmd) =

@@ -83,21 +83,27 @@ module StopResumeScenarios =
             let testBotConfiguration = TestBotConfiguration.create ()
             let sendToBot = TestBotSender.create ()
 
+            let mainModelCfg =
+                {
+                    BotConfiguration = testBotConfiguration
+                    SendToBot = sendToBot
+                    Looper = looper
+                    TimePointQueue = timePointQueue
+                    WindowsMinimizer = Windows.simWindowsMinimizer
+                    ThemeSwitcher = TestThemeSwitcher.create ()
+                    TimePointPrototypeStore = TestTimePointPrototypeStore.create ()
+                    PatternSettings = TestPatternSettings.create ()
+                }
+
             Program.mkProgram 
                 (fun () ->
                     MainModel.init
                         (TestSettingsManager.create ())
-                        testBotConfiguration
                         (TestErrorMessageQueue.create ())
+                        mainModelCfg
                         timePoints
                 ) 
-                (MainModel.Program.update
-                    testBotConfiguration
-                    sendToBot
-                    looper
-                    Windows.simWindowsMinimizer
-                    (TestThemeSwitcher.create ())
-                )
+                (MainModel.Program.update mainModelCfg)
                 (fun m _ -> model <- m)
             |> Program.withSubscription subscribe
             |> Program.withTrace (fun msg _ -> TestContext.WriteLine(sprintf "%A" msg))
@@ -149,17 +155,19 @@ module StopResumeScenarios =
 
     module Then =
 
-        let rec ``Active Point is set on`` timePoint =
+        let rec ``Active Point is set on`` (timePoint: TimePoint) =
             model.ActiveTimePoint
             |> Option.map (fun atp -> atp.Id = timePoint.Id)
             |> Option.defaultValue false
             |> shouldL be True (sprintf "%s:\n%A" (nameof ``Active Point is set on``) timePoint)
 
-        let rec ``Active Point remaining time is equal to or less then`` timePoint =
+
+        let rec ``Active Point remaining time is equal to or less then`` (timePoint: TimePoint) =
             model.ActiveTimePoint
             |> Option.map (fun atp -> atp.TimeSpan <= timePoint.TimeSpan.Add(TimeSpan.FromMilliseconds(Program.tickMilliseconds)))
             |> Option.defaultValue false
             |> shouldL be True (nameof ``Active Point remaining time is equal to or less then``)
+
 
         let rec ``LooperState is Playing`` () =
             model.LooperState

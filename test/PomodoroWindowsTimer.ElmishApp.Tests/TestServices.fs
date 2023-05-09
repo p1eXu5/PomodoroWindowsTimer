@@ -10,6 +10,7 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open PomodoroWindowsTimer.ElmishApp.MainModel
+open PomodoroWindowsTimer.Types
 
 let faker = Faker("en")
 
@@ -81,6 +82,24 @@ module TestThemeSwitcher =
     let create () =
         { new IThemeSwitcher with
             member _.SwitchTheme _ = ()
+        }
+
+
+[<RequireQualifiedAccess>]
+module TestTimePointPrototypeStore =
+    let create () =
+        {
+            Read = fun () -> TimePointPrototype.defaults
+            Write = fun _ -> ()
+        }
+
+
+[<RequireQualifiedAccess>]
+module TestPatternSettings =
+    let create () =
+        { new IPatternSettings with
+            member _.Read() = [TimePointsSettingsModel.DEFAULT_PATTERN]
+            member _.Write(_) = ()
         }
 
 
