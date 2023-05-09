@@ -3,20 +3,25 @@
 open Elmish.WPF
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.SettingsModel
 
 let bindings () =
     [
         "BotSettingsModel"
-            |> Binding.SubModel.required BotSettingsModel.Bindings.bindings
+            |> Binding.SubModel.opt BotSettingsModel.Bindings.bindings
             |> Binding.mapModel (fun m ->
                 m.BotSettingsModel
             )
-            |> Binding.mapMsg SettingsModel.Msg.BotSettingsModelMsg
+            |> Binding.mapMsg Msg.BotSettingsModelMsg
 
         "TimePointsSettingsModel"
-            |> Binding.SubModel.required TimePointsSettingsModel.Bindings.bindings
+            |> Binding.SubModel.opt TimePointsSettingsModel.Bindings.bindings
             |> Binding.mapModel (fun m ->
                 m.TimePointsSettingsModel
             )
-            |> Binding.mapMsg SettingsModel.Msg.TimePointsSettingsModelMsg
+            |> Binding.mapMsg Msg.TimePointsSettingsModelMsg
+
+        "SelectedSettingsIndex" |> Binding.twoWay (getSelectedSettingsIndex, Msg.SetSelectedSettingsIndex)
+
+        "SetTimePointsSettingsModelIndexCommand" |> Binding.cmd (Msg.SetSelectedSettingsIndex 0)
     ]

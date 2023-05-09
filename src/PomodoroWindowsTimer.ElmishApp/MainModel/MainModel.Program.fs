@@ -97,7 +97,7 @@ let update
         model, Cmd.ofMsg Play
 
     | SettingsMsg bmsg ->
-        let (settingsModel, settingsModelCmd) = SettingsModel.Program.update cfg.BotConfiguration bmsg model.SettingsModel
+        let (settingsModel, settingsModelCmd) = SettingsModel.Program.update cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings bmsg model.SettingsModel
         { model with SettingsModel = settingsModel }, Cmd.map SettingsMsg settingsModelCmd
 
     | Msg.PreChangeActiveTimeSpan ->
