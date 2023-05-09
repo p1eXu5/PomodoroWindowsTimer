@@ -23,9 +23,13 @@ module TimePointsSettingsModel =
         | SetSelectedPattern of string option
         | ProcessParseResult of Result<string list, string>
         | TimePointPrototypeMsg of id: Kind * TimePointPrototypeMsg
+        | TimePointMsg of id: Guid * TimePointMsg
     and
         TimePointPrototypeMsg =
             | SetTimeSpan of string
+    and
+        TimePointMsg =
+            | SetName of string
 
     open Elmish
     open PomodoroWindowsTimer.ElmishApp.Infrastructure

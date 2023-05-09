@@ -85,3 +85,27 @@ let update msg model =
             , Cmd.ofMsg (SetSelectedPattern model.SelectedPattern)
         )
         |> Option.defaultValue (model, Cmd.none)
+
+    | TimePointMsg (id, tpMsg) ->
+        let timePointInd =
+            model.TimePoints
+            |> List.findIndex (fun p -> p.Id = id)
+
+        let timePoint =
+            match tpMsg with
+            | SetName v when v <> null ->
+                { (model.TimePoints |> List.item timePointInd) with Name = v } |> Some
+            | _ -> None
+
+        timePoint
+        |> Option.map (fun p ->
+            {
+                model with
+                    TimePoints =
+                        (model.TimePoints |> List.take timePointInd)
+                        @ [p]
+                        @ (model.TimePoints |> List.skip (timePointInd + 1))
+            }
+            , Cmd.none
+        )
+        |> Option.defaultValue (model, Cmd.none)

@@ -9,8 +9,16 @@
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <ControlTemplate x:Key="ct_GeneratedTimePoint">
+            <StackPanel Orientation="Horizontal">
+                <TextBox Text="{Binding Name}" Width="100" Margin="18,0,0,0" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding TimeSpan}" Margin="20,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Kind}" VerticalAlignment="Center" />
+            </StackPanel>
+        </ControlTemplate>
+        
         <DataTemplate x:Key="dt_SettingsTimepPointTemplate">
-            <Control x:Name="theControl" Focusable="False" Template="{StaticResource ct_UnselectedTimePoint2}" />
+            <Control x:Name="theControl" Focusable="False" Template="{StaticResource ct_GeneratedTimePoint}" />
         </DataTemplate>
     </UserControl.Resources>
     
@@ -37,37 +45,48 @@
                       SelectedIndex="{Binding SelectedPatternIndex}"
                       >
             </ComboBox>
-            
-            <ListBox ItemsSource="{Binding TimePointPrototypes}" HorizontalContentAlignment="Stretch">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="Alias" />
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="TimeSpan" />
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Text="{Binding Kind}" VerticalAlignment="Center" IsReadOnly="True"/>
-                            <TextBox Grid.Column="1" Text="{Binding Alias}" VerticalAlignment="Center" IsReadOnly="True" Margin="10,0"/>
-                            <materialDesign:TimePicker Grid.Column="2" Width="100"
-                                                       materialDesign:HintAssist.Hint="Validates"
-                                                       Is24Hours="True"
-                                                       IsInvalidTextAllowed="False"
-                                                       VerticalAlignment="Center"
-                                                       WithSeconds="False"
-                                                       Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}">
-                            </materialDesign:TimePicker>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top">
+                <TextBlock Margin="0,30,0,10"
+                   Style="{StaticResource MaterialDesignButtonTextBlock}"
+                   HorizontalAlignment="Center"
+                   Text="PROTOTYPES"
+                   />
+                
+                <ListBox ItemsSource="{Binding TimePointPrototypes}" HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Alias" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="TimeSpan" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding Kind}" VerticalAlignment="Center" IsReadOnly="True"/>
+                                <TextBox Grid.Column="1" Text="{Binding Alias}" VerticalAlignment="Center" IsReadOnly="True" Margin="10,0"/>
+                                <materialDesign:TimePicker Grid.Column="2" Width="100"
+                                                           materialDesign:HintAssist.Hint="Validates"
+                                                           Is24Hours="True"
+                                                           IsInvalidTextAllowed="False"
+                                                           VerticalAlignment="Center"
+                                                           WithSeconds="False"
+                                                           Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}">
+                                </materialDesign:TimePicker>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </StackPanel>
 
         </DockPanel>
 
         <ListBox Grid.Row="0" Grid.Column="1"
+                 HorizontalAlignment="Center"
                  ItemsSource="{Binding TimePoints}"
                  ItemTemplate="{StaticResource dt_SettingsTimepPointTemplate}"
                  SelectionMode="Single"
+                 ScrollViewer.VerticalScrollBarVisibility="Visible"
+                 Height="280"
                  />
 
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">

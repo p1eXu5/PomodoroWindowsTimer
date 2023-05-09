@@ -22,8 +22,9 @@ let bindings ()  : Binding<TimePointsSettingsModel, TimePointsSettingsModel.Msg>
         "TimePoints" |> Binding.subModelSeq (
             (fun m -> m.TimePoints),
             (fun tp -> tp.Id),
+            Msg.TimePointMsg,
             (fun () -> [
-                "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
+                "Name" |> Binding.twoWay ((fun (_, e) -> e.Name), TimePointMsg.SetName)
                 "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan)
                 "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
                 "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
