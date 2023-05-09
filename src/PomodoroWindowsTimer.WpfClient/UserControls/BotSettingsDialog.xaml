@@ -20,11 +20,7 @@
                  />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Grid.Column="2" Margin="0,0,0,0"
-                      Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                      Content="Close"
-                      IsDefault="True"
-                      Style="{StaticResource MaterialDesignFlatButton}" />
+            
         </StackPanel>
     </StackPanel>
 </UserControl>

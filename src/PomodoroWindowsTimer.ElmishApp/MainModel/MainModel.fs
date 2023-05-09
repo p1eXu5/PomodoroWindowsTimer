@@ -37,7 +37,8 @@ type MainModeConfig =
         Looper: Looper
         WindowsMinimizer: WindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
-        KindAliasesStore: TimePointPrototypeStore
+        TimePointPrototypeStore: TimePointPrototypeStore
+        PatternSettings: IPatternSettings
     }
 
 
@@ -87,14 +88,19 @@ module MainModel =
 
         let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
+        let (settingsModel, settingsMsg) = SettingsModel.init cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings
+
         { initDefault () with
             AssemblyVersion = assemblyVer
             SettingsManager = settingsManager
             ErrorQueue = errorQueue
             TimePoints = timePoints
-            SettingsModel = SettingsModel.init cfg.BotConfiguration cfg.KindAliasesStore
+            SettingsModel = settingsModel
         }
-        , Cmd.ofMsg Msg.PickFirstTimePoint
+        , Cmd.batch [
+            Cmd.ofMsg Msg.PickFirstTimePoint
+            Cmd.map Msg.SettingsMsg settingsMsg
+        ]
 
 
     let setLooperState state m = { m with LooperState = state }

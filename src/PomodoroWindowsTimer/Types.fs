@@ -17,7 +17,17 @@ type TimePoint =
         Kind: Kind
     }
 
+/// Kind alias, used in patterns.
 type Alias = private Alias of string
+
+
+type TimePointPrototype =
+    {
+        Kind: Kind
+        Alias: Alias
+        TimeSpan: TimeSpan
+    }
+
 
 module Alias =
     let create str =
@@ -35,14 +45,6 @@ module Alias =
     let value (Alias v) = v
 
 
-type TimePointPrototype =
-    {
-        Kind: Kind
-        Alias: Alias
-        TimeSpan: TimeSpan
-    }
-
-
 module TimePointPrototype =
 
     let orThrow = function
@@ -55,3 +57,11 @@ module TimePointPrototype =
             { Kind = Kind.Break; Alias = "b" |> Alias.create |> orThrow; TimeSpan = TimeSpan.FromMinutes(5) }
             { Kind = Kind.LongBreak; Alias = "lb" |> Alias.create |> orThrow; TimeSpan = TimeSpan.FromMinutes(20) }
         ]
+
+    let toTimePoint ind prototype =
+        {
+            Id = Guid.NewGuid()
+            Name = sprintf "%O %i" prototype.Kind ind
+            TimeSpan = prototype.TimeSpan
+            Kind = prototype.Kind
+        }

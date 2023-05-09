@@ -15,12 +15,24 @@ let bindings ()  : Binding<TimePointsSettingsModel, TimePointsSettingsModel.Msg>
             (fun () -> [
                 "Kind" |> Binding.oneWay (fun (_, m) -> m.Kind)
                 "Alias" |> Binding.oneWay (fun (_, m) -> m.Alias |> Alias.value)
-                "TimeSpan" |> Binding.twoWay ((fun (_, m) -> m.TimeSpan), (fun ts _ -> TimePointPrototypeMsg.SetTimeSpan ts))
+                "TimeSpan" |> Binding.twoWay ((fun (_, m) -> m.TimeSpan.ToString()), (fun ts _ -> TimePointPrototypeMsg.SetTimeSpan ts))
+            ])
+        )
+
+        "TimePoints" |> Binding.subModelSeq (
+            (fun m -> m.TimePoints),
+            (fun tp -> tp.Id),
+            (fun () -> [
+                "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
+                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan)
+                "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
+                "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
             ])
         )
 
         // TODO: copy from LogParser
         "Patterns" |> Binding.oneWaySeq (getPatterns, (=), id)
-        "SelectedPattern" |> Binding.oneWayToSourceOpt (SetSelectedPatters)
+        "SelectedPattern" |> Binding.oneWayToSourceOpt (SetSelectedPattern)
+        "SelectedPatternIndex" |> Binding.twoWay (getSelectedPatternIndex, SetSelectedPatternIndex)
     ]
 

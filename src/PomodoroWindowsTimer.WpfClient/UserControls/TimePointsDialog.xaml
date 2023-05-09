@@ -6,27 +6,50 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <DataTemplate x:Key="dt_SettingsTimepPointTemplate">
+            <Control x:Name="theControl" Focusable="False" Template="{StaticResource ct_UnselectedTimePoint}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <StackPanel>
+        
+        <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" LastChildFill="True">
+            <!-- Patterns -->
+            <ComboBox DockPanel.Dock="Bottom"
+                      Width="250" Margin="10,0,10,10"
+                      materialDesign:HintAssist.Hint="Pattern"
+                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                      IsEditable="True"
+                      IsTextSearchEnabled="True"
+                      Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                      ItemsSource="{Binding Patterns}"
+                      SelectedIndex="{Binding SelectedPatternIndex}"
+                      >
+            </ComboBox>
             
-            <ListBox Grid.Column="0">
+            <ListBox ItemsSource="{Binding TimePointPrototypes}" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="Alias" />
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="TimeSpan" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding Name}"/>
-                            <materialDesign:TimePicker Width="100"
+                            <TextBox Grid.Column="0" Text="{Binding Kind}" VerticalAlignment="Center" IsReadOnly="True"/>
+                            <TextBox Grid.Column="1" Text="{Binding Alias}" VerticalAlignment="Center" IsReadOnly="True" Margin="10,0"/>
+                            <materialDesign:TimePicker Grid.Column="2" Width="100"
                                                        materialDesign:HintAssist.Hint="Validates"
                                                        Is24Hours="True"
                                                        IsInvalidTextAllowed="False"
+                                                       VerticalAlignment="Center"
                                                        Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}">
                             </materialDesign:TimePicker>
                         </Grid>
@@ -34,16 +57,12 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <!-- Service name -->
-            <ComboBox Width="250" Margin="10,0,10,10"
-                      materialDesign:HintAssist.Hint="Pattern"
-                      Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                      IsEditable="True"
-                      IsTextSearchEnabled="True"
-                      Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
-                      ItemsSource="{Binding Patterns}"
-                      >
-            </ComboBox>
-        </StackPanel>
+        </DockPanel>
+
+        <ListBox Grid.Column="1"
+                 ItemsSource="{Binding TimePoints}"
+                 ItemTemplate="{StaticResource dt_SettingsTimepPointTemplate}"
+                 SelectionMode="Single"
+                 />
     </Grid>
 </UserControl>

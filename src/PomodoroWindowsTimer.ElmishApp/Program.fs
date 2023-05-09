@@ -17,7 +17,15 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 let [<Literal>] tickMilliseconds = 200
 
 
-let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration, themeSwitcher: IThemeSwitcher, timePointKindAliases : ITimePointPrototypesSettings) =
+let internal main (
+    window,
+    errorQueue,
+    settingsManager,
+    botConfiguration: IBotConfiguration,
+    themeSwitcher: IThemeSwitcher,
+    timePointPrototypesSettings : ITimePointPrototypesSettings,
+    patternSettings: IPatternSettings)
+    =
     let logger =
         LoggerConfiguration()
 #if DEBUG
@@ -93,7 +101,8 @@ let internal main (window, errorQueue, settingsManager, botConfiguration: IBotCo
             Looper = looper
             WindowsMinimizer = windowsMinimizer
             ThemeSwitcher = themeSwitcher
-            KindAliasesStore = TimePointPrototypeStore.initialize timePointKindAliases
+            TimePointPrototypeStore = TimePointPrototypeStore.initialize timePointPrototypesSettings
+            PatternSettings = patternSettings
         }
 
 

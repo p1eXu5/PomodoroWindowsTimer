@@ -35,3 +35,9 @@ type ITimePointPrototypesSettings =
     interface
         abstract TimePointPrototypesSettings : string option with get, set
     end
+
+type IPatternSettings =
+    interface
+        abstract Read: unit -> string list
+        abstract Write: string list -> unit
+    end

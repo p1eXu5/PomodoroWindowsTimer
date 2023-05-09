@@ -2,28 +2,75 @@
 
 open PomodoroWindowsTimer.Types
 open System
+open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 type TimePointsSettingsModel =
     {
         TimePointPrototypes: TimePointPrototype list
         Patterns: string list
         SelectedPattern: string option
+        SelectedPatternIndex: int
+        TimePoints: TimePoint list
+        IsPatternWrong: bool
     }
 
 
 module TimePointsSettingsModel =
 
     type Msg =
+        | SetSelectedPattern of string option
+        | SetSelectedPatternIndex of int
         | ParsePattern of string
         | TimePointPrototypeMsg of Kind * TimePointPrototypeMsg
+        | ProcessParseResult of Result<string list, string>
     and
         TimePointPrototypeMsg =
-            | SetTimeSpan of TimeSpan
+            | SetTimeSpan of string
 
-
+    open Elmish
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-    let init (kindAliasesStore: TimePointPrototypeStore) =
+    let [<Literal>] DEFAULT_PATTERN = "(w-b)3-w-lb"
+
+    let init (timePointPrototypeStore: TimePointPrototypeStore) (patternSettings: IPatternSettings) =
+        let (patterns, cmd) =
+            match patternSettings.Read () with
+            | [] -> [ DEFAULT_PATTERN ], Cmd.ofMsg (Msg.SetSelectedPattern (DEFAULT_PATTERN |> Some))
+            | head :: tail -> (head :: tail), Cmd.ofMsg (Msg.SetSelectedPattern (head |> Some))
         {
-            TimePointPrototypes = kindAliasesStore.Read ()
+            TimePointPrototypes = timePointPrototypeStore.Read ()
+            Patterns = patterns
+            SelectedPattern = None
+            SelectedPatternIndex = 0
+            TimePoints = []
+            IsPatternWrong = false
         }
+        , cmd
+
+    // -------
+    // helpers
+    // -------
+    let getPatterns m = m.Patterns
+
+    let getSelectedPatternIndex m = m.SelectedPatternIndex
+
+    let setSelectedPattern pattern m =
+        { m with SelectedPattern = pattern |> Some }
+
+    let setSelectedPatternIndex ind m =
+        { m with SelectedPatternIndex = ind }
+
+    let unsetSelectedPattern m =
+        { m with SelectedPattern = None }
+
+    let setTimePoints tpx m =
+        { m with TimePoints = tpx }
+
+    let clearTimePoints m =
+        { m with TimePoints = [] }
+
+    let setIsPatternWrong m =
+        { m with IsPatternWrong = true }
+
+    let unsetIsPatternWrong m =
+        { m with IsPatternWrong = false }

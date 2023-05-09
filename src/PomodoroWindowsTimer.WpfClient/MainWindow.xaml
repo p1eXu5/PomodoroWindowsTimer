@@ -25,7 +25,7 @@
         <DataTemplate x:Key="dt_BotSettingsDialog">
             <usercontrols:BotSettingsDialog DataContext="{Binding}" />
         </DataTemplate>
-        <DataTemplate x:Key="dt_settingsDialog">
+        <DataTemplate x:Key="dt_SettingsDialog">
             <usercontrols:SettingsDialog DataContext="{Binding}" />
         </DataTemplate>
     </Window.Resources>
@@ -33,7 +33,7 @@
     <materialDesign:DialogHost DialogTheme="Inherit"
                                Identifier="RootDialog"
                                SnackbarMessageQueue="{Binding ElementName=ErrorMessageQueue, Path=MessageQueue}"
-                               DialogContentTemplate="{StaticResource dt_BotSettingsDialog}"
+                               DialogContentTemplate="{StaticResource dt_SettingsDialog}"
                                >
         
         <materialDesign:DrawerHost x:Name="DrawerHost"
