@@ -99,6 +99,7 @@ let internal main (
             BotConfiguration = botConfiguration
             SendToBot = sendToBot
             Looper = looper
+            TimePointQueue = timePointQueue
             WindowsMinimizer = windowsMinimizer
             ThemeSwitcher = themeSwitcher
             TimePointPrototypeStore = TimePointPrototypeStore.initialize timePointPrototypesSettings

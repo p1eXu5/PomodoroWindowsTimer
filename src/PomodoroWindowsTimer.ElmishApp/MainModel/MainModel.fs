@@ -6,6 +6,7 @@ open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.Types
 open System
 open Elmish.Extensions
+open PomodoroWindowsTimer.TimePointQueue
 
 
 type MainModel =
@@ -35,6 +36,7 @@ type MainModeConfig =
         BotConfiguration: IBotConfiguration
         SendToBot: BotSender
         Looper: Looper
+        TimePointQueue: TimePointQueue
         WindowsMinimizer: WindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
         TimePointPrototypeStore: TimePointPrototypeStore
@@ -66,6 +68,7 @@ module MainModel =
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
+        | TryStoreAndSetTimePoints
 
 
     open Elmish
@@ -88,18 +91,19 @@ module MainModel =
 
         let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
-        // let (settingsModel, settingsMsg) = SettingsModel.init cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings
+        let (settingsModel, settingsMsg) = SettingsModel.init cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings
 
         { initDefault () with
             AssemblyVersion = assemblyVer
             SettingsManager = settingsManager
             ErrorQueue = errorQueue
             TimePoints = timePoints
-            SettingsModel = SettingsModel.init ()
+            SettingsModel = settingsModel
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.PickFirstTimePoint
-            // Cmd.map Msg.SettingsMsg settingsMsg
+            Cmd.map Msg.SettingsMsg settingsMsg
+            Cmd.ofMsg Msg.TryStoreAndSetTimePoints
         ]
 
 

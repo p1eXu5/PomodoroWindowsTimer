@@ -7,9 +7,17 @@
         <StackPanel Orientation="Horizontal">
             <StackPanel.InputBindings>
                 <MouseBinding MouseAction="LeftDoubleClick"
-                                          Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                          CommandParameter="{Binding Id}" />
+                              Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                              CommandParameter="{Binding Id}" />
             </StackPanel.InputBindings>
+            <TextBlock Text="{Binding Name}" Width="100" Margin="18,0,0,0" />
+            <TextBlock Text="{Binding TimeSpan}" Margin="10,0"/>
+            <TextBlock Text="{Binding Kind}" />
+        </StackPanel>
+    </ControlTemplate>
+
+    <ControlTemplate x:Key="ct_UnselectedTimePoint2">
+        <StackPanel Orientation="Horizontal">
             <TextBlock Text="{Binding Name}" Width="100" Margin="18,0,0,0" />
             <TextBlock Text="{Binding TimeSpan}" Margin="10,0"/>
             <TextBlock Text="{Binding Kind}" />
@@ -20,8 +28,8 @@
         <StackPanel Orientation="Horizontal">
             <StackPanel.InputBindings>
                 <MouseBinding MouseAction="LeftDoubleClick"
-                                          Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                          CommandParameter="{Binding Id}" />
+                              Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                              CommandParameter="{Binding Id}" />
             </StackPanel.InputBindings>
 
             <Border VerticalAlignment="Center" Margin="0,0,2,0">
@@ -34,4 +42,5 @@
             <TextBlock Text="{Binding Kind}" />
         </StackPanel>
     </ControlTemplate>
+
 </ResourceDictionary>

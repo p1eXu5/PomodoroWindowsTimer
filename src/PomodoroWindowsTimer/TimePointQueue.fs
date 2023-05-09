@@ -24,6 +24,7 @@ type private Msg =
     | GetNext of AsyncReplyChannel<TimePoint option>
     | Pick of AsyncReplyChannel<TimePoint option>
     | Scroll of Guid * AsyncReplyChannel<unit>
+    | Reset
 
 
 type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Threading.CancellationToken) =
@@ -43,6 +44,9 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
                     let! msg = inbox.Receive()
                         
                     match msg with
+                    | Reset ->
+                        return! loop State.Default
+
                     | AddMany timePoints ->
                         let maxPriority' = enqueue timePoints (state.MaxPriority)
                         return! loop { state with MaxPriority = maxPriority' }
@@ -97,6 +101,10 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
     new() = new TimePointQueue(Seq.empty)
 
     member _.ConnectImpulse() = ()
+
+    member this.Reload(timePoints: TimePoint seq) =
+        _agent.Post(Reset)
+        this.AddMany(timePoints)
 
     member _.AddMany(timePoints: TimePoint seq) =
         _agent.Post(AddMany (timePoints |> Seq.readonly))

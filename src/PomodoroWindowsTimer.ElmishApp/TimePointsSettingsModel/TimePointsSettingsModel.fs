@@ -18,11 +18,11 @@ type TimePointsSettingsModel =
 module TimePointsSettingsModel =
 
     type Msg =
-        | SetSelectedPattern of string option
+        | SetPatterns of string list
         | SetSelectedPatternIndex of int
-        | ParsePattern of string
-        | TimePointPrototypeMsg of Kind * TimePointPrototypeMsg
+        | SetSelectedPattern of string option
         | ProcessParseResult of Result<string list, string>
+        | TimePointPrototypeMsg of id: Kind * TimePointPrototypeMsg
     and
         TimePointPrototypeMsg =
             | SetTimeSpan of string
@@ -30,7 +30,7 @@ module TimePointsSettingsModel =
     open Elmish
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-    let [<Literal>] DEFAULT_PATTERN = "(w-b)3-w-lb"
+    let [<Literal>] DEFAULT_PATTERN = "(w-b)3-w-lb-"
 
     let init (timePointPrototypeStore: TimePointPrototypeStore) (patternSettings: IPatternSettings) =
         let (patterns, cmd) =

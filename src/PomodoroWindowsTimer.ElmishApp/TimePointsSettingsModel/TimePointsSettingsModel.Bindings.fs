@@ -15,7 +15,7 @@ let bindings ()  : Binding<TimePointsSettingsModel, TimePointsSettingsModel.Msg>
             (fun () -> [
                 "Kind" |> Binding.oneWay (fun (_, m) -> m.Kind)
                 "Alias" |> Binding.oneWay (fun (_, m) -> m.Alias |> Alias.value)
-                "TimeSpan" |> Binding.twoWay ((fun (_, m) -> m.TimeSpan.ToString()), (fun ts _ -> TimePointPrototypeMsg.SetTimeSpan ts))
+                "TimeSpan" |> Binding.twoWay ((fun (_, m) -> m.TimeSpan.ToString("h':'mm")), (fun ts _ -> TimePointPrototypeMsg.SetTimeSpan ts))
             ])
         )
 
@@ -32,7 +32,11 @@ let bindings ()  : Binding<TimePointsSettingsModel, TimePointsSettingsModel.Msg>
 
         // TODO: copy from LogParser
         "Patterns" |> Binding.oneWaySeq (getPatterns, (=), id)
-        "SelectedPattern" |> Binding.oneWayToSourceOpt (SetSelectedPattern)
+        "SelectedPattern"
+            |> Binding.twoWayOpt ((fun m -> m.SelectedPattern), SetSelectedPattern)
+            |> Binding.addValidation (fun m -> if m.IsPatternWrong then ["Wrong pattern"] else [])
+
         "SelectedPatternIndex" |> Binding.twoWay (getSelectedPatternIndex, SetSelectedPatternIndex)
+        "IsPatternCorrect" |> Binding.oneWay (fun m -> m.IsPatternWrong |> not)
     ]
 

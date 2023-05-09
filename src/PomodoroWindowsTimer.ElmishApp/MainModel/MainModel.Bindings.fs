@@ -60,7 +60,7 @@ let bindings () : Binding<MainModel, Msg> list =
             (fun tp -> tp.Id),
             (fun () -> [
                 "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
-                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan)
+                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
                 "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
                 "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
                 "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePoint |> Option.map (fun atp -> atp.Id = e.Id) |> Option.defaultValue false)
@@ -84,6 +84,17 @@ let bindings () : Binding<MainModel, Msg> list =
                 m.SettingsModel
             )
             |> Binding.mapMsg MainModel.Msg.SettingsMsg
+
+        "TryStoreAndSetTimePointsCommand"
+            |> Binding.cmdIf (fun m ->
+                m.SettingsModel.TimePointsSettingsModel
+                |> Option.bind (fun tpModel ->
+                    if not tpModel.IsPatternWrong then
+                        Msg.TryStoreAndSetTimePoints |> Some
+                    else
+                        None
+                )
+            )
     ]
 
 

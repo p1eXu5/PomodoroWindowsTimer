@@ -32,7 +32,7 @@
                                Identifier="RootDialog"
                                SnackbarMessageQueue="{Binding ElementName=ErrorMessageQueue, Path=MessageQueue}"
                                DialogContentTemplate="{StaticResource dt_SettingsDialog}"
-                               
+                               DialogClosing="DialogHost_DialogClosing"
                                >
         
         <materialDesign:DrawerHost x:Name="DrawerHost"

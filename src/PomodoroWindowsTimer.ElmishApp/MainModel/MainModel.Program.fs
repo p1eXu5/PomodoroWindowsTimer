@@ -113,6 +113,22 @@ let update
         cfg.Looper.Resume()
         model, Cmd.none
 
+    | Msg.TryStoreAndSetTimePoints ->
+        cfg.Looper.Stop()
+        let timePointsSettingsModel = model.SettingsModel.TimePointsSettingsModel |> Option.get
+        cfg.TimePointQueue.Reload(timePointsSettingsModel.TimePoints)
+        let patterns = timePointsSettingsModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsSettingsModel.Patterns) |> List.distinct
+        cfg.PatternSettings.Write(patterns)
+        cfg.TimePointPrototypeStore.Write(timePointsSettingsModel.TimePointPrototypes)
+        { model with TimePoints = timePointsSettingsModel.TimePoints }, Cmd.batch [
+            Cmd.ofMsg Msg.PickFirstTimePoint
+
+            TimePointsSettingsModel.Msg.SetPatterns patterns
+            |> SettingsModel.Msg.TimePointsSettingsModelMsg
+            |> Msg.SettingsMsg
+            |> Cmd.ofMsg
+        ]
+
     | Msg.OnError ex ->
         model.ErrorQueue.EnqueuError(ex.Message)
         model, Cmd.none

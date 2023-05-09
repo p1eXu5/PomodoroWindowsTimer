@@ -16,11 +16,9 @@
             <Behaviors:InvokeCommandAction Command="{Binding SetTimePointsSettingsModelIndexCommand}" />
         </Behaviors:EventTrigger>
     </Behaviors:Interaction.Triggers>
-    
+
     <DockPanel LastChildFill="True"
                >
-        
-
         <TabControl materialDesign:ColorZoneAssist.Foreground="Gold"
                     materialDesign:ColorZoneAssist.Mode="Custom"
                     SelectedIndex="{Binding SelectedSettingsIndex}"

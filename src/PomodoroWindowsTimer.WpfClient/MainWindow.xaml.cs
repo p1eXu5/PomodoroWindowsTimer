@@ -45,4 +45,18 @@ public partial class MainWindow : Window
             openFileCommand.Execute(null);
         }
     }
+
+    private void DialogHost_DialogClosing(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
+    {
+        if (eventArgs.Parameter is bool parameter && parameter == false)
+        {
+            return;
+        }
+
+        ICommand command = ((dynamic)DataContext).TryStoreAndSetTimePointsCommand;
+        if (command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+    }
 }

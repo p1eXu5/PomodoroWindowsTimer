@@ -16,12 +16,12 @@ module SettingsModel =
 
     open Elmish
 
-    let init () =
-        {
-            SelectedSettingsIndex = -1
-            BotSettingsModel = None
-            TimePointsSettingsModel = None
-        }
+    //let init () =
+    //    {
+    //        SelectedSettingsIndex = -1
+    //        BotSettingsModel = None
+    //        TimePointsSettingsModel = None
+    //    }
 
 
     let getSelectedSettingsIndex m = m.SelectedSettingsIndex
@@ -29,11 +29,12 @@ module SettingsModel =
     let setSelectedSettingsIndex ind m =
         { m with SelectedSettingsIndex = ind }
 
-    // let init botConfiguration timePointPrototypeStore patternSettings =
-    //     let botSettings = BotSettingsModel.init botConfiguration
-    //     let (timePointsSettings, cmd) = TimePointsSettingsModel.init timePointPrototypeStore patternSettings
-    //     {
-    //         BotSettingsModel = botSettings
-    //         TimePointsSettingsModel = timePointsSettings
-    //     }
-    //     , Cmd.map TimePointsSettingsModelMsg cmd
+    let init botConfiguration timePointPrototypeStore patternSettings =
+        let botSettings = BotSettingsModel.init botConfiguration
+        let (timePointsSettings, cmd) = TimePointsSettingsModel.init timePointPrototypeStore patternSettings
+        {
+            SelectedSettingsIndex = -1
+            BotSettingsModel = botSettings |> Some
+            TimePointsSettingsModel = timePointsSettings |> Some
+        }
+        , Cmd.map TimePointsSettingsModelMsg cmd

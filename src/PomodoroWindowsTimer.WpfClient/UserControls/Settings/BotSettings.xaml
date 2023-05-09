@@ -23,10 +23,16 @@
             <Button DockPanel.Dock="Bottom" Margin="10"
                 HorizontalAlignment="Center"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                Content="Close"
+                Content="CLOSE"
                 IsDefault="True"
                 Style="{StaticResource MaterialDesignFlatButton}"
-                />
+                >
+                <Button.CommandParameter>
+                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
+                        False
+                    </system:Boolean>
+                </Button.CommandParameter>
+            </Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -10,17 +10,21 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <DataTemplate x:Key="dt_SettingsTimepPointTemplate">
-            <Control x:Name="theControl" Focusable="False" Template="{StaticResource ct_UnselectedTimePoint}" />
+            <Control x:Name="theControl" Focusable="False" Template="{StaticResource ct_UnselectedTimePoint2}" />
         </DataTemplate>
     </UserControl.Resources>
     
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        
-        <DockPanel Grid.Column="0" Grid.IsSharedSizeScope="True" LastChildFill="True">
+
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.IsSharedSizeScope="True" LastChildFill="True">
             <!-- Patterns -->
             <ComboBox DockPanel.Dock="Bottom"
                       Width="250" Margin="10,0,10,10"
@@ -28,7 +32,7 @@
                       Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                       IsEditable="True"
                       IsTextSearchEnabled="True"
-                      Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                      Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged}"
                       ItemsSource="{Binding Patterns}"
                       SelectedIndex="{Binding SelectedPatternIndex}"
                       >
@@ -50,6 +54,7 @@
                                                        Is24Hours="True"
                                                        IsInvalidTextAllowed="False"
                                                        VerticalAlignment="Center"
+                                                       WithSeconds="False"
                                                        Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}">
                             </materialDesign:TimePicker>
                         </Grid>
@@ -59,10 +64,40 @@
 
         </DockPanel>
 
-        <ListBox Grid.Column="1"
+        <ListBox Grid.Row="0" Grid.Column="1"
                  ItemsSource="{Binding TimePoints}"
                  ItemTemplate="{StaticResource dt_SettingsTimepPointTemplate}"
                  SelectionMode="Single"
                  />
+
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button DockPanel.Dock="Bottom" Margin="10"
+                HorizontalAlignment="Center"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                Content="CLOSE"
+                IsCancel="True"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                >
+                <Button.CommandParameter>
+                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
+                        False
+                    </system:Boolean>
+                </Button.CommandParameter>
+            </Button>
+            <Button DockPanel.Dock="Bottom" Margin="10"
+                HorizontalAlignment="Center"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                Content="APPLY"
+                IsDefault="True"
+                IsEnabled="{Binding IsPatternCorrect}"
+                Style="{StaticResource MaterialDesignFlatButton}"
+                >
+                <Button.CommandParameter>
+                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
+                        True
+                    </system:Boolean>
+                </Button.CommandParameter>
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl>
