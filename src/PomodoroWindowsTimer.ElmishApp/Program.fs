@@ -24,6 +24,7 @@ let internal main (
     botConfiguration: IBotConfiguration,
     themeSwitcher: IThemeSwitcher,
     timePointPrototypesSettings : ITimePointPrototypesSettings,
+    timePointSettings : ITimePointSettings,
     patternSettings: IPatternSettings)
     =
     let logger =
@@ -49,27 +50,7 @@ let internal main (
 
     // let mainModelLogger : ILogger = loggerFactory.CreateLogger(nameof (PomodoroWindowsTimer.ElmishApp.Models.MainModel))
 
-    let timePoints =
-        [
-            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 3"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 4"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(20); Kind = Break }
-        ]
-
-    let testTimePoints =
-        [
-            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
-        ]
-
-    let timePointQueue = new TimePointQueue(timePoints)
+    let timePointQueue = new TimePointQueue()
     let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
 
     let subscribe _ =
@@ -103,12 +84,13 @@ let internal main (
             WindowsMinimizer = windowsMinimizer
             ThemeSwitcher = themeSwitcher
             TimePointPrototypeStore = TimePointPrototypeStore.initialize timePointPrototypesSettings
+            TimePointStore = TimePointStore.initialize timePointSettings
             PatternSettings = patternSettings
         }
 
 
     WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager errorQueue mainModelCfg timePoints)
+        (fun () -> MainModel.init settingsManager errorQueue mainModelCfg)
         (MainModel.Program.update mainModelCfg)
         MainModel.Bindings.bindings
     |> WpfProgram.withLogger loggerFactory

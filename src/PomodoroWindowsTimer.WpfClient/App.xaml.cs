@@ -57,6 +57,7 @@ namespace PomodoroWindowsTimer.WpfClient
                 new BotConfiguration(SettingsManager.Instance),
                 new ThemeSwitcher(),
                 new TimePointPrototypesSettings(SettingsManager.Instance),
+                new TimePointSettings(SettingsManager.Instance),
                 new PatternSettings(SettingsManager.Instance)
             );
         }

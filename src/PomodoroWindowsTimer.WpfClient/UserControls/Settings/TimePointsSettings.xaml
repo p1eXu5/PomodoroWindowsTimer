@@ -25,7 +25,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="80" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -80,16 +80,22 @@
 
         </DockPanel>
 
-        <ListBox Grid.Row="0" Grid.Column="1"
-                 HorizontalAlignment="Center"
-                 ItemsSource="{Binding TimePoints}"
-                 ItemTemplate="{StaticResource dt_SettingsTimepPointTemplate}"
-                 SelectionMode="Single"
-                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                 Height="280"
-                 />
+        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Top">
+            <TextBlock Margin="0,30,0,10"
+                   Style="{StaticResource MaterialDesignButtonTextBlock}"
+                   HorizontalAlignment="Center"
+                   Text="TIME POINTS"
+                   />
+            <ListBox HorizontalAlignment="Center"
+                     ItemsSource="{Binding TimePoints}"
+                     ItemTemplate="{StaticResource dt_SettingsTimepPointTemplate}"
+                     SelectionMode="Single"
+                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                     Height="244"
+                     />
+        </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button DockPanel.Dock="Bottom" Margin="10"
                 HorizontalAlignment="Center"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"

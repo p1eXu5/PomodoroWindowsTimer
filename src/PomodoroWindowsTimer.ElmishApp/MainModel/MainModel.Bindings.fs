@@ -19,6 +19,7 @@ let bindings () : Binding<MainModel, Msg> list =
         "PlayPauseButtonText"
         |> Binding.oneWay (fun m ->
             match m.LooperState with
+            | TimeShiftOnStopped _
             | Initialized -> "Play"
             | Playing -> "Stop"
             | Stopped -> "Resume"
@@ -27,6 +28,7 @@ let bindings () : Binding<MainModel, Msg> list =
         "PlayStopCommand"
         |> Binding.cmd (fun m ->
             match m.LooperState with
+            | TimeShiftOnStopped _
             | Initialized -> Msg.Play
             | Playing -> Msg.Stop
             | Stopped -> Msg.Resume

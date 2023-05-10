@@ -16,6 +16,11 @@ let update
     (msg: Msg) (model: MainModel) =
 
     match msg with
+    | Msg.LoadTimePointsFromSettings ->
+        let timePoints = cfg.TimePointStore.Read()
+        cfg.TimePointQueue.Reload(timePoints)
+        { model with TimePoints = timePoints }, Cmd.ofMsg Msg.PickFirstTimePoint
+
     | Msg.PickFirstTimePoint ->
         cfg.Looper.PreloadTimePoint()
         model, Cmd.none
@@ -100,9 +105,16 @@ let update
         let (settingsModel, settingsModelCmd) = SettingsModel.Program.update cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings bmsg model.SettingsModel
         { model with SettingsModel = settingsModel }, Cmd.map SettingsMsg settingsModelCmd
 
+    // --------------------
+    // Active time changing
+    // --------------------
     | Msg.PreChangeActiveTimeSpan ->
-        cfg.Looper.Stop()
-        model, Cmd.none
+        match model.LooperState with
+        | Playing ->
+            cfg.Looper.Stop()
+            model, Cmd.none
+        | _ ->
+            { model with LooperState = TimeShiftOnStopped model.LooperState }, Cmd.none
 
     | Msg.ChangeActiveTimeSpan v ->
         let duration = model |> getActiveTimeDuration
@@ -110,9 +122,14 @@ let update
         model, Cmd.none
 
     | Msg.PostChangeActiveTimeSpan ->
-        cfg.Looper.Resume()
-        model, Cmd.none
+        match model.LooperState with
+        | TimeShiftOnStopped s ->
+            { model with LooperState = s }, Cmd.none
+        | _ ->
+            cfg.Looper.Resume()
+            model, Cmd.none
 
+    // --------------------
     | Msg.TryStoreAndSetTimePoints ->
         cfg.Looper.Stop()
         let timePointsSettingsModel = model.SettingsModel.TimePointsSettingsModel |> Option.get

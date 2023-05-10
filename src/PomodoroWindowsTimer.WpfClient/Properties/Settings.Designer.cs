@@ -69,5 +69,17 @@ namespace PomodoroWindowsTimer.WpfClient.Properties {
                 this["TimePointPrototypes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TimePoints {
+            get {
+                return ((string)(this["TimePoints"]));
+            }
+            set {
+                this["TimePoints"] = value;
+            }
+        }
     }
 }

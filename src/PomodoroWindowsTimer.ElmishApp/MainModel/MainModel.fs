@@ -27,6 +27,7 @@ and
         | Initialized
         | Playing
         | Stopped
+        | TimeShiftOnStopped of previosState: LooperState
 and
     UIInitiator = UIInitiator of TimePoint
 
@@ -40,6 +41,7 @@ type MainModeConfig =
         WindowsMinimizer: WindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
         TimePointPrototypeStore: TimePointPrototypeStore
+        TimePointStore: TimePointStore
         PatternSettings: IPatternSettings
     }
 
@@ -68,7 +70,9 @@ module MainModel =
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
+        /// Stores and loads generated timepoints from prototypes.
         | TryStoreAndSetTimePoints
+        | LoadTimePointsFromSettings
 
 
     open Elmish
@@ -87,7 +91,7 @@ module MainModel =
             LastCommandInitiator = None
         }
 
-    let init settingsManager errorQueue (cfg: MainModeConfig) timePoints : MainModel * Cmd<Msg> =
+    let init settingsManager errorQueue (cfg: MainModeConfig) : MainModel * Cmd<Msg> =
 
         let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
 
@@ -97,16 +101,16 @@ module MainModel =
             AssemblyVersion = assemblyVer
             SettingsManager = settingsManager
             ErrorQueue = errorQueue
-            TimePoints = timePoints
+            TimePoints = []
             SettingsModel = settingsModel
         }
         , Cmd.batch [
-            Cmd.ofMsg Msg.PickFirstTimePoint
-            Cmd.map Msg.SettingsMsg settingsMsg
-            Cmd.ofMsg Msg.TryStoreAndSetTimePoints
+            Cmd.ofMsg Msg.LoadTimePointsFromSettings
         ]
 
-
+    // =========
+    // accessors
+    // =========
     let setLooperState state m = { m with LooperState = state }
 
     let setUIInitiator m  =
@@ -125,6 +129,10 @@ module MainModel =
 
     let isLooperRunning m =
         match m.LooperState with
+        | TimeShiftOnStopped s ->
+            match s with
+            | Initialized -> false
+            | _ -> true
         | Initialized -> false
         | _ -> true
 

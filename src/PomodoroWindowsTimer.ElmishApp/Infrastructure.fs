@@ -23,27 +23,68 @@ module TimePointPrototypeStore =
             .WithUnionUnwrapSingleCaseUnions(false)
             .ToJsonSerializerOptions()
 
-    let read (timePointKindAliases : ITimePointPrototypesSettings) =
-        timePointKindAliases.TimePointPrototypesSettings
+    let read (timePointPrototypeSettings : ITimePointPrototypesSettings) =
+        timePointPrototypeSettings.TimePointPrototypesSettings
         |> Option.map (fun s ->
             JsonSerializer.Deserialize<TimePointPrototype list>(s, options)
         )
         |> Option.defaultValue TimePointPrototype.defaults
 
 
-    let write (timePointKindAliases : ITimePointPrototypesSettings) (aliases: TimePointPrototype list) =
-        match aliases with
+    let write (timePointPrototypeSettings : ITimePointPrototypesSettings) (timePointPrototypes: TimePointPrototype list) =
+        match timePointPrototypes with
         | [] ->
-            timePointKindAliases.TimePointPrototypesSettings <- None
+            timePointPrototypeSettings.TimePointPrototypesSettings <- None
         | _ ->
-            let s = JsonSerializer.Serialize(aliases, options)
-            timePointKindAliases.TimePointPrototypesSettings <- s |> Some
+            let s = JsonSerializer.Serialize(timePointPrototypes, options)
+            timePointPrototypeSettings.TimePointPrototypesSettings <- s |> Some
 
 
-    let initialize (timePointKindAliases : ITimePointPrototypesSettings) =
+    let initialize (timePointPrototypeSettings : ITimePointPrototypesSettings) : TimePointPrototypeStore =
         {
-            Read = fun () -> read timePointKindAliases
-            Write = write timePointKindAliases
+            Read = fun () -> read timePointPrototypeSettings
+            Write = write timePointPrototypeSettings
+        }
+
+
+type TimePointStore =
+    {
+        Read: unit -> TimePoint list
+        Write: TimePoint list -> unit
+    }
+
+module TimePointStore =
+    open System.Text.Json
+    open System.Text.Json.Serialization
+
+    let options =
+        JsonFSharpOptions.Default()
+            .WithUnionExternalTag()
+            .WithUnionNamedFields()
+            .WithUnionUnwrapSingleCaseUnions(false)
+            .ToJsonSerializerOptions()
+
+    let read (timePointSettings : ITimePointSettings) =
+        timePointSettings.TimePointSettings
+        |> Option.map (fun s ->
+            JsonSerializer.Deserialize<TimePoint list>(s, options)
+        )
+        |> Option.defaultValue TimePoint.defaults
+
+
+    let write (timePointSettings : ITimePointSettings) (timePoints: TimePoint list) =
+        match timePoints with
+        | [] ->
+            timePointSettings.TimePointSettings <- None
+        | _ ->
+            let s = JsonSerializer.Serialize(timePoints, options)
+            timePointSettings.TimePointSettings <- s |> Some
+
+
+    let initialize (timePointSettings : ITimePointSettings) : TimePointStore =
+        {
+            Read = fun () -> read timePointSettings
+            Write = write timePointSettings
         }
 
 
