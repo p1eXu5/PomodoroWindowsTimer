@@ -87,9 +87,18 @@ module TestThemeSwitcher =
 
 [<RequireQualifiedAccess>]
 module TestTimePointPrototypeStore =
-    let create () =
+    let create () : TimePointPrototypeStore =
         {
             Read = fun () -> TimePointPrototype.defaults
+            Write = fun _ -> ()
+        }
+
+
+[<RequireQualifiedAccess>]
+module TestTimePointStore =
+    let create (timePoints: TimePoint list) : TimePointStore =
+        {
+            Read = fun () -> timePoints
             Write = fun _ -> ()
         }
 

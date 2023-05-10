@@ -92,6 +92,7 @@ module StopResumeScenarios =
                     WindowsMinimizer = Windows.simWindowsMinimizer
                     ThemeSwitcher = TestThemeSwitcher.create ()
                     TimePointPrototypeStore = TestTimePointPrototypeStore.create ()
+                    TimePointStore = TestTimePointStore.create timePoints
                     PatternSettings = TestPatternSettings.create ()
                 }
 
@@ -101,7 +102,6 @@ module StopResumeScenarios =
                         (TestSettingsManager.create ())
                         (TestErrorMessageQueue.create ())
                         mainModelCfg
-                        timePoints
                 ) 
                 (MainModel.Program.update mainModelCfg)
                 (fun m _ -> model <- m)
