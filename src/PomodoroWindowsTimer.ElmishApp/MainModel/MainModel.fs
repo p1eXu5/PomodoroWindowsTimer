@@ -184,3 +184,14 @@ module MainModel =
         |> Option.defaultValue 0.0
 
     let getDisableSkipBreak m = m.DisableSkipBreak
+
+    let nextMsg m =
+        m.ActiveTimePoint
+        |> Option.bind (fun atp ->
+            match atp.Kind with
+            | Kind.Break
+            | Kind.LongBreak when m.DisableSkipBreak ->
+                None
+            | _ ->
+                Msg.Next |> Some
+        )

@@ -34,7 +34,7 @@ let bindings () : Binding<MainModel, Msg> list =
             | Stopped -> Msg.Resume
         )
 
-        "NextCommand" |> Binding.cmd Msg.Next
+        "NextCommand" |> Binding.cmdIf nextMsg
 
         "ReplayCommand"
         |> Binding.cmdIf (fun m ->
