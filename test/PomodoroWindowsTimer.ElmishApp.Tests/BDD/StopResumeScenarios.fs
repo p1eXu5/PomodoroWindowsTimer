@@ -94,6 +94,7 @@ module StopResumeScenarios =
                     TimePointPrototypeStore = TestTimePointPrototypeStore.create ()
                     TimePointStore = TestTimePointStore.create timePoints
                     PatternSettings = TestPatternSettings.create ()
+                    DisableSkipBreakSettings = TestDisableSkipBreakSettings.create ()
                 }
 
             Program.mkProgram 

@@ -52,10 +52,10 @@ module TestBotConfiguration =
     let create () =
         { new IBotSettings with
             member _.BotToken
-                with get() = faker.Random.Hash()
+                with get() = faker.Random.Hash() |> Some
                 and set t = ()
             member _. MyChatId
-                with get() = faker.Numeric(9)
+                with get() = faker.Numeric(9) |> Some
                 and set t = ()
         }
 
@@ -109,6 +109,14 @@ module TestPatternSettings =
         { new IPatternSettings with
             member _.Read() = [TimePointsSettingsModel.DEFAULT_PATTERN]
             member _.Write(_) = ()
+        }
+
+module TestDisableSkipBreakSettings =
+    let create () =
+        { new IDisableSkipBreakSettings with
+            member _.DisableSkipBreak
+                with get() = false
+                and set t = ()
         }
 
 
