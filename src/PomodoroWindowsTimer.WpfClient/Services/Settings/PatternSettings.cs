@@ -3,7 +3,7 @@ using Microsoft.FSharp.Collections;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using System.Collections.Specialized;
 
-namespace PomodoroWindowsTimer.WpfClient.Services;
+namespace PomodoroWindowsTimer.WpfClient.Services.Settings;
 
 public sealed class PatternSettings : IPatternSettings
 {
@@ -22,7 +22,7 @@ public sealed class PatternSettings : IPatternSettings
             return FSharpList<string>.Empty;
         }
 
-        return SeqModule.ToList<string>(coll.Cast<string>());
+        return SeqModule.ToList(coll.Cast<string>());
     }
 
     public void Write(FSharpList<string> list)

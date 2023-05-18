@@ -17,9 +17,9 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls;
 /// <summary>
 /// Interaction logic for DrawerUserControl.xaml
 /// </summary>
-public partial class DrawerUserControl : UserControl
+public partial class RunningTimePoints : UserControl
 {
-    public DrawerUserControl()
+    public RunningTimePoints()
     {
         InitializeComponent();
     }

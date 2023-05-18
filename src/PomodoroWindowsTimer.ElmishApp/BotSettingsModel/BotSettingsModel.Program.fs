@@ -5,12 +5,12 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.BotSettingsModel
 
 
-let update (botConfiguration: IBotConfiguration) msg model =
+let update (botConfiguration: IBotSettings) msg model =
     match msg with
     | SetBotToken token ->
-        botConfiguration.BotToken <- (token |> Option.defaultValue "")
+        botConfiguration.BotToken <- token
         { model with BotToken = token }
 
     | SetChatId chatId ->
-        botConfiguration.MyChatId <- (chatId |> Option.defaultValue "")
+        botConfiguration.MyChatId <- chatId
         { model with ChatId = chatId }

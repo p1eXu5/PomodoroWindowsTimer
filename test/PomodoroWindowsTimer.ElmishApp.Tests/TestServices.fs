@@ -50,7 +50,7 @@ module TestErrorMessageQueue =
 module TestBotConfiguration =
 
     let create () =
-        { new IBotConfiguration with
+        { new IBotSettings with
             member _.BotToken
                 with get() = faker.Random.Hash()
                 and set t = ()

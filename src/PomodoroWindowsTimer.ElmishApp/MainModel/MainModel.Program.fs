@@ -9,7 +9,7 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
-
+open Elmish.WPF
 
 let update
     (cfg: MainModeConfig)
@@ -70,6 +70,16 @@ let update
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
             | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none)
             | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
+                //let breakCmd =
+                //    Cmd.batch [
+                //        Cmd.ofMsg MinimizeWindows
+                //        Cmd.OfAsync.start (
+                //            task {
+                //                let vm = Binding.SubModelT.
+                //                let! _ = cfg.DialogHost.
+                //            }
+                //        )
+                //    ]
                 match nextTp.Kind with
                 | LongBreak -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
                 | Break -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
@@ -93,7 +103,7 @@ let update
     | SendToChatBot ->
         let messageText =
             model.ActiveTimePoint |> Option.map (fun tp -> $"It's time to {tp.Name}!!") |> Option.defaultValue "It's time!!"
-        model, Cmd.OfTask.attempt (cfg.SendToBot cfg.BotConfiguration) messageText Msg.OnError
+        model, Cmd.OfTask.attempt (cfg.SendToBot cfg.BotSettings) messageText Msg.OnError
 
     | StartTimePoint (Operation.Start id) ->
         model, Cmd.batch [ Cmd.ofMsg Stop; Cmd.OfAsync.either cfg.Looper.TimePointQueue.Scroll id (Operation.Finish >> StartTimePoint) OnError ]
@@ -101,9 +111,17 @@ let update
     | StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg Play
 
-    | SettingsMsg bmsg ->
-        let (settingsModel, settingsModelCmd) = SettingsModel.Program.update cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings bmsg model.SettingsModel
-        { model with SettingsModel = settingsModel }, Cmd.map SettingsMsg settingsModelCmd
+    | BotSettingsMsg bmsg ->
+        let settingsModel = BotSettingsModel.Program.update cfg.BotSettings bmsg model.BotSettingsModel
+        { model with BotSettingsModel = settingsModel }, Cmd.none
+
+    | TimePointsSettingsMsg tpmsg ->
+        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsSettingsModel.Program.update tpmsg model.TimePointsSettingsModel
+        { model with TimePointsSettingsModel = tpSettingsModel}, Cmd.map TimePointsSettingsMsg tpSettingsModelCmd
+
+    | SetDisableSkipBreak v ->
+        cfg.DisableSkipBreakSettings.DisableSkipBreak <- v
+        { model with DisableSkipBreak = v }, Cmd.none
 
     // --------------------
     // Active time changing
@@ -132,7 +150,7 @@ let update
     // --------------------
     | Msg.TryStoreAndSetTimePoints ->
         cfg.Looper.Stop()
-        let timePointsSettingsModel = model.SettingsModel.TimePointsSettingsModel |> Option.get
+        let timePointsSettingsModel = model.TimePointsSettingsModel
         cfg.TimePointQueue.Reload(timePointsSettingsModel.TimePoints)
         let patterns = timePointsSettingsModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsSettingsModel.Patterns) |> List.distinct
         cfg.PatternSettings.Write(patterns)
@@ -141,8 +159,7 @@ let update
             Cmd.ofMsg Msg.PickFirstTimePoint
 
             TimePointsSettingsModel.Msg.SetPatterns patterns
-            |> SettingsModel.Msg.TimePointsSettingsModelMsg
-            |> Msg.SettingsMsg
+            |> Msg.TimePointsSettingsMsg
             |> Cmd.ofMsg
         ]
 

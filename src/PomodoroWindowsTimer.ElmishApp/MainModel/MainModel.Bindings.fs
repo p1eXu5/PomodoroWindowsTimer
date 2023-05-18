@@ -80,17 +80,27 @@ let bindings () : Binding<MainModel, Msg> list =
             |> Option.defaultValue false
         )
 
-        "SettingsModel"
-            |> Binding.SubModel.required SettingsModel.Bindings.bindings
+        "BotSettingsModel"
+            |> Binding.SubModel.required BotSettingsModel.Bindings.bindings
             |> Binding.mapModel (fun m ->
-                m.SettingsModel
+                m.BotSettingsModel
             )
-            |> Binding.mapMsg MainModel.Msg.SettingsMsg
+            |> Binding.mapMsg MainModel.Msg.BotSettingsMsg
+
+        "TimePointsSettingsModel"
+            |> Binding.SubModel.required TimePointsSettingsModel.Bindings.bindings
+            |> Binding.mapModel (fun m ->
+                m.TimePointsSettingsModel
+            )
+            |> Binding.mapMsg MainModel.Msg.TimePointsSettingsMsg
+
+        "DisableSkipBreak"
+            |> Binding.twoWay (getDisableSkipBreak, Msg.SetDisableSkipBreak)
 
         "TryStoreAndSetTimePointsCommand"
             |> Binding.cmdIf (fun m ->
-                m.SettingsModel.TimePointsSettingsModel
-                |> Option.bind (fun tpModel ->
+                m.TimePointsSettingsModel
+                |> (fun tpModel ->
                     if not tpModel.IsPatternWrong then
                         Msg.TryStoreAndSetTimePoints |> Some
                     else

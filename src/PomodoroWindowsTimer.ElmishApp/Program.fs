@@ -21,17 +21,18 @@ let internal main (
     window,
     errorQueue,
     settingsManager,
-    botConfiguration: IBotConfiguration,
+    botSettings: IBotSettings,
     themeSwitcher: IThemeSwitcher,
     timePointPrototypesSettings : ITimePointPrototypesSettings,
     timePointSettings : ITimePointSettings,
-    patternSettings: IPatternSettings)
+    patternSettings: IPatternSettings,
+    disableSkipBreakSettings: IDisableSkipBreakSettings)
     =
     let logger =
         LoggerConfiguration()
 #if DEBUG
-            .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Verbose)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Verbose)
+            .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Debug)
+            .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Debug)
             .MinimumLevel.Override("Elmish.WPF.Performance", Events.LogEventLevel.Debug)
             .MinimumLevel.Override(nameof (PomodoroWindowsTimer.ElmishApp), Events.LogEventLevel.Debug)
 #else
@@ -65,9 +66,13 @@ let internal main (
 
     looper.Start()
 
-    let sendToBot (botConfiguration: IBotConfiguration) =
-        let botClient = TelegramBotClient(botConfiguration.BotToken)
-        Telegram.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
+    let sendToBot (botSettings: IBotSettings) =
+        match botSettings.BotToken, botSettings.MyChatId with
+        | Some botToken, Some myChatId ->
+            let botClient = TelegramBotClient(botToken)
+            Telegram.sendToBot botClient (Types.ChatId(myChatId))
+        | _ ->
+            fun _ -> task { return () }
 
 #if DEBUG
     let windowsMinimizer = Windows.simWindowsMinimizer
@@ -77,7 +82,7 @@ let internal main (
 
     let mainModelCfg =
         {
-            BotConfiguration = botConfiguration
+            BotSettings = botSettings
             SendToBot = sendToBot
             Looper = looper
             TimePointQueue = timePointQueue
@@ -86,6 +91,7 @@ let internal main (
             TimePointPrototypeStore = TimePointPrototypeStore.initialize timePointPrototypesSettings
             TimePointStore = TimePointStore.initialize timePointSettings
             PatternSettings = patternSettings
+            DisableSkipBreakSettings = disableSkipBreakSettings
         }
 
 

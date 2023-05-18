@@ -1,32 +1,44 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.BotSettings"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="400"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             Width="400"
+             Height="200"
+             Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
+             mc:Ignorable="d"
              >
-    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10">
-        <TextBox Text="{Binding BotToken}" MinWidth="300" Margin="0" HorizontalAlignment="Center"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+    <StackPanel Margin="10"
+                VerticalAlignment="Center"
+                Orientation="Vertical"
+                >
+        <TextBox Width="300"
+                 Margin="0"
+                 HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Bot token"
-                 />
-        <TextBox Text="{Binding ChatId}" MinWidth="300" Margin="0,10,0,40" HorizontalAlignment="Center"
                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Text="{Binding BotToken}"
+                 />
+        <TextBox Width="300"
+                 Margin="0,10,0,20"
+                 HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Chat ID"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Text="{Binding ChatId}"
                  />
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button DockPanel.Dock="Bottom" Margin="10"
-                HorizontalAlignment="Center"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                Content="CLOSE"
-                IsDefault="True"
-                Style="{StaticResource MaterialDesignFlatButton}"
-                >
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+            <Button DockPanel.Dock="Bottom"
+                    Margin="10"
+                    HorizontalAlignment="Center"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                    Content="CLOSE"
+                    IsDefault="True"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    >
                 <Button.CommandParameter>
                     <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
                         False

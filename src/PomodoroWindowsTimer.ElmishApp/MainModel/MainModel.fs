@@ -1,12 +1,12 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-open PomodoroWindowsTimer.ElmishApp.Infrastructure
-open PomodoroWindowsTimer.Looper
-open PomodoroWindowsTimer.Types
 open System
 open Elmish.Extensions
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.TimePointQueue
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 
 type MainModel =
@@ -18,7 +18,9 @@ type MainModel =
         ActiveTimePoint : TimePoint option
         LooperState : LooperState
         TimePoints: TimePoint list
-        SettingsModel: SettingsModel
+        BotSettingsModel: BotSettingsModel
+        TimePointsSettingsModel: TimePointsSettingsModel
+        DisableSkipBreak: bool
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
     }
@@ -34,7 +36,7 @@ and
 
 type MainModeConfig =
     {
-        BotConfiguration: IBotConfiguration
+        BotSettings: IBotSettings
         SendToBot: BotSender
         Looper: Looper
         TimePointQueue: TimePointQueue
@@ -43,6 +45,7 @@ type MainModeConfig =
         TimePointPrototypeStore: TimePointPrototypeStore
         TimePointStore: TimePointStore
         PatternSettings: IPatternSettings
+        DisableSkipBreakSettings: IDisableSkipBreakSettings
     }
 
 
@@ -58,7 +61,10 @@ module MainModel =
         | OnError of exn
         | PickFirstTimePoint
         | StartTimePoint of Operation<Guid, unit>
-        | SettingsMsg of SettingsModel.Msg
+        | BotSettingsMsg of BotSettingsModel.Msg
+        | InitializeTimePointsSettingsModel
+        | TimePointsSettingsMsg of TimePointsSettingsModel.Msg
+        | SetDisableSkipBreak of bool
         // test msgs
         | MinimizeWindows
         | SetIsMinimized of bool
@@ -86,26 +92,34 @@ module MainModel =
             ActiveTimePoint = None
             LooperState = Initialized
             TimePoints = []
-            SettingsModel = Unchecked.defaultof<_>
+            BotSettingsModel = Unchecked.defaultof<_>
+            TimePointsSettingsModel = Unchecked.defaultof<_>
+            DisableSkipBreak = false
             IsMinimized = false
             LastCommandInitiator = None
         }
 
     let init settingsManager errorQueue (cfg: MainModeConfig) : MainModel * Cmd<Msg> =
 
-        let assemblyVer = "Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()
+        let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version
+        let assemblyVer =
+            sprintf "Version: %i.%i.%i" ver.Major ver.Minor ver.Build
 
-        let (settingsModel, settingsMsg) = SettingsModel.init cfg.BotConfiguration cfg.TimePointPrototypeStore cfg.PatternSettings
+        let botSettingsModel = BotSettingsModel.init cfg.BotSettings
+        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsSettingsModel.init cfg.TimePointPrototypeStore cfg.PatternSettings
 
         { initDefault () with
             AssemblyVersion = assemblyVer
             SettingsManager = settingsManager
             ErrorQueue = errorQueue
             TimePoints = []
-            SettingsModel = settingsModel
+            BotSettingsModel = botSettingsModel
+            TimePointsSettingsModel = tpSettingsModel
+            DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
+            Cmd.map Msg.TimePointsSettingsMsg tpSettingsModelCmd
         ]
 
     // =========
@@ -168,3 +182,5 @@ module MainModel =
         )
         |> Option.map (fun tp -> tp.TimeSpan.TotalSeconds)
         |> Option.defaultValue 0.0
+
+    let getDisableSkipBreak m = m.DisableSkipBreak

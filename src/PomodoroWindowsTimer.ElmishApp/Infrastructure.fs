@@ -158,7 +158,7 @@ module Windows =
 
 type Message = string
 
-type BotSender = IBotConfiguration -> Message -> Task<unit>
+type BotSender = IBotSettings -> Message -> Task<unit>
 
 module Telegram =
 

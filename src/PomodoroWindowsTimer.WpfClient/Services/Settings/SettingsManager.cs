@@ -1,7 +1,6 @@
 ﻿using PomodoroWindowsTimer.ElmishApp.Abstractions;
-using PomodoroWindowsTimer.WpfClient.Properties;
 
-namespace PomodoroWindowsTimer.WpfClient
+namespace PomodoroWindowsTimer.WpfClient.Services.Settings
 {
     public class SettingsManager : ISettingsManager
     {
@@ -14,14 +13,14 @@ namespace PomodoroWindowsTimer.WpfClient
 
         public object Load(string key)
         {
-            return Settings.Default[key];
+            return Properties.Settings.Default[key];
         }
 
         public void Save(string key, object value)
         {
-            Settings.Default[key] = value;
-            Settings.Default.Save();
-            Settings.Default.Reload();
+            Properties.Settings.Default[key] = value;
+            Properties.Settings.Default.Save();
+            Properties.Settings.Default.Reload();
         }
     }
 }

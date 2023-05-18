@@ -1,7 +1,7 @@
 ﻿using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 
-namespace PomodoroWindowsTimer.WpfClient.Services;
+namespace PomodoroWindowsTimer.WpfClient.Services.Settings;
 
 public sealed class TimePointPrototypesSettings : ITimePointPrototypesSettings
 {

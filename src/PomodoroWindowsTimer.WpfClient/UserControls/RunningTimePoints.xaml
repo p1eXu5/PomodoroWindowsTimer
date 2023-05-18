@@ -1,0 +1,136 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.RunningTimePoints"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+             x:Name="m_DrawerUserControl"
+             d:DesignHeight="250"
+             d:DesignWidth="300"
+             Background="{DynamicResource PrimaryHueDarkBrush}"
+             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             mc:Ignorable="d"
+             >
+    <UserControl.Resources>
+        <ControlTemplate x:Key="ct_UnselectedTimePoint">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.InputBindings>
+                    <MouseBinding Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                  CommandParameter="{Binding Id}"
+                                  MouseAction="LeftDoubleClick"
+                                  />
+                </StackPanel.InputBindings>
+                <TextBlock Width="100"
+                           Margin="18,0,0,0"
+                           Text="{Binding Name}"
+                           />
+                <TextBlock Margin="10,0" Text="{Binding TimeSpan}" />
+                <TextBlock Text="{Binding Kind}" />
+            </StackPanel>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="ct_SelectedTimePoint">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.InputBindings>
+                    <MouseBinding Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                                  CommandParameter="{Binding Id}"
+                                  MouseAction="LeftDoubleClick"
+                                  />
+                </StackPanel.InputBindings>
+
+                <Border Margin="0,0,2,0" VerticalAlignment="Center">
+                    <materialDesign:PackIcon Height="14"
+                                             Foreground="#00FF00"
+                                             Kind="Play"
+                                             />
+                </Border>
+
+                <TextBlock Width="100" Text="{Binding Name}" />
+                <TextBlock Margin="10,0" Text="{Binding TimeSpan}" />
+                <TextBlock Text="{Binding Kind}" />
+            </StackPanel>
+        </ControlTemplate>
+
+        <DataTemplate x:Key="dt_TimepPointTemplate">
+            <Control x:Name="theControl"
+                     Focusable="False"
+                     Template="{StaticResource ct_UnselectedTimePoint}"
+                     />
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=DataContext.IsSelected}" Value="True">
+                    <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_SelectedTimePoint}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <DockPanel Margin="16" LastChildFill="True">
+        <!--  Disable skip break  -->
+        <Border DockPanel.Dock="Bottom"
+                Margin="0,10,0,0"
+                Padding="35,10,13,10"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                Background="{DynamicResource MaterialDesignToolBarBackground}"
+                >
+            <DockPanel LastChildFill="True">
+                <ToggleButton DockPanel.Dock="Right"
+                              IsChecked="{Binding DisableSkipBreak}"
+                              Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                              ToolTip="Disable skip break"
+                              />
+                <TextBlock DockPanel.Dock="Top"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                           Text="Disable skip break"
+                           />
+                <!--  variant 2  -->
+                <!--<TextBlock DockPanel.Dock="Top"
+                           FontSize="12"
+                           Margin="0,0,0,10"
+                           Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                           Text="Unlock concent"
+                           />
+                <ToggleButton x:Name="m_LockToggler"
+                              DockPanel.Dock="Left"
+                              Width="26"
+                              Height="26"
+                              Margin="0,0,5,0"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Bottom"
+                              Content="{materialDesign:PackIcon Kind=Lock,
+                                                                Size=15}"
+                              IsChecked="False"
+                              Style="{StaticResource MaterialDesignFlatPrimaryToggleButton}"
+                              ToolTip="MaterialDesignFlatPrimaryToggleButton"
+                              />
+                <TextBox DockPanel.Dock="Right"
+                         VerticalAlignment="Center"
+                         materialDesign:HintAssist.Hint="Unlock concent text"
+                         IsEnabled="{Binding ElementName=m_LockToggler, Path=IsChecked}"
+                         />-->
+
+
+                <!--  variant 1  -->
+                <!--<Button Margin="10"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                        CommandParameter="{Binding SettingsModel}"
+                        Content="SETTINGS"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        />-->
+            </DockPanel>
+        </Border>
+
+        <shared:TimePointList DockPanel.Dock="Top"
+                              DataContext="{Binding TimePoints}"
+                              TimePointListBoxItemTemplate="{StaticResource dt_TimepPointTemplate}"
+                              />
+    </DockPanel>
+</UserControl>

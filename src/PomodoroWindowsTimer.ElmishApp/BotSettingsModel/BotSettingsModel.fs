@@ -16,15 +16,8 @@ module BotSettingsModel =
         | SetChatId of string option
 
 
-    let init (botConfiguration: IBotConfiguration) =
+    let init (botConfiguration: IBotSettings) =
         {
-            BotToken = 
-                match botConfiguration.BotToken with
-                | null -> None
-                | s -> s |> Some
-
-            ChatId =
-                match botConfiguration.MyChatId with
-                | null -> None
-                | s -> s |> Some
+            BotToken = botConfiguration.BotToken
+            ChatId = botConfiguration.MyChatId
         }

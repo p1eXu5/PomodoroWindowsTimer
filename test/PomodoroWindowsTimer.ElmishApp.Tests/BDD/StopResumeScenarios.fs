@@ -85,7 +85,7 @@ module StopResumeScenarios =
 
             let mainModelCfg =
                 {
-                    BotConfiguration = testBotConfiguration
+                    BotSettings = testBotConfiguration
                     SendToBot = sendToBot
                     Looper = looper
                     TimePointQueue = timePointQueue
