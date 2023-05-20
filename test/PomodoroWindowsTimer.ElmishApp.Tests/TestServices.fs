@@ -107,7 +107,7 @@ module TestTimePointStore =
 module TestPatternSettings =
     let create () =
         { new IPatternSettings with
-            member _.Read() = [TimePointsSettingsModel.DEFAULT_PATTERN]
+            member _.Read() = [TimePointsGenerator.DEFAULT_PATTERN]
             member _.Write(_) = ()
         }
 

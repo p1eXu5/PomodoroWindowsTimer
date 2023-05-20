@@ -13,13 +13,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PomodoroWindowsTimer.WpfClient.UserControls.Settings;
+namespace PomodoroWindowsTimer.WpfClient.UserControls;
 /// <summary>
 /// Interaction logic for TimePointsDialog.xaml
 /// </summary>
-public partial class TimePointsSettings : UserControl
+public partial class TimePointsGenerator : UserControl
 {
-    public TimePointsSettings()
+    public TimePointsGenerator()
     {
         InitializeComponent();
     }

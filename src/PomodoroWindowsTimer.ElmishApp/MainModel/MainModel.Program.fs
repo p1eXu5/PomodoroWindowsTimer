@@ -116,8 +116,8 @@ let update
         { model with BotSettingsModel = settingsModel }, Cmd.none
 
     | TimePointsSettingsMsg tpmsg ->
-        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsSettingsModel.Program.update tpmsg model.TimePointsSettingsModel
-        { model with TimePointsSettingsModel = tpSettingsModel}, Cmd.map TimePointsSettingsMsg tpSettingsModelCmd
+        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.Program.update tpmsg model.TimePointsGeneratorModel
+        { model with TimePointsGeneratorModel = tpSettingsModel}, Cmd.map TimePointsSettingsMsg tpSettingsModelCmd
 
     | SetDisableSkipBreak v ->
         cfg.DisableSkipBreakSettings.DisableSkipBreak <- v
@@ -150,7 +150,7 @@ let update
     // --------------------
     | Msg.TryStoreAndSetTimePoints ->
         cfg.Looper.Stop()
-        let timePointsSettingsModel = model.TimePointsSettingsModel
+        let timePointsSettingsModel = model.TimePointsGeneratorModel
         cfg.TimePointQueue.Reload(timePointsSettingsModel.TimePoints)
         let patterns = timePointsSettingsModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsSettingsModel.Patterns) |> List.distinct
         cfg.PatternSettings.Write(patterns)
@@ -158,7 +158,7 @@ let update
         { model with TimePoints = timePointsSettingsModel.TimePoints }, Cmd.batch [
             Cmd.ofMsg Msg.PickFirstTimePoint
 
-            TimePointsSettingsModel.Msg.SetPatterns patterns
+            TimePointsGenerator.Msg.SetPatterns patterns
             |> Msg.TimePointsSettingsMsg
             |> Cmd.ofMsg
         ]

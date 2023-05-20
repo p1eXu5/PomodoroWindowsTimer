@@ -16,6 +16,8 @@ let bindings () : Binding<MainModel, Msg> list =
 
         "LooperIsRunning" |> Binding.oneWay (isLooperRunning)
 
+        "IsPlaying" |> Binding.oneWay (isPlaying)
+
         "PlayPauseButtonText"
         |> Binding.oneWay (fun m ->
             match m.LooperState with
@@ -64,6 +66,7 @@ let bindings () : Binding<MainModel, Msg> list =
                 "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
                 "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
                 "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
+                "KindAlias" |> Binding.oneWay (fun (_, e) -> e.KindAlias)
                 "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
                 "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePoint |> Option.map (fun atp -> atp.Id = e.Id) |> Option.defaultValue false)
             ])
@@ -87,10 +90,10 @@ let bindings () : Binding<MainModel, Msg> list =
             )
             |> Binding.mapMsg MainModel.Msg.BotSettingsMsg
 
-        "TimePointsSettingsModel"
-            |> Binding.SubModel.required TimePointsSettingsModel.Bindings.bindings
+        "TimePointsGeneratorModel"
+            |> Binding.SubModel.required TimePointsGenerator.Bindings.bindings
             |> Binding.mapModel (fun m ->
-                m.TimePointsSettingsModel
+                m.TimePointsGeneratorModel
             )
             |> Binding.mapMsg MainModel.Msg.TimePointsSettingsMsg
 
@@ -99,7 +102,7 @@ let bindings () : Binding<MainModel, Msg> list =
 
         "TryStoreAndSetTimePointsCommand"
             |> Binding.cmdIf (fun m ->
-                m.TimePointsSettingsModel
+                m.TimePointsGeneratorModel
                 |> (fun tpModel ->
                     if not tpModel.IsPatternWrong then
                         Msg.TryStoreAndSetTimePoints |> Some

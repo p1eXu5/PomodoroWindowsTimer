@@ -15,9 +15,9 @@
     <Compile Include="BotSettingsModel\BotSettingsModel.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Program.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Bindings.fs" />
-    <Compile Include="TimePointsSettingsModel\TimePointsSettingsModel.fs" />
-    <Compile Include="TimePointsSettingsModel\TimePointsSettingsModel.Program.fs" />
-    <Compile Include="TimePointsSettingsModel\TimePointsSettingsModel.Bindings.fs" />
+    <Compile Include="TimePointsGenerator\TimePointsGenerator.fs" />
+    <Compile Include="TimePointsGenerator\TimePointsGenerator.Program.fs" />
+    <Compile Include="TimePointsGenerator\TimePointsGenerator.Bindings.fs" />
     <Compile Include="SettingsModel\SettingsModel.fs" />
     <Compile Include="SettingsModel\SettingsModel.Program.fs" />
     <Compile Include="SettingsModel\SettingsModel.Bindings.fs" />

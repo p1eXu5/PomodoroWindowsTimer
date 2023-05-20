@@ -4,7 +4,7 @@ open PomodoroWindowsTimer.Types
 open System
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 
-type TimePointsSettingsModel =
+type TimePointsGenerator =
     {
         TimePointPrototypes: TimePointPrototype list
         Patterns: string list
@@ -15,7 +15,7 @@ type TimePointsSettingsModel =
     }
 
 
-module TimePointsSettingsModel =
+module TimePointsGenerator =
 
     type Msg =
         | SetPatterns of string list
@@ -26,6 +26,7 @@ module TimePointsSettingsModel =
         | TimePointMsg of id: Guid * TimePointMsg
     and
         TimePointPrototypeMsg =
+            | SetName of string
             | SetTimeSpan of string
     and
         TimePointMsg =

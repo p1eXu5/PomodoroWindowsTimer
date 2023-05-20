@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.TimePointsSettings"
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.TimePointsGenerator"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
@@ -32,7 +32,9 @@
                            VerticalAlignment="Center"
                            Text="{Binding TimeSpan}"
                            />
-                <TextBlock VerticalAlignment="Center" Text="{Binding Kind}" />
+                <TextBlock VerticalAlignment="Center"
+                           Text="{Binding Kind}"
+                           />
             </StackPanel>
         </ControlTemplate>
 
@@ -47,8 +49,12 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="Alias" />
-                    <ColumnDefinition Width="Auto" SharedSizeGroup="TimeSpan" />
+                    <ColumnDefinition Width="Auto"
+                                      SharedSizeGroup="Alias"
+                                      />
+                    <ColumnDefinition Width="Auto"
+                                      SharedSizeGroup="TimeSpan"
+                                      />
                 </Grid.ColumnDefinitions>
                 <TextBox Grid.Column="0"
                          VerticalAlignment="Center"
@@ -73,6 +79,14 @@
             </Grid>
         </DataTemplate>
 
+        <DataTemplate x:Key="dt_TimePointPrototype">
+            <shared:EditableTimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                                      shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                                      shared:TimePointAssistant.TimePointName="{Binding Name}"
+                                      shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                                      />
+        </DataTemplate>
+
         <converters:HeightReminder2Converter x:Key="conv_HeightReminder" />
     </UserControl.Resources>
 
@@ -82,8 +96,8 @@
             <!--<RowDefinition Height="80" />-->
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="320" />
         </Grid.ColumnDefinitions>
 
         <!--  Prototype section  -->
@@ -94,7 +108,7 @@
                    LastChildFill="True"
                    >
 
-            <!--  Patterns check box  -->
+            <!--  Patterns combo box  -->
             <Border x:Name="m_PatternsSection"
                     DockPanel.Dock="Bottom"
                     Margin="0,10,0,0"
@@ -124,7 +138,8 @@
                                   HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePointPrototypes}"
                                   Header="PROTOTYPES"
-                                  TimePointListBoxItemTemplate="{StaticResource dt_Prototypes}"
+                                  TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
+                                  TimePointListBoxScrollBarVisibility="Hidden"
                                   />
         </DockPanel>
 
@@ -140,7 +155,9 @@
                     Height="{Binding ElementName=m_PatternsSection, Path=ActualHeight}"
                     Margin="0,10,0,0"
                     >
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Center"
+                            Orientation="Horizontal"
+                            >
                     <Button HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Command=""
@@ -172,9 +189,11 @@
             <!--  Prototype list  -->
             <shared:TimePointList Grid.Row="0"
                                   Grid.Column="1"
+                                  HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePoints}"
                                   Header="GENERATED TIME POINTS"
-                                  TimePointListBoxItemTemplate="{StaticResource dt_SettingsTimepPointTemplate}"
+                                  TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
+                                  TimePointListBoxScrollBarVisibility="Visible"
                                   />
         </DockPanel>
 

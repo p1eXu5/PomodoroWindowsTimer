@@ -9,6 +9,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              x:Name="m_DrawerUserControl"
+             HorizontalAlignment="Stretch"
              d:DesignHeight="250"
              d:DesignWidth="300"
              Background="{DynamicResource PrimaryHueDarkBrush}"
@@ -28,7 +29,9 @@
                            Margin="18,0,0,0"
                            Text="{Binding Name}"
                            />
-                <TextBlock Margin="10,0" Text="{Binding TimeSpan}" />
+                <TextBlock Margin="10,0"
+                           Text="{Binding TimeSpan}"
+                           />
                 <TextBlock Text="{Binding Kind}" />
             </StackPanel>
         </ControlTemplate>
@@ -42,40 +45,137 @@
                                   />
                 </StackPanel.InputBindings>
 
-                <Border Margin="0,0,2,0" VerticalAlignment="Center">
+                <Border Margin="0,0,2,0"
+                        VerticalAlignment="Center"
+                        >
                     <materialDesign:PackIcon Height="14"
                                              Foreground="#00FF00"
                                              Kind="Play"
                                              />
                 </Border>
 
-                <TextBlock Width="100" Text="{Binding Name}" />
-                <TextBlock Margin="10,0" Text="{Binding TimeSpan}" />
+                <TextBlock Width="100"
+                           Text="{Binding Name}"
+                           />
+                <TextBlock Margin="10,0"
+                           Text="{Binding TimeSpan}"
+                           />
                 <TextBlock Text="{Binding Kind}" />
             </StackPanel>
         </ControlTemplate>
 
+
+        <converters:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
+
+        <!--  unselected time point  -->
+        <ControlTemplate x:Key="ct_UnselectedTimePointNew">
+            <shared:TimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                              shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                              shared:TimePointAssistant.TimePointName="{Binding Name}"
+                              shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                              ButtonForeground="{DynamicResource PrimaryHueLightBrush}"
+                              NameForeground="#D8E7ED"
+                              PlayStopCommand="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              PlayStopCommandParameter="{Binding Id}"
+                              >
+                <shared:TimePoint.ButtonIcon>
+                    <ControlTemplate>
+                        <materialDesign:PackIcon Width="20"
+                                                 Height="20"
+                                                 Margin="0,4,0,0"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Kind="Play"
+                                                 />
+                    </ControlTemplate>
+                </shared:TimePoint.ButtonIcon>
+            </shared:TimePoint>
+        </ControlTemplate>
+
+        <!--  selected stopped time point  -->
+        <ControlTemplate x:Key="ct_SelectedStoppedTimePointNew">
+            <shared:TimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                              shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                              shared:TimePointAssistant.TimePointName="{Binding Name}"
+                              shared:TimePointAssistant.TimePointTimeSpan="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}"
+                              ButtonForeground="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}"
+                              NameForeground="White"
+                              PlayStopCommand="{Binding DataContext.PlayStopCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              >
+                <shared:TimePoint.ButtonIcon>
+                    <ControlTemplate>
+                        <materialDesign:PackIcon Width="20"
+                                                 Height="20"
+                                                 Margin="0,4,0,0"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Kind="Play"
+                                                 />
+                    </ControlTemplate>
+                </shared:TimePoint.ButtonIcon>
+            </shared:TimePoint>
+        </ControlTemplate>
+
+        <!--  selected playing time point  -->
+        <ControlTemplate x:Key="ct_SelectedPlayingTimePointNew">
+            <shared:TimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                              shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                              shared:TimePointAssistant.TimePointName="{Binding Name}"
+                              shared:TimePointAssistant.TimePointTimeSpan="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}"
+                              ButtonForeground="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}"
+                              NameForeground="White"
+                              PlayStopCommand="{Binding DataContext.PlayStopCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              >
+                <shared:TimePoint.ButtonIcon>
+                    <ControlTemplate>
+                        <materialDesign:PackIcon Width="20"
+                                                 Height="20"
+                                                 Margin="0,4,0,0"
+                                                 HorizontalAlignment="Center"
+                                                 VerticalAlignment="Center"
+                                                 Kind="Stop"
+                                                 />
+                    </ControlTemplate>
+                </shared:TimePoint.ButtonIcon>
+            </shared:TimePoint>
+        </ControlTemplate>
+
+        <!--  time point data template  -->
         <DataTemplate x:Key="dt_TimepPointTemplate">
             <Control x:Name="theControl"
                      Focusable="False"
-                     Template="{StaticResource ct_UnselectedTimePoint}"
+                     Template="{StaticResource ct_UnselectedTimePointNew}"
                      />
             <DataTemplate.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=DataContext.IsSelected}" Value="True">
-                    <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_SelectedTimePoint}" />
-                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=DataContext.IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.IsPlaying}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_SelectedPlayingTimePointNew}" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=DataContext.IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.IsPlaying}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_SelectedStoppedTimePointNew}" />
+                </MultiDataTrigger>
             </DataTemplate.Triggers>
         </DataTemplate>
     </UserControl.Resources>
 
-    <DockPanel Margin="16" LastChildFill="True">
+    <!--  content  -->
+    <DockPanel Margin="16"
+               LastChildFill="True"
+               >
         <!--  Disable skip break  -->
         <Border DockPanel.Dock="Bottom"
                 Margin="0,10,0,0"
-                Padding="35,10,13,10"
+                Padding="10,10,10,0"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
-                Background="{DynamicResource MaterialDesignToolBarBackground}"
+                Background="{DynamicResource PrimaryHueDarkBrush}"
                 >
             <DockPanel LastChildFill="True">
                 <ToggleButton DockPanel.Dock="Right"
@@ -83,7 +183,9 @@
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               ToolTip="Disable skip break"
                               />
-                <TextBlock DockPanel.Dock="Top"
+                <TextBlock DockPanel.Dock="Right"
+                           Margin="0,0,10,0"
+                           HorizontalAlignment="Right"
                            VerticalAlignment="Center"
                            FontSize="12"
                            Style="{StaticResource MaterialDesignOverlineTextBlock}"
@@ -128,9 +230,12 @@
             </DockPanel>
         </Border>
 
+        <!--  time points  -->
         <shared:TimePointList DockPanel.Dock="Top"
+                              HorizontalAlignment="Stretch"
                               DataContext="{Binding TimePoints}"
                               TimePointListBoxItemTemplate="{StaticResource dt_TimepPointTemplate}"
+                              TimePointListBoxScrollBarVisibility="Auto"
                               />
     </DockPanel>
 </UserControl>

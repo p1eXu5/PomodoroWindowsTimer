@@ -4,7 +4,7 @@ type SettingsModel =
     {
         SelectedSettingsIndex: int
         BotSettingsModel: BotSettingsModel option
-        TimePointsSettingsModel: TimePointsSettingsModel option
+        TimePointsGenerator: TimePointsGenerator option
     }
 
 module SettingsModel =
@@ -12,7 +12,7 @@ module SettingsModel =
     type Msg =
         | SetSelectedSettingsIndex of int
         | BotSettingsModelMsg of BotSettingsModel.Msg
-        | TimePointsSettingsModelMsg of TimePointsSettingsModel.Msg
+        | TimePointsSettingsModelMsg of TimePointsGenerator.Msg
 
     open Elmish
 
@@ -20,7 +20,7 @@ module SettingsModel =
     //    {
     //        SelectedSettingsIndex = -1
     //        BotSettingsModel = None
-    //        TimePointsSettingsModel = None
+    //        TimePointsGenerator = None
     //    }
 
 
@@ -31,10 +31,10 @@ module SettingsModel =
 
     let init botConfiguration timePointPrototypeStore patternSettings =
         let botSettings = BotSettingsModel.init botConfiguration
-        let (timePointsSettings, cmd) = TimePointsSettingsModel.init timePointPrototypeStore patternSettings
+        let (timePointsSettings, cmd) = TimePointsGenerator.init timePointPrototypeStore patternSettings
         {
             SelectedSettingsIndex = -1
             BotSettingsModel = botSettings |> Some
-            TimePointsSettingsModel = timePointsSettings |> Some
+            TimePointsGenerator = timePointsSettings |> Some
         }
         , Cmd.map TimePointsSettingsModelMsg cmd

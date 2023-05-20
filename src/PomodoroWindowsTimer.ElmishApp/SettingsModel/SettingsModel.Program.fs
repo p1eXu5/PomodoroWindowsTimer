@@ -9,9 +9,9 @@ let update botConfiguration timePointPrototypeStore patternSettings (msg: Msg) m
     match msg with
     | SetSelectedSettingsIndex ind ->
         match ind with
-        | 0 when model.TimePointsSettingsModel |> Option.isNone ->
-            let (m, cmd) = TimePointsSettingsModel.init timePointPrototypeStore patternSettings
-            { model with TimePointsSettingsModel = m |> Some } |> setSelectedSettingsIndex 0 , Cmd.map TimePointsSettingsModelMsg cmd
+        | 0 when model.TimePointsGenerator |> Option.isNone ->
+            let (m, cmd) = TimePointsGenerator.init timePointPrototypeStore patternSettings
+            { model with TimePointsGenerator = m |> Some } |> setSelectedSettingsIndex 0 , Cmd.map TimePointsSettingsModelMsg cmd
 
         | 1 when model.BotSettingsModel |> Option.isNone ->
             let botSettingsModel = BotSettingsModel.init botConfiguration
@@ -24,5 +24,5 @@ let update botConfiguration timePointPrototypeStore patternSettings (msg: Msg) m
         { model with BotSettingsModel = botSettingsModel |> Some }, Cmd.none
 
     | TimePointsSettingsModelMsg tmsg ->
-        let (timePointsSettingsModel, timePointsSettingsModelCmd) = TimePointsSettingsModel.Program.update tmsg (model.TimePointsSettingsModel |> Option.get)
-        { model with TimePointsSettingsModel = timePointsSettingsModel |> Some }, Cmd.map TimePointsSettingsModelMsg timePointsSettingsModelCmd
+        let (timePointsSettingsModel, timePointsSettingsModelCmd) = TimePointsGenerator.Program.update tmsg (model.TimePointsGenerator |> Option.get)
+        { model with TimePointsGenerator = timePointsSettingsModel |> Some }, Cmd.map TimePointsSettingsModelMsg timePointsSettingsModelCmd

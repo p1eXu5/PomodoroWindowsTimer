@@ -9,8 +9,7 @@
              x:Name="m_TimePointListContainer"
              MinWidth="150"
              MinHeight="150"
-             Padding="10"
-             HorizontalAlignment="Stretch"
+             HorizontalAlignment="Center"
              d:DesignHeight="180"
              d:DesignWidth="170"
              Background="{DynamicResource MaterialDesignToolBarBackground}"
@@ -21,30 +20,57 @@
         <converters:HeightReminder2Converter x:Key="conv_HeightReminder" />
     </UserControl.Resources>
 
-    <StackPanel Orientation="Vertical">
-        <TextBlock x:Name="m_TimePointsHeader"
-                   Margin="0,0,0,10"
-                   HorizontalAlignment="Center"
-                   Style="{StaticResource MaterialDesignButtonTextBlock}"
-                   Text="{Binding Path=Header, ElementName=m_TimePointListContainer, FallbackValue=TIME POINTS}"
-                   />
+    <StackPanel HorizontalAlignment="Stretch"
+                Orientation="Vertical"
+                >
+        <!--  header  -->
+        <Border x:Name="m_TimePointsHeader"
+                BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
+                BorderThickness="0,0,0,1"
+                >
+            <TextBlock Margin="0,16"
+                       HorizontalAlignment="Center"
+                       Style="{StaticResource MaterialDesignButtonTextBlock}"
+                       Text="{Binding Path=Header, ElementName=m_TimePointListContainer, FallbackValue=TIME POINTS}"
+                       />
+        </Border>
 
         <!--  ItemTemplate="" is set in code behind  -->
-        <ListBox x:Name="m_TimePointListBox"
-                 ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                 SelectionMode="Single"
-                 >
-            <ListBox.Height>
+        <ScrollViewer x:Name="m_ScrollViewer"
+                      VerticalScrollBarVisibility="Visible"
+                      >
+            <ScrollViewer.Height>
                 <MultiBinding Converter="{StaticResource conv_HeightReminder}"
                               Mode="OneWay"
                               UpdateSourceTrigger="PropertyChanged"
                               >
-                    <Binding ElementName="m_TimePointListContainer" Path="ActualHeight" />
-                    <Binding ElementName="m_TimePointsHeader" Path="ActualHeight" />
-                    <Binding ElementName="m_TimePointsHeader" Path="Margin" />
+                    <Binding ElementName="m_TimePointListContainer"
+                             Path="ActualHeight"
+                             />
+                    <Binding ElementName="m_TimePointsHeader"
+                             Path="ActualHeight"
+                             />
+                    <Binding ElementName="m_TimePointsHeader"
+                             Path="Margin"
+                             />
                 </MultiBinding>
-            </ListBox.Height>
-        </ListBox>
+            </ScrollViewer.Height>
+            <ItemsControl x:Name="m_TimePointListBox"
+                          Grid.IsSharedSizeScope="True"
+                          ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
+                          >
+
+                <!--<ListBox.ItemContainerStyle>
+                    <Style TargetType="Control">
+                        <Setter Property="Control.HorizontalAlignment" Value="Stretch" />
+                -->
+                <!--<Setter Property="Control.Margin" Value="0" />
+                        <Setter Property="Control.Padding" Value="0" />-->
+                <!--
+                        <Setter Property="ItemsControl.BorderThickness" Value="0" />
+                    </Style>
+                </ListBox.ItemContainerStyle>-->
+            </ItemsControl>
+        </ScrollViewer>
     </StackPanel>
 </UserControl>

@@ -2,6 +2,7 @@
 
 open System
 
+
 type Name = string
 
 type Kind =
@@ -9,22 +10,25 @@ type Kind =
     | Break
     | LongBreak
 
+/// Kind alias, used in patterns.
+type Alias = private Alias of string
+
+
 type TimePoint =
     {
         Id: Guid
         Name: Name
         TimeSpan: TimeSpan
         Kind: Kind
+        KindAlias: Alias
     }
-
-/// Kind alias, used in patterns.
-type Alias = private Alias of string
 
 
 type TimePointPrototype =
     {
+        Name: string
         Kind: Kind
-        Alias: Alias
+        KindAlias: Alias
         TimeSpan: TimeSpan
     }
 
@@ -42,20 +46,37 @@ module Alias =
         else
             Ok (Alias str)
 
-    let value (Alias v) = v
-
-
-module TimePointPrototype =
-
     let orThrow = function
         | Ok alias -> alias
         | Error err -> failwith err
 
+    let createOrThrow str =
+        str |> create |> orThrow
+
+    let value (Alias v) = v
+
+
+module Kind =
+    let displayString = function
+        | Work -> "WORK"
+        | Break -> "BREAK"
+        | LongBreak -> "LONG BREAK"
+
+    let alias = 
+        (function
+            | Work -> "w"
+            | Break -> "b"
+            | LongBreak -> "lb")
+        >> Alias.createOrThrow
+
+
+module TimePointPrototype =
+
     let defaults =
         [
-            { Kind = Kind.Work; Alias = "w" |> Alias.create |> orThrow; TimeSpan = TimeSpan.FromMinutes(25) }
-            { Kind = Kind.Break; Alias = "b" |> Alias.create |> orThrow; TimeSpan = TimeSpan.FromMinutes(5) }
-            { Kind = Kind.LongBreak; Alias = "lb" |> Alias.create |> orThrow; TimeSpan = TimeSpan.FromMinutes(20) }
+            { Name = "Focused work"; Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(25) }
+            { Name = "Break"; Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(5) }
+            { Name = "Long break"; Kind = Kind.LongBreak; KindAlias = Kind.LongBreak |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(20) }
         ]
 
     let toTimePoint ind prototype =
@@ -64,6 +85,7 @@ module TimePointPrototype =
             Name = sprintf "%O %i" prototype.Kind ind
             TimeSpan = prototype.TimeSpan
             Kind = prototype.Kind
+            KindAlias = prototype.KindAlias
         }
 
 
@@ -71,20 +93,20 @@ module TimePoint =
 
     let defaults =
         [
-            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 3"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 4"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(20); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Focused Work 3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Break 3"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Focused Work 4"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(20); Kind = Kind.LongBreak; KindAlias = Kind.LongBreak |> Kind.alias }
         ]
 
     let testDefaults =
         [
-            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
+            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
+            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
         ]

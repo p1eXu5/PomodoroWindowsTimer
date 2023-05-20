@@ -33,7 +33,12 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Shared
             set => m_TimePointListBox.ItemTemplate = value;
         }
 
-
+        [Bindable(true)]
+        public ScrollBarVisibility TimePointListBoxScrollBarVisibility
+        {
+            get => m_ScrollViewer.VerticalScrollBarVisibility;
+            set => m_ScrollViewer.VerticalScrollBarVisibility = value;
+        }
 
         public string? Header
         {
@@ -44,5 +49,7 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Shared
         // Using a DependencyProperty as the backing store for Header.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty HeaderProperty =
             DependencyProperty.Register("Header", typeof(string), typeof(TimePointList), new PropertyMetadata(defaultValue: "TIME POINTS"));
+
+
     }
 }

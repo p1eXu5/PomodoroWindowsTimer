@@ -23,11 +23,22 @@
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
 
                 <digitPanel:DigitPanelTheme />
             </ResourceDictionary.MergedDictionaries>
 
-            <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />
+            <SolidColorBrush x:Key="PrimaryHueDarkBrush"
+                             Color="#1A1A1A"
+                             />
+
+            <SolidColorBrush x:Key="WorkDigitForeground"
+                             Color="#00FF00"
+                             />
+
+            <SolidColorBrush x:Key="BreakDigitForeground"
+                             Color="#FF0000"
+                             />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

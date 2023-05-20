@@ -14,10 +14,10 @@ let bindings () =
             )
             |> Binding.mapMsg Msg.BotSettingsModelMsg
 
-        "TimePointsSettingsModel"
-            |> Binding.SubModel.opt TimePointsSettingsModel.Bindings.bindings
+        "TimePointsGenerator"
+            |> Binding.SubModel.opt TimePointsGenerator.Bindings.bindings
             |> Binding.mapModel (fun m ->
-                m.TimePointsSettingsModel
+                m.TimePointsGenerator
             )
             |> Binding.mapMsg Msg.TimePointsSettingsModelMsg
 

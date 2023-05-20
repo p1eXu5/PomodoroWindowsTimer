@@ -19,7 +19,7 @@ type MainModel =
         LooperState : LooperState
         TimePoints: TimePoint list
         BotSettingsModel: BotSettingsModel
-        TimePointsSettingsModel: TimePointsSettingsModel
+        TimePointsGeneratorModel: TimePointsGenerator
         DisableSkipBreak: bool
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
@@ -63,7 +63,7 @@ module MainModel =
         | StartTimePoint of Operation<Guid, unit>
         | BotSettingsMsg of BotSettingsModel.Msg
         | InitializeTimePointsSettingsModel
-        | TimePointsSettingsMsg of TimePointsSettingsModel.Msg
+        | TimePointsSettingsMsg of TimePointsGenerator.Msg
         | SetDisableSkipBreak of bool
         // test msgs
         | MinimizeWindows
@@ -93,7 +93,7 @@ module MainModel =
             LooperState = Initialized
             TimePoints = []
             BotSettingsModel = Unchecked.defaultof<_>
-            TimePointsSettingsModel = Unchecked.defaultof<_>
+            TimePointsGeneratorModel = Unchecked.defaultof<_>
             DisableSkipBreak = false
             IsMinimized = false
             LastCommandInitiator = None
@@ -106,7 +106,7 @@ module MainModel =
             sprintf "Version: %i.%i.%i" ver.Major ver.Minor ver.Build
 
         let botSettingsModel = BotSettingsModel.init cfg.BotSettings
-        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsSettingsModel.init cfg.TimePointPrototypeStore cfg.PatternSettings
+        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternSettings
 
         { initDefault () with
             AssemblyVersion = assemblyVer
@@ -114,7 +114,7 @@ module MainModel =
             ErrorQueue = errorQueue
             TimePoints = []
             BotSettingsModel = botSettingsModel
-            TimePointsSettingsModel = tpSettingsModel
+            TimePointsGeneratorModel = tpSettingsModel
             DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
         }
         , Cmd.batch [
@@ -149,6 +149,11 @@ module MainModel =
             | _ -> true
         | Initialized -> false
         | _ -> true
+
+    let isPlaying m =
+        match m.LooperState with
+        | Playing -> true
+        | _ -> false
 
     let timePointKindEnum m =
         m.ActiveTimePoint

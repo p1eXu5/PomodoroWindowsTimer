@@ -1,14 +1,14 @@
-﻿module PomodoroWindowsTimer.ElmishApp.TimePointsSettingsModel.Program
+﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGenerator.Program
 
 open Elmish
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.TimePointsSettingsModel
+open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
 
 
 let parsePattern model pattern =
-        Parser.parse (model.TimePointPrototypes |> List.map (fun p -> p.Alias |> Alias.value)) pattern
+        Parser.parse (model.TimePointPrototypes |> List.map (fun p -> p.KindAlias |> Alias.value)) pattern
 
 
 let update msg model =
@@ -19,7 +19,7 @@ let update msg model =
             match l with
             | [] -> res |> List.rev
             | head :: tail ->
-                let ind = model.TimePointPrototypes |> List.findIndex (fun p -> p.Alias |> Alias.value |> (=) head)
+                let ind = model.TimePointPrototypes |> List.findIndex (fun p -> p.KindAlias |> Alias.value |> (=) head)
                 let prototype =
                     (model.TimePointPrototypes |> List.item ind |> TimePointPrototype.toTimePoint state[ind])
                 do

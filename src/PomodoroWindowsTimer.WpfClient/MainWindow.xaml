@@ -11,7 +11,7 @@
         xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp;assembly=PomodoroWindowsTimer.ElmishApp"
         Title="{Binding Title}"
         Width="800"
-        Height="420"
+        Height="610"
         MinWidth="650"
         MinHeight="420"
         Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}"
@@ -47,17 +47,23 @@
                                    BottomDrawerCornerRadius="20 20 0 0"
                                    >
             <materialDesign:DrawerHost.LeftDrawerContent>
-                <usercontrols:RunningTimePoints DataContext="{Binding}" />
+                <usercontrols:RunningTimePoints Width="350"
+                                                DataContext="{Binding}"
+                                                />
             </materialDesign:DrawerHost.LeftDrawerContent>
 
             <!--  time points generator  -->
             <materialDesign:DrawerHost.RightDrawerContent>
-                <settings:TimePointsSettings MinWidth="650" DataContext="{Binding TimePointsSettingsModel}" />
+                <usercontrols:TimePointsGenerator DataContext="{Binding TimePointsGeneratorModel}" />
             </materialDesign:DrawerHost.RightDrawerContent>
 
-            <DockPanel Margin="10,0,10,0" LastChildFill="True">
+            <DockPanel Margin="10,0,10,0"
+                       LastChildFill="True"
+                       >
                 <!--  top menu buttons  -->
-                <DockPanel DockPanel.Dock="Top" VerticalAlignment="Center">
+                <DockPanel DockPanel.Dock="Top"
+                           VerticalAlignment="Center"
+                           >
                     <!--  version  -->
                     <TextBlock DockPanel.Dock="Right"
                                Margin="5,5,10,5"
@@ -110,12 +116,18 @@
                                          MessageQueue="{Binding ErrorMessageQueue}"
                                          />
 
-                <materialDesign:ColorZone VerticalAlignment="Center" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
+                <materialDesign:ColorZone VerticalAlignment="Center"
+                                          Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}"
+                                          >
                     <!--  Content  -->
-                    <DockPanel Margin="0,0,0,20" LastChildFill="True">
+                    <DockPanel Margin="0,0,0,20"
+                               LastChildFill="True"
+                               >
                         <DockPanel.Resources>
                             <DataTemplate x:Key="gp_Green">
-                                <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                <StackPanel HorizontalAlignment="Center"
+                                            Orientation="Vertical"
+                                            >
                                     <TextBlock Margin="0,0,0,20"
                                                HorizontalAlignment="Left"
                                                Foreground="#00FF00"
@@ -143,7 +155,9 @@
                             </DataTemplate>
 
                             <DataTemplate x:Key="gp_Red">
-                                <StackPanel HorizontalAlignment="Center" Orientation="Vertical">
+                                <StackPanel HorizontalAlignment="Center"
+                                            Orientation="Vertical"
+                                            >
                                     <TextBlock Margin="0,0,0,20"
                                                HorizontalAlignment="Left"
                                                Foreground="#FF0000"
@@ -189,7 +203,9 @@
                                     Orientation="Horizontal"
                                     >
                             <StackPanel.Resources>
-                                <Style BasedOn="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}" TargetType="Button">
+                                <Style BasedOn="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}"
+                                       TargetType="Button"
+                                       >
                                     <Setter Property="Background">
                                         <Setter.Value>
                                             <LinearGradientBrush>

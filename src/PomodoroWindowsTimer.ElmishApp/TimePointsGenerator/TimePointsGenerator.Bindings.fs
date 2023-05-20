@@ -1,20 +1,21 @@
-﻿module PomodoroWindowsTimer.ElmishApp.TimePointsSettingsModel.Bindings
+﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGenerator.Bindings
 
 open System
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.TimePointsSettingsModel
+open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
 
-let bindings ()  : Binding<TimePointsSettingsModel, TimePointsSettingsModel.Msg> list =
+let bindings ()  : Binding<TimePointsGenerator, TimePointsGenerator.Msg> list =
     [
         "TimePointPrototypes" |> Binding.subModelSeq (
             (fun m -> m.TimePointPrototypes),
             (fun tp -> tp.Kind),
             Msg.TimePointPrototypeMsg,
             (fun () -> [
+                "Name" |> Binding.twoWay ((fun (_, e: TimePointPrototype) -> e.Name), TimePointPrototypeMsg.SetName)
                 "Kind" |> Binding.oneWay (fun (_, m) -> m.Kind)
-                "Alias" |> Binding.oneWay (fun (_, m) -> m.Alias |> Alias.value)
+                "KindAlias" |> Binding.oneWay (fun (_, m) -> m.KindAlias)
                 "TimeSpan" |> Binding.twoWay ((fun (_, m) -> m.TimeSpan.ToString("h':'mm")), (fun ts _ -> TimePointPrototypeMsg.SetTimeSpan ts))
             ])
         )
@@ -24,9 +25,10 @@ let bindings ()  : Binding<TimePointsSettingsModel, TimePointsSettingsModel.Msg>
             (fun tp -> tp.Id),
             Msg.TimePointMsg,
             (fun () -> [
-                "Name" |> Binding.twoWay ((fun (_, e) -> e.Name), TimePointMsg.SetName)
-                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan)
+                "Name" |> Binding.twoWay ((fun (_, e: TimePoint) -> e.Name), TimePointMsg.SetName)
+                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
                 "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
+                "KindAlias" |> Binding.oneWay (fun (_, m) -> m.KindAlias)
                 "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
             ])
         )
