@@ -26,7 +26,8 @@ let update
         model, Cmd.none
     
     | Msg.SetActiveTimePoint atp ->
-        model |> setActiveTimePoint atp, Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
+        let model' = model |> setActiveTimePoint atp
+        model', Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model' |> timePointKindEnum) Msg.OnError
 
     | Msg.Next ->
         cfg.Looper.Next()
