@@ -5,7 +5,6 @@ open System.Threading.Tasks
 open NUnit.Framework
 open FsUnit.TopLevelOperators
 open ShouldExtensions
-open Bogus
 
 open Elmish
 open PomodoroWindowsTimer.Types
@@ -19,40 +18,11 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
 open PomodoroWindowsTimer.ElmishApp.Tests.TestServices
+open PomodoroWindowsTimer.ElmishApp.Tests.Fakers
+open System.Collections.Generic
 
 
-module StopResumeScenarios =
-    let faker = Faker("en")
-
-    let ``0.5 sec`` = TimeSpan.FromMilliseconds(500)
-    let ``3 sec`` = TimeSpan.FromSeconds(3)
-
-    let timePointFaker namePrefix =
-        let kind = faker.Random.ArrayElement([| Kind.Work; Kind.Break; Kind.LongBreak |])
-        {
-            Id = faker.Random.Uuid()
-            Name = (namePrefix, faker.Commerce.ProductName()) ||> sprintf "%s. %s"
-            TimeSpan = faker.Date.Timespan()
-            Kind = kind
-            KindAlias = kind |> Kind.alias
-        }
-
-    let workTP timeSpan =
-        {
-            timePointFaker "Work"
-                with
-                    TimeSpan = timeSpan
-                    Kind = Kind.Work
-        }
-
-    let breakTP timeSpan =
-        {
-            timePointFaker "Break"
-                with
-                    TimeSpan = timeSpan
-                    Kind = Kind.Break
-        }
-
+module StopResumeFeature =
 
     let mutable model = Unchecked.defaultof<_>
     let mutable looper = Unchecked.defaultof<_>
@@ -85,6 +55,8 @@ module StopResumeScenarios =
             let testBotConfiguration = TestBotConfiguration.create ()
             let sendToBot = TestBotSender.create ()
 
+            let dict = Dictionary<string, obj>()
+
             let mainModelCfg =
                 {
                     BotSettings = testBotConfiguration
@@ -95,8 +67,8 @@ module StopResumeScenarios =
                     ThemeSwitcher = TestThemeSwitcher.create ()
                     TimePointPrototypeStore = TestTimePointPrototypeStore.create ()
                     TimePointStore = TestTimePointStore.create timePoints
-                    PatternSettings = TestPatternSettings.create ()
-                    DisableSkipBreakSettings = TestDisableSkipBreakSettings.create ()
+                    PatternStore = PatternStore.initialize (TestPatternSettings.create dict)
+                    DisableSkipBreakSettings = TestDisableSkipBreakSettings.create dict
                 }
 
             Program.mkProgram 
@@ -121,7 +93,7 @@ module StopResumeScenarios =
 
     module When =
         let ``Spent 2.5 ticks time`` () =
-            testDispatch.WaitTimeout()
+            CommonSteps.``Spent 2.5 ticks time`` testDispatch
 
         let ``Looper starts playing`` () =
             testDispatch.TriggerWithTimeout(Msg.Play)
@@ -154,7 +126,7 @@ module StopResumeScenarios =
             }
             |> Async.AwaitTask
             |> Async.RunSynchronously
-            
+
 
     module Then =
 

@@ -20,7 +20,7 @@ module TimePointsGenerator =
     type Msg =
         | SetPatterns of string list
         | SetSelectedPatternIndex of int
-        | SetSelectedPattern of string option
+        | SetSelectedPattern of Pattern option
         | ProcessParseResult of Result<string list, string>
         | TimePointPrototypeMsg of id: Kind * TimePointPrototypeMsg
         | TimePointMsg of id: Guid * TimePointMsg
@@ -35,22 +35,22 @@ module TimePointsGenerator =
     open Elmish
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-    let [<Literal>] DEFAULT_PATTERN = "(w-b)3-w-lb"
-
-    let init (timePointPrototypeStore: TimePointPrototypeStore) (patternSettings: IPatternSettings) =
+    let init (timePointPrototypeStore: TimePointPrototypeStore) (patternStore: PatternStore) =
         let (patterns, cmd) =
-            match patternSettings.Read () with
-            | [] -> [ DEFAULT_PATTERN ], Cmd.ofMsg (Msg.SetSelectedPattern (DEFAULT_PATTERN |> Some))
-            | head :: tail -> (head :: tail), Cmd.ofMsg (Msg.SetSelectedPattern (head |> Some))
-        {
-            TimePointPrototypes = timePointPrototypeStore.Read ()
-            Patterns = patterns
-            SelectedPattern = None
-            SelectedPatternIndex = 0
-            TimePoints = []
-            IsPatternWrong = false
-        }
-        , cmd
+            match patternStore.Read () with
+            | [] -> ([], Cmd.none)
+            | l -> (l, Cmd.ofMsg (Msg.SetSelectedPattern (l |> List.head |> Some)))
+
+        let model =
+            {
+                TimePointPrototypes = timePointPrototypeStore.Read ()
+                Patterns = patterns
+                SelectedPattern = None
+                SelectedPatternIndex = 0
+                TimePoints = []
+                IsPatternWrong = false
+            }
+        model, cmd
 
     // -------
     // helpers

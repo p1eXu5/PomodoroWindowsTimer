@@ -33,6 +33,9 @@ type TimePointPrototype =
     }
 
 
+type Pattern = string
+
+
 module Alias =
     let create str =
         let maxLen = 10
@@ -109,4 +112,12 @@ module TimePoint =
             { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
             { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
             { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
+        ]
+
+
+module Pattern =
+
+    let defaults =
+        [
+            "(w-b)3-w-lb"
         ]

@@ -1,5 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Abstractions
 
+open PomodoroWindowsTimer.Types
+
 type ISettingsManager =
     interface
         abstract Load : key: string -> obj
@@ -45,8 +47,7 @@ type ITimePointSettings =
 
 type IPatternSettings =
     interface
-        abstract Read: unit -> string list
-        abstract Write: string list -> unit
+        abstract Patterns : Pattern list with get, set
     end
 
 

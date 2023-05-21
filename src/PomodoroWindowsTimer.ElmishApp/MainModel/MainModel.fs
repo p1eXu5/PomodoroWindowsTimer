@@ -44,7 +44,7 @@ type MainModeConfig =
         ThemeSwitcher: IThemeSwitcher
         TimePointPrototypeStore: TimePointPrototypeStore
         TimePointStore: TimePointStore
-        PatternSettings: IPatternSettings
+        PatternStore: PatternStore
         DisableSkipBreakSettings: IDisableSkipBreakSettings
     }
 
@@ -106,7 +106,7 @@ module MainModel =
             sprintf "Version: %i.%i.%i" ver.Major ver.Minor ver.Build
 
         let botSettingsModel = BotSettingsModel.init cfg.BotSettings
-        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternSettings
+        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
 
         { initDefault () with
             AssemblyVersion = assemblyVer

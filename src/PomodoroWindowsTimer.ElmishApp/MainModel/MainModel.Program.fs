@@ -154,7 +154,7 @@ let update
         let timePointsSettingsModel = model.TimePointsGeneratorModel
         cfg.TimePointQueue.Reload(timePointsSettingsModel.TimePoints)
         let patterns = timePointsSettingsModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsSettingsModel.Patterns) |> List.distinct
-        cfg.PatternSettings.Write(patterns)
+        cfg.PatternStore.Write(patterns)
         cfg.TimePointPrototypeStore.Write(timePointsSettingsModel.TimePointPrototypes)
         { model with TimePoints = timePointsSettingsModel.TimePoints }, Cmd.batch [
             Cmd.ofMsg Msg.PickFirstTimePoint

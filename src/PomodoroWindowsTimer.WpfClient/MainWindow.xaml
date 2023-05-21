@@ -268,7 +268,7 @@
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsEnabled" Value="false">
                                                         <Setter Property="BorderThickness" Value="0" />
-                                                        <Setter TargetName="MyContentPresenter" Property="Visibility" Value="Hidden"/>
+                                                        <Setter TargetName="MyContentPresenter" Property="Visibility" Value="Hidden" />
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>

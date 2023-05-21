@@ -12,8 +12,13 @@
   <ItemGroup>
     <Compile Include="FakerExtensions.fs" />
     <Compile Include="ShouldExtensions.fs" />
+    <Compile Include="TestState.fs" />
     <Compile Include="TestServices.fs" />
-    <Compile Include="BDD\StopResumeScenarios.fs" />
+    <Compile Include="TestElmishProgram.fs" />
+    <Compile Include="Fakers.fs" />
+    <Compile Include="BDD\CommonSteps.fs" />
+    <Compile Include="BDD\StopResumeFeature.fs" />
+    <Compile Include="BDD\GenerateTimePointsFeature.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

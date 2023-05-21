@@ -90,7 +90,7 @@ let internal main (
             ThemeSwitcher = themeSwitcher
             TimePointPrototypeStore = TimePointPrototypeStore.initialize timePointPrototypesSettings
             TimePointStore = TimePointStore.initialize timePointSettings
-            PatternSettings = patternSettings
+            PatternStore = PatternStore.initialize patternSettings
             DisableSkipBreakSettings = disableSkipBreakSettings
         }
 

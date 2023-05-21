@@ -88,6 +88,31 @@ module TimePointStore =
         }
 
 
+type PatternStore =
+    {
+        Read: unit -> Pattern list
+        Write: Pattern list -> unit
+    }
+
+module PatternStore =
+
+    let read (patternSettings : IPatternSettings) =
+        match patternSettings.Patterns with
+        | [] -> Pattern.defaults
+        | l -> l
+
+
+    let write (patternSettings : IPatternSettings) (patterns: Pattern list) =
+        patternSettings.Patterns <- patterns
+
+
+    let initialize (patternSettings : IPatternSettings) : PatternStore =
+        {
+            Read = fun () -> read patternSettings
+            Write = write patternSettings
+        }
+
+
 type WindowsMinimizer =
     {
         Minimize: string -> Async<unit>

@@ -14,6 +14,12 @@ public sealed class PatternSettings : IPatternSettings
         _settingsManager = settingsManager;
     }
 
+    public FSharpList<string> Patterns
+    {
+        get => Read();
+        set => Write(value);
+    }
+
     public FSharpList<string> Read()
     {
         var coll = _settingsManager.Load("Patterns") as StringCollection;

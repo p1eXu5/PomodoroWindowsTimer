@@ -94,6 +94,25 @@ module TestTimePointPrototypeStore =
         }
 
 
+module TestSettings =
+    let get key (dict: IDictionary<string, obj>) =
+        match dict.TryGetValue(key) with
+        | true, v -> v :?> string |> Some
+        | _, _ -> None
+
+
+[<RequireQualifiedAccess>]
+module TestTimePointPrototypeSettings =
+    let create (dict: IDictionary<string, obj>) =
+        { new ITimePointPrototypesSettings with
+            member _.TimePointPrototypesSettings
+                with get() =
+                    dict |> TestSettings.get "TestTimePointPrototypeSettings"
+                and set v =
+                    dict.Add("TestTimePointPrototypeSettings", box v)
+        }
+
+
 [<RequireQualifiedAccess>]
 module TestTimePointStore =
     let create (timePoints: TimePoint list) : TimePointStore =
@@ -102,21 +121,41 @@ module TestTimePointStore =
             Write = fun _ -> ()
         }
 
+[<RequireQualifiedAccess>]
+module TestTimePointSettings =
+    let create dict =
+        { new ITimePointSettings with
+            member _.TimePointSettings
+                with get() =
+                    dict |> TestSettings.get "TestTimePointSettings"
+                and set v =
+                    dict.Add("TestTimePointSettings", box v)
+        }
+
 
 [<RequireQualifiedAccess>]
 module TestPatternSettings =
-    let create () =
+    let create (dict: IDictionary<string, obj>) =
         { new IPatternSettings with
-            member _.Read() = [TimePointsGenerator.DEFAULT_PATTERN]
-            member _.Write(_) = ()
+            member _.Patterns
+                with get() =
+                    match dict.TryGetValue("TestPatternSettings") with
+                        | true, v -> v :?> string list
+                        | _, _ -> []
+                and set(patterns) =
+                    dict.Add("TestPatternSettings", box patterns)
         }
 
 module TestDisableSkipBreakSettings =
-    let create () =
+    let create (dict: IDictionary<string, obj>) =
         { new IDisableSkipBreakSettings with
             member _.DisableSkipBreak
-                with get() = false
-                and set t = ()
+                with get() =
+                    match dict.TryGetValue("TestDisableSkipBreakSettings") with
+                    | true, v -> v :?> bool
+                    | _, _ -> false
+                and set v =
+                    dict.Add("TestTimePointSettings", box v)
         }
 
 
