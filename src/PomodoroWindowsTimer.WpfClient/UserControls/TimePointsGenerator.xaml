@@ -150,7 +150,7 @@
                    LastChildFill="True"
                    >
 
-            <!--  Buttons  -->
+            <!--  buttons  -->
             <Border DockPanel.Dock="Bottom"
                     Height="{Binding ElementName=m_PatternsSection, Path=ActualHeight}"
                     Margin="0,10,0,0"

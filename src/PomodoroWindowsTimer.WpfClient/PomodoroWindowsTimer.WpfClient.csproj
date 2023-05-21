@@ -25,6 +25,7 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="appsettings.Personal.json" />
+    <None Remove="Resources\metalArtboard-50.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +53,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\metalArtboard-50.png" />
   </ItemGroup>
 
   <ItemGroup>
