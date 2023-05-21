@@ -24,5 +24,5 @@ let update botConfiguration timePointPrototypeStore patternSettings (msg: Msg) m
         { model with BotSettingsModel = botSettingsModel |> Some }, Cmd.none
 
     | TimePointsSettingsModelMsg tmsg ->
-        let (timePointsSettingsModel, timePointsSettingsModelCmd) = TimePointsGenerator.Program.update tmsg (model.TimePointsGenerator |> Option.get)
+        let (timePointsSettingsModel, timePointsSettingsModelCmd, _) = TimePointsGenerator.Program.update tmsg (model.TimePointsGenerator |> Option.get)
         { model with TimePointsGenerator = timePointsSettingsModel |> Some }, Cmd.map TimePointsSettingsModelMsg timePointsSettingsModelCmd

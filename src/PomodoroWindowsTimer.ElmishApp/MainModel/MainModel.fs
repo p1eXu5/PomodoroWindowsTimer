@@ -63,7 +63,7 @@ module MainModel =
         | StartTimePoint of Operation<Guid, unit>
         | BotSettingsMsg of BotSettingsModel.Msg
         | InitializeTimePointsSettingsModel
-        | TimePointsSettingsMsg of TimePointsGenerator.Msg
+        | TimePointsGeneratorMsg of TimePointsGenerator.Msg
         | SetDisableSkipBreak of bool
         // test msgs
         | MinimizeWindows
@@ -119,7 +119,7 @@ module MainModel =
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
-            Cmd.map Msg.TimePointsSettingsMsg tpSettingsModelCmd
+            Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
         ]
 
     // =========

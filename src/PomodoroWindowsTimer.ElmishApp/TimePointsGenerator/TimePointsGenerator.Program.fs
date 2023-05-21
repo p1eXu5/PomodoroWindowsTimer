@@ -5,6 +5,7 @@ open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
+open Elmish.Extensions
 
 
 let parsePattern model pattern =
@@ -33,7 +34,7 @@ let update msg model =
 
     match msg with
     | SetPatterns xp ->
-        { model with Patterns = xp }, Cmd.none
+        { model with Patterns = xp }, Cmd.none, Intent.none
 
     | SetSelectedPattern (Some p) ->
         match parsePattern p with
@@ -42,25 +43,25 @@ let update msg model =
             |> setSelectedPattern p
             |> setTimePoints (res |> toTimePoints)
             |> unsetIsPatternWrong
-            , Cmd.none
+            , Cmd.none, Intent.none
         | Error _ ->
             model
             |> setSelectedPattern p
             |> setIsPatternWrong
             |> clearTimePoints
-            , Cmd.none
+            , Cmd.none, Intent.none
 
     | SetSelectedPattern None ->
-        model |> unsetSelectedPattern |> unsetIsPatternWrong |> clearTimePoints, Cmd.none
+        model |> unsetSelectedPattern |> unsetIsPatternWrong |> clearTimePoints, Cmd.none, Intent.none
 
     | ProcessParseResult (Ok res) ->
-        model |> setTimePoints (res |> toTimePoints) |> unsetIsPatternWrong, Cmd.none
+        model |> setTimePoints (res |> toTimePoints) |> unsetIsPatternWrong, Cmd.none, Intent.none
 
     | ProcessParseResult (Error _) ->
-        model |> setIsPatternWrong |> clearTimePoints, Cmd.none
+        model |> setIsPatternWrong |> clearTimePoints, Cmd.none, Intent.none
 
     | SetSelectedPatternIndex ind ->
-        model |> setSelectedPatternIndex ind, Cmd.none
+        model |> setSelectedPatternIndex ind, Cmd.none, Intent.none
 
     | TimePointPrototypeMsg (kind, ptMsg) ->
         let prototypeInd =
@@ -83,8 +84,9 @@ let update msg model =
                         @ (model.TimePointPrototypes |> List.skip (prototypeInd + 1))
             }
             , Cmd.ofMsg (SetSelectedPattern model.SelectedPattern)
+            , Intent.none
         )
-        |> Option.defaultValue (model, Cmd.none)
+        |> Option.defaultValue (model, Cmd.none, Intent.none)
 
     | TimePointMsg (id, tpMsg) ->
         let timePointInd =
@@ -106,6 +108,9 @@ let update msg model =
                         @ [p]
                         @ (model.TimePoints |> List.skip (timePointInd + 1))
             }
-            , Cmd.none
+            , Cmd.none, Intent.none
         )
-        |> Option.defaultValue (model, Cmd.none)
+        |> Option.defaultValue (model, Cmd.none, Intent.none)
+
+    | ApplyTimePoints ->
+        (model, Cmd.none, Request.ApplyGeneratedTimePoints |> Intent.Request )

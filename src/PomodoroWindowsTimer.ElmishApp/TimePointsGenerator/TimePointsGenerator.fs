@@ -24,6 +24,7 @@ module TimePointsGenerator =
         | ProcessParseResult of Result<string list, string>
         | TimePointPrototypeMsg of id: Kind * TimePointPrototypeMsg
         | TimePointMsg of id: Guid * TimePointMsg
+        | ApplyTimePoints
     and
         TimePointPrototypeMsg =
             | SetName of string
@@ -31,6 +32,10 @@ module TimePointsGenerator =
     and
         TimePointMsg =
             | SetName of string
+
+    type Request =
+        | ApplyGeneratedTimePoints
+
 
     open Elmish
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
@@ -79,3 +84,10 @@ module TimePointsGenerator =
 
     let unsetIsPatternWrong m =
         { m with IsPatternWrong = false }
+
+    let applyMsg (m: TimePointsGenerator) =
+        if not m.IsPatternWrong then
+            match m.TimePoints with
+            | [] -> None
+            | _ -> Some Msg.ApplyTimePoints
+        else None

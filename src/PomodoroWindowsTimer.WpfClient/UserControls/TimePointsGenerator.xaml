@@ -158,22 +158,18 @@
                 <StackPanel HorizontalAlignment="Center"
                             Orientation="Horizontal"
                             >
+                    <!--  CLOSE button  -->
                     <Button HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Command=""
+                            Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                            CommandParameter="{x:Static Dock.Right}"
                             Content="CLOSE"
                             Style="{StaticResource MaterialDesignFlatButton}"
-                            >
-                        <Button.CommandParameter>
-                            <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                                False
-                            </system:Boolean>
-                        </Button.CommandParameter>
-                    </Button>
-
+                            />
+                    <!--  APPLY button  -->
                     <Button HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Command=""
+                            Command="{Binding ApplyCommand}"
                             Content="APPLY"
                             Style="{StaticResource MaterialDesignFlatButton}"
                             >

@@ -85,7 +85,7 @@ module TimePointPrototype =
     let toTimePoint ind prototype =
         {
             Id = Guid.NewGuid()
-            Name = sprintf "%O %i" prototype.Kind ind
+            Name = sprintf "%s %i" prototype.Name ind
             TimeSpan = prototype.TimeSpan
             Kind = prototype.Kind
             KindAlias = prototype.KindAlias

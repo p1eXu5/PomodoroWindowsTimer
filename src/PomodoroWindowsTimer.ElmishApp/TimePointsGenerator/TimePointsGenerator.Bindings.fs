@@ -41,5 +41,7 @@ let bindings ()  : Binding<TimePointsGenerator, TimePointsGenerator.Msg> list =
 
         "SelectedPatternIndex" |> Binding.twoWay (getSelectedPatternIndex, SetSelectedPatternIndex)
         "IsPatternCorrect" |> Binding.oneWay (fun m -> m.IsPatternWrong |> not)
+
+        "ApplyCommand" |> Binding.cmdIf applyMsg
     ]
 

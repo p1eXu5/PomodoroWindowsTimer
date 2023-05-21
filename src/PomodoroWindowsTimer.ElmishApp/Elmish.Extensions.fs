@@ -7,3 +7,12 @@ type Operation<'TArg, 'TRes> =
     | Start of 'TArg
     | Finish of 'TRes
 
+[<RequireQualifiedAccess>]
+type Intent<'TIntent> =
+    | None
+    | Request of 'TIntent
+
+[<RequireQualifiedAccess>]
+module Intent =
+    let none = Intent.None
+    

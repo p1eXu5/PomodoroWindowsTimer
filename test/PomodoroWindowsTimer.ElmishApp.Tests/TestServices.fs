@@ -94,25 +94,6 @@ module TestTimePointPrototypeStore =
         }
 
 
-module TestSettings =
-    let get key (dict: IDictionary<string, obj>) =
-        match dict.TryGetValue(key) with
-        | true, v -> v :?> string |> Some
-        | _, _ -> None
-
-
-[<RequireQualifiedAccess>]
-module TestTimePointPrototypeSettings =
-    let create (dict: IDictionary<string, obj>) =
-        { new ITimePointPrototypesSettings with
-            member _.TimePointPrototypesSettings
-                with get() =
-                    dict |> TestSettings.get "TestTimePointPrototypeSettings"
-                and set v =
-                    dict.Add("TestTimePointPrototypeSettings", box v)
-        }
-
-
 [<RequireQualifiedAccess>]
 module TestTimePointStore =
     let create (timePoints: TimePoint list) : TimePointStore =
@@ -121,15 +102,43 @@ module TestTimePointStore =
             Write = fun _ -> ()
         }
 
+
+// ==================
+// settings
+// ==================
+
+module TestSettings =
+    let getStrOpt key (dict: IDictionary<string, obj>) =
+        match dict.TryGetValue(key) with
+        | true, v -> v :?> string |> Some
+        | _, _ -> None
+
+    let addStrOpt key v (dict: IDictionary<string, obj>) =
+        match v with
+        | Some s -> dict[key] <- box s
+        | None -> dict.Remove(key) |> ignore
+
+
+[<RequireQualifiedAccess>]
+module TestTimePointPrototypeSettings =
+    let create (dict: IDictionary<string, obj>) =
+        { new ITimePointPrototypesSettings with
+            member _.TimePointPrototypesSettings
+                with get() =
+                    dict |> TestSettings.getStrOpt "TestTimePointPrototypeSettings"
+                and set v =
+                    dict |> TestSettings.addStrOpt "TestTimePointPrototypeSettings" v
+        }
+
 [<RequireQualifiedAccess>]
 module TestTimePointSettings =
     let create dict =
         { new ITimePointSettings with
             member _.TimePointSettings
                 with get() =
-                    dict |> TestSettings.get "TestTimePointSettings"
+                    dict |> TestSettings.getStrOpt "TestTimePointSettings"
                 and set v =
-                    dict.Add("TestTimePointSettings", box v)
+                    dict |> TestSettings.addStrOpt "TestTimePointSettings" v
         }
 
 
@@ -143,7 +152,7 @@ module TestPatternSettings =
                         | true, v -> v :?> string list
                         | _, _ -> []
                 and set(patterns) =
-                    dict.Add("TestPatternSettings", box patterns)
+                    dict["TestPatternSettings"] <- patterns
         }
 
 module TestDisableSkipBreakSettings =
@@ -155,8 +164,9 @@ module TestDisableSkipBreakSettings =
                     | true, v -> v :?> bool
                     | _, _ -> false
                 and set v =
-                    dict.Add("TestTimePointSettings", box v)
+                    dict["TestDisableSkipBreakSettings"] <- v
         }
+
 
 
 type TestDispatch () =

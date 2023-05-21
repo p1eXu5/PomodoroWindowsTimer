@@ -95,7 +95,7 @@ let bindings () : Binding<MainModel, Msg> list =
             |> Binding.mapModel (fun m ->
                 m.TimePointsGeneratorModel
             )
-            |> Binding.mapMsg MainModel.Msg.TimePointsSettingsMsg
+            |> Binding.mapMsg MainModel.Msg.TimePointsGeneratorMsg
 
         "DisableSkipBreak"
             |> Binding.twoWay (getDisableSkipBreak, Msg.SetDisableSkipBreak)

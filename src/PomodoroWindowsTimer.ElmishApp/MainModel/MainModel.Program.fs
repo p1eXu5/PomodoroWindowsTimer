@@ -10,6 +10,8 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open Elmish.WPF
+open Elmish.WPF.Extensions
+open Elmish.WPF.Extensions
 
 let update
     (cfg: MainModeConfig)
@@ -116,9 +118,15 @@ let update
         let settingsModel = BotSettingsModel.Program.update cfg.BotSettings bmsg model.BotSettingsModel
         { model with BotSettingsModel = settingsModel }, Cmd.none
 
-    | TimePointsSettingsMsg tpmsg ->
-        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.Program.update tpmsg model.TimePointsGeneratorModel
-        { model with TimePointsGeneratorModel = tpSettingsModel}, Cmd.map TimePointsSettingsMsg tpSettingsModelCmd
+    | TimePointsGeneratorMsg tpmsg ->
+        let (tpSettingsModel, tpSettingsModelCmd, intent) = TimePointsGenerator.Program.update tpmsg model.TimePointsGeneratorModel
+        let model' = { model with TimePointsGeneratorModel = tpSettingsModel}
+        let cmd' = Cmd.map TimePointsGeneratorMsg tpSettingsModelCmd
+        match intent with
+        | Intent.Request (TimePointsGenerator.Request.ApplyGeneratedTimePoints) ->
+            model', Cmd.batch [cmd'; Cmd.ofMsg Msg.TryStoreAndSetTimePoints]
+        | Intent.None ->
+            model', cmd'
 
     | SetDisableSkipBreak v ->
         cfg.DisableSkipBreakSettings.DisableSkipBreak <- v
@@ -151,17 +159,17 @@ let update
     // --------------------
     | Msg.TryStoreAndSetTimePoints ->
         cfg.Looper.Stop()
-        let timePointsSettingsModel = model.TimePointsGeneratorModel
-        cfg.TimePointQueue.Reload(timePointsSettingsModel.TimePoints)
-        let patterns = timePointsSettingsModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsSettingsModel.Patterns) |> List.distinct
+        let timePointsGeneratorModel = model.TimePointsGeneratorModel
+        cfg.TimePointQueue.Reload(timePointsGeneratorModel.TimePoints)
+        let patterns = timePointsGeneratorModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsGeneratorModel.Patterns) |> List.distinct
+        
         cfg.PatternStore.Write(patterns)
-        cfg.TimePointPrototypeStore.Write(timePointsSettingsModel.TimePointPrototypes)
-        { model with TimePoints = timePointsSettingsModel.TimePoints }, Cmd.batch [
-            Cmd.ofMsg Msg.PickFirstTimePoint
+        cfg.TimePointPrototypeStore.Write(timePointsGeneratorModel.TimePointPrototypes)
+        cfg.TimePointStore.Write(timePointsGeneratorModel.TimePoints)
 
-            TimePointsGenerator.Msg.SetPatterns patterns
-            |> Msg.TimePointsSettingsMsg
-            |> Cmd.ofMsg
+        { model with TimePoints = timePointsGeneratorModel.TimePoints }
+        , Cmd.batch [
+            Cmd.ofMsg Msg.PickFirstTimePoint
         ]
 
     | Msg.OnError ex ->
