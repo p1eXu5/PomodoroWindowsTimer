@@ -79,7 +79,7 @@ let bindings () : Binding<MainModel, Msg> list =
         "IsBreak"
         |> Binding.oneWay (fun m ->
             m.ActiveTimePoint
-            |> Option.map (fun tp -> tp.Kind |> function Kind.Break -> true | _ -> false)
+            |> Option.map (fun tp -> tp.Kind |> function Kind.Break | Kind.LongBreak -> true | _ -> false)
             |> Option.defaultValue false
         )
 
