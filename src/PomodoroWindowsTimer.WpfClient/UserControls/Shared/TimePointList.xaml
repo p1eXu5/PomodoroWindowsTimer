@@ -7,11 +7,11 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_TimePointListContainer"
-             MinWidth="150"
+             MinWidth="170"
              MinHeight="150"
              HorizontalAlignment="Center"
              d:DesignHeight="180"
-             d:DesignWidth="170"
+             d:DesignWidth="320"
              Background="{DynamicResource MaterialDesignToolBarBackground}"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
@@ -28,13 +28,61 @@
                 BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                 BorderThickness="0,0,0,1"
                 >
-            <TextBlock Margin="0,16"
-                       HorizontalAlignment="Center"
-                       Style="{StaticResource MaterialDesignButtonTextBlock}"
-                       Text="{Binding Path=Header, ElementName=m_TimePointListContainer, FallbackValue=TIME POINTS}"
-                       />
-        </Border>
+            <DockPanel LastChildFill="True">
+                <Grid DockPanel.Dock="Bottom">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0"
+                          Margin="15,0,0,0"
+                          >
+                        <materialDesign:PackIcon VerticalAlignment="Center"
+                                                 Kind="Magnify"
+                                                 />
+                        <TextBox Margin="0,5"
+                                 Padding="25,0,0,0"
+                                 HorizontalAlignment="Stretch"
+                                 />
+                    </Grid>
 
+                    <Border Grid.Column="1"
+                            Margin="15,4,5,4"
+                            Padding="0"
+                            BorderThickness="1,0,0,0"
+                            BorderBrush="{StaticResource MaterialDesignLightSeparatorBackground}"
+                            />
+
+                    <Menu Grid.Column="2"
+                          Margin="0,0,5,0"
+                          VerticalAlignment="Center"
+                          IsMainMenu="False"
+                          ToolBar.OverflowMode="Never"
+                          >
+                        <MenuItem Height="40"
+                                  Padding="8"
+                                  Header="Extended"
+                                  >
+
+                            <MenuItem Padding="8"
+                                      Header="Extended"
+                                      />
+                            <MenuItem Padding="8"
+                                      Header="Extended"
+                                      />
+                        </MenuItem>
+                    </Menu>
+                </Grid>
+                <TextBlock Margin="10,16,0,16"
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource MaterialDesignButtonTextBlock}"
+                           Text="{Binding Path=Header,
+                                          ElementName=m_TimePointListContainer,
+                                          FallbackValue=TIME POINTS}"
+                           />
+            </DockPanel>
+        </Border>
         <!--  ItemTemplate="" is set in code behind  -->
         <ScrollViewer x:Name="m_ScrollViewer"
                       VerticalScrollBarVisibility="Visible"
@@ -57,20 +105,9 @@
             </ScrollViewer.Height>
             <ItemsControl x:Name="m_TimePointListBox"
                           Grid.IsSharedSizeScope="True"
-                          ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
-                          >
-
-                <!--<ListBox.ItemContainerStyle>
-                    <Style TargetType="Control">
-                        <Setter Property="Control.HorizontalAlignment" Value="Stretch" />
-                -->
-                <!--<Setter Property="Control.Margin" Value="0" />
-                        <Setter Property="Control.Padding" Value="0" />-->
-                <!--
-                        <Setter Property="ItemsControl.BorderThickness" Value="0" />
-                    </Style>
-                </ListBox.ItemContainerStyle>-->
-            </ItemsControl>
+                          ItemsSource="{Binding DataContext,
+                                                ElementName=m_TimePointListContainer}"
+                          />
         </ScrollViewer>
     </StackPanel>
 </UserControl>
