@@ -20,7 +20,7 @@
         Icon="pomodoro-technique.ico"
         TextElement.FontSize="13"
         TextElement.FontWeight="Regular"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
         WindowStartupLocation="CenterScreen"
@@ -40,15 +40,16 @@
                                DialogContentTemplate="{StaticResource dt_BotSettingsDialog}"
                                DialogTheme="Inherit"
                                Identifier="RootDialog"
-                               SnackbarMessageQueue="{Binding ElementName=ErrorMessageQueue, Path=MessageQueue}"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
+                                                              Path=MessageQueue}"
                                >
 
         <materialDesign:DrawerHost x:Name="DrawerHost"
                                    HorizontalAlignment="Stretch"
                                    VerticalAlignment="Stretch"
-                                   BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                   BorderBrush="{DynamicResource MaterialDesign.Brush.TextBox.HoverBackground}"
                                    BorderThickness="2"
-                                   BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
+                                   BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
                                    BottomDrawerCornerRadius="20 20 0 0"
                                    >
             <materialDesign:DrawerHost.LeftDrawerContent>
@@ -75,31 +76,32 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Foreground="#4E6876"
-                               Text="{Binding AssemblyVersion, FallbackValue=v 1.0.1.0}"
+                               Text="{Binding AssemblyVersion,
+                                              FallbackValue=v 1.0.1.0}"
                                />
                     <!--  running time points  -->
                     <Button DockPanel.Dock="Left"
-                            HorizontalAlignment="Left"
                             Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
                             CommandParameter="{x:Static Dock.Left}"
+                            HorizontalAlignment="Left"
                             Content="{materialDesign:PackIcon TimerPlayOutline}"
                             Style="{StaticResource MaterialDesignIconButton}"
                             ToolTip="MaterialDesignFloatingActionMiniDarkButton"
                             />
                     <!--  time points generator open button  -->
                     <Button DockPanel.Dock="Left"
-                            HorizontalAlignment="Left"
                             Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
                             CommandParameter="{x:Static Dock.Right}"
+                            HorizontalAlignment="Left"
                             Content="{materialDesign:PackIcon TimerCogOutline}"
                             Style="{StaticResource MaterialDesignIconButton}"
                             ToolTip="MaterialDesignFloatingActionMiniDarkButton"
                             />
                     <!--  telegram bot settings open dialog button  -->
                     <Button DockPanel.Dock="Left"
-                            HorizontalAlignment="Left"
                             Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
                             CommandParameter="{Binding BotSettingsModel}"
+                            HorizontalAlignment="Left"
                             Content="{materialDesign:PackIcon CommentAccountOutline}"
                             RenderTransformOrigin="0.5,0.5"
                             Style="{StaticResource MaterialDesignIconButton}"
@@ -115,7 +117,8 @@
                     </Button>
                 </DockPanel>
 
-                <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
+                                         DockPanel.Dock="Bottom"
                                          HorizontalAlignment="Stretch"
                                          ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
                                          MessageQueue="{Binding ErrorMessageQueue}"
@@ -136,25 +139,36 @@
                                     <TextBlock Margin="0,0,0,20"
                                                HorizontalAlignment="Left"
                                                Foreground="#00FF00"
-                                               Text="{Binding DataContext.ActiveTimePointName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                               Text="{Binding DataContext.ActiveTimePointName,
+                                                              RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                             AncestorType=Control}}"
                                                />
                                     <digitPanel:TimerTable HorizontalAlignment="Stretch"
                                                            VerticalAlignment="Center"
                                                            DigitBackground="#004000"
                                                            Foreground="#00FF00"
                                                            Format="mm':'ss"
-                                                           Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                                           Value="{Binding DataContext.ActiveTime,
+                                                                           RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                          AncestorType=Control},
+                                                                           FallbackValue=00:00:00.00}"
                                                            />
                                     <Slider DockPanel.Dock="Top"
                                             Margin="0,40,0,0"
                                             Foreground="#00FF00"
-                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet,
+                                                                RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                               AncestorType=Control}}"
+                                            Maximum="{Binding DataContext.ActiveTimeDuration,
+                                                              RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                             AncestorType=Control}}"
                                             Minimum="0"
                                             Orientation="Horizontal"
                                             PreviewMouseDown="Slider_MouseDown"
                                             PreviewMouseUp="Slider_MouseUp"
-                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Value="{Binding DataContext.ActiveTimeSeconds,
+                                                            RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                           AncestorType=Control}}"
                                             />
                                 </StackPanel>
                             </DataTemplate>
@@ -166,25 +180,36 @@
                                     <TextBlock Margin="0,0,0,20"
                                                HorizontalAlignment="Left"
                                                Foreground="#FF0000"
-                                               Text="{Binding DataContext.ActiveTimePointName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                               Text="{Binding DataContext.ActiveTimePointName,
+                                                              RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                             AncestorType=Control}}"
                                                />
                                     <digitPanel:TimerTable HorizontalAlignment="Stretch"
                                                            VerticalAlignment="Center"
                                                            DigitBackground="#400000"
                                                            Foreground="#FF0000"
                                                            Format="mm':'ss"
-                                                           Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
+                                                           Value="{Binding DataContext.ActiveTime,
+                                                                           RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                          AncestorType=Control},
+                                                                           FallbackValue=00:00:00.00}"
                                                            />
                                     <Slider DockPanel.Dock="Top"
                                             Margin="0,40,0,0"
                                             Foreground="#FF0000"
-                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet,
+                                                                RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                               AncestorType=Control}}"
+                                            Maximum="{Binding DataContext.ActiveTimeDuration,
+                                                              RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                             AncestorType=Control}}"
                                             Minimum="0"
                                             Orientation="Horizontal"
                                             PreviewMouseDown="Slider_MouseDown"
                                             PreviewMouseUp="Slider_MouseUp"
-                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
+                                            Value="{Binding DataContext.ActiveTimeSeconds,
+                                                            RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                           AncestorType=Control}}"
                                             />
                                 </StackPanel>
                             </DataTemplate>
@@ -209,7 +234,7 @@
                                     >
                             <StackPanel.Resources>
                                 <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Foreground" Value="{DynamicResource SecondaryHueDarkForegroundBrush}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark.Foreground}" />
                                     <Setter Property="Cursor" Value="Hand" />
                                     <Setter Property="Padding" Value="16,10" />
                                     <Setter Property="TextBlock.FontSize" Value="14" />
@@ -218,7 +243,7 @@
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="HorizontalContentAlignment" Value="Center" />
                                     <Setter Property="VerticalContentAlignment" Value="Center" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource SecondaryHueDarkBrush}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
                                     <Setter Property="BorderThickness" Value="1" />
                                     <Setter Property="Width" Value="100" />
                                     <Setter Property="Background">
@@ -237,7 +262,6 @@
                                                               Direction="0"
                                                               Opacity="0.5"
                                                               ShadowDepth="0"
-                                                              Color="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=(Border.BorderBrush).(SolidColorBrush.Color)}"
                                                               />
                                         </Setter.Value>
                                     </Setter>
@@ -248,11 +272,14 @@
                                                     <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:ShadowAssist.CacheMode)}">
                                                         <Grid HorizontalAlignment="Center">
                                                             <Border x:Name="border"
-                                                                    Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ButtonBase}}, Path=ActualWidth}"
+                                                                    Width="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                                                                                   AncestorType={x:Type ButtonBase}},
+                                                                                    Path=ActualWidth}"
                                                                     Background="{TemplateBinding Background}"
                                                                     BorderBrush="{TemplateBinding BorderBrush}"
                                                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                                                    CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                                                    CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius),
+                                                                                           RelativeSource={RelativeSource TemplatedParent}}"
                                                                     />
 
                                                             <ContentPresenter x:Name="MyContentPresenter"
@@ -282,7 +309,6 @@
                                                                       Direction="0"
                                                                       Opacity="1"
                                                                       ShadowDepth="0"
-                                                                      Color="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=(Border.BorderBrush).(SolidColorBrush.Color)}"
                                                                       />
                                                 </Setter.Value>
                                             </Setter>
@@ -294,7 +320,6 @@
                                                                       Direction="0"
                                                                       Opacity="0"
                                                                       ShadowDepth="0"
-                                                                      Color="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}, Path=(Border.BorderBrush).(SolidColorBrush.Color)}"
                                                                       />
                                                 </Setter.Value>
                                             </Setter>
@@ -303,26 +328,29 @@
                                 </Style>
                             </StackPanel.Resources>
                             <Button Command="{Binding ReplayCommand}"
-                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Visibility="{Binding LooperIsRunning,
+                                                         Converter={StaticResource BooleanToVisibilityConverter}}"
                                     >
                                 <!--  Content="Replay"  -->
                                 Replay
                                 <!--<ctrl:OutlinedTextBlock ClipToBounds="False"
-                                                        Fill="{DynamicResource SecondaryHueDarkForegroundBrush}"
+                                                        Fill="{DynamicResource MaterialDesign.Brush.Secondary.Dark.Foreground}"
                                                         Stroke="Black"
                                                         StrokePosition="Outside"
                                                         StrokeThickness="1"
                                                         Text=" Replay"
                                                         />-->
                             </Button>
-                            <Button Margin="20,0,0,0"
-                                    Command="{Binding PlayStopCommand}"
-                                    Content="{Binding PlayPauseButtonText, FallbackValue=Resume}"
+                            <Button Command="{Binding PlayStopCommand}"
+                                    Margin="20,0,0,0"
+                                    Content="{Binding PlayPauseButtonText,
+                                                      FallbackValue=Resume}"
                                     />
-                            <Button Margin="20,0,0,0"
-                                    Command="{Binding NextCommand}"
+                            <Button Command="{Binding NextCommand}"
+                                    Margin="20,0,0,0"
                                     Content="Next"
-                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Visibility="{Binding LooperIsRunning,
+                                                         Converter={StaticResource BooleanToVisibilityConverter}}"
                                     />
                             <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
                             <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->

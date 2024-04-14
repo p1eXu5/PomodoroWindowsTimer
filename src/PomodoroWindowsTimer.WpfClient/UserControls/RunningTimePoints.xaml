@@ -20,7 +20,8 @@
         <ControlTemplate x:Key="ct_UnselectedTimePoint">
             <StackPanel Orientation="Horizontal">
                 <StackPanel.InputBindings>
-                    <MouseBinding Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    <MouseBinding Command="{Binding DataContext.StartTimePointCommand,
+                                                    RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                   CommandParameter="{Binding Id}"
                                   MouseAction="LeftDoubleClick"
                                   />
@@ -39,7 +40,8 @@
         <ControlTemplate x:Key="ct_SelectedTimePoint">
             <StackPanel Orientation="Horizontal">
                 <StackPanel.InputBindings>
-                    <MouseBinding Command="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    <MouseBinding Command="{Binding DataContext.StartTimePointCommand,
+                                                    RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
                                   CommandParameter="{Binding Id}"
                                   MouseAction="LeftDoubleClick"
                                   />
@@ -73,9 +75,11 @@
                               shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
                               shared:TimePointAssistant.TimePointName="{Binding Name}"
                               shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
-                              ButtonForeground="{DynamicResource PrimaryHueLightBrush}"
+                              ButtonForeground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
                               NameForeground="#D8E7ED"
-                              PlayStopCommand="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              PlayStopCommand="{Binding DataContext.StartTimePointCommand,
+                                                        RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                       AncestorType=Window}}"
                               PlayStopCommandParameter="{Binding Id}"
                               >
                 <shared:TimePoint.ButtonIcon>
@@ -97,10 +101,16 @@
             <shared:TimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
                               shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
                               shared:TimePointAssistant.TimePointName="{Binding Name}"
-                              shared:TimePointAssistant.TimePointTimeSpan="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}"
-                              ButtonForeground="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}"
+                              shared:TimePointAssistant.TimePointTimeSpan="{Binding DataContext.ActiveTime,
+                                                                                    RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                                   AncestorType=Window},
+                                                                                    StringFormat=h\\:mm}"
+                              ButtonForeground="{Binding Kind,
+                                                         Converter={StaticResource conv_KindToBrushConverter}}"
                               NameForeground="White"
-                              PlayStopCommand="{Binding DataContext.PlayStopCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              PlayStopCommand="{Binding DataContext.PlayStopCommand,
+                                                        RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                       AncestorType=Window}}"
                               >
                 <shared:TimePoint.ButtonIcon>
                     <ControlTemplate>
@@ -121,10 +131,16 @@
             <shared:TimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
                               shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
                               shared:TimePointAssistant.TimePointName="{Binding Name}"
-                              shared:TimePointAssistant.TimePointTimeSpan="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}"
-                              ButtonForeground="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}"
+                              shared:TimePointAssistant.TimePointTimeSpan="{Binding DataContext.ActiveTime,
+                                                                                    RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                                   AncestorType=Window},
+                                                                                    StringFormat=h\\:mm}"
+                              ButtonForeground="{Binding Kind,
+                                                         Converter={StaticResource conv_KindToBrushConverter}}"
                               NameForeground="White"
-                              PlayStopCommand="{Binding DataContext.PlayStopCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
+                              PlayStopCommand="{Binding DataContext.PlayStopCommand,
+                                                        RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                       AncestorType=Window}}"
                               >
                 <shared:TimePoint.ButtonIcon>
                     <ControlTemplate>
@@ -182,6 +198,7 @@
                               IsChecked="{Binding DisableSkipBreak}"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               ToolTip="Disable skip break"
+                              Focusable="False"
                               />
                 <TextBlock DockPanel.Dock="Right"
                            Margin="0,0,10,0"

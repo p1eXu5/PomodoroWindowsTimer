@@ -12,7 +12,7 @@ internal class ThemeSwitcher : IThemeSwitcher
 
     public void SwitchTheme(TimePointKind value)
     {
-        ITheme theme = _paletteHelper.GetTheme();
+        Theme theme = _paletteHelper.GetTheme();
 
         switch (value)
         {

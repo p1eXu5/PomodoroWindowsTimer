@@ -7,7 +7,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_EditableTimePointContainer"
-             Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=ActualWidth}"
+             Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                            AncestorType=ItemsControl},
+                             Path=ActualWidth}"
              Height="56"
              Padding="0,0,0,0"
              d:DesignHeight="56"
@@ -63,7 +65,9 @@
                              Background="{DynamicResource MaterialDesignDarkBackground}"
                              FontSize="16"
                              Style="{StaticResource MaterialDesignTextBox}"
-                             Text="{Binding Path=(local:TimePointAssistant.TimePointName), ElementName=m_EditableTimePointContainer, FallbackValue=Time point name}"
+                             Text="{Binding Path=(local:TimePointAssistant.TimePointName),
+                                            ElementName=m_EditableTimePointContainer,
+                                            FallbackValue=Time point name}"
                              />
                 </Border>
 
@@ -82,7 +86,8 @@
                                                FontSize="16"
                                                Is24Hours="True"
                                                IsInvalidTextAllowed="False"
-                                               Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan), ElementName=m_EditableTimePointContainer}"
+                                               Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
+                                                              ElementName=m_EditableTimePointContainer}"
                                                WithSeconds="False"
                                                />
                 </Border>
@@ -95,7 +100,9 @@
                             Orientation="Horizontal"
                             >
                     <materialDesign:PackIcon VerticalAlignment="Center"
-                                             Foreground="{Binding (local:TimePointAssistant.TimePointKind), ElementName=m_EditableTimePointContainer, Converter={StaticResource conv_KindToBrushConverter}}"
+                                             Foreground="{Binding (local:TimePointAssistant.TimePointKind),
+                                                                  ElementName=m_EditableTimePointContainer,
+                                                                  Converter={StaticResource conv_KindToBrushConverter}}"
                                              Kind="CircleSmall"
                                              />
                     <TextBlock VerticalAlignment="Center"

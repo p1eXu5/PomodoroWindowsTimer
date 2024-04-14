@@ -7,7 +7,6 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_RunningTimePointContainer"
-             Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBox}, Path=ActualWidth}"
              Height="56"
              Padding="0"
              d:DesignHeight="56"
@@ -31,21 +30,26 @@
                     >
                 <Border Width="2"
                         HorizontalAlignment="Left"
-                        BorderBrush="{Binding Path=ButtonForeground, ElementName=m_RunningTimePointContainer, FallbackValue=White}"
+                        BorderBrush="{Binding Path=ButtonForeground,
+                                              ElementName=m_RunningTimePointContainer,
+                                              FallbackValue=White}"
                         BorderThickness="1"
                         />
             </Border>
 
             <Button DockPanel.Dock="Right"
+                    Command="{Binding ElementName=m_RunningTimePointContainer,
+                                      Path=PlayStopCommand}"
+                    CommandParameter="{Binding ElementName=m_RunningTimePointContainer,
+                                               Path=PlayStopCommandParameter}"
                     Width="60"
                     Height="56"
                     materialDesign:ButtonAssist.CornerRadius="0"
                     materialDesign:ElevationAssist.Elevation="Dp0"
                     BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                     BorderThickness="1"
-                    Command="{Binding ElementName=m_RunningTimePointContainer, Path=PlayStopCommand}"
-                    CommandParameter="{Binding ElementName=m_RunningTimePointContainer, Path=PlayStopCommandParameter}"
-                    Foreground="{Binding Path=ButtonForeground, ElementName=m_RunningTimePointContainer}"
+                    Foreground="{Binding Path=ButtonForeground,
+                                         ElementName=m_RunningTimePointContainer}"
                     RenderTransformOrigin="0.5,0.5"
                     Style="{StaticResource MaterialDesignPaperDarkButton}"
                     >
@@ -55,7 +59,8 @@
                 <StackPanel Orientation="Vertical">
                     <TextBlock HorizontalAlignment="Center"
                                Style="{StaticResource MaterialDesignButtonTextBlock}"
-                               Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan), ElementName=m_RunningTimePointContainer}"
+                               Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
+                                              ElementName=m_RunningTimePointContainer}"
                                />
                     <Control Template="{Binding Path=ButtonIcon, ElementName=m_RunningTimePointContainer}" />
                     <!--<materialDesign:PackIcon Width="20"
@@ -86,16 +91,18 @@
                            Grid.ColumnSpan="2"
                            VerticalAlignment="Center"
                            FontSize="16"
-                           Foreground="{Binding Path=NameForeground, ElementName=m_RunningTimePointContainer}"
+                           Foreground="{Binding Path=NameForeground,
+                                                ElementName=m_RunningTimePointContainer}"
                            Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                           Text="{Binding Path=(local:TimePointAssistant.TimePointName), ElementName=m_RunningTimePointContainer}"
+                           Text="{Binding Path=(local:TimePointAssistant.TimePointName),
+                                          ElementName=m_RunningTimePointContainer}"
                            />
                 <!--  kind & alias  -->
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            VerticalAlignment="Center"
                            FontSize="10"
-                           Foreground="{DynamicResource PrimaryHueLightBrush}"
+                           Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
                            >
                     <Run Text="{Binding Path=(local:TimePointAssistant.TimePointKind), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />
