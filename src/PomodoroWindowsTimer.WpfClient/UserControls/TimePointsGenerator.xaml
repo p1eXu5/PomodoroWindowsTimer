@@ -14,87 +14,7 @@
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
-    <!--<Behaviors:Interaction.Triggers>
-        <Behaviors:EventTrigger EventName="Loaded">
-            <Behaviors:InvokeCommandAction Command="{Binding SetTimePointsSettingsModel}" />
-        </Behaviors:EventTrigger>
-    </Behaviors:Interaction.Triggers>-->
-
-    <UserControl.Resources>
-        <ControlTemplate x:Key="ct_GeneratedTimePoint">
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="100"
-                         Margin="18,0,0,0"
-                         VerticalAlignment="Center"
-                         Text="{Binding Name}"
-                         />
-                <TextBlock Margin="20,0"
-                           VerticalAlignment="Center"
-                           Text="{Binding TimeSpan}"
-                           />
-                <TextBlock VerticalAlignment="Center"
-                           Text="{Binding Kind}"
-                           />
-            </StackPanel>
-        </ControlTemplate>
-
-        <DataTemplate x:Key="dt_SettingsTimepPointTemplate">
-            <Control x:Name="theControl"
-                     Focusable="False"
-                     Template="{StaticResource ct_GeneratedTimePoint}"
-                     />
-        </DataTemplate>
-
-        <DataTemplate x:Key="dt_Prototypes">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto"
-                                      SharedSizeGroup="Alias"
-                                      />
-                    <ColumnDefinition Width="Auto"
-                                      SharedSizeGroup="TimeSpan"
-                                      />
-                </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0"
-                         VerticalAlignment="Center"
-                         IsReadOnly="True"
-                         Text="{Binding Kind}"
-                         />
-                <TextBox Grid.Column="1"
-                         Margin="10,0"
-                         VerticalAlignment="Center"
-                         IsReadOnly="True"
-                         Text="{Binding Alias}"
-                         />
-                <materialDesign:TimePicker Grid.Column="2"
-                                           Width="100"
-                                           VerticalAlignment="Center"
-                                           materialDesign:HintAssist.Hint="Validates"
-                                           Is24Hours="True"
-                                           IsInvalidTextAllowed="False"
-                                           Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}"
-                                           WithSeconds="False"
-                                           />
-            </Grid>
-        </DataTemplate>
-
-        <DataTemplate x:Key="dt_TimePointPrototype">
-            <shared:EditableTimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
-                                      shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
-                                      shared:TimePointAssistant.TimePointName="{Binding Name}"
-                                      shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
-                                      />
-        </DataTemplate>
-
-        <converters:HeightReminder2Converter x:Key="conv_HeightReminder" />
-    </UserControl.Resources>
-
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <!--<RowDefinition Height="80" />-->
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="320" />
             <ColumnDefinition Width="320" />
@@ -128,7 +48,8 @@
                               IsTextSearchEnabled="True"
                               ItemsSource="{Binding Patterns}"
                               SelectedIndex="{Binding SelectedPatternIndex}"
-                              Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged}"
+                              Text="{Binding SelectedPattern,
+                                             UpdateSourceTrigger=PropertyChanged}"
                               />
                 </StackPanel>
             </Border>
@@ -138,7 +59,7 @@
                                   HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePointPrototypes}"
                                   Header="PROTOTYPES"
-                                  TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
+                                  TimePointListBoxItemTemplate="{StaticResource dt_EditableTimePoint}"
                                   TimePointListBoxScrollBarVisibility="Hidden"
                                   />
         </DockPanel>
@@ -152,24 +73,25 @@
 
             <!--  buttons  -->
             <Border DockPanel.Dock="Bottom"
-                    Height="{Binding ElementName=m_PatternsSection, Path=ActualHeight}"
+                    Height="{Binding ElementName=m_PatternsSection,
+                                     Path=ActualHeight}"
                     Margin="0,10,0,0"
                     >
                 <StackPanel HorizontalAlignment="Center"
                             Orientation="Horizontal"
                             >
                     <!--  CLOSE button  -->
-                    <Button HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                    <Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
                             CommandParameter="{x:Static Dock.Right}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
                             Content="CLOSE"
                             Style="{StaticResource MaterialDesignFlatButton}"
                             />
                     <!--  APPLY button  -->
-                    <Button HorizontalAlignment="Center"
+                    <Button Command="{Binding ApplyCommand}"
+                            HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Command="{Binding ApplyCommand}"
                             Content="APPLY"
                             Style="{StaticResource MaterialDesignFlatButton}"
                             >
@@ -188,48 +110,9 @@
                                   HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePoints}"
                                   Header="GENERATED TIME POINTS"
-                                  TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
+                                  TimePointListBoxItemTemplate="{StaticResource dt_EditableTimePoint}"
                                   TimePointListBoxScrollBarVisibility="Visible"
                                   />
         </DockPanel>
-
-
-        <!--  dialog buttons  -->
-        <!--<StackPanel Grid.Row="1"
-                    Grid.ColumnSpan="2"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal"
-                    >
-            <Button DockPanel.Dock="Bottom"
-                    Margin="10"
-                    HorizontalAlignment="Center"
-                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                    Content="CLOSE"
-                    IsCancel="True"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    >
-                <Button.CommandParameter>
-                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                        False
-                    </system:Boolean>
-                </Button.CommandParameter>
-            </Button>
-            <Button DockPanel.Dock="Bottom"
-                    Margin="10"
-                    HorizontalAlignment="Center"
-                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                    Content="APPLY"
-                    IsDefault="True"
-                    IsEnabled="{Binding IsPatternCorrect}"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    >
-                <Button.CommandParameter>
-                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                        True
-                    </system:Boolean>
-                </Button.CommandParameter>
-            </Button>
-        </StackPanel>-->
     </Grid>
 </UserControl>

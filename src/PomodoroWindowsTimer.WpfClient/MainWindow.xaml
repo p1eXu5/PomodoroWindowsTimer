@@ -12,7 +12,7 @@
         xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp;assembly=PomodoroWindowsTimer.ElmishApp"
         Title="{Binding Title}"
         Width="800"
-        Height="420"
+        Height="520"
         MinWidth="650"
         MinHeight="420"
         Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}"

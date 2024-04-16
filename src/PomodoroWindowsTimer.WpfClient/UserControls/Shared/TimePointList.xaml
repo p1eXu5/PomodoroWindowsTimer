@@ -59,6 +59,7 @@
                           VerticalAlignment="Center"
                           IsMainMenu="False"
                           ToolBar.OverflowMode="Never"
+                          IsEnabled="False"
                           >
                         <MenuItem Height="40"
                                   Padding="8"
@@ -103,7 +104,7 @@
                              />
                 </MultiBinding>
             </ScrollViewer.Height>
-            <!-- ItemTemplate is set through binding property TimePointListBoxItemTemplate in code behind -->
+            <!--  ItemTemplate is set through binding property TimePointListBoxItemTemplate in code behind  -->
             <ItemsControl x:Name="m_TimePointListBox"
                           Grid.IsSharedSizeScope="True"
                           ItemsSource="{Binding DataContext,

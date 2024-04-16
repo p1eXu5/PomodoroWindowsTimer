@@ -102,12 +102,13 @@
                     <materialDesign:PackIcon VerticalAlignment="Center"
                                              Foreground="{Binding (local:TimePointAssistant.TimePointKind),
                                                                   ElementName=m_EditableTimePointContainer,
-                                                                  Converter={StaticResource conv_KindToBrushConverter}}"
+                                                                  Converter={StaticResource conv_KindToBrushConverter},
+                                                                  FallbackValue=White}"
                                              Kind="CircleSmall"
                                              />
                     <TextBlock VerticalAlignment="Center"
                                FontSize="10"
-                               Foreground="{DynamicResource PrimaryHueLightBrush}"
+                               Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
                                Style="{StaticResource MaterialDesignButtonTextBlock}"
                                >
                         <Run Text="{Binding Path=(local:TimePointAssistant.TimePointKind), ElementName=m_EditableTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />

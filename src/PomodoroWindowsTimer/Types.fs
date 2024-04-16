@@ -72,6 +72,12 @@ module Kind =
             | LongBreak -> "lb")
         >> Alias.createOrThrow
 
+    [<CompiledName("ToShortString")>]
+    let toShortString = function
+        | Work -> "W"
+        | Break -> "BR"
+        | LongBreak -> "LB"
+
 
 module TimePointPrototype =
 

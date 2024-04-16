@@ -1,9 +1,9 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Shared.TimePoint"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
+             xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+             xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_RunningTimePointContainer"
@@ -11,14 +11,15 @@
              Padding="0"
              d:DesignHeight="56"
              d:DesignWidth="280"
+             d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
              Background="{DynamicResource MaterialDesignToolBarBackground}"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <UserControl.Resources>
-        <converters:KindAliasToTextConverter x:Key="conv_KindAliasToTextConverter" />
-        <converters:KindToTextConverter x:Key="conv_KindToTextConverter" />
-        <converters:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
+        <conv:KindAliasToTextConverter x:Key="conv_KindAliasToTextConverter" />
+        <conv:KindToTextConverter x:Key="conv_KindToTextConverter" />
+        <conv:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
     </UserControl.Resources>
 
     <Border BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
@@ -47,10 +48,9 @@
                     materialDesign:ButtonAssist.CornerRadius="0"
                     materialDesign:ElevationAssist.Elevation="Dp0"
                     BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
-                    BorderThickness="1"
+                    BorderThickness="1,0,0,0"
                     Foreground="{Binding Path=ButtonForeground,
                                          ElementName=m_RunningTimePointContainer}"
-                    RenderTransformOrigin="0.5,0.5"
                     Style="{StaticResource MaterialDesignPaperDarkButton}"
                     >
                 <Button.RenderTransform>
@@ -59,10 +59,16 @@
                 <StackPanel Orientation="Vertical">
                     <TextBlock HorizontalAlignment="Center"
                                Style="{StaticResource MaterialDesignButtonTextBlock}"
-                               Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
+                               Text="{Binding Path=(shared:TimePointAssistant.TimePointTimeSpan),
                                               ElementName=m_RunningTimePointContainer}"
                                />
-                    <Control Template="{Binding Path=ButtonIcon, ElementName=m_RunningTimePointContainer}" />
+                    <!--  icon  -->
+                    <Control d:Height="20"
+                             d:Width="20"
+                             d:Margin="0,4,0,0"
+                             Template="{Binding Path=ButtonIcon,
+                                                ElementName=m_RunningTimePointContainer}"
+                             />
                     <!--<materialDesign:PackIcon Width="20"
                                              Height="20"
                                              Margin="0,4,0,0"
@@ -94,7 +100,7 @@
                            Foreground="{Binding Path=NameForeground,
                                                 ElementName=m_RunningTimePointContainer}"
                            Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                           Text="{Binding Path=(local:TimePointAssistant.TimePointName),
+                           Text="{Binding Path=(shared:TimePointAssistant.TimePointName),
                                           ElementName=m_RunningTimePointContainer}"
                            />
                 <!--  kind & alias  -->
@@ -105,8 +111,8 @@
                            Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
                            >
-                    <Run Text="{Binding Path=(local:TimePointAssistant.TimePointKind), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />
-                    <Run Text="(" /><Run Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindAliasToTextConverter}, FallbackValue=?}" /><Run Text=")" />
+                    <Run Text="{Binding Path=(shared:TimePointAssistant.TimePointKind), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />
+                    <Run Text="(" /><Run Text="{Binding Path=(shared:TimePointAssistant.TimePointKindAlias), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindAliasToTextConverter}, FallbackValue=?}" /><Run Text=")" />
                 </TextBlock>
 
                 <Button Grid.Row="1"

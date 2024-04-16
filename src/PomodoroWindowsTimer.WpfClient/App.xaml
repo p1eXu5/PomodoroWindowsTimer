@@ -27,7 +27,10 @@
 
                 <digitPanel:DigitPanelTheme />
 
-                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/TimePointTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePoints.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePointsV2.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/TimePointConstructor.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 

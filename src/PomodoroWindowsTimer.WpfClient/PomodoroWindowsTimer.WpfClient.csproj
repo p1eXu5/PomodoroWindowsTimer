@@ -10,8 +10,8 @@
     
     <Title>Pomodoro Windows Timer</Title>
 
-    <AssemblyVersion>2.0.1</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <AssemblyVersion>2.0.2</AssemblyVersion>
+    <FileVersion>2.0.2.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
     
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
@@ -72,6 +72,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UserControls\Constructor\" />
   </ItemGroup>
 
 </Project>

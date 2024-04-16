@@ -86,7 +86,7 @@
         <shared:TimePointList DockPanel.Dock="Top"
                               HorizontalAlignment="Stretch"
                               DataContext="{Binding TimePoints}"
-                              TimePointListBoxItemTemplate="{StaticResource dt_TimepPointTemplate}"
+                              TimePointListBoxItemTemplate="{StaticResource dt_PlaylistTimePointV2}"
                               TimePointListBoxScrollBarVisibility="Auto"
                               />
     </DockPanel>
