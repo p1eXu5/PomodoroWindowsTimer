@@ -26,6 +26,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
 
                 <digitPanel:DigitPanelTheme />
+
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/TimePointTemplates.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />
