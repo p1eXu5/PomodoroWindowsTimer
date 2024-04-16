@@ -86,7 +86,7 @@
                             HorizontalAlignment="Left"
                             Content="{materialDesign:PackIcon TimerPlayOutline}"
                             Style="{StaticResource MaterialDesignIconButton}"
-                            ToolTip="MaterialDesignFloatingActionMiniDarkButton"
+                            ToolTip="Playlist"
                             />
                     <!--  time points generator open button  -->
                     <Button DockPanel.Dock="Left"
@@ -95,7 +95,7 @@
                             HorizontalAlignment="Left"
                             Content="{materialDesign:PackIcon TimerCogOutline}"
                             Style="{StaticResource MaterialDesignIconButton}"
-                            ToolTip="MaterialDesignFloatingActionMiniDarkButton"
+                            ToolTip="Playlist constructor"
                             />
                     <!--  telegram bot settings open dialog button  -->
                     <Button DockPanel.Dock="Left"
@@ -105,6 +105,7 @@
                             Content="{materialDesign:PackIcon CommentAccountOutline}"
                             RenderTransformOrigin="0.5,0.5"
                             Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="Telegram bot settings"
                             >
                         <Button.RenderTransform>
                             <TransformGroup>
