@@ -115,9 +115,9 @@ module PatternStore =
 
 type WindowsMinimizer =
     {
-        Minimize: string -> Async<unit>
+        MinimizeOther: unit -> Async<unit>
         Restore: unit -> Async<unit>
-        RestoreMainWindow: string -> Async<unit>
+        RestoreMainWindow: unit -> Async<unit>
     }
 
 module Windows =
@@ -165,17 +165,17 @@ module Windows =
             showWindow(appWindow, SW_RESTORE) |> ignore
         }
 
-    let prodWindowsMinimizer =
+    let prodWindowsMinimizer mainWindowTitle =
         {
-            Minimize = minimize
+            MinimizeOther = fun () -> minimize mainWindowTitle
             Restore = restore
-            RestoreMainWindow = restoreMainWindow
+            RestoreMainWindow = fun () -> restoreMainWindow mainWindowTitle
         }
 
     /// for debug purpose
     let simWindowsMinimizer =
         {
-            Minimize = fun _ -> async.Return ()
+            MinimizeOther = fun _ -> async.Return ()
             Restore = async.Return
             RestoreMainWindow = fun _ -> async.Return ()
         }
@@ -183,7 +183,7 @@ module Windows =
 
 type Message = string
 
-type BotSender = IBotSettings -> Message -> Task<unit>
+type BotSender = Message -> Task<unit>
 
 module Telegram =
 

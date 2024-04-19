@@ -482,3 +482,4 @@ $RECYCLE.BIN/
 /NuGet.Config
 /images/228017.png
 /images
+/src/PomodoroWindowsTimer.WpfClient/appsettings.Development.json

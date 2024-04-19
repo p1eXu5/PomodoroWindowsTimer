@@ -11,15 +11,11 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 type MainModel =
     {
-        Title: string
-        AssemblyVersion: string
-        SettingsManager : ISettingsManager
-        ErrorQueue : IErrorMessageQueue
         ActiveTimePoint : TimePoint option
         LooperState : LooperState
         TimePoints: TimePoint list
-        BotSettingsModel: BotSettingsModel
-        TimePointsGeneratorModel: TimePointsGenerator
+        BotSettingsModel: BotSettingsModel option
+        TimePointsGeneratorModel: TimePointsGenerator option
         DisableSkipBreak: bool
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
@@ -42,9 +38,7 @@ type MainModeConfig =
         TimePointQueue: TimePointQueue
         WindowsMinimizer: WindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
-        TimePointPrototypeStore: TimePointPrototypeStore
         TimePointStore: TimePointStore
-        PatternStore: PatternStore
         DisableSkipBreakSettings: IDisableSkipBreakSettings
     }
 
@@ -52,17 +46,17 @@ type MainModeConfig =
 module MainModel =
 
     type Msg =
+        | LoadTimePointsFromSettings
+        /// Stores and loads generated timepoints from prototypes.
+        | LoadTimePoints of TimePoint list
         | LooperMsg of LooperEvent
         | Play
         | Next
         | Replay
         | Stop
         | Resume
-        | OnError of exn
-        | PickFirstTimePoint
         | StartTimePoint of Operation<Guid, unit>
         | BotSettingsMsg of BotSettingsModel.Msg
-        | InitializeTimePointsSettingsModel
         | TimePointsGeneratorMsg of TimePointsGenerator.Msg
         | SetDisableSkipBreak of bool
         // test msgs
@@ -71,55 +65,45 @@ module MainModel =
         | RestoreWindows
         | RestoreMainWindow
         | SendToChatBot
-        | SetActiveTimePoint of TimePoint option
         | SelectTimePoint of Guid option
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
-        /// Stores and loads generated timepoints from prototypes.
-        | TryStoreAndSetTimePoints
-        | LoadTimePointsFromSettings
+        | OnError of exn
 
+    module MsgWith =
+
+        let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
+            match msg, model.TimePointsGeneratorModel with
+            | Msg.TimePointsGeneratorMsg smsg, Some sm ->
+                (smsg, sm) |> Some
+            | _ -> None
+
+        let (|BotSettingsMsg|_|) (model: MainModel) (msg: Msg) =
+            match msg, model.BotSettingsModel with
+            | Msg.BotSettingsMsg smsg, Some sm ->
+                (smsg, sm) |> Some
+            | _ -> None
 
     open Elmish
 
-    let initDefault () =
+    let init (cfg: MainModeConfig) : MainModel * Cmd<Msg> =
+        //let botSettingsModel = BotSettingsModel.init cfg.BotSettings
+        //let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
+
         {
-            Title = "Pomodoro Windows Timer"
-            AssemblyVersion = "Asm.v."
-            SettingsManager = Unchecked.defaultof<_>
-            ErrorQueue = Unchecked.defaultof<_>
             ActiveTimePoint = None
             LooperState = Initialized
             TimePoints = []
-            BotSettingsModel = Unchecked.defaultof<_>
-            TimePointsGeneratorModel = Unchecked.defaultof<_>
-            DisableSkipBreak = false
+            BotSettingsModel = None
+            TimePointsGeneratorModel = None
             IsMinimized = false
             LastCommandInitiator = None
-        }
-
-    let init settingsManager errorQueue (cfg: MainModeConfig) : MainModel * Cmd<Msg> =
-
-        let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version
-        let assemblyVer =
-            sprintf "Version: %i.%i.%i" ver.Major ver.Minor ver.Build
-
-        let botSettingsModel = BotSettingsModel.init cfg.BotSettings
-        let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
-
-        { initDefault () with
-            AssemblyVersion = assemblyVer
-            SettingsManager = settingsManager
-            ErrorQueue = errorQueue
-            TimePoints = []
-            BotSettingsModel = botSettingsModel
-            TimePointsGeneratorModel = tpSettingsModel
             DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
-            Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
+            // Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
         ]
 
     // =========

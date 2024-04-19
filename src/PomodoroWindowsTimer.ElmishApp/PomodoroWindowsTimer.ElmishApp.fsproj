@@ -18,12 +18,10 @@
     <Compile Include="TimePointsGenerator\TimePointsGenerator.fs" />
     <Compile Include="TimePointsGenerator\TimePointsGenerator.Program.fs" />
     <Compile Include="TimePointsGenerator\TimePointsGenerator.Bindings.fs" />
-    <Compile Include="SettingsModel\SettingsModel.fs" />
-    <Compile Include="SettingsModel\SettingsModel.Program.fs" />
-    <Compile Include="SettingsModel\SettingsModel.Bindings.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />
+    <Compile Include="CompositionRoot.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

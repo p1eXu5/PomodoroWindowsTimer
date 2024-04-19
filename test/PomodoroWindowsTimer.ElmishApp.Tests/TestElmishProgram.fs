@@ -7,6 +7,7 @@ open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp
 open NUnit.Framework
 open TestServices
+open PomodoroWindowsTimer.Types
 
 type TestElmishProgram =
     {
@@ -44,15 +45,15 @@ module TestElmishProgram =
                 TimePointQueue = timePointQueue
                 WindowsMinimizer = Windows.simWindowsMinimizer
                 ThemeSwitcher = TestThemeSwitcher.create ()
-                TimePointPrototypeStore = TimePointPrototypeStore.initialize (TestTimePointPrototypeSettings.create dict)
+                // TimePointPrototypeStore = TimePointPrototypeStore.initialize (TestTimePointPrototypeSettings.create dict)
                 TimePointStore = TimePointStore.initialize (TestTimePointSettings.create dict)
-                PatternStore = PatternStore.initialize (TestPatternSettings.create dict)
+                // PatternStore = PatternStore.initialize (TestPatternSettings.create dict)
                 DisableSkipBreakSettings = TestDisableSkipBreakSettings.create dict
             }
 
     let run mainModelCfgFactory =
         let timePointQueue = new TimePointQueue()
-        let looper = new Looper((timePointQueue :> ITimePointQueue), Program.tickMilliseconds)
+        let looper = new Looper((timePointQueue :> ITimePointQueue), 200<ms>)
         
         let mainModelCfg =
             mainModelCfgFactory looper timePointQueue

@@ -1,67 +1,57 @@
 ﻿module PomodoroWindowsTimer.Tests.LooperTests
 
+open System
+open System.Threading
+open System.Collections.Generic
+
 open NUnit.Framework
+open FsUnit
+open ShouldExtensions
+
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.TimePointQueue
-open System
-open FsUnit.TopLevelOperators
-open ShouldExtensions.FsUnit
-open FSharp.Control
+open PomodoroWindowsTimer.Looper
+
+let private xtp =
+    [
+        { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.NewGuid(); Name = "3"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.NewGuid(); Name = "4"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
+    ]
+
+let private timePointQueue () =
+    let tpQueue = new TimePointQueue()
+    tpQueue.Start()
+    tpQueue.AddMany(xtp)
+    tpQueue
 
 [<Test>]
-let ``get test``() =
-    async {
-        use looper = new TimePointQueue()
-        looper.Start()
-        let xtp =
-            [
-                { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-                { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-                { Id = Guid.NewGuid(); Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-                { Id = Guid.NewGuid(); Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-            ]
-        looper.AddMany(xtp)
-        let! storredTp = looper.GetTimePointsWithPriority()
+let ``Next test``() =
+    task {
+        use tpQueue = timePointQueue ()
+        use looper = new Looper(tpQueue, 200<ms>, CancellationToken.None)
+        use semaphore = new SemaphoreSlim(0, 1)
 
-        storredTp |> Seq.map fst |> should equalSeq  xtp
-        storredTp
-        |> Seq.map snd
-        |> Seq.zip [ 0f; 1f; 2f; 3f ]
-        |> Seq.iter (fun (expected, actual) -> actual |> shouldL (equalWithin 0.1f) expected $"Actual %A{storredTp |> Seq.map fst}")
+        let mutable startedTPStack = Queue<TimePoint>()
+        let subscriber looperEvent =
+            async {
+                if startedTPStack.Count < 8 then
+                    match looperEvent with
+                    | TimePointStarted (newTimePoint, _) ->
+                        startedTPStack.Enqueue(newTimePoint)
+                    | _ -> ()
+                else
+                    semaphore.Release() |> ignore
+            }
+        looper.Start([ subscriber ])
+
+        //looper.PreloadTimePoint()
+        looper.Next()
+
+        let! _ = semaphore.WaitAsync(TimeSpan.FromSeconds(1.0 * 8.0 * 2.0))
+
+        startedTPStack |> Seq.map _.Id |> should equalSeq ((xtp @ xtp) |> Seq.map _.Id)
+        // Looper is discrete according to tickMilliseconds parameter. If active taime point time span is less then second, reminder will be added to the next time point
+        startedTPStack |> Seq.map _.TimeSpan |> Seq.forall (fun span -> span >= TimeSpan.FromSeconds(1) && span < TimeSpan.FromSeconds(2)) |> should be True
     }
-    |> toTask
-
-[<Test>]
-let ``asyncSeq test``() =
-    async {
-        use looper = new TimePointQueue()
-        looper.Start()
-        let xtp =
-            [
-                { Id = Guid.NewGuid(); Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-                { Id = Guid.NewGuid(); Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-                { Id = Guid.NewGuid(); Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-                { Id = Guid.NewGuid(); Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-            ]
-        looper.AddMany(xtp)
-
-        let! first =
-            looper.GetAsyncSeq ()
-            |> AsyncSeq.tryFirst
-
-        first |> should be (ofCase <@ Option<TimePoint>.Some @>)
-
-        first |> Option.get |> should equal (xtp |> List.head)
-
-        let! storredTp = looper.GetTimePointsWithPriority()
-
-        storredTp |> Seq.map fst |> should equivalent xtp
-        storredTp |> Seq.map fst |> should not' (equalSeq xtp)
-
-        storredTp
-        |> Seq.map snd
-        |> Seq.sort
-        |> Seq.zip [ 1f; 2f; 3f; 4f ]
-        |> Seq.iter (fun (expected, actual) -> actual |> shouldL (equalWithin 0.1f) expected $"Actual %A{storredTp |> Seq.map fst}")
-    }
-    |> toTask

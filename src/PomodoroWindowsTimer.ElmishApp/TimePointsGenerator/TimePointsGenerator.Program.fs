@@ -6,13 +6,15 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
 open Elmish.Extensions
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 
 let parsePattern model pattern =
         Parser.parse (model.TimePointPrototypes |> List.map (fun p -> p.KindAlias |> Alias.value)) pattern
 
 
-let update msg model =
+let update (patternStore: PatternStore) (timePointPrototypeStore: TimePointPrototypeStore) msg model =
     let parsePattern = parsePattern model
 
     let toTimePoints aliases =
@@ -113,4 +115,7 @@ let update msg model =
         |> Option.defaultValue (model, Cmd.none, Intent.none)
 
     | ApplyTimePoints ->
+        let patterns = model.SelectedPattern |> Option.get |> (fun p -> p :: model.Patterns) |> List.distinct
+        patternStore.Write(patterns)
+        timePointPrototypeStore.Write(model.TimePointPrototypes)
         (model, Cmd.none, Request.ApplyGeneratedTimePoints |> Intent.Request )

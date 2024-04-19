@@ -22,13 +22,22 @@
             >
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"
-                                  SharedSizeGroup="gg_Kind"
-                                  />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0"
+            <Border Grid.Column="0">
+                <Border Width="2"
+                        HorizontalAlignment="Left"
+                        BorderBrush="{Binding Path=ButtonForeground,
+                                              ElementName=m_Root,
+                                              FallbackValue=White}"
+                        BorderThickness="1"
+                        />
+            </Border>
+
+            <Border Grid.Column="1"
                     Width="20"
                     BorderThickness="0,0,1,0"
                     BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
@@ -39,15 +48,15 @@
                                           ElementName=m_Root,
                                           Converter={StaticResource conv_KindToShortTextConverter},
                                           FallbackValue=W}"
-                           Foreground="{Binding Kind,
-                                                Converter={StaticResource conv_KindToBrushConverter},
-                                                FallbackValue='#00FF00'}"
+                           Foreground="{Binding ElementName=m_Root,
+                                                Path=ButtonForeground,
+                                                FallbackValue='Gray'}"
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
                            FontSize="10"
                            />
             </Border>
 
-            <TextBlock Grid.Column="1"
+            <TextBlock Grid.Column="2"
                        Margin="8,0"
                        VerticalAlignment="Center"
                        FontSize="16"
@@ -56,10 +65,11 @@
                        Text="{Binding Path=(local:TimePointAssistant.TimePointName),
                                       ElementName=m_Root}"
                        Foreground="{Binding ElementName=m_Root,
-                                            Path=NameForeground}"
+                                            Path=NameForeground,
+                                            FallbackValue=White}"
                        />
 
-            <Button Grid.Column="2"
+            <Button Grid.Column="3"
                     Command="{Binding ElementName=m_Root,
                                       Path=PlayStopCommand}"
                     CommandParameter="{Binding ElementName=m_Root,

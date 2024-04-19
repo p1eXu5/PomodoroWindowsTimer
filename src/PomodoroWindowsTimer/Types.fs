@@ -2,6 +2,8 @@
 
 open System
 
+type [<Measure>] ms
+type [<Measure>] sec
 
 type Name = string
 
@@ -77,6 +79,11 @@ module Kind =
         | Work -> "W"
         | Break -> "BR"
         | LongBreak -> "LB"
+
+
+type LooperEvent =
+    | TimePointStarted of ``new``: TimePoint * old: TimePoint option 
+    | TimePointTimeReduced of TimePoint
 
 
 module TimePointPrototype =

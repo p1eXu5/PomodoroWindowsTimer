@@ -97,35 +97,38 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
         , defaultArg cancellationToken CancellationToken.None
     )
 
+    let isStarted = ref 0
+
     new(cancellationToken: System.Threading.CancellationToken) = new TimePointQueue(Seq.empty, cancellationToken)
     new() = new TimePointQueue(Seq.empty)
 
-    member _.ConnectImpulse() = ()
+    member this.Start() =
+        if Interlocked.CompareExchange(isStarted, 1, 0) = 1 then
+            ()
+        else
+            _agent.Start()
+            if timePoints |> (not << Seq.isEmpty) then
+                this.AddMany(timePoints)
+
+    member _.AddMany(timePoints: TimePoint seq) =
+        _agent.Post(AddMany (timePoints |> Seq.readonly))
 
     member this.Reload(timePoints: TimePoint seq) =
         _agent.Post(Reset)
         this.AddMany(timePoints)
 
-    member _.AddMany(timePoints: TimePoint seq) =
-        _agent.Post(AddMany (timePoints |> Seq.readonly))
-            
+    member _.TryPick =
+        _agent.PostAndReply(Pick, 1000)
+
+    member _.Scroll(id: Guid) =
+        let _ = _agent.PostAndReply(fun reply -> Scroll (id, reply))
+        ()
+
+    member _.TryEnqueue =
+        _agent.PostAndReply(GetNext, 1000)
+
     member _.GetTimePointsWithPriority() =
-        _agent.PostAndAsyncReply(GetTimePointsWithPriority)
-
-    member _.GetAsyncSeq() =
-        let rec loop () =
-            asyncSeq {
-                let! nextTp = _agent.PostAndAsyncReply(GetNext, 1000)
-                if nextTp |> Option.isSome then
-                    yield nextTp |> Option.get
-                    yield! loop ()
-            }
-        loop ()
-
-    member this.Start() =
-        _agent.Start()
-        if timePoints |> (not << Seq.isEmpty) then
-            this.AddMany(timePoints)
+        _agent.PostAndReply(GetTimePointsWithPriority)
 
     member private _.Dispose(isDisposing: bool) =
         if _isDisposed then ()
@@ -138,13 +141,10 @@ type TimePointQueue(timePoints: TimePoint seq, ?cancellationToken: System.Thread
 
     interface ITimePointQueue with
         member this.Start() = this.Start()
-        member _.Enqueue = _agent.PostAndAsyncReply(GetNext, 1000)
-        member _.Pick = _agent.PostAndReply(Pick, 1000)
-        member _.Scroll(id: Guid) =
-            async {
-                let! _ = _agent.PostAndAsyncReply(fun reply -> Scroll (id, reply))
-                return ()
-            }
+        member this.TryEnqueue = this.TryEnqueue
+        member this.TryPick = this.TryPick
+        member this.Scroll(id: Guid) = this.Scroll(id)
+        member this.Reload timePoints = this.Reload(timePoints)
 
     interface IDisposable with
         member this.Dispose() =

@@ -13,4 +13,14 @@ public static class StringExtensions
 
         return FSharpOption<string>.Some(value);
     }
+
+    public static string? FromFSharpOption(this FSharpOption<string> value)
+    {
+        if (FSharpOption<string>.get_IsNone(value))
+        {
+            return null;
+        }
+
+        return value.Value;
+    }
 }

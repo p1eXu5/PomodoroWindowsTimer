@@ -2,16 +2,9 @@
 
 open PomodoroWindowsTimer.Types
 
-type ISettingsManager =
-    interface
-        abstract Load : key: string -> obj
-        abstract Save : key: string -> value: obj -> unit
-    end
-
-
 type IErrorMessageQueue =
     interface
-        abstract EnqueuError : string -> unit
+        abstract EnqueueError : string -> unit
     end
 
 
@@ -20,6 +13,34 @@ type IBotSettings =
         abstract BotToken : string option with get, set
         abstract MyChatId : string option with get, set
     end
+
+type IPatternSettings =
+    interface
+        abstract Patterns : Pattern list with get, set
+    end
+
+type ITimePointPrototypesSettings =
+    interface
+        abstract TimePointPrototypesSettings : string option with get, set
+    end
+
+type ITimePointSettings =
+    interface
+        abstract TimePointSettings : string option with get, set
+    end
+
+type IDisableSkipBreakSettings =
+    interface
+        abstract DisableSkipBreak : bool with get, set
+    end
+
+type IUserSettings =
+    inherit IBotSettings
+    inherit IPatternSettings
+    inherit ITimePointPrototypesSettings
+    inherit ITimePointSettings
+    inherit IDisableSkipBreakSettings
+
 
 /// Used in theme switcher on WPF side
 type TimePointKind =
@@ -33,25 +54,3 @@ type IThemeSwitcher =
     end
 
 
-type ITimePointPrototypesSettings =
-    interface
-        abstract TimePointPrototypesSettings : string option with get, set
-    end
-
-
-type ITimePointSettings =
-    interface
-        abstract TimePointSettings : string option with get, set
-    end
-
-
-type IPatternSettings =
-    interface
-        abstract Patterns : Pattern list with get, set
-    end
-
-
-type IDisableSkipBreakSettings =
-    interface
-        abstract DisableSkipBreak : bool with get, set
-    end

@@ -15,21 +15,38 @@ open Elmish.WPF.Extensions
 
 let update
     (cfg: MainModeConfig)
-    (msg: Msg) (model: MainModel) =
-
+    updateBotSettingsModel
+    updateTimePointGeneratorModel
+    enqueueError
+    (msg: Msg)
+    (model: MainModel)
+    =
     match msg with
     | Msg.LoadTimePointsFromSettings ->
         let timePoints = cfg.TimePointStore.Read()
         cfg.TimePointQueue.Reload(timePoints)
-        { model with TimePoints = timePoints }, Cmd.ofMsg Msg.PickFirstTimePoint
-
-    | Msg.PickFirstTimePoint ->
         cfg.Looper.PreloadTimePoint()
-        model, Cmd.none
-    
-    | Msg.SetActiveTimePoint atp ->
-        let model' = model |> setActiveTimePoint atp
-        model', Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model' |> timePointKindEnum) Msg.OnError
+        { model with TimePoints = timePoints }, Cmd.none
+
+    | Msg.LooperMsg evt ->
+        let (activeTimePoint, cmd, switchTheme) =
+            match evt with
+            | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none, false)
+            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none, true)
+            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
+                match nextTp.Kind with
+                | LongBreak -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows, true)
+                | Break -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows, true)
+                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows ], true)
+                | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows; Cmd.ofMsg SendToChatBot ], true)
+
+        let model = model |> setActiveTimePoint activeTimePoint
+        model
+        , Cmd.batch [
+            cmd
+            if switchTheme then
+                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
+        ]
 
     | Msg.Next ->
         cfg.Looper.Next()
@@ -66,39 +83,14 @@ let update
         let cmd =
             Cmd.batch [Cmd.ofMsg Msg.PreChangeActiveTimeSpan; Cmd.ofMsg (ChangeActiveTimeSpan 0.0); Cmd.ofMsg Msg.Resume]
         model, cmd
-
-    | Msg.LooperMsg evt ->
-        let (activeTimePoint, cmd) =
-            match evt with
-            | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none)
-            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none)
-            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
-                //let breakCmd =
-                //    Cmd.batch [
-                //        Cmd.ofMsg MinimizeWindows
-                //        Cmd.OfAsync.start (
-                //            task {
-                //                let vm = Binding.SubModelT.
-                //                let! _ = cfg.DialogHost.
-                //            }
-                //        )
-                //    ]
-                match nextTp.Kind with
-                | LongBreak -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
-                | Break -> (nextTp |> Some, Cmd.ofMsg MinimizeWindows)
-                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows ])
-                | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg RestoreWindows; Cmd.ofMsg SendToChatBot ])
-
-        model, Cmd.batch [ Cmd.ofMsg (Msg.SetActiveTimePoint activeTimePoint); cmd ]
-
     | MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfAsync.either cfg.WindowsMinimizer.Minimize model.Title (fun _ -> Msg.SetIsMinimized true) Msg.OnError
+        { model with IsMinimized = true }, Cmd.OfAsync.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> Msg.SetIsMinimized true) Msg.OnError
 
     | RestoreWindows when model.IsMinimized ->
         { model with IsMinimized = false }, Cmd.OfAsync.either cfg.WindowsMinimizer.Restore () (fun _ -> Msg.SetIsMinimized false) Msg.OnError
 
     | RestoreMainWindow ->
-        model, Cmd.OfAsync.attempt cfg.WindowsMinimizer.RestoreMainWindow model.Title Msg.OnError
+        model, Cmd.OfAsync.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnError
 
     | SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none
@@ -106,25 +98,25 @@ let update
     | SendToChatBot ->
         let messageText =
             model.ActiveTimePoint |> Option.map (fun tp -> $"It's time to {tp.Name}!!") |> Option.defaultValue "It's time!!"
-        model, Cmd.OfTask.attempt (cfg.SendToBot cfg.BotSettings) messageText Msg.OnError
+        model, Cmd.OfTask.attempt cfg.SendToBot messageText Msg.OnError
 
     | StartTimePoint (Operation.Start id) ->
-        model, Cmd.batch [ Cmd.ofMsg Stop; Cmd.OfAsync.either cfg.Looper.TimePointQueue.Scroll id (Operation.Finish >> StartTimePoint) OnError ]
+        model, Cmd.batch [ Cmd.ofMsg Stop; Cmd.OfFunc.either cfg.Looper.TimePointQueue.Scroll id (Operation.Finish >> StartTimePoint) OnError ]
 
     | StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg Play
 
-    | BotSettingsMsg bmsg ->
-        let settingsModel = BotSettingsModel.Program.update cfg.BotSettings bmsg model.BotSettingsModel
-        { model with BotSettingsModel = settingsModel }, Cmd.none
+    | MsgWith.BotSettingsMsg model (bmsg, bModel) ->
+        let bModel = updateBotSettingsModel bmsg bModel
+        { model with BotSettingsModel = bModel |> Some }, Cmd.none
 
-    | TimePointsGeneratorMsg tpmsg ->
-        let (tpSettingsModel, tpSettingsModelCmd, intent) = TimePointsGenerator.Program.update tpmsg model.TimePointsGeneratorModel
-        let model' = { model with TimePointsGeneratorModel = tpSettingsModel}
-        let cmd' = Cmd.map TimePointsGeneratorMsg tpSettingsModelCmd
+    | MsgWith.TimePointsGeneratorMsg model (genMsg, genModel) ->
+        let (genModel, genCmd, intent) = updateTimePointGeneratorModel genMsg genModel
+        let model' = { model with TimePointsGeneratorModel = genModel |> Some }
+        let cmd' = Cmd.map TimePointsGeneratorMsg genCmd
         match intent with
         | Intent.Request (TimePointsGenerator.Request.ApplyGeneratedTimePoints) ->
-            model', Cmd.batch [cmd'; Cmd.ofMsg Msg.TryStoreAndSetTimePoints]
+            model', Cmd.batch [cmd'; Cmd.ofMsg (Msg.LoadTimePoints genModel.TimePoints)]
         | Intent.None ->
             model', cmd'
 
@@ -145,7 +137,7 @@ let update
 
     | Msg.ChangeActiveTimeSpan v ->
         let duration = model |> getActiveTimeDuration
-        cfg.Looper.Shift(duration - v)
+        cfg.Looper.Shift((duration - v) * 1.0<sec>)
         model, Cmd.none
 
     | Msg.PostChangeActiveTimeSpan ->
@@ -157,23 +149,17 @@ let update
             model, Cmd.none
 
     // --------------------
-    | Msg.TryStoreAndSetTimePoints ->
+    | Msg.LoadTimePoints timePoints ->
         cfg.Looper.Stop()
-        let timePointsGeneratorModel = model.TimePointsGeneratorModel
-        cfg.TimePointQueue.Reload(timePointsGeneratorModel.TimePoints)
-        let patterns = timePointsGeneratorModel.SelectedPattern |> Option.get |> (fun p -> p :: timePointsGeneratorModel.Patterns) |> List.distinct
-        
-        cfg.PatternStore.Write(patterns)
-        cfg.TimePointPrototypeStore.Write(timePointsGeneratorModel.TimePointPrototypes)
-        cfg.TimePointStore.Write(timePointsGeneratorModel.TimePoints)
+        cfg.TimePointQueue.Reload(timePoints)
+        cfg.TimePointStore.Write(timePoints)
+        cfg.Looper.PreloadTimePoint()
 
-        { model with TimePoints = timePointsGeneratorModel.TimePoints }
-        , Cmd.batch [
-            Cmd.ofMsg Msg.PickFirstTimePoint
-        ]
+        { model with TimePoints = timePoints }
+        , Cmd.none
 
     | Msg.OnError ex ->
-        model.ErrorQueue.EnqueuError(ex.Message)
+        enqueueError ex.Message
         model, Cmd.none
 
     | _ -> model, Cmd.none

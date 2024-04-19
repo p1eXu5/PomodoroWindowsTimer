@@ -8,11 +8,11 @@ open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open System
 open Elmish.Extensions
 
-let bindings () : Binding<MainModel, Msg> list =
+let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> list =
     [
-        "Title" |> Binding.oneWay (fun m -> m.Title)
-        "AssemblyVersion" |> Binding.oneWay (fun m -> m.AssemblyVersion)
-        "ErrorMessageQueue" |> Binding.oneWay (fun m -> m.ErrorQueue)
+        "Title" |> Binding.oneWay (fun _ -> title)
+        "AssemblyVersion" |> Binding.oneWay (fun _ -> assemblyVersion)
+        "ErrorMessageQueue" |> Binding.oneWay (fun _ -> errorMessageQueue)
 
         "LooperIsRunning" |> Binding.oneWay (isLooperRunning)
 
@@ -84,14 +84,14 @@ let bindings () : Binding<MainModel, Msg> list =
         )
 
         "BotSettingsModel"
-            |> Binding.SubModel.required BotSettingsModel.Bindings.bindings
+            |> Binding.SubModel.opt BotSettingsModel.Bindings.bindings
             |> Binding.mapModel (fun m ->
                 m.BotSettingsModel
             )
             |> Binding.mapMsg MainModel.Msg.BotSettingsMsg
 
         "TimePointsGeneratorModel"
-            |> Binding.SubModel.required TimePointsGenerator.Bindings.bindings
+            |> Binding.SubModel.opt TimePointsGenerator.Bindings.bindings
             |> Binding.mapModel (fun m ->
                 m.TimePointsGeneratorModel
             )
@@ -103,9 +103,9 @@ let bindings () : Binding<MainModel, Msg> list =
         "TryStoreAndSetTimePointsCommand"
             |> Binding.cmdIf (fun m ->
                 m.TimePointsGeneratorModel
-                |> (fun tpModel ->
+                |> Option.bind (fun tpModel ->
                     if not tpModel.IsPatternWrong then
-                        Msg.TryStoreAndSetTimePoints |> Some
+                        Msg.LoadTimePoints tpModel.TimePoints |> Some
                     else
                         None
                 )
