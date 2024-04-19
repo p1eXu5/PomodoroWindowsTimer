@@ -8,7 +8,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              x:Name="m_Root"
-             Height="32"
+             Height="36"
              Padding="0"
              d:DesignWidth="280"
              d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
@@ -47,7 +47,7 @@
                 </Border>
 
                 <Border Grid.Column="1"
-                        Width="20"
+                        Width="30"
                         BorderThickness="0,0,1,0"
                         BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                         >
@@ -90,6 +90,7 @@
                         Foreground="{Binding Path=ButtonForeground,
                                              ElementName=m_Root}"
                         Style="{StaticResource MaterialDesignPaperDarkButton}"
+                        Height="36"
                         >
                     <Button.Background>
                         <ImageBrush ImageSource="{StaticResource img_Metal}"
