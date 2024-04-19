@@ -32,7 +32,7 @@ let compose
 #if DEBUG
     let windowsMinimizer = Windows.simWindowsMinimizer
 #else
-    let windowsMinimizer = Windows.prodWindowsMinimizer
+    let windowsMinimizer = Windows.prodWindowsMinimizer title
 #endif
 
     let patternStore = PatternStore.initialize userSettings
