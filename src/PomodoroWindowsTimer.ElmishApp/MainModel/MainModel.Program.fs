@@ -17,7 +17,7 @@ let update
     (cfg: MainModeConfig)
     updateBotSettingsModel
     updateTimePointGeneratorModel
-    enqueueError
+    (errorMessageQueue: IErrorMessageQueue)
     (msg: Msg)
     (model: MainModel)
     =
@@ -111,12 +111,12 @@ let update
         { model with BotSettingsModel = bModel |> Some }, Cmd.none
 
     | MsgWith.TimePointsGeneratorMsg model (genMsg, genModel) ->
-        let (genModel, genCmd, intent) = updateTimePointGeneratorModel genMsg genModel
+        let (genModel, genCmd, intent) = updateTimePointGeneratorModel errorMessageQueue genMsg genModel
         let model' = { model with TimePointsGeneratorModel = genModel |> Some }
         let cmd' = Cmd.map TimePointsGeneratorMsg genCmd
         match intent with
         | Intent.Request (TimePointsGenerator.Request.ApplyGeneratedTimePoints) ->
-            model', Cmd.batch [cmd'; Cmd.ofMsg (Msg.LoadTimePoints genModel.TimePoints)]
+            model', Cmd.batch [cmd'; Cmd.ofMsg (Msg.LoadTimePoints (genModel.TimePoints |> List.map _.TimePoint))]
         | Intent.None ->
             model', cmd'
 
@@ -159,7 +159,7 @@ let update
         , Cmd.none
 
     | Msg.OnError ex ->
-        enqueueError ex.Message
+        errorMessageQueue.EnqueueError ex.Message
         model, Cmd.none
 
     | _ -> model, Cmd.none

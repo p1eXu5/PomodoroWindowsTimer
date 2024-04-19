@@ -1,6 +1,7 @@
 ﻿module PomodoroWindowsTimer.Parser
 
 open FParsec
+open PomodoroWindowsTimer.Types
 
 let ws = spaces
 let ws1 = spaces1
@@ -37,8 +38,8 @@ let ptimePointProgram (timePointAliases: string seq) =
     |>> List.concat
 
 
-let parse (timePointAliases: string seq) input =
-    run (ptimePointProgram timePointAliases) input
+let parse (timePointAliases: Alias seq) input =
+    run (ptimePointProgram (timePointAliases |> Seq.map Alias.value)) input
     |> function
-        | Success (ok,_,_) -> Result.Ok ok
+        | Success (ok,_,_) -> Result.Ok (ok |> List.map Alias.createOrThrow)
         | Failure (err,_,_) -> Result.Error err

@@ -1,16 +1,15 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
-open PomodoroWindowsTimer.Types
 open System
-open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Types
 
 type TimePointsGenerator =
     {
-        TimePointPrototypes: TimePointPrototype list
+        TimePointPrototypes: TimePointPrototypeModel list
+        TimePoints: TimePointModel list
         Patterns: string list
         SelectedPattern: string option
         SelectedPatternIndex: int
-        TimePoints: TimePoint list
         IsPatternWrong: bool
     }
 
@@ -19,16 +18,13 @@ module TimePointsGenerator =
 
     type Msg =
         | SetPatterns of string list
+        | ProcessParsingResult of Result<Alias list, string>
+        | SetGeneratedTimePoints of TimePointModel list
         | SetSelectedPatternIndex of int
         | SetSelectedPattern of Pattern option
-        | ProcessParseResult of Result<string list, string>
-        | TimePointPrototypeMsg of id: Kind * TimePointPrototypeMsg
-        | TimePointMsg of id: Guid * TimePointMsg
+        | TimePointPrototypeMsg of id: Kind * TimePointPrototypeModel.Msg
+        | TimePointMsg of id: Guid * TimePointModel.Msg
         | ApplyTimePoints
-    and
-        TimePointPrototypeMsg =
-            | SetName of string
-            | SetTimeSpan of string
     and
         TimePointMsg =
             | SetName of string
@@ -38,6 +34,7 @@ module TimePointsGenerator =
 
 
     open Elmish
+    open Elmish.Extensions
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
     let init (timePointPrototypeStore: TimePointPrototypeStore) (patternStore: PatternStore) =
@@ -48,7 +45,7 @@ module TimePointsGenerator =
 
         let model =
             {
-                TimePointPrototypes = timePointPrototypeStore.Read ()
+                TimePointPrototypes = timePointPrototypeStore.Read () |> List.map TimePointPrototypeModel.init
                 Patterns = patterns
                 SelectedPattern = None
                 SelectedPatternIndex = 0
@@ -56,6 +53,18 @@ module TimePointsGenerator =
                 IsPatternWrong = false
             }
         model, cmd
+
+    let withTimePointPrototypes prototypes (model: TimePointsGenerator) =
+        { model with TimePointPrototypes = prototypes }
+
+    let withTimePoints timePoints (model: TimePointsGenerator) =
+        { model with TimePoints = timePoints }
+
+    let mapPrototype kind f =
+        map _.TimePointPrototypes withTimePointPrototypes (mapFirst (_.Prototype >> _.Kind >> (=) kind) f)
+
+    let mapTimePoint id f =
+        map _.TimePoints withTimePoints (mapFirst (_.TimePoint >> _.Id >> (=) id) f)
 
     // -------
     // helpers

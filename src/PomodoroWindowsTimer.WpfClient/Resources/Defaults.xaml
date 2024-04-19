@@ -16,5 +16,7 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-
+    <BitmapImage x:Key="img_Metal"
+                 UriSource="metalArtboard-50.png"
+                 />
 </ResourceDictionary>

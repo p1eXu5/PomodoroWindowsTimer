@@ -105,7 +105,7 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
                 m.TimePointsGeneratorModel
                 |> Option.bind (fun tpModel ->
                     if not tpModel.IsPatternWrong then
-                        Msg.LoadTimePoints tpModel.TimePoints |> Some
+                        Msg.LoadTimePoints (tpModel.TimePoints |> List.map _.TimePoint) |> Some
                     else
                         None
                 )

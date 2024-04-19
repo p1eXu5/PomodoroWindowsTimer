@@ -30,10 +30,6 @@
         <DataTemplate x:Key="dt_BotSettingsDialog">
             <settings:BotSettings DataContext="{Binding}" />
         </DataTemplate>
-
-        <BitmapImage x:Key="img_Metal"
-                     UriSource="Resources/metalArtboard-50.png"
-                     />
     </Window.Resources>
 
     <materialDesign:DialogHost DialogClosing="DialogHost_DialogClosing"
@@ -66,58 +62,9 @@
             <DockPanel Margin="10,0,10,0"
                        LastChildFill="True"
                        >
-                <!--  top menu buttons  -->
-                <DockPanel DockPanel.Dock="Top"
-                           VerticalAlignment="Center"
-                           >
-                    <!--  version  -->
-                    <TextBlock DockPanel.Dock="Right"
-                               Margin="5,5,10,5"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Foreground="#4E6876"
-                               Text="{Binding AssemblyVersion,
-                                              FallbackValue=v 1.0.1.0}"
-                               />
-                    <!--  running time points  -->
-                    <Button DockPanel.Dock="Left"
-                            Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                            CommandParameter="{x:Static Dock.Left}"
-                            HorizontalAlignment="Left"
-                            Content="{materialDesign:PackIcon TimerPlayOutline}"
-                            Style="{StaticResource MaterialDesignIconButton}"
-                            ToolTip="Playlist"
-                            />
-                    <!--  time points generator open button  -->
-                    <Button DockPanel.Dock="Left"
-                            Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                            CommandParameter="{x:Static Dock.Right}"
-                            HorizontalAlignment="Left"
-                            Content="{materialDesign:PackIcon TimerCogOutline}"
-                            Style="{StaticResource MaterialDesignIconButton}"
-                            ToolTip="Playlist constructor"
-                            />
-                    <!--  telegram bot settings open dialog button  -->
-                    <Button DockPanel.Dock="Left"
-                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                            CommandParameter="{Binding BotSettingsModel}"
-                            HorizontalAlignment="Left"
-                            Content="{materialDesign:PackIcon CommentAccountOutline}"
-                            RenderTransformOrigin="0.5,0.5"
-                            Style="{StaticResource MaterialDesignIconButton}"
-                            ToolTip="Telegram bot settings"
-                            >
-                        <Button.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform />
-                                <SkewTransform />
-                                <RotateTransform />
-                                <TranslateTransform X="2" Y="1" />
-                            </TransformGroup>
-                        </Button.RenderTransform>
-                    </Button>
-                </DockPanel>
-
+                <usercontrols:MainMenu DockPanel.Dock="Top"
+                                       DataContext="{Binding}"
+                                       />
                 <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
                                          DockPanel.Dock="Bottom"
                                          HorizontalAlignment="Stretch"
@@ -227,135 +174,7 @@
                                         DataContext="{Binding}"
                                         />
 
-                        <!--  Buttons  -->
-                        <StackPanel Height="120"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Top"
-                                    Orientation="Horizontal"
-                                    >
-                            <StackPanel.Resources>
-                                <Style TargetType="{x:Type Button}">
-                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark.Foreground}" />
-                                    <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="Padding" Value="16,10" />
-                                    <Setter Property="TextBlock.FontSize" Value="14" />
-                                    <Setter Property="TextBlock.FontWeight" Value="Medium" />
-                                    <Setter Property="HorizontalAlignment" Value="Center" />
-                                    <Setter Property="VerticalAlignment" Value="Center" />
-                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                    <Setter Property="VerticalContentAlignment" Value="Center" />
-                                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
-                                    <Setter Property="BorderThickness" Value="1" />
-                                    <Setter Property="Width" Value="100" />
-                                    <Setter Property="Background">
-                                        <Setter.Value>
-                                            <ImageBrush ImageSource="{StaticResource img_Metal}"
-                                                        Stretch="UniformToFill"
-                                                        TileMode="None"
-                                                        Viewport="0,0,1,1"
-                                                        />
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}" />
-                                    <Setter Property="Button.Effect">
-                                        <Setter.Value>
-                                            <DropShadowEffect BlurRadius="5"
-                                                              Direction="0"
-                                                              Opacity="0.5"
-                                                              ShadowDepth="0"
-                                                              />
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="{x:Type ButtonBase}">
-                                                <Grid>
-                                                    <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:ShadowAssist.CacheMode)}">
-                                                        <Grid HorizontalAlignment="Center">
-                                                            <Border x:Name="border"
-                                                                    Width="{Binding RelativeSource={RelativeSource FindAncestor,
-                                                                                                                   AncestorType={x:Type ButtonBase}},
-                                                                                    Path=ActualWidth}"
-                                                                    Background="{TemplateBinding Background}"
-                                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                                    CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius),
-                                                                                           RelativeSource={RelativeSource TemplatedParent}}"
-                                                                    />
-
-                                                            <ContentPresenter x:Name="MyContentPresenter"
-                                                                              Height="{TemplateBinding Height}"
-                                                                              Margin="{TemplateBinding Padding}"
-                                                                              HorizontalAlignment="Center"
-                                                                              VerticalAlignment="Center"
-                                                                              Content="{TemplateBinding Content}"
-                                                                              />
-                                                        </Grid>
-                                                    </AdornerDecorator>
-                                                </Grid>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsEnabled" Value="false">
-                                                        <Setter Property="BorderThickness" Value="0" />
-                                                        <Setter TargetName="MyContentPresenter" Property="Visibility" Value="Hidden" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Button.Effect">
-                                                <Setter.Value>
-                                                    <DropShadowEffect BlurRadius="10"
-                                                                      Direction="0"
-                                                                      Opacity="1"
-                                                                      ShadowDepth="0"
-                                                                      />
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Trigger>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Setter Property="Button.Effect">
-                                                <Setter.Value>
-                                                    <DropShadowEffect BlurRadius="5"
-                                                                      Direction="0"
-                                                                      Opacity="0"
-                                                                      ShadowDepth="0"
-                                                                      />
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </StackPanel.Resources>
-                            <Button Command="{Binding ReplayCommand}"
-                                    Visibility="{Binding LooperIsRunning,
-                                                         Converter={StaticResource BooleanToVisibilityConverter}}"
-                                    >
-                                <!--  Content="Replay"  -->
-                                Replay
-                                <!--<ctrl:OutlinedTextBlock ClipToBounds="False"
-                                                        Fill="{DynamicResource MaterialDesign.Brush.Secondary.Dark.Foreground}"
-                                                        Stroke="Black"
-                                                        StrokePosition="Outside"
-                                                        StrokeThickness="1"
-                                                        Text=" Replay"
-                                                        />-->
-                            </Button>
-                            <Button Command="{Binding PlayStopCommand}"
-                                    Margin="20,0,0,0"
-                                    Content="{Binding PlayPauseButtonText,
-                                                      FallbackValue=Resume}"
-                                    />
-                            <Button Command="{Binding NextCommand}"
-                                    Margin="20,0,0,0"
-                                    Content="Next"
-                                    Visibility="{Binding LooperIsRunning,
-                                                         Converter={StaticResource BooleanToVisibilityConverter}}"
-                                    />
-                            <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
-                            <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->
-                        </StackPanel>
+                        <usercontrols:ControlButtons DataContext="{Binding}" />
 
                     </DockPanel>
                 </materialDesign:ColorZone>

@@ -16,7 +16,7 @@ let compose
     (tickMilliseconds: int<ms>)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
-    (errorMessageQueue: IErrorMessageQueue)
+    (mainErrorMessageQueue: IErrorMessageQueue)
     =
     let timePointQueue = new TimePointQueue()
     let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
@@ -61,10 +61,7 @@ let compose
         let updateTimePointGeneratorModel =
             TimePointsGenerator.Program.update patternStore timePointPrototypeStore
 
-        let enqueueError =
-            errorMessageQueue.EnqueueError
-
-        MainModel.Program.update mainModelCfg updateBotSettingsModel updateTimePointGeneratorModel enqueueError
+        MainModel.Program.update mainModelCfg updateBotSettingsModel updateTimePointGeneratorModel mainErrorMessageQueue
 
     // bindings:
     let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version
@@ -73,7 +70,7 @@ let compose
 
     let mainModelBindings =
         fun () ->
-            MainModel.Bindings.bindings title assemblyVer errorMessageQueue
+            MainModel.Bindings.bindings title assemblyVer mainErrorMessageQueue
 
     // subscriptions
     let subscribe _ =

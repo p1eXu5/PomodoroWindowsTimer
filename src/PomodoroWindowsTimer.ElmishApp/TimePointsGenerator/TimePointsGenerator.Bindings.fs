@@ -1,37 +1,22 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGenerator.Bindings
 
-open System
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
 
 let bindings ()  : Binding<TimePointsGenerator, TimePointsGenerator.Msg> list =
     [
-        "TimePointPrototypes" |> Binding.subModelSeq (
-            (fun m -> m.TimePointPrototypes),
-            (fun tp -> tp.Kind),
-            Msg.TimePointPrototypeMsg,
-            (fun () -> [
-                "Name" |> Binding.twoWay ((fun (_, e: TimePointPrototype) -> e.Name), TimePointPrototypeMsg.SetName)
-                "Kind" |> Binding.oneWay (fun (_, m) -> m.Kind)
-                "KindAlias" |> Binding.oneWay (fun (_, m) -> m.KindAlias)
-                "TimeSpan" |> Binding.twoWay ((fun (_, m) -> m.TimeSpan.ToString("h':'mm")), (fun ts _ -> TimePointPrototypeMsg.SetTimeSpan ts))
-            ])
-        )
+        "TimePointPrototypes"
+            |> Binding.subModelSeq (TimePointPrototypeModel.Bindings.bindings, _.Prototype >> _.Kind)
+            |> Binding.mapModel _.TimePointPrototypes
+            |> Binding.mapMsg TimePointPrototypeMsg
 
-        "TimePoints" |> Binding.subModelSeq (
-            (fun m -> m.TimePoints),
-            (fun tp -> tp.Id),
-            Msg.TimePointMsg,
-            (fun () -> [
-                "Name" |> Binding.twoWay ((fun (_, e: TimePoint) -> e.Name), TimePointMsg.SetName)
-                "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
-                "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
-                "KindAlias" |> Binding.oneWay (fun (_, m) -> m.KindAlias)
-                "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
-            ])
-        )
+        "TimePoints"
+            |> Binding.subModelSeq (TimePointModel.Bindings.bindings, _.TimePoint >> _.Id)
+            |> Binding.mapModel _.TimePoints
+            |> Binding.mapMsg TimePointMsg
 
         // TODO: copy from LogParser
         "Patterns" |> Binding.oneWaySeq (getPatterns, (=), id)

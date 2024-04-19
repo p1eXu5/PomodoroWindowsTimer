@@ -1,9 +1,48 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
+open PomodoroWindowsTimer.Types
+
+type TimePointPrototypeModel =
+    {
+        Prototype: TimePointPrototype
+    }
 
 module TimePointPrototypeModel =
-    open System
 
     type Msg =
-        | SetTimeSpan of TimeSpan
+        | SetTimeSpan of string
+        | SetName of string
+
+    let init prototype =
+        {
+            Prototype = prototype
+        }
+
+
+namespace PomodoroWindowsTimer.ElmishApp.TimePointPrototypeModel
+
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.TimePointPrototypeModel
+
+module Program =
+
+    let update msg model =
+        match msg with
+        | SetTimeSpan v ->
+            { model with Prototype.TimeSpan = System.TimeSpan.Parse(v) }
+        | SetName v ->
+            { model with Prototype.Name = v }
+
+module Bindings =
+
+    open Elmish.WPF
+    open PomodoroWindowsTimer.Types
+
+    let bindings () : Binding<TimePointPrototypeModel, TimePointPrototypeModel.Msg> list =
+        [
+            "Kind" |> Binding.oneWay (fun m -> m.Prototype.Kind)
+            "Alias" |> Binding.oneWay (fun m -> m.Prototype.KindAlias)
+            "TimeSpan" |> Binding.twoWay ((fun m -> m.Prototype.TimeSpan.ToString("h':'mm")), Msg.SetTimeSpan)
+        ]
+
 
