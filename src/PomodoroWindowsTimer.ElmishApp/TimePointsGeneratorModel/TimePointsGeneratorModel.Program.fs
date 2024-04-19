@@ -1,11 +1,11 @@
-﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGenerator.Program
+﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGeneratorModel.Program
 
 open Elmish
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
+open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGeneratorModel
 open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure

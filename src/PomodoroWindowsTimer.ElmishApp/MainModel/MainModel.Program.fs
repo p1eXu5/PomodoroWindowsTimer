@@ -17,6 +17,7 @@ let update
     (cfg: MainModeConfig)
     updateBotSettingsModel
     updateTimePointGeneratorModel
+    initTimePointGeneratorModel
     (errorMessageQueue: IErrorMessageQueue)
     (msg: Msg)
     (model: MainModel)
@@ -110,12 +111,20 @@ let update
         let bModel = updateBotSettingsModel bmsg bModel
         { model with BotSettingsModel = bModel |> Some }, Cmd.none
 
+    | Msg.InitializeTimePointsGeneratorModel ->
+        let (genModel, genCmd) = initTimePointGeneratorModel ()
+        { model with TimePointsGeneratorModel = genModel |> Some }
+        , Cmd.map TimePointsGeneratorMsg genCmd
+
+    | Msg.EraseTimePointsGeneratorModel isDrawerOpen when not isDrawerOpen ->
+         {model with TimePointsGeneratorModel = None }, Cmd.none
+
     | MsgWith.TimePointsGeneratorMsg model (genMsg, genModel) ->
         let (genModel, genCmd, intent) = updateTimePointGeneratorModel errorMessageQueue genMsg genModel
         let model' = { model with TimePointsGeneratorModel = genModel |> Some }
         let cmd' = Cmd.map TimePointsGeneratorMsg genCmd
         match intent with
-        | Intent.Request (TimePointsGenerator.Request.ApplyGeneratedTimePoints) ->
+        | Intent.Request (TimePointsGeneratorModel.Request.ApplyGeneratedTimePoints) ->
             model', Cmd.batch [cmd'; Cmd.ofMsg (Msg.LoadTimePoints (genModel.TimePoints |> List.map _.TimePoint))]
         | Intent.None ->
             model', cmd'

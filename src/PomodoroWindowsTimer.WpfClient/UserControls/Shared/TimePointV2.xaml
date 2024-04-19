@@ -14,89 +14,107 @@
              d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
              mc:Ignorable="d"
              >
-    <UserControl.Resources>
-        <conv:KindToShortTextConverter x:Key="conv_KindToShortTextConverter" />
-    </UserControl.Resources>
     <Border BorderThickness="0,0,0,1"
             BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
             >
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Border Grid.Column="0">
-                <Border Width="2"
-                        HorizontalAlignment="Left"
-                        BorderBrush="{Binding Path=ButtonForeground,
-                                              ElementName=m_Root,
-                                              FallbackValue=White}"
-                        BorderThickness="1"
-                        />
-            </Border>
-
-            <Border Grid.Column="1"
-                    Width="20"
-                    BorderThickness="0,0,1,0"
-                    BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
-                    >
-                <TextBlock HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Text="{Binding Path=(local:TimePointAssistant.TimePointKind),
-                                          ElementName=m_Root,
-                                          Converter={StaticResource conv_KindToShortTextConverter},
-                                          FallbackValue=W}"
-                           Foreground="{Binding ElementName=m_Root,
-                                                Path=ButtonForeground,
-                                                FallbackValue='Gray'}"
-                           Style="{StaticResource MaterialDesignButtonTextBlock}"
-                           FontSize="10"
-                           />
-            </Border>
-
-            <TextBlock Grid.Column="2"
-                       Margin="8,0"
+            <TextBlock Margin="10,0,85,0"
+                       HorizontalAlignment="Right"
                        VerticalAlignment="Center"
-                       FontSize="16"
-                       TextTrimming="CharacterEllipsis"
-                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                       Text="{Binding Path=(local:TimePointAssistant.TimePointName),
-                                      ElementName=m_Root}"
-                       Foreground="{Binding ElementName=m_Root,
-                                            Path=NameForeground,
-                                            FallbackValue=White}"
+                       Text="{Binding ElementName=m_Root,
+                                      Path=(local:TimePointAssistant.TimePointKind),
+                                      Converter={StaticResource conv_KindToTextConverter},
+                                      FallbackValue=BREAK}"
+                       FontSize="30"
+                       FontWeight="Bold"
+                       Foreground="#33444444"
                        />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0">
+                    <Border Width="2"
+                            HorizontalAlignment="Left"
+                            BorderBrush="{Binding Path=ButtonForeground,
+                                                  ElementName=m_Root,
+                                                  FallbackValue=White}"
+                            BorderThickness="1"
+                            />
+                </Border>
 
-            <Button Grid.Column="3"
-                    Command="{Binding ElementName=m_Root,
-                                      Path=PlayStopCommand}"
-                    CommandParameter="{Binding ElementName=m_Root,
-                                               Path=PlayStopCommandParameter}"
-                    materialDesign:ButtonAssist.CornerRadius="0"
-                    materialDesign:ElevationAssist.Elevation="Dp0"
-                    BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
-                    BorderThickness="1,0,0,0"
-                    Foreground="{Binding Path=ButtonForeground,
-                                         ElementName=m_Root}"
-                    Style="{StaticResource MaterialDesignPaperDarkButton}"
-                    >
-                <StackPanel Orientation="Horizontal">
+                <Border Grid.Column="1"
+                        Width="20"
+                        BorderThickness="0,0,1,0"
+                        BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
+                        >
                     <TextBlock HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias),
+                                              ElementName=m_Root,
+                                              Converter={StaticResource conv_ToUpperInvariantText},
+                                              FallbackValue=W}"
+                               Foreground="{Binding ElementName=m_Root,
+                                                    Path=ButtonForeground,
+                                                    FallbackValue='Gray'}"
                                Style="{StaticResource MaterialDesignButtonTextBlock}"
-                               Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
-                                              ElementName=m_Root}"
+                               FontSize="10"
                                />
-                    <!--  icon  -->
-                    <Control d:Height="20"
-                             d:Width="20"
-                             d:Margin="4,0,-4,0"
-                             Template="{Binding Path=ButtonIcon,
-                                                ElementName=m_Root}"
-                             />
-                    <!--  for design time  -->
-                    <!--<materialDesign:PackIcon Width="18"
+                </Border>
+
+                <TextBlock Grid.Column="2"
+                           Margin="8,0"
+                           VerticalAlignment="Center"
+                           FontSize="16"
+                           TextTrimming="CharacterEllipsis"
+                           Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                           Text="{Binding Path=(local:TimePointAssistant.TimePointName),
+                                          ElementName=m_Root}"
+                           Foreground="{Binding ElementName=m_Root,
+                                                Path=NameForeground,
+                                                FallbackValue=White}"
+                           />
+
+                <Button Grid.Column="3"
+                        Command="{Binding ElementName=m_Root,
+                                          Path=PlayStopCommand}"
+                        CommandParameter="{Binding ElementName=m_Root,
+                                                   Path=PlayStopCommandParameter}"
+                        materialDesign:ButtonAssist.CornerRadius="0"
+                        materialDesign:ElevationAssist.Elevation="Dp0"
+                        BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
+                        BorderThickness="1,0,0,0"
+                        Foreground="{Binding Path=ButtonForeground,
+                                             ElementName=m_Root}"
+                        Style="{StaticResource MaterialDesignPaperDarkButton}"
+                        >
+                    <Button.Background>
+                        <ImageBrush ImageSource="{StaticResource img_Metal}"
+                                    Stretch="UniformToFill"
+                                    TileMode="None"
+                                    Viewport="0,0,1,1"
+                                    Opacity="0.2"
+                                    />
+                    </Button.Background>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Style="{StaticResource MaterialDesignButtonTextBlock}"
+                                   Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
+                                                  ElementName=m_Root}"
+                                   />
+                        <!--  icon  -->
+                        <Control d:Height="20"
+                                 d:Width="20"
+                                 d:Margin="4,0,-4,0"
+                                 Template="{Binding Path=ButtonIcon,
+                                                    ElementName=m_Root}"
+                                 />
+                        <!--  for design time  -->
+                        <!--<materialDesign:PackIcon Width="18"
                                              Height="20"
                                              Margin="0,0,-4,0"
                                              HorizontalAlignment="Center"
@@ -104,8 +122,9 @@
                                              Kind="Play"
                                              Padding="0"
                                              />-->
-                </StackPanel>
-            </Button>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

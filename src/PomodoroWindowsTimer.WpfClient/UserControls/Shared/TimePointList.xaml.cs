@@ -28,6 +28,12 @@ public partial class TimePointList : UserControl
         set => m_ScrollViewer.VerticalScrollBarVisibility = value;
     }
 
+    public Visibility SearchToolbarVisibility
+    {
+        get => m_SearchToolbar.Visibility;
+        set => m_SearchToolbar.Visibility = value;
+    }
+
     public string? Header
     {
         get { return (string?)GetValue(HeaderProperty); }

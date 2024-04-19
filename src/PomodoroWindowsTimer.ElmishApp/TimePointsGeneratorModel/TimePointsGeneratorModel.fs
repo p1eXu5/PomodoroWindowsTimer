@@ -3,7 +3,7 @@
 open System
 open PomodoroWindowsTimer.Types
 
-type TimePointsGenerator =
+type TimePointsGeneratorModel =
     {
         TimePointPrototypes: TimePointPrototypeModel list
         TimePoints: TimePointModel list
@@ -14,7 +14,7 @@ type TimePointsGenerator =
     }
 
 
-module TimePointsGenerator =
+module TimePointsGeneratorModel =
 
     type Msg =
         | SetPatterns of string list
@@ -54,10 +54,10 @@ module TimePointsGenerator =
             }
         model, cmd
 
-    let withTimePointPrototypes prototypes (model: TimePointsGenerator) =
+    let withTimePointPrototypes prototypes (model: TimePointsGeneratorModel) =
         { model with TimePointPrototypes = prototypes }
 
-    let withTimePoints timePoints (model: TimePointsGenerator) =
+    let withTimePoints timePoints (model: TimePointsGeneratorModel) =
         { model with TimePoints = timePoints }
 
     let mapPrototype kind f =
@@ -94,7 +94,7 @@ module TimePointsGenerator =
     let unsetIsPatternWrong m =
         { m with IsPatternWrong = false }
 
-    let applyMsg (m: TimePointsGenerator) =
+    let applyMsg (m: TimePointsGeneratorModel) =
         if not m.IsPatternWrong then
             match m.TimePoints with
             | [] -> None

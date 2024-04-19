@@ -16,12 +16,6 @@
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
-    <UserControl.Resources>
-        <conv:KindAliasToTextConverter x:Key="conv_KindAliasToTextConverter" />
-        <conv:KindToTextConverter x:Key="conv_KindToTextConverter" />
-        <conv:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
-    </UserControl.Resources>
-
     <Border BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
             BorderThickness="0,1,0,1"
             >
@@ -112,7 +106,7 @@
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
                            >
                     <Run Text="{Binding Path=(shared:TimePointAssistant.TimePointKind), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />
-                    <Run Text="(" /><Run Text="{Binding Path=(shared:TimePointAssistant.TimePointKindAlias), ElementName=m_RunningTimePointContainer, Converter={StaticResource conv_KindAliasToTextConverter}, FallbackValue=?}" /><Run Text=")" />
+                    <Run Text="(" /><Run Text="{Binding Path=(shared:TimePointAssistant.TimePointKindAlias), ElementName=m_RunningTimePointContainer, FallbackValue=?}" /><Run Text=")" />
                 </TextBlock>
 
                 <Button Grid.Row="1"

@@ -66,7 +66,7 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
                 "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
                 "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
                 "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
-                "KindAlias" |> Binding.oneWay (fun (_, e) -> e.KindAlias)
+                "KindAlias" |> Binding.oneWay (fun (_, e) -> e.KindAlias |> Alias.value)
                 "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
                 "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePoint |> Option.map (fun atp -> atp.Id = e.Id) |> Option.defaultValue false)
             ])
@@ -91,11 +91,18 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
             |> Binding.mapMsg MainModel.Msg.BotSettingsMsg
 
         "TimePointsGeneratorModel"
-            |> Binding.SubModel.opt TimePointsGenerator.Bindings.bindings
-            |> Binding.mapModel (fun m ->
-                m.TimePointsGeneratorModel
-            )
+            |> Binding.SubModel.opt TimePointsGeneratorModel.Bindings.bindings
+            |> Binding.mapModel _.TimePointsGeneratorModel
             |> Binding.mapMsg MainModel.Msg.TimePointsGeneratorMsg
+
+        "HasTimePointsGenerator" |> Binding.twoWay (_.TimePointsGeneratorModel >> Option.isSome, Msg.EraseTimePointsGeneratorModel)
+
+        "LoadTimePointsGeneratorCommand"
+            |> Binding.cmdIf (fun model ->
+                match model.TimePointsGeneratorModel with
+                | None -> Msg.InitializeTimePointsGeneratorModel |> Some
+                | Some _ -> None
+            )
 
         "DisableSkipBreak"
             |> Binding.twoWay (getDisableSkipBreak, Msg.SetDisableSkipBreak)

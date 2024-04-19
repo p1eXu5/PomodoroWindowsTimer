@@ -33,8 +33,7 @@
                 />
         <!--  time points generator open button  -->
         <Button DockPanel.Dock="Left"
-                Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                CommandParameter="{x:Static Dock.Right}"
+                Command="{Binding LoadTimePointsGeneratorCommand}"
                 HorizontalAlignment="Left"
                 Content="{materialDesign:PackIcon TimerCogOutline}"
                 Style="{StaticResource MaterialDesignIconButton}"

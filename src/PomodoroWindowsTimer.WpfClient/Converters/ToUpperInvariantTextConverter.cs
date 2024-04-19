@@ -6,13 +6,13 @@ using PomodoroWindowsTimer.Types;
 
 namespace PomodoroWindowsTimer.WpfClient.Converters;
 
-internal class KindAliasToTextConverter : IValueConverter
+internal class ToUpperInvariantTextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is Alias alias)
+        if (value is string alias)
         {
-            return AliasModule.value(alias);
+            return alias.ToUpperInvariant();
         }
 
         return DependencyProperty.UnsetValue;

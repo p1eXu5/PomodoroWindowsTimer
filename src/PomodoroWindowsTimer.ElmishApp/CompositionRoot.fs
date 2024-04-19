@@ -59,9 +59,12 @@ let compose
             BotSettingsModel.Program.update userSettings
 
         let updateTimePointGeneratorModel =
-            TimePointsGenerator.Program.update patternStore timePointPrototypeStore
+            TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore
 
-        MainModel.Program.update mainModelCfg updateBotSettingsModel updateTimePointGeneratorModel mainErrorMessageQueue
+        let initTimePointGeneratorModel () =
+            TimePointsGeneratorModel.init timePointPrototypeStore patternStore
+
+        MainModel.Program.update mainModelCfg updateBotSettingsModel updateTimePointGeneratorModel initTimePointGeneratorModel mainErrorMessageQueue
 
     // bindings:
     let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version

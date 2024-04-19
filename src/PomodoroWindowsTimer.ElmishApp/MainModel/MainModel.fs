@@ -15,7 +15,7 @@ type MainModel =
         LooperState : LooperState
         TimePoints: TimePoint list
         BotSettingsModel: BotSettingsModel option
-        TimePointsGeneratorModel: TimePointsGenerator option
+        TimePointsGeneratorModel: TimePointsGeneratorModel option
         DisableSkipBreak: bool
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
@@ -57,7 +57,7 @@ module MainModel =
         | Resume
         | StartTimePoint of Operation<Guid, unit>
         | BotSettingsMsg of BotSettingsModel.Msg
-        | TimePointsGeneratorMsg of TimePointsGenerator.Msg
+        | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
         | SetDisableSkipBreak of bool
         // test msgs
         | MinimizeWindows
@@ -69,6 +69,8 @@ module MainModel =
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
+        | InitializeTimePointsGeneratorModel
+        | EraseTimePointsGeneratorModel of isDrawerOpen: bool
         | OnError of exn
 
     module MsgWith =

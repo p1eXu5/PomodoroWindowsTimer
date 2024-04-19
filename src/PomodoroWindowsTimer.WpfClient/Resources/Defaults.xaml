@@ -6,6 +6,9 @@
                     >
 
     <converters:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
+    <converters:KindToTextConverter x:Key="conv_KindToTextConverter" />
+    <converters:KindToShortTextConverter x:Key="conv_KindToShortTextConverter" />
+    <converters:ToUpperInvariantTextConverter x:Key="conv_ToUpperInvariantText" />
 
     <Style x:Key="st_IconBase"
            TargetType="materialDesign:PackIcon"

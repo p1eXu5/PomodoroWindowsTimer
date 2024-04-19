@@ -40,8 +40,9 @@ module Bindings =
 
     let bindings () : Binding<TimePointPrototypeModel, TimePointPrototypeModel.Msg> list =
         [
+            "Name" |> Binding.oneWay (fun m -> m.Prototype.Name)
             "Kind" |> Binding.oneWay (fun m -> m.Prototype.Kind)
-            "Alias" |> Binding.oneWay (fun m -> m.Prototype.KindAlias)
+            "KindAlias" |> Binding.oneWay (_.Prototype.KindAlias >> Alias.value)
             "TimeSpan" |> Binding.twoWay ((fun m -> m.Prototype.TimeSpan.ToString("h':'mm")), Msg.SetTimeSpan)
         ]
 

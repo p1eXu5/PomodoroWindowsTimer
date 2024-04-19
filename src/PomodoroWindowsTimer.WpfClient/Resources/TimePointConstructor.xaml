@@ -29,8 +29,12 @@
                  />
     </DataTemplate>
 
-    <DataTemplate x:Key="dt_Prototypes">
-        <shared:TimePointPrototype />
+    <DataTemplate x:Key="dt_TimePointPrototype">
+        <shared:TimePointPrototypeV2 shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                                     shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                                     shared:TimePointAssistant.TimePointName="{Binding Name}"
+                                     shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                                     />
     </DataTemplate>
 
     <DataTemplate x:Key="dt_EditableTimePoint">

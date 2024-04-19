@@ -59,15 +59,15 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Shared
         public static readonly DependencyProperty TimePointKindAliasProperty =
             DependencyProperty.RegisterAttached(
           "TimePointKindAlias",
-          typeof(Alias),
+          typeof(string),
           typeof(TimePointAssistant),
           new FrameworkPropertyMetadata(defaultValue: null)
         );
 
-        public static Alias? GetTimePointKindAlias(UIElement target) =>
-            (Alias?)target.GetValue(TimePointKindAliasProperty);
+        public static string? GetTimePointKindAlias(UIElement target) =>
+            (string?)target.GetValue(TimePointKindAliasProperty);
 
-        public static void SetTimePointKindAlias(UIElement target, Alias? value) =>
+        public static void SetTimePointKindAlias(UIElement target, string? value) =>
             target.SetValue(TimePointKindAliasProperty, value);
     }
 }

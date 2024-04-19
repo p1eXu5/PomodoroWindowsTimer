@@ -47,6 +47,7 @@
                                    BorderThickness="2"
                                    BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
                                    BottomDrawerCornerRadius="20 20 0 0"
+                                   IsRightDrawerOpen="{Binding HasTimePointsGenerator}"
                                    >
             <materialDesign:DrawerHost.LeftDrawerContent>
                 <usercontrols:RunningTimePoints Width="350"

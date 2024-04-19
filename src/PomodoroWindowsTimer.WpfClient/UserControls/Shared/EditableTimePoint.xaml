@@ -18,12 +18,6 @@
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
-    <UserControl.Resources>
-        <converters:KindAliasToTextConverter x:Key="conv_KindAliasToTextConverter" />
-        <converters:KindToTextConverter x:Key="conv_KindToTextConverter" />
-        <converters:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
-    </UserControl.Resources>
-
     <Border BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
             BorderThickness="0,0,1,1"
             >
@@ -112,7 +106,7 @@
                                Style="{StaticResource MaterialDesignButtonTextBlock}"
                                >
                         <Run Text="{Binding Path=(local:TimePointAssistant.TimePointKind), ElementName=m_EditableTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />
-                        <Run Text="(" /><Run Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias), ElementName=m_EditableTimePointContainer, Converter={StaticResource conv_KindAliasToTextConverter}, FallbackValue=?}" /><Run Text=")" />
+                        <Run Text="(" /><Run Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias), ElementName=m_EditableTimePointContainer, FallbackValue=?}" /><Run Text=")" />
                     </TextBlock>
                 </StackPanel>
 

@@ -1,12 +1,12 @@
-﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGenerator.Bindings
+﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGeneratorModel.Bindings
 
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGenerator
+open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGeneratorModel
 
-let bindings ()  : Binding<TimePointsGenerator, TimePointsGenerator.Msg> list =
+let bindings ()  : Binding<TimePointsGeneratorModel, TimePointsGeneratorModel.Msg> list =
     [
         "TimePointPrototypes"
             |> Binding.subModelSeq (TimePointPrototypeModel.Bindings.bindings, _.Prototype >> _.Kind)

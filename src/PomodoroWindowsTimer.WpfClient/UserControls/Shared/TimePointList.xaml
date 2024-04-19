@@ -29,25 +29,30 @@
                 BorderThickness="0,0,0,1"
                 >
             <DockPanel LastChildFill="True">
-                <Grid DockPanel.Dock="Bottom">
+                <Grid x:Name="m_SearchToolbar"
+                      DockPanel.Dock="Bottom"
+                      Height="40"
+                      >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0"
-                          Margin="15,0,0,0"
+                          Margin="15,0"
                           >
                         <materialDesign:PackIcon VerticalAlignment="Center"
                                                  Kind="Magnify"
                                                  />
-                        <TextBox Margin="0,5"
-                                 Padding="25,0,0,0"
-                                 HorizontalAlignment="Stretch"
+                        <TextBox Width="200"
+                                 Margin="0,5"
+                                 Padding="25,0,0,5"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Bottom"
                                  />
                     </Grid>
 
-                    <Border Grid.Column="1"
+                    <!--<Border Grid.Column="1"
                             Margin="15,4,5,4"
                             Padding="0"
                             BorderThickness="1,0,0,0"
@@ -73,15 +78,19 @@
                                       Header="Extended"
                                       />
                         </MenuItem>
-                    </Menu>
+                    </Menu>-->
                 </Grid>
-                <TextBlock Margin="10,16,0,16"
-                           HorizontalAlignment="Center"
-                           Style="{StaticResource MaterialDesignButtonTextBlock}"
-                           Text="{Binding Path=Header,
-                                          ElementName=m_TimePointListContainer,
-                                          FallbackValue=TIME POINTS}"
-                           />
+                <Border BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
+                        BorderThickness="0,1,0,1"
+                        >
+                    <TextBlock Margin="10,16,0,16"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource MaterialDesignButtonTextBlock}"
+                               Text="{Binding Path=Header,
+                                              ElementName=m_TimePointListContainer,
+                                              FallbackValue=TIME POINTS}"
+                               />
+                </Border>
             </DockPanel>
         </Border>
         <!--  ItemTemplate="" is set in code behind  -->

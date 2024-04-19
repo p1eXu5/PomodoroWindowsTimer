@@ -59,8 +59,9 @@
                                   HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePointPrototypes}"
                                   Header="PROTOTYPES"
-                                  TimePointListBoxItemTemplate="{StaticResource dt_EditableTimePoint}"
+                                  TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
                                   TimePointListBoxScrollBarVisibility="Hidden"
+                                  SearchToolbarVisibility="Collapsed"
                                   />
         </DockPanel>
 
@@ -104,7 +105,7 @@
                 </StackPanel>
             </Border>
 
-            <!--  Prototype list  -->
+            <!--  Generated TimePoint list  -->
             <shared:TimePointList Grid.Row="0"
                                   Grid.Column="1"
                                   HorizontalAlignment="Stretch"
