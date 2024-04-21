@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Timer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             x:Name="m_Root"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             mc:Ignorable="d"
+             >
+    <StackPanel HorizontalAlignment="Center"
+                Orientation="Vertical"
+                >
+        <TextBlock Margin="0,0,0,20"
+                   HorizontalAlignment="Left"
+                   Foreground="{Binding ElementName=m_Root,
+                                        Path=Foreground}"
+                   Text="{Binding ActiveTimePointName,
+                                  FallbackValue='Time Point Name'}"
+                   />
+        <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               DigitBackground="{Binding ElementName=m_Root,
+                                                         Path=DigitBackground}"
+                               Foreground="{Binding ElementName=m_Root,
+                                                    Path=Foreground}"
+                               Background="{Binding ElementName=m_Root,
+                                                    Path=Background}"
+                               Format="mm':'ss"
+                               Value="{Binding ActiveTime,
+                                               FallbackValue=00:00:00.00}"
+                               />
+        <Slider DockPanel.Dock="Top"
+                Margin="0,40,0,0"
+                Foreground="{Binding ElementName=m_Root,
+                                     Path=Foreground}"
+                IsEnabled="{Binding IsActiveTimePointSet}"
+                Maximum="{Binding ActiveTimeDuration}"
+                Minimum="0"
+                Orientation="Horizontal"
+                PreviewMouseDown="Slider_MouseDown"
+                PreviewMouseUp="Slider_MouseUp"
+                Value="{Binding ActiveTimeSeconds}"
+                />
+    </StackPanel>
+</UserControl>

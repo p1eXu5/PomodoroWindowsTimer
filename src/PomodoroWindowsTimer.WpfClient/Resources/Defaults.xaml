@@ -22,4 +22,10 @@
     <BitmapImage x:Key="img_Metal"
                  UriSource="metalArtboard-50.png"
                  />
+    <BitmapImage x:Key="img_Base"
+                 UriSource="base_texture.png"
+                 />
+    <BitmapImage x:Key="img_Gloss"
+                 UriSource="gloss_texture.png"
+                 />
 </ResourceDictionary>

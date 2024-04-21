@@ -12,14 +12,13 @@
              >
 
     <!--  Buttons  -->
-    <StackPanel Height="120"
+    <StackPanel Margin="0,30"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Top"
                 Orientation="Horizontal"
                 >
         <StackPanel.Resources>
             <Style TargetType="{x:Type Button}">
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark.Foreground}" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
                 <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Padding" Value="16,10" />
                 <Setter Property="TextBlock.FontSize" Value="14" />
@@ -28,19 +27,18 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
+                <Setter Property="BorderBrush" Value="#004400" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Width" Value="100" />
                 <Setter Property="Background">
                     <Setter.Value>
-                        <ImageBrush ImageSource="{StaticResource img_Metal}"
+                        <ImageBrush ImageSource="{StaticResource img_Base}"
                                     Stretch="UniformToFill"
                                     TileMode="None"
                                     Viewport="0,0,1,1"
                                     />
                     </Setter.Value>
                 </Setter>
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}" />
                 <Setter Property="Button.Effect">
                     <Setter.Value>
                         <DropShadowEffect BlurRadius="5"

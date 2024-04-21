@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
@@ -26,6 +26,8 @@
     <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
     <None Remove="appsettings.Personal.json" />
+    <None Remove="Resources\base_texture.png" />
+    <None Remove="Resources\gloss_texture.png" />
     <None Remove="Resources\metalArtboard-50.png" />
   </ItemGroup>
 
@@ -64,6 +66,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\base_texture.png" />
+    <Resource Include="Resources\gloss_texture.png" />
     <Resource Include="Resources\metalArtboard-50.png" />
   </ItemGroup>
 
@@ -80,10 +84,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="UserControls\Constructor\" />
   </ItemGroup>
 
 </Project>
