@@ -54,6 +54,7 @@
                 Content="{materialDesign:PackIcon TimerCogOutline}"
                 Style="{StaticResource MaterialDesignIconButton}"
                 ToolTip="Playlist constructor"
+                IsEnabled="False"
                 />
         <!--  telegram bot settings open dialog button  -->
         <Button DockPanel.Dock="Left"

@@ -5,6 +5,8 @@ PomodoroWindowsTimer
 
 ![main window](./images/main-window.png)
 
+![main window](./images/main-window-open-time-points.png)
+
 <br/>
 
 Yet another Pomodoro timer for Windows, but!
