@@ -18,6 +18,11 @@
                                BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
                                BottomDrawerCornerRadius="20 20 0 0"
                                IsRightDrawerOpen="{Binding HasTimePointsGenerator}"
+                               LeftDrawerBackground="Transparent"
+                               OpenMode="Standard"
+                               IsLeftDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                         AncestorType=Window},
+                                                          Path=(local:UIAssistant.AreRunningTimePointsShown)}"
                                >
         <materialDesign:DrawerHost.LeftDrawerContent>
             <local:RunningTimePoints Width="350"
@@ -55,6 +60,9 @@
                         <DataTemplate x:Key="gp_Red">
                             <local:Timer DigitBackground="#400000"
                                          Foreground="#FF0000"
+                                         DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                              AncestorType=Control},
+                                                               Path=DataContext}"
                                          />
                         </DataTemplate>
 

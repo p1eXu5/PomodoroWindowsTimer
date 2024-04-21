@@ -12,7 +12,6 @@
              HorizontalAlignment="Center"
              d:DesignHeight="180"
              d:DesignWidth="320"
-             Background="{DynamicResource MaterialDesignToolBarBackground}"
              TextElement.Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >

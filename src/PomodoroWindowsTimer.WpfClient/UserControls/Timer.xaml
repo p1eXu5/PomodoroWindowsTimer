@@ -32,7 +32,41 @@
                                Format="mm':'ss"
                                Value="{Binding ActiveTime,
                                                FallbackValue=00:00:00.00}"
-                               />
+                               >
+            <digitPanel:TimerTable.Style>
+                <Style TargetType="digitPanel:TimerTable">
+                    <Setter Property="DigitWidth" Value="100" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=(local:UIAssistant.AreRunningTimePointsShown),
+                                                       RelativeSource={RelativeSource AncestorType=Window}}"
+                                     Value="True"
+                                     >
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
+                                                         To="75"
+                                                         Duration="0:0:0.35"
+                                                         />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <!--  Optionally, define ExitActions if you want the width to animate back when the property is False  -->
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
+                                                         To="100"
+                                                         Duration="0:0:0.35"
+                                                         />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </digitPanel:TimerTable.Style>
+        </digitPanel:TimerTable>
         <Slider DockPanel.Dock="Top"
                 Margin="0,40,0,0"
                 Foreground="{Binding ElementName=m_Root,

@@ -28,4 +28,22 @@
     <BitmapImage x:Key="img_Gloss"
                  UriSource="gloss_texture.png"
                  />
+
+    <ImageBrush x:Key="br_Base"
+                TileMode="FlipXY"
+                ViewportUnits="Absolute"
+                Viewport="0,0,256,256"
+                >
+        <ImageBrush.ImageSource>
+            <DrawingImage>
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <ImageDrawing ImageSource="{StaticResource img_Base}"
+                                      Rect="0,0,256,256"
+                                      />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+        </ImageBrush.ImageSource>
+    </ImageBrush>
 </ResourceDictionary>

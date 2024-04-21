@@ -17,6 +17,7 @@
         Height="520"
         MinWidth="800"
         MinHeight="520"
+        usercontrols:UIAssistant.AreRunningTimePointsShown="False"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Icon="pomodoro-technique.ico"
         TextElement.FontSize="13"
@@ -25,6 +26,7 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
         WindowStartupLocation="CenterScreen"
+        Background="{StaticResource br_Base}"
         mc:Ignorable="d"
         >
     <Window.Resources>
@@ -34,24 +36,6 @@
         <conv:ActualWidthToTopRightPointConverter x:Key="conv_ActualWidthToTopRightPoint" />
         <conv:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
     </Window.Resources>
-    <Window.Background>
-        <ImageBrush TileMode="FlipXY"
-                    ViewportUnits="Absolute"
-                    Viewport="0,0,256,256"
-                    >
-            <ImageBrush.ImageSource>
-                <DrawingImage>
-                    <DrawingImage.Drawing>
-                        <DrawingGroup>
-                            <ImageDrawing ImageSource="{StaticResource img_Base}"
-                                          Rect="0,0,256,256"
-                                          />
-                        </DrawingGroup>
-                    </DrawingImage.Drawing>
-                </DrawingImage>
-            </ImageBrush.ImageSource>
-        </ImageBrush>
-    </Window.Background>
 
     <materialDesign:DialogHost DialogClosing="DialogHost_DialogClosing"
                                DialogContentTemplate="{StaticResource dt_BotSettingsDialog}"
@@ -177,7 +161,8 @@
                     </Border>
                 </Grid>
 
-                <usercontrols:ControlButtons DockPanel.Dock="Top" VerticalAlignment="Top"
+                <usercontrols:ControlButtons DockPanel.Dock="Top"
+                                             VerticalAlignment="Top"
                                              DataContext="{Binding}"
                                              />
             </DockPanel>

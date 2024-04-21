@@ -23,14 +23,30 @@
                                   FallbackValue=v 1.0.1.0}"
                    />
         <!--  running time points  -->
-        <Button DockPanel.Dock="Left"
-                Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                CommandParameter="{x:Static Dock.Left}"
-                HorizontalAlignment="Left"
-                Content="{materialDesign:PackIcon TimerPlayOutline}"
-                Style="{StaticResource MaterialDesignIconButton}"
-                ToolTip="Playlist"
-                />
+        <ToggleButton DockPanel.Dock="Left"
+                      HorizontalAlignment="Left"
+                      Content="{materialDesign:PackIcon TimerPlayOutline}"
+                      ToolTip="Playlist"
+                      IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                         AncestorType=Window},
+                                          Path=(local:UIAssistant.AreRunningTimePointsShown)}"
+                      >
+            <ToggleButton.Style>
+                <Style TargetType="ToggleButton"
+                       BasedOn="{StaticResource MaterialDesignIconButton}"
+                       >
+                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                    <Style.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ToggleButton.Style>
+        </ToggleButton>
         <!--  time points generator open button  -->
         <Button DockPanel.Dock="Left"
                 Command="{Binding LoadTimePointsGeneratorCommand}"
