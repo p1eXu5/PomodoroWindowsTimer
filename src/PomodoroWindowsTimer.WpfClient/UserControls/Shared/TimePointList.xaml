@@ -19,39 +19,32 @@
         <converters:HeightReminder2Converter x:Key="conv_HeightReminder" />
     </UserControl.Resources>
 
-    <StackPanel HorizontalAlignment="Stretch"
-                Orientation="Vertical"
-                >
+    <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical">
         <!--  header  -->
         <Border x:Name="m_TimePointsHeader"
                 BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                 BorderThickness="0,0,0,1"
                 >
-            <DockPanel LastChildFill="True">
-                <Grid x:Name="m_SearchToolbar"
-                      DockPanel.Dock="Bottom"
-                      Height="40"
-                      >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Column="0"
-                          Margin="15,0"
-                          >
-                        <materialDesign:PackIcon VerticalAlignment="Center"
-                                                 Kind="Magnify"
-                                                 />
-                        <TextBox Width="200"
-                                 Margin="0,5"
-                                 Padding="25,0,0,5"
-                                 HorizontalAlignment="Left"
-                                 VerticalAlignment="Bottom"
-                                 />
-                    </Grid>
+            <Grid x:Name="m_SearchToolbar"
+                  DockPanel.Dock="Bottom"
+                  Height="40"
+                  >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Margin="15,0">
+                    <materialDesign:PackIcon VerticalAlignment="Center" Kind="Magnify" />
+                    <TextBox Width="200"
+                             Margin="0,5"
+                             Padding="25,0,0,5"
+                             HorizontalAlignment="Left"
+                             VerticalAlignment="Bottom"
+                             />
+                </Grid>
 
-                    <!--<Border Grid.Column="1"
+                <!--<Border Grid.Column="1"
                             Margin="15,4,5,4"
                             Padding="0"
                             BorderThickness="1,0,0,0"
@@ -78,45 +71,24 @@
                                       />
                         </MenuItem>
                     </Menu>-->
-                </Grid>
-                <Border BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
-                        BorderThickness="0,1,0,1"
-                        >
-                    <TextBlock Margin="10,16,0,16"
-                               HorizontalAlignment="Center"
-                               Style="{StaticResource MaterialDesignButtonTextBlock}"
-                               Text="{Binding Path=Header,
-                                              ElementName=m_TimePointListContainer,
-                                              FallbackValue=TIME POINTS}"
-                               />
-                </Border>
-            </DockPanel>
+            </Grid>
         </Border>
         <!--  ItemTemplate="" is set in code behind  -->
-        <ScrollViewer x:Name="m_ScrollViewer"
-                      VerticalScrollBarVisibility="Visible"
-                      >
+        <ScrollViewer x:Name="m_ScrollViewer" VerticalScrollBarVisibility="Visible">
             <ScrollViewer.Height>
                 <MultiBinding Converter="{StaticResource conv_HeightReminder}"
                               Mode="OneWay"
                               UpdateSourceTrigger="PropertyChanged"
                               >
-                    <Binding ElementName="m_TimePointListContainer"
-                             Path="ActualHeight"
-                             />
-                    <Binding ElementName="m_TimePointsHeader"
-                             Path="ActualHeight"
-                             />
-                    <Binding ElementName="m_TimePointsHeader"
-                             Path="Margin"
-                             />
+                    <Binding ElementName="m_TimePointListContainer" Path="ActualHeight" />
+                    <Binding ElementName="m_TimePointsHeader" Path="ActualHeight" />
+                    <Binding ElementName="m_TimePointsHeader" Path="Margin" />
                 </MultiBinding>
             </ScrollViewer.Height>
             <!--  ItemTemplate is set through binding property TimePointListBoxItemTemplate in code behind  -->
             <ItemsControl x:Name="m_TimePointListBox"
                           Grid.IsSharedSizeScope="True"
-                          ItemsSource="{Binding DataContext,
-                                                ElementName=m_TimePointListContainer}"
+                          ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
                           />
         </ScrollViewer>
     </StackPanel>

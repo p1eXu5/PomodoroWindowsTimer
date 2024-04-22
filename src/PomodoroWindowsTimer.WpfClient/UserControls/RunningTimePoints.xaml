@@ -25,10 +25,10 @@
                 >
             <DockPanel LastChildFill="True">
                 <ToggleButton DockPanel.Dock="Left"
+                              Focusable="False"
                               IsChecked="{Binding DisableSkipBreak}"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               ToolTip="Disable skip break"
-                              Focusable="False"
                               >
                     <ToggleButton.RenderTransform>
                         <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
@@ -45,13 +45,31 @@
             </DockPanel>
         </Border>
 
-        <!--  time points  -->
-        <shared:TimePointList DockPanel.Dock="Top"
-                              HorizontalAlignment="Stretch"
-                              DataContext="{Binding TimePoints}"
-                              TimePointListBoxItemTemplate="{StaticResource dt_PlaylistTimePointV2}"
-                              TimePointListBoxScrollBarVisibility="Auto"
-                              SearchToolbarVisibility="Collapsed"
-                              />
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+
+            <Grid>
+                <Button HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                        CommandParameter="{x:Static Dock.Left}"
+                        Content="{materialDesign:PackIcon ArrowLeft}"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        />
+                <TextBlock Margin="10,16,0,16"
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource MaterialDesignButtonTextBlock}"
+                           Text="{Binding Path=Header, FallbackValue=TIME POINTS}"
+                           />
+
+            </Grid>
+
+            <!--  time points  -->
+            <shared:TimePointList DataContext="{Binding TimePoints}"
+                                  HorizontalAlignment="Stretch"
+                                  SearchToolbarVisibility="Collapsed"
+                                  TimePointListBoxItemTemplate="{StaticResource dt_PlaylistTimePointV2}"
+                                  TimePointListBoxScrollBarVisibility="Auto"
+                                  />
+        </StackPanel>
     </DockPanel>
 </UserControl>
