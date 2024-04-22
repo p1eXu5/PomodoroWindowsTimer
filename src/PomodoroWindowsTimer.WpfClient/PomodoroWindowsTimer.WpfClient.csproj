@@ -22,10 +22,14 @@
     <Configurations>Debug;Release;Personal</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Personal|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
-    <None Remove="appsettings.Personal.json" />
+    <None Remove="appsettings.Production.json" />
     <None Remove="Resources\base_texture.png" />
     <None Remove="Resources\gloss_texture.png" />
     <None Remove="Resources\metalArtboard-50.png" />
@@ -38,13 +42,16 @@
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="appsettings.Production.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="pomodoro-technique.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
-    <Content Include="appsettings.Personal.json">
+    <Content Include="appsettings.Production.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

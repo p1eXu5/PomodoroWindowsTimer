@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 /images
 /src/PomodoroWindowsTimer.WpfClient/appsettings.Development.json
 /docs
+/src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
