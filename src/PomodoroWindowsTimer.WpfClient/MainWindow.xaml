@@ -1,7 +1,8 @@
 ﻿<Window x:Class="PomodoroWindowsTimer.WpfClient.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:ctrl="clr-namespace:PomodoroWindowsTimer.WpfClient.CustomControls"
+        xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
         xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
@@ -10,7 +11,6 @@
         xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
         xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
         xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp;assembly=PomodoroWindowsTimer.ElmishApp"
-        xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
         x:Name="m_Root"
         Title="{Binding Title}"
         Width="800"
@@ -26,8 +26,8 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource br_Base}"
         mc:Ignorable="d"
+        Background="{StaticResource br_Base}"
         >
     <Window.Resources>
         <DataTemplate x:Key="dt_BotSettingsDialog">
@@ -37,34 +37,27 @@
         <conv:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
     </Window.Resources>
 
-    <materialDesign:DialogHost DialogClosing="DialogHost_DialogClosing"
+    <materialDesign:DialogHost DialogContent="{Binding BotSettingsModel}"
                                DialogContentTemplate="{StaticResource dt_BotSettingsDialog}"
                                DialogTheme="Inherit"
                                Identifier="RootDialog"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
-                                                              Path=MessageQueue}"
+                               IsOpen="{Binding IsDialogOpened}"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar, Path=MessageQueue}"
                                >
+        <!--<Behaviors:Interaction.Triggers>
+            <Behaviors:EventTrigger EventName="DialogClosing">
+                <Behaviors:InvokeCommandAction Command="{Binding TryStoreAndSetTimePointsCommand}" />
+            </Behaviors:EventTrigger>
+        </Behaviors:Interaction.Triggers>-->
 
         <Grid>
             <!--  gloss rect  -->
-            <Rectangle Width="{Binding ElementName=m_Root,
-                                       Path=ActualWidth}"
-                       Height="{Binding ElementName=m_Root,
-                                        Path=ActualHeight}"
+            <Rectangle Width="{Binding ElementName=m_Root, Path=ActualWidth}"
+                       Height="{Binding ElementName=m_Root, Path=ActualHeight}"
                        Opacity="0.7"
                        >
                 <Rectangle.OpacityMask>
-                    <RadialGradientBrush MappingMode="Absolute"
-                                         Center="{Binding ElementName=m_Root,
-                                                          Path=ActualWidth,
-                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
-                                         SpreadMethod="Pad"
-                                         RadiusX="500"
-                                         RadiusY="500"
-                                         GradientOrigin="{Binding ElementName=m_Root,
-                                                                  Path=ActualWidth,
-                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
-                                         >
+                    <RadialGradientBrush Center="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToCenterPoint}}" GradientOrigin="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToTopRightPoint}}" MappingMode="Absolute" RadiusX="500" RadiusY="500" SpreadMethod="Pad">
                         <RadialGradientBrush.GradientStops>
                             <GradientStop Offset="0" Color="#FF000000" />
                             <GradientStop Offset="1" Color="#00000000" />
@@ -73,16 +66,14 @@
                 </Rectangle.OpacityMask>
                 <Rectangle.Fill>
                     <ImageBrush TileMode="FlipXY"
-                                ViewportUnits="Absolute"
                                 Viewport="0,0,256,256"
+                                ViewportUnits="Absolute"
                                 >
                         <ImageBrush.ImageSource>
                             <DrawingImage>
                                 <DrawingImage.Drawing>
                                     <DrawingGroup>
-                                        <ImageDrawing ImageSource="{StaticResource img_Gloss}"
-                                                      Rect="0,0,256,256"
-                                                      />
+                                        <ImageDrawing ImageSource="{StaticResource img_Gloss}" Rect="0,0,256,256" />
                                     </DrawingGroup>
                                 </DrawingImage.Drawing>
                             </DrawingImage>
@@ -106,10 +97,10 @@
                       Height="350"
                       Margin="0,30,0,0"
                       >
-                    <Border CornerRadius="4"
-                            Background="Black"
-                            BorderBrush="Black"
+                    <Border BorderBrush="Black"
                             BorderThickness="0"
+                            CornerRadius="4"
+                            Background="Black"
                             >
                         <Grid>
                             <usercontrols:Lcd DataContext="{Binding}" />
@@ -130,17 +121,7 @@
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
                                 <Rectangle.OpacityMask>
-                                    <RadialGradientBrush MappingMode="Absolute"
-                                                         Center="{Binding ElementName=m_Root,
-                                                                          Path=ActualWidth,
-                                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
-                                                         SpreadMethod="Pad"
-                                                         RadiusX="500"
-                                                         RadiusY="500"
-                                                         GradientOrigin="{Binding ElementName=m_Root,
-                                                                                  Path=ActualWidth,
-                                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
-                                                         >
+                                    <RadialGradientBrush Center="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToCenterPoint}}" GradientOrigin="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToTopRightPoint}}" MappingMode="Absolute" RadiusX="500" RadiusY="500" SpreadMethod="Pad">
                                         <RadialGradientBrush.GradientStops>
                                             <GradientStop Offset="0" Color="#FF000000" />
                                             <GradientStop Offset="1" Color="#00000000" />
@@ -162,8 +143,8 @@
                 </Grid>
 
                 <usercontrols:ControlButtons DockPanel.Dock="Top"
-                                             VerticalAlignment="Top"
                                              DataContext="{Binding}"
+                                             VerticalAlignment="Top"
                                              />
             </DockPanel>
         </Grid>

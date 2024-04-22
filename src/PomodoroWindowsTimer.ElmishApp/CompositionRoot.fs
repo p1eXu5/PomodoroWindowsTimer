@@ -21,13 +21,13 @@ let compose
     let timePointQueue = new TimePointQueue()
     let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
 
-    let sendToBot =
+    let sendToBot message =
         match userSettings.BotToken, userSettings.MyChatId with
         | Some botToken, Some myChatId ->
             let botClient = TelegramBotClient(botToken)
-            Telegram.sendToBot botClient (Types.ChatId(myChatId))
+            message |> Telegram.sendToBot botClient (Types.ChatId(myChatId))
         | _ ->
-            fun _ -> task { return () }
+            task { return () }
 
 #if DEBUG
     let windowsMinimizer = Windows.simWindowsMinimizer
@@ -64,7 +64,11 @@ let compose
         let initTimePointGeneratorModel () =
             TimePointsGeneratorModel.init timePointPrototypeStore patternStore
 
-        MainModel.Program.update mainModelCfg updateBotSettingsModel updateTimePointGeneratorModel initTimePointGeneratorModel mainErrorMessageQueue
+        let initBotSettingsModel () =
+            BotSettingsModel.init userSettings
+            |> Some
+
+        MainModel.Program.update mainModelCfg initBotSettingsModel updateBotSettingsModel updateTimePointGeneratorModel initTimePointGeneratorModel mainErrorMessageQueue
 
     // bindings:
     let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version

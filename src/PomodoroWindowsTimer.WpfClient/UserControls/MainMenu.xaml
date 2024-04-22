@@ -50,10 +50,10 @@
                 ToolTip="Playlist constructor"
                 />
         <!--  telegram bot settings open dialog button  -->
-        <Button DockPanel.Dock="Left"
+        <Button x:Name="m_OpenTelegramBotCredentialsButton"
+                DockPanel.Dock="Left"
                 HorizontalAlignment="Left"
-                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                CommandParameter="{Binding BotSettingsModel}"
+                Command="{Binding LoadBotSettingsModelCommand}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 RenderTransformOrigin="0.5,0.5"
                 Style="{StaticResource MaterialDesignIconButton}"

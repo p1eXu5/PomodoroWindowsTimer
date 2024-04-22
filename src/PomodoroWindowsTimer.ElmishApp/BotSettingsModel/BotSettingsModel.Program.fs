@@ -8,9 +8,16 @@ open PomodoroWindowsTimer.ElmishApp.Models.BotSettingsModel
 let update (botConfiguration: IBotSettings) msg model =
     match msg with
     | SetBotToken token ->
-        botConfiguration.BotToken <- token
-        { model with BotToken = token }
+        { model with BotToken = token }, Intent.None
 
     | SetChatId chatId ->
-        botConfiguration.MyChatId <- chatId
-        { model with ChatId = chatId }
+        { model with ChatId = chatId }, Intent.None
+
+    | Apply ->
+        botConfiguration.MyChatId <- model.ChatId
+        botConfiguration.BotToken <- model.BotToken
+        model, Intent.CloseDialogRequested
+
+    | Cancel ->
+        model, Intent.CloseDialogRequested
+

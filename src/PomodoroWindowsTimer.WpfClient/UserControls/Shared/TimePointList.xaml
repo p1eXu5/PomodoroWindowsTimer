@@ -19,9 +19,10 @@
         <converters:HeightReminder2Converter x:Key="conv_HeightReminder" />
     </UserControl.Resources>
 
-    <StackPanel HorizontalAlignment="Stretch" Orientation="Vertical">
+    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <!--  header  -->
         <Border x:Name="m_TimePointsHeader"
+                DockPanel.Dock="Top"
                 BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                 BorderThickness="0,0,0,1"
                 >
@@ -90,6 +91,11 @@
                           Grid.IsSharedSizeScope="True"
                           ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
                           />
+            <!--<ListBox x:Name="m_TimePointListBox"
+                 Grid.IsSharedSizeScope="True"
+                 VerticalAlignment="Stretch"
+                 ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
+                 />-->
         </ScrollViewer>
-    </StackPanel>
+    </DockPanel>
 </UserControl>

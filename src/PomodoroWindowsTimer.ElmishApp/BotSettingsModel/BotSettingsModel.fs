@@ -14,7 +14,13 @@ module BotSettingsModel =
     type Msg =
         | SetBotToken of string option
         | SetChatId of string option
+        | Apply
+        | Cancel
 
+    [<RequireQualifiedAccess>]
+    type Intent =
+        | None
+        | CloseDialogRequested
 
     let init (botConfiguration: IBotSettings) =
         {

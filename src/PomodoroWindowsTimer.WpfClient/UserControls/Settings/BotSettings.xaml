@@ -5,24 +5,24 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             Width="400"
+             Width="450"
              Height="200"
+             mc:Ignorable="d"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
-             mc:Ignorable="d"
              >
     <StackPanel Margin="10"
                 VerticalAlignment="Center"
                 Orientation="Vertical"
                 >
-        <TextBox Width="300"
+        <TextBox Width="350"
                  Margin="0"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Bot token"
                  Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding BotToken}"
                  />
-        <TextBox Width="300"
+        <TextBox Width="350"
                  Margin="0,10,0,20"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Chat ID"
@@ -34,17 +34,18 @@
             <Button DockPanel.Dock="Bottom"
                     Margin="10"
                     HorizontalAlignment="Center"
-                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                    Content="CLOSE"
-                    IsDefault="True"
+                    Command="{Binding ApplyCommand}"
+                    Content="APPLY"
+                    Style="{StaticResource MaterialDesignFlatSecondaryButton}"
+                    />
+            <Button DockPanel.Dock="Bottom"
+                    Margin="10"
+                    HorizontalAlignment="Center"
+                    Command="{Binding CancelCommand}"
+                    Content="CANCEL"
+                    IsCancel="True"
                     Style="{StaticResource MaterialDesignFlatButton}"
-                    >
-                <Button.CommandParameter>
-                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                        False
-                    </system:Boolean>
-                </Button.CommandParameter>
-            </Button>
+                    />
         </StackPanel>
     </StackPanel>
 </UserControl>

@@ -15,6 +15,7 @@ open Elmish.WPF.Extensions
 
 let update
     (cfg: MainModeConfig)
+    initBotSettingsModel
     updateBotSettingsModel
     updateTimePointGeneratorModel
     initTimePointGeneratorModel
@@ -107,10 +108,6 @@ let update
     | StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg Play
 
-    | MsgWith.BotSettingsMsg model (bmsg, bModel) ->
-        let bModel = updateBotSettingsModel bmsg bModel
-        { model with BotSettingsModel = bModel |> Some }, Cmd.none
-
     | Msg.InitializeTimePointsGeneratorModel ->
         let (genModel, genCmd) = initTimePointGeneratorModel ()
         { model with TimePointsGeneratorModel = genModel |> Some }
@@ -129,7 +126,7 @@ let update
         | Intent.None ->
             model', cmd'
 
-    | SetDisableSkipBreak v ->
+    | Msg.SetDisableSkipBreak v ->
         cfg.DisableSkipBreakSettings.DisableSkipBreak <- v
         { model with DisableSkipBreak = v }, Cmd.none
 
@@ -166,6 +163,18 @@ let update
 
         { model with TimePoints = timePoints }
         , Cmd.none
+
+    | Msg.LoadBotSettingsModel ->
+        { model with BotSettingsModel = initBotSettingsModel () }
+        , Cmd.none
+
+    | MsgWith.BotSettingsMsg model (bmsg, bModel) ->
+        let bModel, intent = updateBotSettingsModel bmsg bModel
+        match intent with
+        | BotSettingsModel.Intent.None ->
+            { model with BotSettingsModel = bModel |> Some }, Cmd.none
+        | BotSettingsModel.Intent.CloseDialogRequested ->
+            { model with BotSettingsModel = None }, Cmd.none
 
     | Msg.OnError ex ->
         errorMessageQueue.EnqueueError ex.Message

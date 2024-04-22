@@ -45,9 +45,8 @@
             </DockPanel>
         </Border>
 
-        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-
-            <Grid>
+        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+            <Grid DockPanel.Dock="Top">
                 <Button HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
@@ -60,7 +59,6 @@
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
                            Text="{Binding Path=Header, FallbackValue=TIME POINTS}"
                            />
-
             </Grid>
 
             <!--  time points  -->
@@ -70,6 +68,6 @@
                                   TimePointListBoxItemTemplate="{StaticResource dt_PlaylistTimePointV2}"
                                   TimePointListBoxScrollBarVisibility="Auto"
                                   />
-        </StackPanel>
+        </DockPanel>
     </DockPanel>
 </UserControl>

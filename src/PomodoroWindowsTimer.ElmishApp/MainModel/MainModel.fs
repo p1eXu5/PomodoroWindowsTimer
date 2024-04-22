@@ -56,7 +56,6 @@ module MainModel =
         | Stop
         | Resume
         | StartTimePoint of Operation<Guid, unit>
-        | BotSettingsMsg of BotSettingsModel.Msg
         | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
         | SetDisableSkipBreak of bool
         // test msgs
@@ -71,6 +70,8 @@ module MainModel =
         | PostChangeActiveTimeSpan
         | InitializeTimePointsGeneratorModel
         | EraseTimePointsGeneratorModel of isDrawerOpen: bool
+        | LoadBotSettingsModel
+        | BotSettingsMsg of BotSettingsModel.Msg
         | OnError of exn
 
     module MsgWith =

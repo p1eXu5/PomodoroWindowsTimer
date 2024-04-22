@@ -85,9 +85,7 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
 
         "BotSettingsModel"
             |> Binding.SubModel.opt BotSettingsModel.Bindings.bindings
-            |> Binding.mapModel (fun m ->
-                m.BotSettingsModel
-            )
+            |> Binding.mapModel _.BotSettingsModel
             |> Binding.mapMsg MainModel.Msg.BotSettingsMsg
 
         "TimePointsGeneratorModel"
@@ -117,6 +115,10 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
                         None
                 )
             )
+
+        "IsDialogOpened" |> Binding.oneWay (_.BotSettingsModel >> Option.isSome)
+
+        "LoadBotSettingsModelCommand" |> Binding.cmd Msg.LoadBotSettingsModel
     ]
 
 
