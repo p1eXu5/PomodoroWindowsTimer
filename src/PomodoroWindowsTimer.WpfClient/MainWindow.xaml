@@ -105,7 +105,7 @@
 
                             <Grid Margin="1">
                                 <usercontrols:Lcd DataContext="{Binding}" />
-                                <Border BorderBrush="#101010"
+                                <Border BorderBrush="#0A0A0A"
                                         BorderThickness="0,1,1,0"
                                         CornerRadius="4"
                                         />
@@ -114,7 +114,7 @@
                                         CornerRadius="4"
                                         />
                             </Grid>
-                            <Border BorderBrush="#111111"
+                            <Border BorderBrush="#101010"
                                     BorderThickness="1,0,0,1"
                                     CornerRadius="4"
                                     />
@@ -145,7 +145,7 @@
                                 </Rectangle.OpacityMask>
 
                             </Rectangle>
-                            <Border BorderBrush="Black"
+                            <Border BorderBrush="#0A0A0A"
                                     BorderThickness="0,1,1,0"
                                     CornerRadius="4"
                                     />
