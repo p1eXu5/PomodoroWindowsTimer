@@ -33,24 +33,51 @@ type private Msg =
 
 type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, ?cancellationToken: System.Threading.CancellationToken) =
     let mutable _isDisposed = false
+    
+    let startHandleMessage =
+        LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(0b0_0001_0001, "Start Handle TimePointQueue Message"),
+            "Start handle {TimePointQueueMsgName}"
+        )
+
+    let logStartHandle (scopeName: string) =
+        startHandleMessage.Invoke(logger, scopeName, null)
+
+    let messageScope =
+        LoggerMessage.DefineScope<string>(
+            "Scope of message: {TimePointQueueMsgName}"
+        )
+
+    let beginScope (scopeName: string) =
+        let scope = messageScope.Invoke(logger, scopeName)
+        logStartHandle scopeName
+        scope
+
+    let newStateMessage =
+        LoggerMessage.Define<string>(
+            LogLevel.Trace,
+            new EventId(0b0_0001_0010, "New TimePointQueue State"),
+            "New State: {NewState}"
+        )
 
     let logNewState (state: State) =
         if logger.IsEnabled(LogLevel.Trace) then
             let stateJson = JsonHelpers.Serialize(state)
-            logger.LogTrace("New State: {NewState}", stateJson)
+            newStateMessage.Invoke(logger, stateJson, null)
+
+    let timePointsMessage =
+        LoggerMessage.Define<string>(
+            LogLevel.Trace,
+            new EventId(0b0_0001_0011, "TimePointQueue TimePoint List"),
+            "TimePoint list: {TimePointList}"
+        )
 
     let logTimePoints l =
         if logger.IsEnabled(LogLevel.Trace) then
             let json = JsonHelpers.Serialize(l)
-            logger.LogTrace("TimePoint list: {TimePointList}", json)
+            timePointsMessage.Invoke(logger, json, null)
 
-    let logStartHandle (scopeName: string) =
-        logger.LogDebug("Start handle {TimePointQueueMsgName}", scopeName)
-
-    let beginScope (scopeName: string) =
-        let scope = logger.BeginScope(scopeName)
-        logStartHandle scopeName
-        scope
 
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->

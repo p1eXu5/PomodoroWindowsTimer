@@ -1,5 +1,6 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.MainModel.Program
 
+open Microsoft.Extensions.Logging
 open Elmish
 open Elmish.Extensions
 open PomodoroWindowsTimer.Types
@@ -9,8 +10,11 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
+open PomodoroWindowsTimer.ElmishApp.Logging
+
 let updateOnPlayerMsg
     (cfg: MainModeConfig)
+   
     (msg: PlayerMsg)
     (model: MainModel)
     =
@@ -51,7 +55,9 @@ let updateOnPlayerMsg
             Cmd.batch [Cmd.ofMsg Msg.PreChangeActiveTimeSpan; Cmd.ofMsg (ChangeActiveTimeSpan 0.0); Cmd.ofMsg (PlayerMsg.Resume |> Msg.PlayerMsg)]
         model, cmd
 
-    | _ -> model, Cmd.none
+    | _ ->
+        // logger.LogUnprocessedMessage()
+        model, Cmd.none
 
 
 let updateOnWindowsMsg (cfg: MainModeConfig) (msg: WindowsMsg) (model: MainModel) =
@@ -78,6 +84,7 @@ let update
     updateTimePointGeneratorModel
     initTimePointGeneratorModel
     (errorMessageQueue: IErrorMessageQueue)
+    (logger: ILogger<MainModel>)
     (msg: Msg)
     (model: MainModel)
     =
@@ -221,4 +228,6 @@ let update
         errorMessageQueue.EnqueueError ex.Message
         model, Cmd.none
 
-    | _ -> model, Cmd.none
+    | _ ->
+        logger.LogUnprocessedMessage(msg, model)
+        model, Cmd.none

@@ -32,7 +32,7 @@ let private timePointQueue () =
 let ``Next test``() =
     task {
         use tpQueue = timePointQueue ()
-        use looper = new Looper(tpQueue, 200<ms>, CancellationToken.None)
+        use looper = new Looper(tpQueue, 200<ms>, TestLogger<Looper>(TestContextWriters.Default, LogOut.All) :> ILogger<Looper>, CancellationToken.None)
         use semaphore = new SemaphoreSlim(0, 1)
 
         let mutable startedTPStack = Queue<TimePoint>()

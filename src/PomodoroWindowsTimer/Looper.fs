@@ -5,6 +5,7 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open System
 open System.Threading
+open Microsoft.Extensions.Logging
 
 
 type private State = 
@@ -36,9 +37,41 @@ type private Msg =
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
-type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, ?cancellationToken: System.Threading.CancellationToken) =
+type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: ILogger<Looper>, ?cancellationToken: System.Threading.CancellationToken) =
     let mutable timer : Timer = Unchecked.defaultof<_>
     let mutable _isDisposed = false
+
+    let startHandleMessage =
+        LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(0b0_0010_0001, "Start Handle Looper Message"),
+            "Start handle Looper message: {LooperMsgName}"
+        )
+
+    let logStartHandle (scopeName: string) =
+        startHandleMessage.Invoke(logger, scopeName, null)
+
+    let messageScope =
+        LoggerMessage.DefineScope<string>(
+            "Scope of Looper message: {LooperMsgName}"
+        )
+
+    let beginScope (scopeName: string) =
+        let scope = messageScope.Invoke(logger, scopeName)
+        logStartHandle scopeName
+        scope
+
+    let newStateMessage =
+        LoggerMessage.Define<string>(
+            LogLevel.Trace,
+            new EventId(0b0_0001_0010, "New Looper State"),
+            "New Looper State: {NewLooperState}"
+        )
+
+    let logNewState (state: State) =
+        if logger.IsEnabled(LogLevel.Trace) then
+            let stateJson = JsonHelpers.Serialize(state)
+            newStateMessage.Invoke(logger, stateJson, null)
 
     let invoker = new MailboxProcessor<Choice<Async<unit> list, unit>>(
         (fun inbox ->
@@ -113,9 +146,13 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, ?cancell
 
                     match msg with
                     | PreloadTimePoint when state.ActiveTimePoint |> Option.isNone ->
+                        use scope = beginScope (nameof PreloadTimePoint)
+
                         let tpOpt = timePointQueue.TryPick
                         tpOpt
                         |> Option.iter (fun atp -> LooperEvent.TimePointStarted (atp, None) |> tryPostEvent)
+
+                        scope.Dispose()
                         return! loop { state with ActiveTimePoint = tpOpt }
 
                     | Resume when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
@@ -124,6 +161,8 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, ?cancell
                         return! loop { state with StartTime = dt; IsStopped = false }
 
                     | Next ->
+                        use scope = beginScope (nameof Next)
+                        scope.Dispose()
                         return! initialize { state with IsStopped = false; StartTime = DateTime.Now }
 
                     | Tick when state.ActiveTimePoint |> Option.isNone && not (state.IsStopped) ->

@@ -22,7 +22,7 @@ let internal main
             errorMessageQueue
             loggerFactory
 
-    WpfProgram.mkProgram 
+    WpfProgram.mkProgram
         initMainModel
         updateMainModel
         mainModelBindings

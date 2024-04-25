@@ -1,6 +1,10 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.CompositionRoot
 
+open Microsoft.Extensions.Logging
+
+open Elmish
 open Telegram.Bot
+
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.TimePointQueue
@@ -9,7 +13,7 @@ open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
-open Microsoft.Extensions.Logging
+open System
 
 
 let compose
@@ -21,7 +25,7 @@ let compose
     (loggerFactory: ILoggerFactory)
     =
     let timePointQueue = new TimePointQueue(loggerFactory.CreateLogger<TimePointQueue>())
-    let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
+    let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds, loggerFactory.CreateLogger<Looper>())
 
     let sendToBot message =
         match userSettings.BotToken, userSettings.MyChatId with
@@ -70,7 +74,14 @@ let compose
             BotSettingsModel.init userSettings
             |> Some
 
-        MainModel.Program.update mainModelCfg initBotSettingsModel updateBotSettingsModel updateTimePointGeneratorModel initTimePointGeneratorModel mainErrorMessageQueue
+        MainModel.Program.update
+            mainModelCfg
+            initBotSettingsModel
+            updateBotSettingsModel
+            updateTimePointGeneratorModel
+            initTimePointGeneratorModel
+            mainErrorMessageQueue
+            (loggerFactory.CreateLogger<MainModel>())
 
     // bindings:
     let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version
@@ -82,15 +93,18 @@ let compose
             MainModel.Bindings.bindings title assemblyVer mainErrorMessageQueue
 
     // subscriptions
-    let subscribe _ =
-        let effect dispatch =
+    let subscribe _ : (SubId * Subscribe<_>) list =
+        let looperSubscription dispatch =
             let onLooperEvt =
                 fun evt ->
                     async {
                         do dispatch (MainModel.Msg.LooperMsg evt)
                     }
             looper.AddSubscriber(onLooperEvt)
-        [ effect ]
+            { new IDisposable with 
+                member _.Dispose() = ()
+            }
+        [ ["Looper"], looperSubscription ]
 
     // initialization
     looper.Start()
