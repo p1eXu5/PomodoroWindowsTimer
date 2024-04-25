@@ -14,7 +14,7 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 
 let updateOnPlayerMsg
     (cfg: MainModeConfig)
-   
+    (logger: ILogger<MainModel>)
     (msg: PlayerMsg)
     (model: MainModel)
     =
@@ -56,11 +56,11 @@ let updateOnPlayerMsg
         model, cmd
 
     | _ ->
-        // logger.LogUnprocessedMessage()
+        logger.LogUnprocessedMessage(msg, model)
         model, Cmd.none
 
 
-let updateOnWindowsMsg (cfg: MainModeConfig) (msg: WindowsMsg) (model: MainModel) =
+let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
     | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
         { model with IsMinimized = true }, Cmd.OfAsync.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnError
@@ -74,7 +74,9 @@ let updateOnWindowsMsg (cfg: MainModeConfig) (msg: WindowsMsg) (model: MainModel
     | WindowsMsg.SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none
 
-    | _ -> model, Cmd.none
+    | _ ->
+        logger.LogUnprocessedMessage(msg, model)
+        model, Cmd.none
 
 
 let update
@@ -90,6 +92,8 @@ let update
     =
     let updateOnPlayerMsg = updateOnPlayerMsg cfg
     let updateOnWindowsMsg = updateOnWindowsMsg cfg
+
+    use _ = logger.BeginMessageScope<MainModel.Msg>(msg)
 
     match msg with
     // --------------------
@@ -131,7 +135,7 @@ let update
     // Player, Windows
     // --------------------
 
-    | Msg.PlayerMsg pmsg -> updateOnPlayerMsg pmsg model
+    | Msg.PlayerMsg pmsg -> updateOnPlayerMsg logger pmsg model
 
     | Msg.LooperMsg evt ->
         let (activeTimePoint, cmd, switchTheme) =
@@ -153,7 +157,7 @@ let update
                 Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
         ]
 
-    | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg wmsg model
+    | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
 
     // --------------------
     // TimePoint Generator
