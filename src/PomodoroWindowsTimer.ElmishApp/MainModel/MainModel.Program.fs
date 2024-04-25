@@ -93,8 +93,6 @@ let update
     let updateOnPlayerMsg = updateOnPlayerMsg cfg
     let updateOnWindowsMsg = updateOnWindowsMsg cfg
 
-    use _ = logger.BeginMessageScope<MainModel.Msg>(msg)
-
     match msg with
     // --------------------
     // Flags

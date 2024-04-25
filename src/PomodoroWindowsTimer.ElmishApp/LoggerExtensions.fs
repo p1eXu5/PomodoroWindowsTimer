@@ -12,7 +12,7 @@ module MessageScope =
 
     type LoggerExtensions () =
         [<Extension>]
-        static member BeginMessageScope<'Msg>(logger: ILogger, msg: 'Msg) =
+        static member BeginMessageScope<'Msg>(logger: ILogger, _: 'Msg) =
             loggerMessage.Invoke(logger, typedefof<'Msg>.Name)
 
 
