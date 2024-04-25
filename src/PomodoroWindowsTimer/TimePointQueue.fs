@@ -78,6 +78,17 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
             let json = JsonHelpers.Serialize(l)
             timePointsMessage.Invoke(logger, json, null)
 
+    let nextTimePointMessage =
+        LoggerMessage.Define<string, float32>(
+            LogLevel.Trace,
+            new EventId(0b0_0001_0100, "Next TimePointQueue TimePoint"),
+            "Replying with the next TimePoint: {TimePoint} with priority {Priority}"
+        )
+
+    let logNextTimePoint (tp: TimePoint) (priority: float32) =
+        if logger.IsEnabled(LogLevel.Trace) then
+            let json = JsonHelpers.Serialize(tp)
+            nextTimePointMessage.Invoke(logger, json, priority, null)
 
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->
@@ -149,12 +160,14 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                             logger.LogDebug("Queue is empty")
                             reply.Reply(None)
                         else
-                            let tp = state.Queue.Dequeue()
+                            let tp = state.Queue.First
+                            let priority = state.Queue.GetPriority(tp)
+                            let _ = state.Queue.Dequeue()
                             state.Queue.Enqueue(tp, state.MaxPriority)
                             let state = { state with MaxPriority = state.MaxPriority + 1f }
                             logNewState state
 
-                            logger.LogDebug("Replying with the next TimePoint: {TimePoint}", tp)
+                            logNextTimePoint tp priority
                             reply.Reply(tp |> Some)
 
                         scope.Dispose()
@@ -168,7 +181,8 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                             reply.Reply(None)
                         else
                             let tp = state.Queue.First
-                            logger.LogDebug("Replying with the TimePoint: {TimePoint}", tp)
+                            let priority = state.Queue.GetPriority(tp)
+                            logNextTimePoint tp priority
                             reply.Reply(tp |> Some)
 
                         scope.Dispose()
