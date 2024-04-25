@@ -30,6 +30,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="p1eXu5.AspNetCore.Testing.Logging" Version="1.0.14" />
   </ItemGroup>
 
   <ItemGroup>

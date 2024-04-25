@@ -17,6 +17,7 @@ type MainModel =
         BotSettingsModel: BotSettingsModel option
         TimePointsGeneratorModel: TimePointsGeneratorModel option
         DisableSkipBreak: bool
+        DisableMinimizeMaximizeWindows: bool
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
     }
@@ -46,33 +47,55 @@ type MainModeConfig =
 module MainModel =
 
     type Msg =
+        | SetDisableSkipBreak of bool
+        | SetDisableMinimizeMaximizeWindows of bool
+
         | LoadTimePointsFromSettings
         /// Stores and loads generated timepoints from prototypes.
         | LoadTimePoints of TimePoint list
-        | LooperMsg of LooperEvent
-        | Play
-        | Next
-        | Replay
-        | Stop
-        | Resume
         | StartTimePoint of Operation<Guid, unit>
+        
+        | PlayerMsg of PlayerMsg
+        | LooperMsg of LooperEvent
+        | WindowsMsg of WindowsMsg
+
+        | InitializeTimePointsGeneratorModel
         | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
-        | SetDisableSkipBreak of bool
-        // test msgs
-        | MinimizeWindows
-        | SetIsMinimized of bool
-        | RestoreWindows
-        | RestoreMainWindow
+        | EraseTimePointsGeneratorModel of isDrawerOpen: bool
+
+        | LoadBotSettingsModel
+        | BotSettingsMsg of BotSettingsModel.Msg
         | SendToChatBot
-        | SelectTimePoint of Guid option
+        
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
-        | InitializeTimePointsGeneratorModel
-        | EraseTimePointsGeneratorModel of isDrawerOpen: bool
-        | LoadBotSettingsModel
-        | BotSettingsMsg of BotSettingsModel.Msg
+        
         | OnError of exn
+    and
+        WindowsMsg =
+            | MinimizeWindows
+            | SetIsMinimized of bool
+            | RestoreWindows
+            | RestoreMainWindow
+    and
+        PlayerMsg =
+            | Play
+            | Next
+            | Replay
+            | Stop
+            | Resume
+
+    module Msg = 
+        let tryNext (model: MainModel) =
+            model.ActiveTimePoint
+            |> Option.bind (fun atp ->
+                match atp.Kind with
+                | Kind.Break
+                | Kind.LongBreak when model.DisableSkipBreak -> None
+                | _ ->
+                    PlayerMsg.Next |> Msg.PlayerMsg |> Some
+            )
 
     module MsgWith =
 
@@ -103,6 +126,7 @@ module MainModel =
             IsMinimized = false
             LastCommandInitiator = None
             DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
+            DisableMinimizeMaximizeWindows = false
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
@@ -175,15 +199,5 @@ module MainModel =
         |> Option.map (fun tp -> tp.TimeSpan.TotalSeconds)
         |> Option.defaultValue 0.0
 
-    let getDisableSkipBreak m = m.DisableSkipBreak
 
-    let nextMsg m =
-        m.ActiveTimePoint
-        |> Option.bind (fun atp ->
-            match atp.Kind with
-            | Kind.Break
-            | Kind.LongBreak when m.DisableSkipBreak ->
-                None
-            | _ ->
-                Msg.Next |> Some
-        )
+    

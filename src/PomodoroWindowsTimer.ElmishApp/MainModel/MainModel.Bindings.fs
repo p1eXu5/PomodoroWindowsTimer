@@ -31,12 +31,12 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
         |> Binding.cmd (fun m ->
             match m.LooperState with
             | TimeShiftOnStopped _
-            | Initialized -> Msg.Play
-            | Playing -> Msg.Stop
-            | Stopped -> Msg.Resume
+            | Initialized -> PlayerMsg.Play |> Msg.PlayerMsg
+            | Playing -> PlayerMsg.Stop |> Msg.PlayerMsg
+            | Stopped -> PlayerMsg.Resume |> Msg.PlayerMsg
         )
 
-        "NextCommand" |> Binding.cmdIf nextMsg
+        "NextCommand" |> Binding.cmdIf Msg.tryNext
 
         "ReplayCommand"
         |> Binding.cmdIf (fun m ->
@@ -44,7 +44,7 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
             | Playing
             | Stopped ->
                 m.ActiveTimePoint
-                |> Option.map (fun _ -> Msg.Replay)
+                |> Option.map (fun _ -> PlayerMsg.Replay |> Msg.PlayerMsg)
             | _ -> None
         )
 
@@ -72,7 +72,7 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
             ])
         )
 
-        "MinimizeCommand" |> Binding.cmd MinimizeWindows
+        "MinimizeCommand" |> Binding.cmd (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
         "SendToChatBotCommand" |> Binding.cmd SendToChatBot
         "StartTimePointCommand" |> Binding.cmdParam (fun id -> (id :?> Guid) |> Operation.Start |> StartTimePoint)
 
@@ -103,7 +103,10 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
             )
 
         "DisableSkipBreak"
-            |> Binding.twoWay (getDisableSkipBreak, Msg.SetDisableSkipBreak)
+            |> Binding.twoWay (_.DisableSkipBreak, Msg.SetDisableSkipBreak)
+
+        "DisableMinimizeMaximizeWindows"
+            |> Binding.twoWay (_.DisableMinimizeMaximizeWindows, Msg.SetDisableMinimizeMaximizeWindows)
 
         "TryStoreAndSetTimePointsCommand"
             |> Binding.cmdIf (fun m ->

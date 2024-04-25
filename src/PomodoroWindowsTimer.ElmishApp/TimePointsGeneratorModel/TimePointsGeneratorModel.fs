@@ -1,6 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
 open System
+open Elmish.Extensions
 open PomodoroWindowsTimer.Types
 
 type TimePointsGeneratorModel =

@@ -8,10 +8,12 @@ open ShouldExtensions
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.TimePointQueue
+open p1eXu5.AspNetCore.Testing.Logging
+open Microsoft.Extensions.Logging
 
 [<Test>]
 let ``AddMany -> GetTimePointsWithPriority test``() =
-    use tpQueue = new TimePointQueue()
+    use tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(TestContextWriters.Default, LogOut.All) :> ILogger<TimePointQueue>)
     tpQueue.Start()
     let xtp =
         [
@@ -32,7 +34,7 @@ let ``AddMany -> GetTimePointsWithPriority test``() =
 
 [<Test>]
 let ``AddMany -> Enqueue test``() =
-    use tpQueue = new TimePointQueue()
+    use tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(TestContextWriters.Default, LogOut.All) :> ILogger<TimePointQueue>)
     tpQueue.Start()
     let xtp =
         [

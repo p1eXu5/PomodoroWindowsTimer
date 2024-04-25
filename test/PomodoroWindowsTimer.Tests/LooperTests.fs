@@ -11,6 +11,8 @@ open ShouldExtensions
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.TimePointQueue
 open PomodoroWindowsTimer.Looper
+open p1eXu5.AspNetCore.Testing.Logging
+open Microsoft.Extensions.Logging
 
 let private xtp =
     [
@@ -21,7 +23,7 @@ let private xtp =
     ]
 
 let private timePointQueue () =
-    let tpQueue = new TimePointQueue()
+    let tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(TestContextWriters.Default, LogOut.All) :> ILogger<TimePointQueue>)
     tpQueue.Start()
     tpQueue.AddMany(xtp)
     tpQueue

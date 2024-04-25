@@ -18,6 +18,9 @@
     <Compile Include="TimePointsGeneratorModel\TimePointsGeneratorModel.fs" />
     <Compile Include="TimePointsGeneratorModel\TimePointsGeneratorModel.Program.fs" />
     <Compile Include="TimePointsGeneratorModel\TimePointsGeneratorModel.Bindings.fs" />
+    <Compile Include="AppDialogModel\AppDialogModel.fs" />
+    <Compile Include="AppDialogModel\AppDialogModel.Program.fs" />
+    <Compile Include="AppDialogModel\AppDialogModel.Bindings.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />
@@ -28,6 +31,7 @@
   <ItemGroup>
     <PackageReference Include="Elmish.WPF" Version="4.0.0-beta-49" />
     <PackageReference Include="FSharp.SystemTextJson" Version="1.3.13" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.15.1" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />

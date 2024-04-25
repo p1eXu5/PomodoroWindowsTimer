@@ -17,53 +17,77 @@
              >
     <!--  content  -->
     <DockPanel LastChildFill="True">
-        <!--  Disable skip break  -->
-        <Border DockPanel.Dock="Bottom"
-                Margin="10,10"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom"
-                >
-            <DockPanel LastChildFill="True">
-                <ToggleButton DockPanel.Dock="Left"
-                              Focusable="False"
-                              IsChecked="{Binding DisableSkipBreak}"
-                              Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                              ToolTip="Disable skip break"
-                              >
-                    <ToggleButton.RenderTransform>
-                        <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
-                    </ToggleButton.RenderTransform>
-                </ToggleButton>
-                <TextBlock DockPanel.Dock="Left"
-                           Margin="0,0"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           FontSize="12"
-                           Style="{StaticResource MaterialDesignOverlineTextBlock}"
-                           Text="Disable skip break"
-                           />
-            </DockPanel>
-        </Border>
 
-        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+        <!--  Disable skip break  -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Margin="10,0,0,10"
+                    Orientation="Horizontal"
+                    >
+            <ToggleButton Focusable="False"
+                          IsChecked="{Binding DisableSkipBreak}"
+                          Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                          ToolTip="Disable skip break"
+                          >
+                <ToggleButton.RenderTransform>
+                    <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
+                </ToggleButton.RenderTransform>
+            </ToggleButton>
+            <TextBlock DockPanel.Dock="Left"
+                       Margin="0,0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                       Text="Disable skip break"
+                       />
+        </StackPanel>
+
+        <!--  Disable minimize/maximize windows  -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Margin="10,0"
+                    Orientation="Horizontal"
+                    >
+            <ToggleButton Focusable="False"
+                          IsChecked="{Binding DisableMinimizeMaximizeWindows}"
+                          Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                          ToolTip="Disable skip break"
+                          >
+                <ToggleButton.RenderTransform>
+                    <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
+                </ToggleButton.RenderTransform>
+            </ToggleButton>
+            <TextBlock DockPanel.Dock="Left"
+                       Margin="0,0"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       Style="{StaticResource MaterialDesignOverlineTextBlock}"
+                       Text="Disable minimize/maximize windows"
+                       />
+        </StackPanel>
+
+        <DockPanel DockPanel.Dock="Top"
+                   LastChildFill="True"
+                   >
             <Grid DockPanel.Dock="Top">
-                <Button HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                <Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
                         CommandParameter="{x:Static Dock.Left}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
                         Content="{materialDesign:PackIcon ArrowLeft}"
                         Style="{StaticResource MaterialDesignIconButton}"
                         />
                 <TextBlock Margin="10,16,0,16"
                            HorizontalAlignment="Center"
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
-                           Text="{Binding Path=Header, FallbackValue=TIME POINTS}"
+                           Text="{Binding Path=Header,
+                                          FallbackValue=TIME POINTS}"
                            />
             </Grid>
 
             <!--  time points  -->
-            <shared:TimePointList DataContext="{Binding TimePoints}"
-                                  HorizontalAlignment="Stretch"
+            <shared:TimePointList HorizontalAlignment="Stretch"
+                                  DataContext="{Binding TimePoints}"
                                   SearchToolbarVisibility="Collapsed"
                                   TimePointListBoxItemTemplate="{StaticResource dt_PlaylistTimePointV2}"
                                   TimePointListBoxScrollBarVisibility="Auto"

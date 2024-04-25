@@ -9,6 +9,7 @@ open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open Microsoft.Extensions.Logging
 
 
 let compose
@@ -17,8 +18,9 @@ let compose
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
+    (loggerFactory: ILoggerFactory)
     =
-    let timePointQueue = new TimePointQueue()
+    let timePointQueue = new TimePointQueue(loggerFactory.CreateLogger<TimePointQueue>())
     let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
 
     let sendToBot message =

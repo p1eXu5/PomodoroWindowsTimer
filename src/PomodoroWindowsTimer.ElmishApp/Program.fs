@@ -20,6 +20,7 @@ let internal main
             themeSwitcher
             userSettings
             errorMessageQueue
+            loggerFactory
 
     WpfProgram.mkProgram 
         initMainModel

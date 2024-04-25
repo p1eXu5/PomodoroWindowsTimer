@@ -17,13 +17,20 @@
                                BorderThickness="0"
                                BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
                                BottomDrawerCornerRadius="20 20 0 0"
-                               IsLeftDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=(local:UIAssistant.AreRunningTimePointsShown)}"
-                               IsRightDrawerOpen="{Binding HasTimePointsGenerator}"
+                               IsLeftDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                         AncestorType=Window},
+                                                          Path=(local:UIAssistant.AreRunningTimePointsShown)}"
+                               IsRightDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                          AncestorType=Window},
+                                                           Path=(local:UIAssistant.IsTimePointsGeneratorShown)}"
                                LeftDrawerBackground="Transparent"
+                               RightDrawerBackground="Transparent"
                                OpenMode="Standard"
                                >
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <local:RunningTimePoints DataContext="{Binding}" Width="350" />
+            <local:RunningTimePoints Width="350"
+                                     DataContext="{Binding}"
+                                     />
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <!--  time points generator  -->
@@ -32,22 +39,32 @@
             <local:TimePointsGenerator DataContext="{Binding TimePointsGeneratorModel}" />
         </materialDesign:DrawerHost.RightDrawerContent>-->
 
-        <DockPanel Margin="10,0,10,0" LastChildFill="True">
-            <local:MainMenu DockPanel.Dock="Top" DataContext="{Binding}" />
+        <DockPanel Margin="10,0,10,0"
+                   LastChildFill="True"
+                   >
+            <local:MainMenu DockPanel.Dock="Top"
+                            DataContext="{Binding}"
+                            />
 
-            <materialDesign:ColorZone VerticalAlignment="Center" Background="Transparent">
+            <materialDesign:ColorZone VerticalAlignment="Center"
+                                      Background="Transparent"
+                                      >
                 <!--  Content  -->
                 <Grid Margin="0,0,0,20">
                     <Grid.Resources>
                         <DataTemplate x:Key="gp_Green">
-                            <local:Timer DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=DataContext}"
+                            <local:Timer DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                              AncestorType=Control},
+                                                               Path=DataContext}"
                                          DigitBackground="#004000"
                                          Foreground="#00FF00"
                                          />
                         </DataTemplate>
 
                         <DataTemplate x:Key="gp_Red">
-                            <local:Timer DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, Path=DataContext}"
+                            <local:Timer DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                              AncestorType=Control},
+                                                               Path=DataContext}"
                                          DigitBackground="#400000"
                                          Foreground="#FF0000"
                                          />
@@ -59,8 +76,8 @@
                     <!--  Digit Panel  -->
                     <ContentControl x:Name="m_DigitPanel"
                                     DockPanel.Dock="Top"
-                                    DataContext="{Binding}"
                                     HorizontalAlignment="Center"
+                                    DataContext="{Binding}"
                                     Content="{Binding IsBreak}"
                                     ContentTemplateSelector="{StaticResource dts_DigitPanel}"
                                     />

@@ -10,50 +10,57 @@
              mc:Ignorable="d"
              >
     <!--  top menu buttons  -->
-    <DockPanel DockPanel.Dock="Top" VerticalAlignment="Center">
+    <DockPanel DockPanel.Dock="Top"
+               VerticalAlignment="Center"
+               >
+        <DockPanel.Resources>
+            <Style x:Key="st_MenuToggleButton"
+                   TargetType="ToggleButton"
+                   BasedOn="{StaticResource MaterialDesignIconButton}"
+                   >
+                <Setter Property="DockPanel.Dock" Value="Left" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                <Style.Triggers>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary}" />
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="False">
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </DockPanel.Resources>
         <!--  version  -->
         <TextBlock DockPanel.Dock="Right"
                    Margin="5,5,10,5"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   Text="{Binding AssemblyVersion, FallbackValue=v 1.0.1.0}"
+                   Text="{Binding AssemblyVersion,
+                                  FallbackValue=v 1.0.1.0}"
                    Foreground="#4E6876"
                    />
         <!--  running time points  -->
-        <ToggleButton DockPanel.Dock="Left"
-                      HorizontalAlignment="Left"
+        <ToggleButton Style="{StaticResource st_MenuToggleButton}"
                       Content="{materialDesign:PackIcon TimerPlayOutline}"
-                      IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=(local:UIAssistant.AreRunningTimePointsShown)}"
+                      IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                         AncestorType=Window},
+                                          Path=(local:UIAssistant.AreRunningTimePointsShown)}"
                       ToolTip="Playlist"
-                      >
-            <ToggleButton.Style>
-                <Style TargetType="ToggleButton" BasedOn="{StaticResource MaterialDesignIconButton}">
-                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
-                    <Style.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary}" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="False">
-                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ToggleButton.Style>
-        </ToggleButton>
+                      />
         <!--  time points generator open button  -->
-        <Button DockPanel.Dock="Left"
-                HorizontalAlignment="Left"
-                Command="{Binding LoadTimePointsGeneratorCommand}"
-                Content="{materialDesign:PackIcon TimerCogOutline}"
-                IsEnabled="False"
-                Style="{StaticResource MaterialDesignIconButton}"
-                ToolTip="Playlist constructor"
-                />
+        <ToggleButton Style="{StaticResource st_MenuToggleButton}"
+                      Content="{materialDesign:PackIcon TimerCogOutline}"
+                      IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                         AncestorType=Window},
+                                          Path=(local:UIAssistant.IsTimePointsGeneratorShown)}"
+                      ToolTip="Generator"
+                      />
         <!--  telegram bot settings open dialog button  -->
         <Button x:Name="m_OpenTelegramBotCredentialsButton"
                 DockPanel.Dock="Left"
-                HorizontalAlignment="Left"
                 Command="{Binding LoadBotSettingsModelCommand}"
+                HorizontalAlignment="Left"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 RenderTransformOrigin="0.5,0.5"
                 Style="{StaticResource MaterialDesignIconButton}"
@@ -68,5 +75,24 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
+        <!--  save time points button  -->
+        <Button DockPanel.Dock="Left"
+                Command="{Binding SaveTimePointsFileCommand}"
+                Margin="3,0,0,0"
+                HorizontalAlignment="Left"
+                Content="{materialDesign:PackIcon ContentSaveOutline}"
+                IsEnabled="False"
+                Style="{StaticResource MaterialDesignIconButton}"
+                ToolTip="Playlist constructor"
+                />
+        <!--  save time points button  -->
+        <Button DockPanel.Dock="Left"
+                Command="{Binding OpenTimePointsFileCommand}"
+                HorizontalAlignment="Left"
+                Content="{materialDesign:PackIcon FolderOpenOutline}"
+                IsEnabled="False"
+                Style="{StaticResource MaterialDesignIconButton}"
+                ToolTip="Playlist constructor"
+                />
     </DockPanel>
 </UserControl>
