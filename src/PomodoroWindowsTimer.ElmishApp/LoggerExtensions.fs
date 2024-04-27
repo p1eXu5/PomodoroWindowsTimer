@@ -7,7 +7,7 @@ open PomodoroWindowsTimer
 [<AutoOpen>]
 module MessageScope =
     let private loggerMessage = LoggerMessage.DefineScope<string>(
-        "Scope of Message: {Message}."
+        "Scope of Message: {Msg}."
     )
 
     type LoggerExtensions () =
@@ -21,7 +21,7 @@ module UnprocessedMessage =
     let private loggerMessage = LoggerMessage.Define<string, string>(
         LogLevel.Warning,
         new EventId(0b0_1111_0001, "Unprocessabele Elmish Message"),
-        "Unprocessabele message: {Message}. Model: {Model}."
+        "Unprocessabele message: {Msg}. Model: {Model}."
     )
 
     type LoggerExtensions () =

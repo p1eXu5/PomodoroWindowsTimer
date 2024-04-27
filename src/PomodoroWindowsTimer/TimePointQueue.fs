@@ -54,6 +54,25 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
         logStartHandle scopeName
         scope
 
+    let startHandleWithArgMessage =
+        LoggerMessage.Define<string, string>(
+            LogLevel.Trace,
+            new EventId(0b0_0001_0001, "Start Handle TimePointQueue Message"),
+            "Start handling {TimePointQueueMsgName} message with args: {MsgArgs}..."
+        )
+
+    let logStartHandleWithArgs (scopeName: string) (args: 'a) =
+        if logger.IsEnabled(LogLevel.Trace) then
+            let json = JsonHelpers.Serialize args
+            startHandleWithArgMessage.Invoke(logger, scopeName, json, null)
+        else
+            startHandleWithArgMessage.Invoke(logger, scopeName, args.GetType().Name, null)
+
+    let beginScopeWithArgs (scopeName: string) (args: 'a) =
+        let scope = messageScope.Invoke(logger, scopeName)
+        logStartHandleWithArgs scopeName args
+        scope
+
     let newStateMessage =
         LoggerMessage.Define<string>(
             LogLevel.Trace,
@@ -145,7 +164,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                         return! loop state
 
                     | Scroll (id, reply) ->
-                        use scope = beginScope (nameof Scroll)
+                        use scope = beginScopeWithArgs (nameof Scroll) id
 
                         if state.Queue.Count = 0 then
                             logger.LogDebug("Queue is empty")
