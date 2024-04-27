@@ -6,11 +6,12 @@ open PomodoroWindowsTimer.Types
 
 type ITimePointQueue =
     inherit IDisposable
+    abstract AddMany : TimePoint seq -> unit
     abstract Start : unit -> unit
-    abstract TryEnqueue : TimePoint option with get
+    abstract TryGetNext : unit -> TimePoint option
     abstract Reload : TimePoint list -> unit
-    abstract TryPick : TimePoint option
-    abstract Scroll : Guid -> unit
+    abstract TryPick : unit -> TimePoint option
+    abstract ScrollTo : Guid -> unit
 
 type ILooper =
     inherit IDisposable

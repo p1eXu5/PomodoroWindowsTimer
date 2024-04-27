@@ -123,7 +123,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
 
                     let initialize state =
                         async {
-                            let tpOpt = timePointQueue.TryEnqueue
+                            let tpOpt = timePointQueue.TryGetNext()
 
                             let dt = DateTime.Now
 
@@ -148,7 +148,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                     | PreloadTimePoint when state.ActiveTimePoint |> Option.isNone ->
                         use scope = beginScope (nameof PreloadTimePoint)
 
-                        let tpOpt = timePointQueue.TryPick
+                        let tpOpt = timePointQueue.TryPick()
                         tpOpt
                         |> Option.iter (fun atp -> LooperEvent.TimePointStarted (atp, None) |> tryPostEvent)
 
@@ -174,7 +174,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                         let atp = { atp with TimeSpan = atp.TimeSpan - (dt - state.StartTime) }
 
                         if MathF.Floor(float32 atp.TimeSpan.TotalSeconds) = 0f then
-                            let tpOpt = timePointQueue.TryEnqueue
+                            let tpOpt = timePointQueue.TryGetNext()
                             match tpOpt with
                             | None ->
                                 tryPostEvent (LooperEvent.TimePointTimeReduced atp)

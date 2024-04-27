@@ -124,7 +124,7 @@ let update
         , Cmd.none
 
     | StartTimePoint (Operation.Start id) ->
-        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.Scroll id (Operation.Finish >> Msg.StartTimePoint) OnError ]
+        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) OnError ]
 
     | StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg (PlayerMsg.Play |> Msg.PlayerMsg)
