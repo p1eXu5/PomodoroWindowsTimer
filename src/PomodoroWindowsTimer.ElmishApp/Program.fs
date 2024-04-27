@@ -6,6 +6,9 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 
+[<Literal>]
+let internal tickMilliseconds = 200<ms>
+
 let internal main
     (window: System.Windows.Window)
     (themeSwitcher: IThemeSwitcher)
@@ -16,7 +19,7 @@ let internal main
     let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
         CompositionRoot.compose
             "Pomodoro Windows Timer"
-            200<ms>
+            tickMilliseconds
             themeSwitcher
             userSettings
             errorMessageQueue

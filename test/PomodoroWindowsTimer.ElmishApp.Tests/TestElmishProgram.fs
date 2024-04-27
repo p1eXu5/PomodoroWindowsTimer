@@ -8,6 +8,9 @@ open PomodoroWindowsTimer.ElmishApp
 open NUnit.Framework
 open TestServices
 open PomodoroWindowsTimer.Types
+open Microsoft.Extensions.Logging
+open p1eXu5.AspNetCore.Testing.Logging
+open NUnit.Framework
 
 type TestElmishProgram =
     {
@@ -37,7 +40,7 @@ module TestElmishProgram =
         let testBotConfiguration = TestBotConfiguration.create ()
         let sendToBot = TestBotSender.create ()
 
-        fun looper timePointQueue ->
+        fun () ->
             {
                 BotSettings = testBotConfiguration
                 SendToBot = sendToBot
@@ -52,53 +55,50 @@ module TestElmishProgram =
             }
 
     let run mainModelCfgFactory =
-        let timePointQueue = new TimePointQueue()
-        let looper = new Looper((timePointQueue :> ITimePointQueue), 200<ms>)
-        
+        let testLoggerFactory = TestLoggerFactory.CreateWith(TestContext.Progress, TestContext.Out)
+
         let mainModelCfg =
-            mainModelCfgFactory looper timePointQueue
+            mainModelCfgFactory ()
+
+        let (initMainModel, updateMainModel, _, subscribe) =
+            CompositionRoot.compose
+                "Pomodoro Windows Timer"
+                Program.tickMilliseconds
+                (TestThemeSwitcher.create ())
+                (TestUserSettings.create ())
+                (TestErrorMessageQueue.create ())
+                testLoggerFactory
 
         let testElmishProgram =
             {
                 Looper = looper
                 TestDispatch = TestDispatch()
-                MainModel = MainModel.initDefault ()
+                MainModel = Unchecked.defaultof<_>
                 TestDispatchSubscriber = Unchecked.defaultof<_>
                 MainModelCfg = mainModelCfg
             }
 
 
-        let subscribe _ =
-            let looperEffect dispatch =
-                let onLooperEvt =
-                    fun evt ->
-                        async {
-                            do dispatch (MainModel.Msg.LooperMsg evt)
-                        }
-
-                looper.AddSubscriber(onLooperEvt)
+        let subscribe m : (SubId * Subscribe<_>) list =
 
             let sendExtMsgEffect dispatch =
                 testElmishProgram.TestDispatchSubscriber <-
                     testElmishProgram.TestDispatch.MsgDispatchRequested.Subscribe(fun msg -> dispatch msg)
+                { new System.IDisposable with 
+                    member _.Dispose() = ()
+                }
 
-            [ looperEffect; sendExtMsgEffect ]
+            ( ["sendExtMsgEffect"], sendExtMsgEffect ) :: (subscribe m)
 
         looper.Start()
 
-
         do
             Program.mkProgram 
-                (fun () ->
-                    MainModel.init
-                        (TestSettingsManager.create ())
-                        (TestErrorMessageQueue.create ())
-                        mainModelCfg
-                ) 
-                (MainModel.Program.update mainModelCfg)
+                initMainModel
+                updateMainModel
                 (fun m _ -> testElmishProgram.MainModel <- m)
             |> Program.withSubscription subscribe
-            |> Program.withTrace (fun msg _ -> TestContext.WriteLine(sprintf "%A" msg))
+            |> Program.withTrace (fun msg _ _ -> TestContext.WriteLine(sprintf "%A" msg))
             |> Program.run
 
         testElmishProgram

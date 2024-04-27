@@ -43,11 +43,11 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ButtonBase}">
-                            <Grid>
-                                <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:ShadowAssist.CacheMode)}">
-                                    <Grid HorizontalAlignment="Center">
+                            <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:ShadowAssist.CacheMode)}">
+                                <Grid Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ButtonBase}}, Path=ActualWidth}">
+
+                                    <Grid Margin="1" HorizontalAlignment="Stretch">
                                         <Border x:Name="border"
-                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ButtonBase}}, Path=ActualWidth}"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}"
                                                 CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
@@ -62,8 +62,18 @@
                                                           Content="{TemplateBinding Content}"
                                                           />
                                     </Grid>
-                                </AdornerDecorator>
-                            </Grid>
+                                    <Border x:Name="m_OuterBottomLeftShadowBorder"
+                                            BorderBrush="#1F4F1F"
+                                            BorderThickness="1,0,0,1"
+                                            CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                            />
+                                    <Border x:Name="m_OuterTopRightShadowBorder"
+                                            BorderBrush="#003000"
+                                            BorderThickness="0,1,1,0"
+                                            CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                            />
+                                </Grid>
+                            </AdornerDecorator>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter Property="BorderThickness" Value="0" />

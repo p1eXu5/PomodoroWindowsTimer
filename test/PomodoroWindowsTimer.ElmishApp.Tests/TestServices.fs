@@ -15,7 +15,7 @@ open PomodoroWindowsTimer.Types
 let faker = Faker("en")
 
 [<RequireQualifiedAccess>]
-module TestSettingsManager =
+module TestUserSettings =
 
     let private dict = Dictionary<string, obj>()
 
@@ -28,9 +28,13 @@ module TestSettingsManager =
         dict.Add(key, v)
 
     let create () =
-        { new ISettingsManager with
-            member _.Load (key: string) : obj = load key
-            member _.Save (key: string) (value: obj) : unit = save key value
+        { new IUserSettings with
+            member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
+            member _.MyChatId with get () = dict["MyChatId"] :?> string option and set v = dict["MyChatId"] <- v
+            member _.Patterns with get () = dict["Patterns"] :?> Pattern list and set v = dict["Patterns"] <- v
+            member _.TimePointPrototypesSettings with get () = dict["TimePointPrototypesSettings"] :?> string option and set v = dict["TimePointPrototypesSettings"] <- v
+            member _.TimePointSettings with get () = dict["TimePointSettings"] :?> string option and set v = dict["TimePointSettings"] <- v
+            member _.DisableSkipBreak with get () = dict["DisableSkipBreak"] :?> bool and set v = dict["DisableSkipBreak"] <- v
         }
 
     do
@@ -41,9 +45,10 @@ module TestSettingsManager =
 [<RequireQualifiedAccess>]
 module TestErrorMessageQueue =
 
-    let create () =
+    let create () : IErrorMessageQueue =
         { new IErrorMessageQueue with
-            member _.EnqueuError _ = () }
+            member _.EnqueueError _ = ()
+        }
 
 
 [<RequireQualifiedAccess>]
@@ -65,7 +70,7 @@ module TestBotSender =
 
     let messages = List<string>()
 
-    let sendToBot _ message =
+    let sendToBot (message: Message) =
         task {
             messages.Add(message)
             return ()
@@ -170,7 +175,7 @@ module TestDisableSkipBreakSettings =
 
 
 type TestDispatch () =
-    let timeout = Program.tickMilliseconds * 2 + (Program.tickMilliseconds / 2)
+    let timeout = ((int Program.tickMilliseconds) * 2 + ((int Program.tickMilliseconds) / 2))
 
     let msgDispatchRequestedEvent = new Event<_>()
 

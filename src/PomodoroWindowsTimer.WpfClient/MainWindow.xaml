@@ -27,8 +27,8 @@
         TextOptions.TextFormattingMode="Ideal"
         TextOptions.TextRenderingMode="Auto"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource br_Base}"
         mc:Ignorable="d"
+        Background="{StaticResource br_Base}"
         >
     <Window.Resources>
         <DataTemplate x:Key="dt_BotSettingsDialog">
@@ -43,8 +43,7 @@
                                DialogTheme="Inherit"
                                Identifier="RootDialog"
                                IsOpen="{Binding IsDialogOpened}"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
-                                                              Path=MessageQueue}"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar, Path=MessageQueue}"
                                >
         <!--<Behaviors:Interaction.Triggers>
             <Behaviors:EventTrigger EventName="DialogClosing">
@@ -54,24 +53,12 @@
 
         <Grid>
             <!--  gloss rect  -->
-            <Rectangle Width="{Binding ElementName=m_Root,
-                                       Path=ActualWidth}"
-                       Height="{Binding ElementName=m_Root,
-                                        Path=ActualHeight}"
+            <Rectangle Width="{Binding ElementName=m_Root, Path=ActualWidth}"
+                       Height="{Binding ElementName=m_Root, Path=ActualHeight}"
                        Opacity="0.7"
                        >
                 <Rectangle.OpacityMask>
-                    <RadialGradientBrush Center="{Binding ElementName=m_Root,
-                                                          Path=ActualWidth,
-                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
-                                         GradientOrigin="{Binding ElementName=m_Root,
-                                                                  Path=ActualWidth,
-                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
-                                         MappingMode="Absolute"
-                                         RadiusX="500"
-                                         RadiusY="500"
-                                         SpreadMethod="Pad"
-                                         >
+                    <RadialGradientBrush Center="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToCenterPoint}}" GradientOrigin="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToTopRightPoint}}" MappingMode="Absolute" RadiusX="500" RadiusY="500" SpreadMethod="Pad">
                         <RadialGradientBrush.GradientStops>
                             <GradientStop Offset="0" Color="#FF000000" />
                             <GradientStop Offset="1" Color="#00000000" />
@@ -87,9 +74,7 @@
                             <DrawingImage>
                                 <DrawingImage.Drawing>
                                     <DrawingGroup>
-                                        <ImageDrawing ImageSource="{StaticResource img_Gloss}"
-                                                      Rect="0,0,256,256"
-                                                      />
+                                        <ImageDrawing ImageSource="{StaticResource img_Gloss}" Rect="0,0,256,256" />
                                     </DrawingGroup>
                                 </DrawingImage.Drawing>
                             </DrawingImage>
@@ -113,7 +98,8 @@
                       Height="350"
                       Margin="0,30,0,0"
                       >
-                    <Border BorderThickness="0"
+                    <Border x:Name="m_BlackPane"
+                            BorderThickness="0"
                             CornerRadius="4"
                             Background="Black"
                             >
@@ -130,7 +116,9 @@
                                         CornerRadius="4"
                                         />
                             </Grid>
-                            <Border BorderBrush="#101010"
+
+                            <Border x:Name="m_OuterBottomLeftShadowBorder"
+                                    BorderBrush="#101010"
                                     BorderThickness="1,0,0,1"
                                     CornerRadius="4"
                                     />
@@ -152,17 +140,7 @@
                                     </LinearGradientBrush>
                                 </Rectangle.Fill>
                                 <Rectangle.OpacityMask>
-                                    <RadialGradientBrush Center="{Binding ElementName=m_Root,
-                                                                          Path=ActualWidth,
-                                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
-                                                         GradientOrigin="{Binding ElementName=m_Root,
-                                                                                  Path=ActualWidth,
-                                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
-                                                         MappingMode="Absolute"
-                                                         RadiusX="500"
-                                                         RadiusY="500"
-                                                         SpreadMethod="Pad"
-                                                         >
+                                    <RadialGradientBrush Center="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToCenterPoint}}" GradientOrigin="{Binding ElementName=m_Root, Path=ActualWidth, Converter={StaticResource conv_ActualWidthToTopRightPoint}}" MappingMode="Absolute" RadiusX="500" RadiusY="500" SpreadMethod="Pad">
                                         <RadialGradientBrush.GradientStops>
                                             <GradientStop Offset="0" Color="#FF000000" />
                                             <GradientStop Offset="1" Color="#00000000" />
@@ -171,7 +149,8 @@
                                 </Rectangle.OpacityMask>
 
                             </Rectangle>
-                            <Border BorderBrush="#0A0A0A"
+                            <Border x:Name="m_OuterTopRightShadowBorder"
+                                    BorderBrush="#0A0A0A"
                                     BorderThickness="0,1,1,0"
                                     CornerRadius="4"
                                     />
@@ -180,8 +159,8 @@
                 </Grid>
 
                 <usercontrols:ControlButtons DockPanel.Dock="Top"
-                                             VerticalAlignment="Top"
                                              DataContext="{Binding}"
+                                             VerticalAlignment="Top"
                                              />
             </DockPanel>
         </Grid>
