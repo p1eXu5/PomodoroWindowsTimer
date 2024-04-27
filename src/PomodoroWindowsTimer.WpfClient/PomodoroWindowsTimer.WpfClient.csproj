@@ -10,8 +10,8 @@
     
     <Title>Pomodoro Windows Timer</Title>
 
-    <AssemblyVersion>2.0.2</AssemblyVersion>
-    <FileVersion>2.0.2.0</FileVersion>
+    <AssemblyVersion>2.0.3</AssemblyVersion>
+    <FileVersion>2.0.3.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
     
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
