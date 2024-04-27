@@ -38,7 +38,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
         LoggerMessage.Define<string>(
             LogLevel.Debug,
             new EventId(0b0_0001_0001, "Start Handle TimePointQueue Message"),
-            "Start handle {TimePointQueueMsgName}"
+            "Start handling {TimePointQueueMsgName} message..."
         )
 
     let logStartHandle (scopeName: string) =
@@ -90,32 +90,44 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
             let json = JsonHelpers.Serialize(tp)
             nextTimePointMessage.Invoke(logger, json, priority, null)
 
+    let endHandleMessage =
+        LoggerMessage.Define<string>(
+            LogLevel.Debug,
+            new EventId(0b0_0001_1000, "End Handle TimePointQueue Message"),
+            "{TimePointQueueMsgName} has been handled."
+        )
+
+    let closeScope (scope: IDisposable) (msgName: string) =
+        endHandleMessage.Invoke(logger, msgName, null)
+        scope.Dispose()
+
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->
             let rec loop state =
-                let enqueue timePoints priority =
-                    timePoints
-                    |> Seq.fold (fun p tp ->
-                        state.Queue.Enqueue(tp, p)
-                        p + 1f
-                    ) priority
-
-
                 async {
                     let! msg = inbox.Receive()
                         
                     match msg with
                     | Reset ->
-                        logStartHandle (nameof Reset)
-                        return! loop State.Default
+                        use scope = beginScope (nameof Reset)
+                        let newState = State.Default
+                        closeScope scope (nameof Reset)
+                        return! loop newState
 
                     | AddMany timePoints ->
                         use scope = beginScope (nameof AddMany)
 
-                        let state = { state with MaxPriority = enqueue timePoints (state.MaxPriority) }
+                        let maxPriority =
+                            timePoints
+                            |> Seq.fold (fun p tp ->
+                                state.Queue.Enqueue(tp, p)
+                                p + 1f
+                            ) state.MaxPriority
+
+                        let state = { state with MaxPriority = maxPriority }
                         logNewState state
 
-                        scope.Dispose()
+                        closeScope scope (nameof AddMany)
                         return! loop state
 
 
@@ -129,7 +141,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                         logTimePoints xtp
                         reply.Reply xtp
 
-                        scope.Dispose()
+                        closeScope scope (nameof GetTimePointsWithPriority)
                         return! loop state
 
                     | Scroll (id, reply) ->
@@ -139,17 +151,31 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                             logger.LogDebug("Queue is empty")
                             reply.Reply(())
                         else
-                            while state.Queue.First.Id <> id do
-                                let priority = state.Queue.GetPriority(state.Queue.First)
-                                let tp = state.Queue.Dequeue()
-                                state.Queue.Enqueue(tp, priority + state.MaxPriority)
+                            let rec move queue stack =
+                                match queue with
+                                | [] ->
+                                    logger.LogWarning("Scroll is failed, time point with target id {TimePointId} has not been found in queue", id)
+                                    state
+                                | tp :: tail when tp.Id = id ->
+                                    let (newQueue, maxPriority) =
+                                        (tp :: tail) @ (stack |> List.rev)
+                                        |> Seq.fold (fun (newQueue: SimplePriorityQueue<TimePoint>, p) tp ->
+                                            newQueue.Enqueue(tp, p)
+                                            (newQueue, p + 1f)
+                                        ) (SimplePriorityQueue<TimePoint>(), 0f)
+                                    {
+                                        Queue = newQueue
+                                        MaxPriority = maxPriority
+                                    }
+                                | tp :: tail ->
+                                    move tail (tp :: stack)
 
-                            let state = { state with MaxPriority = state.MaxPriority + (float32 state.Queue.Count) }
+                            let state = move (state.Queue |> Seq.toList) []
                             logNewState state
 
                             reply.Reply(())
 
-                        scope.Dispose()
+                        closeScope scope (nameof Scroll)
                         return! loop state
 
 
@@ -170,7 +196,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                             logNextTimePoint tp priority
                             reply.Reply(tp |> Some)
 
-                        scope.Dispose()
+                        closeScope scope (nameof GetNext)
                         return! loop state
 
                     | Pick reply ->
@@ -185,7 +211,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                             logNextTimePoint tp priority
                             reply.Reply(tp |> Some)
 
-                        scope.Dispose()
+                        closeScope scope (nameof Pick)
                         return! loop state
                 }
 
