@@ -147,7 +147,7 @@ module MainModel =
 
     let setActiveTimePoint tp m = { m with ActiveTimePoint = tp; LastCommandInitiator = None }
 
-    let isUIInitiator tp m =
+    let isUIInitiator (tp: TimePoint) m =
         match m.LastCommandInitiator with
         | Some (UIInitiator atp) -> atp.Id = tp.Id
         | _ -> false

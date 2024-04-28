@@ -37,6 +37,15 @@ type TimePointPrototype =
 
 type Pattern = string
 
+type Work =
+    {
+        Id: int
+        Number: string option
+        Title: string
+        CreatedAt: DateTimeOffset
+        UpdatedAt: DateTimeOffset
+    }
+
 
 module Alias =
     let create str =

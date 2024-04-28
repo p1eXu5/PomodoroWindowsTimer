@@ -49,4 +49,8 @@
     <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="8.0.300-beta.24178.1" />
+  </ItemGroup>
+
 </Project>

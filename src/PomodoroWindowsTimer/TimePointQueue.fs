@@ -188,7 +188,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
                         state.Queue.Clear()
 
-                        let rec move minPriority queue priority =
+                        let rec move minPriority (queue: TimePoint list) priority =
                             match queue with
                             | [] ->
                                 logger.LogWarning("Scroll is failed, time point with target id {TimePointId} has not been found in queue", id)
