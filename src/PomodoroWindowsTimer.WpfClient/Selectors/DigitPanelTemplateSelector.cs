@@ -1,9 +1,9 @@
-﻿using System.Windows.Controls;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace PomodoroWindowsTimer.WpfClient;
 
-public class DigitPanelTemplateSelector : DataTemplateSelector
+public sealed class DigitPanelTemplateSelector : DataTemplateSelector
 {
     public override DataTemplate? SelectTemplate(object isBreak, DependencyObject container)
     {

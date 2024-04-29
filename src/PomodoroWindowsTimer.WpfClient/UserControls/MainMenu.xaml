@@ -5,6 +5,8 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=vm:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="50"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -41,30 +43,33 @@
                    Foreground="#4E6876"
                    />
         <!--  running time points  -->
-        <ToggleButton Style="{StaticResource st_MenuToggleButton}"
-                      Content="{materialDesign:PackIcon TimerPlayOutline}"
+        <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"
+                      ToolTip="Playlist"
+                      Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                          AncestorType=Window},
                                           Path=(local:UIAssistant.AreRunningTimePointsShown)}"
-                      ToolTip="Playlist"
                       />
         <!--  time points generator open button  -->
-        <ToggleButton Style="{StaticResource st_MenuToggleButton}"
-                      Content="{materialDesign:PackIcon TimerCogOutline}"
+        <ToggleButton Content="{materialDesign:PackIcon TimerCogOutline}"
+                      ToolTip="Generator"
+                      Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                          AncestorType=Window},
-                                          Path=(local:UIAssistant.IsTimePointsGeneratorShown)}"
-                      ToolTip="Generator"
+                                          Path=(local:UIAssistant.IsRightLcdDrawerOpen)}"
                       />
         <!--  telegram bot settings open dialog button  -->
-        <Button x:Name="m_OpenTelegramBotCredentialsButton"
-                DockPanel.Dock="Left"
-                Command="{Binding LoadBotSettingsModelCommand}"
-                HorizontalAlignment="Left"
+        <Button DockPanel.Dock="Left"
+                x:Name="m_OpenTelegramBotCredentialsButton"
+                xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+                d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
+                DataContext="{Binding AppDialog}"
+                Command="{Binding OpenBotSettingsDialogCommand}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
-                RenderTransformOrigin="0.5,0.5"
-                Style="{StaticResource MaterialDesignIconButton}"
                 ToolTip="Telegram bot settings"
+                Style="{StaticResource MaterialDesignIconButton}"
+                HorizontalAlignment="Left"
+                RenderTransformOrigin="0.5,0.5"
                 >
             <Button.RenderTransform>
                 <TransformGroup>
@@ -75,24 +80,25 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
+
         <!--  save time points button  -->
         <Button DockPanel.Dock="Left"
                 Command="{Binding SaveTimePointsFileCommand}"
+                Content="{materialDesign:PackIcon ContentSaveOutline}"
+                ToolTip="Playlist constructor"
+                Style="{StaticResource MaterialDesignIconButton}"
                 Margin="3,0,0,0"
                 HorizontalAlignment="Left"
-                Content="{materialDesign:PackIcon ContentSaveOutline}"
                 IsEnabled="False"
-                Style="{StaticResource MaterialDesignIconButton}"
-                ToolTip="Playlist constructor"
                 />
         <!--  save time points button  -->
         <Button DockPanel.Dock="Left"
                 Command="{Binding OpenTimePointsFileCommand}"
-                HorizontalAlignment="Left"
                 Content="{materialDesign:PackIcon FolderOpenOutline}"
-                IsEnabled="False"
-                Style="{StaticResource MaterialDesignIconButton}"
                 ToolTip="Playlist constructor"
+                Style="{StaticResource MaterialDesignIconButton}"
+                HorizontalAlignment="Left"
+                IsEnabled="False"
                 />
     </DockPanel>
 </UserControl>

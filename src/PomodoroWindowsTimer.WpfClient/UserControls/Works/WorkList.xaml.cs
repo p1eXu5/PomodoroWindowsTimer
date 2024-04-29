@@ -13,13 +13,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PomodoroWindowsTimer.WpfClient.UserControls;
+namespace PomodoroWindowsTimer.WpfClient.UserControls.Works;
 /// <summary>
-/// Interaction logic for WorkSelector.xaml
+/// Interaction logic for WorkList.xaml
 /// </summary>
-public partial class WorkSelector : UserControl
+public partial class WorkList : UserControl
 {
-    public WorkSelector()
+    public WorkList()
     {
         InitializeComponent();
     }

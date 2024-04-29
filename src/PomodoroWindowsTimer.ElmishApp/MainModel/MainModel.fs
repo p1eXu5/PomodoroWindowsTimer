@@ -90,6 +90,7 @@ module MainModel =
         | PostChangeActiveTimeSpan
 
         | AppDialogModelMsg of AppDialogModel.Msg
+        | WorkSelectorModelMsg of WorkSelectorModel.Msg
         
         | OnError of string
         | OnExn of exn
@@ -118,7 +119,14 @@ module MainModel =
                     PlayerMsg.Next |> Msg.PlayerMsg |> Some
             )
 
-    //module MsgWith =
+    module MsgWith =
+
+        let (|WorkSelectorModelMsg|_|) (model: MainModel) (msg: Msg) =
+            match msg, model.WorkSelector with
+            | Msg.WorkSelectorModelMsg smsg, Some sm ->
+                (smsg, sm) |> Some
+            | _ -> None
+
 
     //    let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
     //        match msg, model.TimePointsGeneratorModel with
@@ -233,4 +241,7 @@ module MainModel =
 
     let withAppDialogModel addDialogModel (model: MainModel) =
          { model with AppDialog = addDialogModel }
+
+    let withWorkSelectorModel workSelectorModel (model: MainModel) =
+         { model with WorkSelector = workSelectorModel |> Some }
 

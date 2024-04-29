@@ -41,7 +41,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val BotSettingsDialog : Binding =
         nameof __.BotSettingsDialog
-            |> Binding.SubModel.opt (BotSettingsModel.Bindings.bindings)
+            |> Binding.SubModel.opt (BotSettingsModel.Bindings.ToList)
             |> Binding.mapModel (botSettingsModel)
             |> Binding.mapMsg (Msg.BotSettingsModelMsg)
 

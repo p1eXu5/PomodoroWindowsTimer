@@ -1,4 +1,4 @@
-﻿module PomodoroWindowsTimer.ElmishApp.MainModel.Bindings
+﻿namespace PomodoroWindowsTimer.ElmishApp.MainModel
 
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
@@ -158,7 +158,14 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
             |> Binding.mapModel _.AppDialog
             |> Binding.mapMsg Msg.AppDialogModelMsg
 
+    member val WorkSelector : Binding =
+        nameof __.WorkSelector
+            |> Binding.SubModel.opt (WorkSelectorModel.Bindings.ToList)
+            |> Binding.mapModel _.WorkSelector
+            |> Binding.mapMsg Msg.WorkSelectorModelMsg
 
+
+(*
 let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> list =
     [
         // "BotSettingsModel"
@@ -195,5 +202,6 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
 
         // "LoadBotSettingsModelCommand" |> Binding.cmd Msg.LoadBotSettingsModel
     ]
+*)
 
 

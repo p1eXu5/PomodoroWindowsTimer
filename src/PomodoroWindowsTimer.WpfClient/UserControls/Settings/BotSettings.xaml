@@ -5,46 +5,49 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             DataContext="{Binding BotSettingsDialog}"
              Width="450"
              Height="200"
-             mc:Ignorable="d"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
+             mc:Ignorable="d"
              >
     <StackPanel Margin="10"
                 VerticalAlignment="Center"
                 Orientation="Vertical"
                 >
-        <TextBox Width="350"
+        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Width="350"
                  Margin="0"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Bot token"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding BotToken}"
                  />
-        <TextBox Width="350"
+        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Width="350"
                  Margin="0,10,0,20"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Chat ID"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding ChatId}"
                  />
 
-        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+        <StackPanel HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
             <Button DockPanel.Dock="Bottom"
-                    Margin="10"
-                    HorizontalAlignment="Center"
                     Command="{Binding ApplyCommand}"
                     Content="APPLY"
                     Style="{StaticResource MaterialDesignFlatSecondaryButton}"
-                    />
-            <Button DockPanel.Dock="Bottom"
                     Margin="10"
                     HorizontalAlignment="Center"
+                    />
+            <Button DockPanel.Dock="Bottom"
                     Command="{Binding CancelCommand}"
                     Content="CANCEL"
-                    IsCancel="True"
                     Style="{StaticResource MaterialDesignFlatButton}"
+                    Margin="10"
+                    HorizontalAlignment="Center"
+                    IsCancel="True"
                     />
         </StackPanel>
     </StackPanel>

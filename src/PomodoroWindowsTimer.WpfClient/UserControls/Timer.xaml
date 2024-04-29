@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Timer"
+             x:Name="m_Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,7 +7,6 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             x:Name="m_Root"
              d:DesignHeight="350"
              d:DesignWidth="600"
              d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
@@ -19,20 +19,20 @@
                     Visibility="{Binding IsCurrentWorkSet,
                                          Converter={StaticResource BooleanToVisibilityConverter}}"
                     >
-            <TextBlock Margin="1,0,0,10"
-                       DataContext="{Binding CurrentWork}"
+            <TextBlock DataContext="{Binding CurrentWork}"
+                       Margin="1,0,0,10"
                        Foreground="{Binding ElementName=m_Root,
                                             Path=Foreground}"
                        Text="{Binding Number,
                                       FallbackValue='DEV-0001'}"
                        />
-            <TextBlock MaxWidth="500"
+            <TextBlock DataContext="{Binding CurrentWork}"
+                       MaxWidth="500"
                        Margin="0,0,0,22"
                        Foreground="{Binding ElementName=m_Root,
                                             Path=Foreground}"
                        Text="{Binding Title,
                                       FallbackValue='[DEV-0001] Task title and description multilined'}"
-                       DataContext="{Binding CurrentWork}"
                        TextWrapping="Wrap"
                        FontSize="18"
                        />
@@ -59,7 +59,7 @@
                 <Style TargetType="digitPanel:TimerTable">
                     <Setter Property="DigitWidth" Value="100" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Path=(local:UIAssistant.AreRunningTimePointsShown),
+                        <DataTrigger Binding="{Binding Path=(local:UIAssistant.IsLeftLcdDrawerOpen),
                                                        RelativeSource={RelativeSource AncestorType=Window}}"
                                      Value="True"
                                      >

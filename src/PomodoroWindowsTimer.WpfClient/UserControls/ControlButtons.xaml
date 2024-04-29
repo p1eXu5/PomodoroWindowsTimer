@@ -57,11 +57,11 @@
                                                 />
 
                                         <ContentPresenter x:Name="MyContentPresenter"
+                                                          Content="{TemplateBinding Content}"
                                                           Height="{TemplateBinding Height}"
                                                           Margin="{TemplateBinding Padding}"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"
-                                                          Content="{TemplateBinding Content}"
                                                           />
                                     </Grid>
                                 </Grid>
@@ -107,13 +107,13 @@
                                      Converter={StaticResource BooleanToVisibilityConverter}}"
                 />
         <Button Command="{Binding PlayStopCommand}"
-                Margin="20,0,0,0"
                 Content="{Binding PlayPauseButtonText,
                                   FallbackValue=Resume}"
+                Margin="20,0,0,0"
                 />
         <Button Command="{Binding NextCommand}"
-                Margin="20,0,0,0"
                 Content="Next"
+                Margin="20,0,0,0"
                 Visibility="{Binding LooperIsRunning,
                                      Converter={StaticResource BooleanToVisibilityConverter}}"
                 />

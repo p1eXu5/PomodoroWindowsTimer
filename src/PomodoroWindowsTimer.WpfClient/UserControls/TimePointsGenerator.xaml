@@ -29,17 +29,17 @@
                    >
 
             <!--  Patterns combo box  -->
-            <Border x:Name="m_PatternsSection"
-                    DockPanel.Dock="Bottom"
+            <Border DockPanel.Dock="Bottom"
+                    x:Name="m_PatternsSection"
                     Margin="0,10,0,0"
                     Padding="10,10,10,16"
                     Background="{DynamicResource MaterialDesignToolBarBackground}"
                     >
                 <StackPanel>
                     <TextBlock DockPanel.Dock="Top"
+                               Style="{StaticResource MaterialDesignOverlineTextBlock}"
                                VerticalAlignment="Center"
                                FontSize="12"
-                               Style="{StaticResource MaterialDesignOverlineTextBlock}"
                                Text="Pattern:"
                                />
                     <ComboBox DockPanel.Dock="Bottom"
@@ -56,8 +56,8 @@
 
             <!--  Prototype list  -->
             <shared:TimePointList DockPanel.Dock="Top"
-                                  HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePointPrototypes}"
+                                  HorizontalAlignment="Stretch"
                                   Header="PROTOTYPES"
                                   TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
                                   TimePointListBoxScrollBarVisibility="Hidden"
@@ -84,17 +84,17 @@
                     <!--  CLOSE button  -->
                     <Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
                             CommandParameter="{x:Static Dock.Right}"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
                             Content="CLOSE"
                             Style="{StaticResource MaterialDesignFlatButton}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
                             />
                     <!--  APPLY button  -->
                     <Button Command="{Binding ApplyCommand}"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
                             Content="APPLY"
                             Style="{StaticResource MaterialDesignFlatButton}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
                             >
                         <Button.CommandParameter>
                             <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
@@ -108,8 +108,8 @@
             <!--  Generated TimePoint list  -->
             <shared:TimePointList Grid.Row="0"
                                   Grid.Column="1"
-                                  HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePoints}"
+                                  HorizontalAlignment="Stretch"
                                   Header="GENERATED TIME POINTS"
                                   TimePointListBoxItemTemplate="{StaticResource dt_EditableTimePoint}"
                                   TimePointListBoxScrollBarVisibility="Visible"

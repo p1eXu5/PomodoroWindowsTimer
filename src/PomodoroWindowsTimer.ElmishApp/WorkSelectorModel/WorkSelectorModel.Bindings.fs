@@ -1,4 +1,4 @@
-﻿module PomodoroWindowsTimer.ElmishApp.WorkSelectorModel.Bindings
+﻿namespace PomodoroWindowsTimer.ElmishApp.WorkSelectorModel
 
 open Elmish.WPF
 open Elmish.Extensions

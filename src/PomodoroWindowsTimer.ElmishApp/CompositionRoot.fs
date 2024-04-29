@@ -86,10 +86,17 @@ let compose
                 updateTimePointGeneratorModel
                 dialogErrorMessageQueue
 
+        let updateWorkListModel =
+            WorkListModel.Program.update workRepository (loggerFactory.CreateLogger<WorkListModel>()) mainErrorMessageQueue updateWorkModel
+
+        let updateWorkSelectorModel =
+            WorkSelectorModel.Program.update updateWorkListModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
+
         MainModel.Program.update
             mainModelCfg
             updateWorkModel
             updateAppDialogModel
+            updateWorkSelectorModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
 
@@ -100,7 +107,7 @@ let compose
 
     let mainModelBindings =
         fun () ->
-            MainModel.Bindings.Bindings.ToList title assemblyVer mainErrorMessageQueue dialogErrorMessageQueue
+            MainModel.Bindings.ToList title assemblyVer mainErrorMessageQueue dialogErrorMessageQueue
 
     // subscriptions
     let subscribe _ : (SubId * Subscribe<_>) list =

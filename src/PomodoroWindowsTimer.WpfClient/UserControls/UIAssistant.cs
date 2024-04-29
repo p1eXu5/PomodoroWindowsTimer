@@ -4,35 +4,38 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls;
 
 public static class UIAssistant
 {
-    public static readonly DependencyProperty AreRunningTimePointsShownProperty =
-            DependencyProperty.RegisterAttached(
-          "AreRunningTimePointsShown",
-          typeof(bool),
-          typeof(UIAssistant),
-          new FrameworkPropertyMetadata(defaultValue: false)
+    public static readonly DependencyProperty IsLeftLcdDrawerOpenProperty =
+        DependencyProperty.RegisterAttached(
+            "IsLeftLcdDrawerOpen",
+            typeof(bool),
+            typeof(UIAssistant),
+            new FrameworkPropertyMetadata(defaultValue: false)
         );
 
-    public static bool GetAreRunningTimePointsShown(UIElement target) =>
-        (bool)target.GetValue(AreRunningTimePointsShownProperty);
+    public static bool GetIsLeftLcdDrawerOpen(UIElement target) =>
+        (bool)target.GetValue(IsLeftLcdDrawerOpenProperty);
 
-    public static void SetAreRunningTimePointsShown(UIElement target, bool value) =>
-        target.SetValue(AreRunningTimePointsShownProperty, value);
+    public static void SetIsLeftLcdDrawerOpen(UIElement target, bool value) =>
+        target.SetValue(IsLeftLcdDrawerOpenProperty, value);
 
 
 
-    public static bool GetIsTimePointsGeneratorShown(DependencyObject obj)
+    // Using a DependencyProperty as the backing store for IsRightLcdDrawerOpen.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty IsRightLcdDrawerOpenProperty =
+        DependencyProperty.RegisterAttached(
+            "IsRightLcdDrawerOpen",
+            typeof(bool),
+            typeof(UIAssistant),
+            new PropertyMetadata(false)
+        );
+
+    public static bool GetIsRightLcdDrawerOpen(DependencyObject obj)
     {
-        return (bool)obj.GetValue(IsTimePointsGeneratorShownProperty);
+        return (bool)obj.GetValue(IsRightLcdDrawerOpenProperty);
     }
 
-    public static void SetIsTimePointsGeneratorShown(DependencyObject obj, bool value)
+    public static void SetIsRightLcdDrawerOpen(DependencyObject obj, bool value)
     {
-        obj.SetValue(IsTimePointsGeneratorShownProperty, value);
+        obj.SetValue(IsRightLcdDrawerOpenProperty, value);
     }
-
-    // Using a DependencyProperty as the backing store for IsTimePointsGeneratorShown.  This enables animation, styling, binding, etc...
-    public static readonly DependencyProperty IsTimePointsGeneratorShownProperty =
-        DependencyProperty.RegisterAttached("IsTimePointsGeneratorShown", typeof(bool), typeof(UIAssistant), new PropertyMetadata(false));
-
-
 }

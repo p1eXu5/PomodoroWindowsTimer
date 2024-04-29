@@ -4,9 +4,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient"
+             xmlns:MainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
+             d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -19,24 +22,26 @@
                                BottomDrawerCornerRadius="20 20 0 0"
                                IsLeftDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                                          AncestorType=Window},
-                                                          Path=(local:UIAssistant.AreRunningTimePointsShown)}"
+                                                          Path=(local:UIAssistant.IsLeftLcdDrawerOpen)}"
                                IsRightDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                                                           AncestorType=Window},
-                                                           Path=(local:UIAssistant.IsTimePointsGeneratorShown)}"
+                                                           Path=(local:UIAssistant.IsRightLcdDrawerOpen)}"
                                LeftDrawerBackground="Transparent"
                                RightDrawerBackground="Transparent"
                                OpenMode="Standard"
                                >
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <local:RunningTimePoints Width="350"
-                                     DataContext="{Binding}"
+            <local:RunningTimePoints DataContext="{Binding}"
+                                     Width="350"
                                      />
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <!--  time points generator  -->
+
+        <!--<materialDesign:DrawerHost.RightDrawerContent>
+        -->
+        <!--<works:WorkSelector DataContext="{Binding W}" />-->
         <!--
-        <materialDesign:DrawerHost.RightDrawerContent>
-            <local:TimePointsGenerator DataContext="{Binding TimePointsGeneratorModel}" />
         </materialDesign:DrawerHost.RightDrawerContent>-->
 
         <DockPanel Margin="10,0,10,0"
@@ -74,12 +79,12 @@
                     </Grid.Resources>
 
                     <!--  Digit Panel  -->
-                    <ContentControl x:Name="m_DigitPanel"
-                                    DockPanel.Dock="Top"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
+                    <ContentControl DockPanel.Dock="Top"
+                                    x:Name="m_DigitPanel"
                                     DataContext="{Binding}"
                                     Content="{Binding IsBreak}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
                                     ContentTemplateSelector="{StaticResource dts_DigitPanel}"
                                     />
 

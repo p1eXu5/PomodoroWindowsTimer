@@ -3,6 +3,9 @@
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
                     xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+                    xmlns:userControls="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+                    xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+                    xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
                     >
 
     <converters:KindToBrushConverter x:Key="conv_KindToBrushConverter" />
@@ -46,4 +49,18 @@
             </DrawingImage>
         </ImageBrush.ImageSource>
     </ImageBrush>
+
+    <DataTemplate x:Key="dt_BotSettingsDialog">
+        <settings:BotSettings />
+    </DataTemplate>
+
+    <DataTemplate x:Key="dt_WorkList">
+        <works:WorkList DataContext="{Binding WorkList}" />
+    </DataTemplate>
+    <DataTemplate x:Key="dt_CreatingWork">
+        <works:CreatingWork DataContext="{Binding CreatingWork}" />
+    </DataTemplate>
+    <DataTemplate x:Key="dt_UpdatingWork">
+        <works:UpdatingWork DataContext="{Binding UpdatingWork}" />
+    </DataTemplate>
 </ResourceDictionary>

@@ -12,6 +12,7 @@ internal sealed class ElmishProgramFactory(
     IThemeSwitcher themeSwitcher,
     IUserSettings userSettings,
     [FromKeyedServices("main")] IErrorMessageQueue mainErrorMessageQueue,
+    [FromKeyedServices("dialog")] IErrorMessageQueue dialogErrorMessageQueue,
     ILoggerFactory loggerFactory
 )
 {
@@ -28,5 +29,6 @@ internal sealed class ElmishProgramFactory(
             ThemeSwitcher,
             UserSettings,
             MainErrorMessageQueue,
+            dialogErrorMessageQueue,
             LoggerFactory);
 }

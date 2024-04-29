@@ -84,6 +84,7 @@ let update
     (cfg: MainModeConfig)
     updateWorkModel
     updateAppDialogModel
+    updateWorkSelectorModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     (msg: Msg)
@@ -257,6 +258,11 @@ let update
         let (m, cmd) = updateAppDialogModel smsg model.AppDialog
         model |> withAppDialogModel m
         , Cmd.map Msg.AppDialogModelMsg cmd
+
+    | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
+        let (m, cmd) = updateWorkSelectorModel smsg m
+        model |> withWorkSelectorModel m
+        , Cmd.map Msg.WorkSelectorModelMsg cmd
 
     // --------------------
 
