@@ -1,6 +1,7 @@
 module PomodoroWindowsTimer.Storage.Tests.WorkRepositoryTests
 
 open System
+open System.Threading
 open System.IO
 open System.Reflection
 open Microsoft.Data.Sqlite
@@ -17,15 +18,22 @@ let private dbFileName = "work_test.db"
 
 let faker = Faker()
 
+let ct = CancellationToken.None
+
 let mutable private connectionString = Unchecked.defaultof<string>
 
-let getConnection () =
+let getConnectionString () =
     if String.IsNullOrWhiteSpace(connectionString) then
         let dataSource = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), dbFileName)
         if File.Exists(dataSource) then
             File.Delete(dataSource)
         connectionString <- $"Data Source=%s{dataSource};"
-    new SqliteConnection(connectionString)
+        connectionString
+    else
+        connectionString
+
+let getConnection () =
+    new SqliteConnection(getConnectionString())
 
 let generateNumber () : string option =
     let numFactory =
@@ -44,9 +52,8 @@ let generateTitle () : string =
 [<OneTimeSetUp>]
 let Setup () =
     task {
-        let conn = getConnection ()
         do!
-            Initializer.initdb conn
+            Initializer.initdb (getConnectionString())
     }
 
 [<Test>]
@@ -56,13 +63,13 @@ let ``create test`` () =
         let create =
             create System.TimeProvider.System (Helpers.execute conn)
 
-        let! res1 = create (generateNumber ()) (generateTitle ())
-        let! res2 = create (generateNumber ()) (generateTitle ())
+        let! res1 = create (generateNumber ()) (generateTitle ()) ct
+        let! res2 = create (generateNumber ()) (generateTitle ()) ct
 
         match res1, res2 with
         | Error err, _ -> failAssert err
         | _, Error err -> failAssert err
-        | Ok id1, Ok id2 ->
+        | Ok (id1, _), Ok (id2, _) ->
             id1 |> shouldBeGreaterThan 0
             id2 |> shouldBeGreaterThan id1
     }
@@ -80,8 +87,8 @@ let ``readAll test`` () =
         let number = generateNumber ()
         let title = generateTitle ()
 
-        let! _ = create number title
-        let! res = readAll ()
+        let! _ = create number title ct
+        let! res = readAll ct
 
         match res with
         | Error err -> failAssert err
@@ -103,8 +110,8 @@ let ``find test`` () =
         let number = generateNumber ()
         let title = generateTitle ()
 
-        let! _ = create number title
-        let! res = find title[..3]
+        let! _ = create number title ct
+        let! res = find title[..3] ct
 
         match res with
         | Error err -> failAssert err
@@ -129,10 +136,10 @@ let ``update test`` () =
         let findById =
             findById (Helpers.select conn)
         
-        match! create (generateNumber ()) (generateTitle ()) with
+        match! create (generateNumber ()) (generateTitle ()) ct with
         | Error err -> failAssert err
-        | Ok id ->
-            match! findById id with
+        | Ok (id, _) ->
+            match! findById id ct with
             | Error err -> failAssert err
             | Ok work ->
                 let number = generateNumber ()
@@ -145,10 +152,10 @@ let ``update test`` () =
                             Title = title
                     }
 
-                match! update updatedWork with
+                match! update updatedWork ct with
                 | Error err -> failAssert err
-                | Ok () ->
-                    match! find title with
+                | Ok _ ->
+                    match! find title ct with
                     | Error err -> failAssert err
                     | Ok rows ->
                         rows |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number, title)
@@ -168,13 +175,13 @@ let ``delete test`` () =
         let findById =
             findById (Helpers.select conn)
 
-        match! create (generateNumber ()) (generateTitle ()) with
+        match! create (generateNumber ()) (generateTitle ()) ct with
         | Error err -> failAssert err
-        | Ok id ->
-            match! delete id with
+        | Ok (id, _) ->
+            match! delete id ct with
             | Error err -> failAssert err
             | Ok () ->
-                match! findById id with
+                match! findById id ct with
                 | Error err -> failAssert err
                 | Ok None -> ()
                 | Ok (Some _) -> failAssert "Work has not been deleted"

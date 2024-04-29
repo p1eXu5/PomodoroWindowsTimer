@@ -4,26 +4,20 @@ using System.Windows.Controls;
 
 namespace PomodoroWindowsTimer.WpfClient.Selectors;
 
-public sealed class DialogTemplateSelector : DataTemplateSelector
+public sealed class WorkStageTemplateSelector : DataTemplateSelector
 {
     public override DataTemplate? SelectTemplate(object model, DependencyObject container)
     {
-        FrameworkElement? element = container as FrameworkElement;
-
-        if (element != null && model != null)
+        if (container is FrameworkElement element && model != null)
         {
-            string? modelName = ((dynamic)model).ModelName;
-
-            if (modelName is null)
-            {
-                return null;
-            }
+            WorkSelectorModelModule.Stage modelName = ((dynamic)model).Stage; // List, Create, Update
 
             if (modelName.Equals("LockUnlockBreakModelSettings", StringComparison.Ordinal))
                 return element.FindResource("gp_Red") as DataTemplate;
 
-            return element.FindResource("gp_Green") as DataTemplate;
+            return element.FindResource("dt_WorkList") as DataTemplate;
         }
+
         return null;
     }
 }

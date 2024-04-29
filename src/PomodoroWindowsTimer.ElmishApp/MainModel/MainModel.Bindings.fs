@@ -122,6 +122,13 @@ let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> l
         "IsDialogOpened" |> Binding.oneWay (_.BotSettingsModel >> Option.isSome)
 
         "LoadBotSettingsModelCommand" |> Binding.cmd Msg.LoadBotSettingsModel
+
+        "CurrentWork"
+            |> Binding.SubModel.opt (WorkModel.Bindings.ToList)
+            |> Binding.mapModel _.Work
+            |> Binding.mapMsg Msg.WorkModelMsg
+
+        "IsCurrentWorkSet" |> Binding.oneWay (_.Work >> Option.isSome)
     ]
 
 

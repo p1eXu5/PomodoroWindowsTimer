@@ -8,6 +8,9 @@ open Dapper.FSharp.SQLite
 open PomodoroWindowsTimer.Types
 open Dapper
 open System.Collections.Generic
+open PomodoroWindowsTimer.Abstractions
+open Microsoft.Data.Sqlite
+open System.Threading
 
 [<CLIMutable>]
 type ReadRow =
@@ -35,15 +38,21 @@ type internal Cfg =
 let private readTable = table'<ReadRow> "work"
 let private writeTable = table'<CreateRow> "work"
 
-let create (timeProvider: System.TimeProvider) (execute: string seq -> Map<string, obj> seq -> Task<Result<int, string>>) (number: string option) (title: string) =
+let create
+    (timeProvider: System.TimeProvider)
+    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<int, string>>)
+    (number: string option)
+    (title: string)
+    (ct: CancellationToken)
+    =
     task {
-        let nowDate = timeProvider.GetUtcNow().ToUnixTimeMilliseconds()
+        let nowDate = timeProvider.GetUtcNow()
 
         let newWork =
             {
                 number = number
                 title = title
-                created_at = nowDate
+                created_at = nowDate.ToUnixTimeMilliseconds()
             } : CreateRow
 
         let (insertSql, insertSqlParams) =
@@ -61,20 +70,20 @@ let create (timeProvider: System.TimeProvider) (execute: string seq -> Map<strin
             }
             |> Deconstructor.select<ReadRow>
 
-        let cmd = CommandDefinition()
+        let! res =
+            execute (seq { insertSql; selectLastSql }) (seq { insertSqlParams; selectLastSqlParams }) ct
 
-        return!
-            execute (seq { insertSql; selectLastSql }) (seq { insertSqlParams; selectLastSqlParams })
+        return res |> Result.map (fun id -> id, nowDate)
     }
 
-let readAll (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) () =
+let readAll (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) ct =
     task {
         let! res =
             select {
                 for _ in readTable do
                 selectAll
             }
-            |> selectf
+            |> selectf ct
 
         return
             res
@@ -88,14 +97,14 @@ let readAll (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>)
                 } : Work))
     }
 
-let findById (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: int) =
+let findById (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: int) ct =
     task {
         let! res =
             select {
                 for row in readTable do
                 where (row.id = id)
             }
-            |> selectf
+            |> selectf ct
 
         return
             res
@@ -109,7 +118,7 @@ let findById (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>
                 } : Work) >> Seq.tryHead)
     }
 
-let find (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (text: string) =
+let find (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (text: string) ct =
     task {
         let likeExpr = sprintf "%%%s%%" text
 
@@ -119,7 +128,7 @@ let find (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (t
                 where (like row.number likeExpr)
                 orWhere (like row.title likeExpr)
             }
-            |> selectf
+            |> selectf ct
 
         return
             res
@@ -133,28 +142,57 @@ let find (selectf: SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (t
                 } : Work))
     }
 
-let update (timeProvider: System.TimeProvider) (updatef: UpdateQuery<_> -> Task<Result<unit, string>>) (work: Work) =
+let findOrCreate
+    (timeProvider: System.TimeProvider)
+    (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>)
+    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<int, string>>)
+    (work: Work)
+    ct
+    =
     task {
-        let nowDate = timeProvider.GetUtcNow().ToUnixTimeMilliseconds()
+        match! findById selectf work.Id ct with
+        | Ok (Some work) -> return work |> Ok
+        | Ok None ->
+            match! create timeProvider execute work.Number work.Title ct with
+            | Ok (id, createdAt) ->
+                return
+                    {
+                        work with
+                            Id = id
+                            CreatedAt = createdAt
+                            UpdatedAt = createdAt
+                    }
+                    |> Ok
+            | Error err -> return Error err
+        | Error err -> return Error err
+    }
 
-        return!
+let update (timeProvider: System.TimeProvider) (updatef: CancellationToken -> UpdateQuery<_> -> Task<Result<unit, string>>) (work: Work) ct =
+    task {
+        let nowDate = timeProvider.GetUtcNow()
+        let updatedAt = nowDate.ToUnixTimeMilliseconds() |> Some
+
+        let! res =
             update {
                 for r in readTable do
                 setColumn r.number work.Number
                 setColumn r.title work.Title
-                setColumn r.updated_at (nowDate |> Some)
+                setColumn r.updated_at updatedAt
                 where (r.id = work.Id)
             }
-            |> updatef
+            |> updatef ct
+
+        return res |> Result.map (fun () -> nowDate)
     }
 
-let delete (deletef: DeleteQuery -> Task<Result<unit, string>>) (id: int) =
+let delete (deletef: CancellationToken -> DeleteQuery -> Task<Result<unit, string>>) (id: int) ct =
     task {
         return!
             delete {
                 for r in readTable do
                 where (r.id = id)
             }
-            |> deletef
+            |> deletef ct
     }
+
 

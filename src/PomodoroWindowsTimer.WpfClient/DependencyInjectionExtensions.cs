@@ -3,14 +3,38 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.WpfClient;
 using PomodoroWindowsTimer.WpfClient.Services;
+using PomodoroWindowsTimer.Storage;
+using PomodoroWindowsTimer.WpfClient.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace DrugRoom.WpfClient;
 
 internal static class DependencyInjectionExtensions
 {
+    public static void AddDb(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<WorkDbOptions>().Bind(configuration.GetSection("WorkDb")).ValidateDataAnnotations().ValidateOnStart();
+
+
+        services.TryAddSingleton<IWorkRepository>(sp =>
+        {
+            // var logger = sp.GetRequiredService<ILogger<IWorkRepository>>
+            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
+            
+            using var scope = sp.CreateScope();
+            var workDbOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<WorkDbOptions>>().Value;
+
+            return
+                Initializer.initWorkRepository(workDbOptions.ConnectionString, timeProvider);
+        });
+
+        services.AddHostedService<DbSeederHostedService>();
+    }
+
     public static void AddTimeProvider(this IServiceCollection services)
         => services.TryAddSingleton(TimeProvider.System);
 

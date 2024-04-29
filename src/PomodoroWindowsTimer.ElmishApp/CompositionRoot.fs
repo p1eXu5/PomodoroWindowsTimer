@@ -19,6 +19,7 @@ open System
 let compose
     (title: string)
     (tickMilliseconds: int<ms>)
+    (workRepository: IWorkRepository)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
@@ -46,14 +47,14 @@ let compose
 
     let mainModelCfg =
         {
-            BotSettings = userSettings
+            UserSettings = userSettings
             SendToBot = sendToBot
             Looper = looper
             TimePointQueue = timePointQueue
             WindowsMinimizer = windowsMinimizer
             ThemeSwitcher = themeSwitcher
             TimePointStore = TimePointStore.initialize userSettings
-            DisableSkipBreakSettings = userSettings
+            WorkRepository = workRepository
         }
     // init
     let initMainModel () =
@@ -74,12 +75,16 @@ let compose
             BotSettingsModel.init userSettings
             |> Some
 
+        let updateWorkModel =
+            WorkModel.Program.update workRepository (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue
+
         MainModel.Program.update
             mainModelCfg
             initBotSettingsModel
             updateBotSettingsModel
             updateTimePointGeneratorModel
             initTimePointGeneratorModel
+            updateWorkModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
 

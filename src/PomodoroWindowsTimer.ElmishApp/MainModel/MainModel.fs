@@ -7,19 +7,21 @@ open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.TimePointQueue
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open PomodoroWindowsTimer.Abstractions
 
 
 type MainModel =
     {
+        Work: WorkModel option
         ActiveTimePoint : TimePoint option
         LooperState : LooperState
         TimePoints: TimePoint list
-        BotSettingsModel: BotSettingsModel option
-        TimePointsGeneratorModel: TimePointsGeneratorModel option
         DisableSkipBreak: bool
         DisableMinimizeMaximizeWindows: bool
         IsMinimized: bool
         LastCommandInitiator: UIInitiator option
+        BotSettingsModel: BotSettingsModel option
+        TimePointsGeneratorModel: TimePointsGeneratorModel option
     }
 and
     LooperState =
@@ -33,15 +35,18 @@ and
 
 type MainModeConfig =
     {
-        BotSettings: IBotSettings
+        UserSettings: IUserSettings
         SendToBot: BotSender
         Looper: Looper
         TimePointQueue: TimePointQueue
         WindowsMinimizer: WindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
         TimePointStore: TimePointStore
-        DisableSkipBreakSettings: IDisableSkipBreakSettings
+        WorkRepository: IWorkRepository
     }
+    member this.BotSettings = this.UserSettings :> IBotSettings
+    member this.DisableSkipBreakSettings = this.UserSettings :> IDisableSkipBreakSettings
+    member this.CurrentWorkItemSettings = this.UserSettings :> ICurrentWorkItemSettings
 
 
 module MainModel =
@@ -55,6 +60,10 @@ module MainModel =
         | LoadTimePoints of TimePoint list
         | StartTimePoint of Operation<Guid, unit>
         
+        | LoadCurrentWork
+        | SetCurrentWorkIfNone of Result<Work, string>
+        | WorkModelMsg of WorkModel.Msg
+
         | PlayerMsg of PlayerMsg
         | LooperMsg of LooperEvent
         | WindowsMsg of WindowsMsg
@@ -71,7 +80,8 @@ module MainModel =
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
         
-        | OnError of exn
+        | OnError of string
+        | OnExn of exn
     and
         WindowsMsg =
             | MinimizeWindows
@@ -118,6 +128,7 @@ module MainModel =
         //let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
 
         {
+            Work = None
             ActiveTimePoint = None
             LooperState = Initialized
             TimePoints = []
@@ -130,6 +141,7 @@ module MainModel =
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
+            Cmd.ofMsg Msg.LoadCurrentWork
             // Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
         ]
 
@@ -199,5 +211,6 @@ module MainModel =
         |> Option.map (fun tp -> tp.TimeSpan.TotalSeconds)
         |> Option.defaultValue 0.0
 
+    let withWorkModel workModel (model: MainModel) =
+         { model with Work = workModel }
 
-    

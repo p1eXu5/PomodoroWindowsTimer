@@ -7,15 +7,37 @@
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              x:Name="m_Root"
-             d:DesignHeight="450"
-             d:DesignWidth="800"
+             d:DesignHeight="350"
+             d:DesignWidth="600"
+             d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
              mc:Ignorable="d"
              >
     <StackPanel HorizontalAlignment="Center"
                 Orientation="Vertical"
                 >
-        <TextBlock Margin="0,0,0,20"
-                   HorizontalAlignment="Left"
+        <StackPanel Orientation="Vertical"
+                    Visibility="{Binding IsCurrentWorkSet,
+                                         Converter={StaticResource BooleanToVisibilityConverter}}"
+                    >
+            <TextBlock Margin="1,0,0,10"
+                       DataContext="{Binding CurrentWork}"
+                       Foreground="{Binding ElementName=m_Root,
+                                            Path=Foreground}"
+                       Text="{Binding Number,
+                                      FallbackValue='DEV-0001'}"
+                       />
+            <TextBlock MaxWidth="500"
+                       Margin="0,0,0,22"
+                       Foreground="{Binding ElementName=m_Root,
+                                            Path=Foreground}"
+                       Text="{Binding Title,
+                                      FallbackValue='[DEV-0001] Task title and description multilined'}"
+                       DataContext="{Binding CurrentWork}"
+                       TextWrapping="Wrap"
+                       FontSize="18"
+                       />
+        </StackPanel>
+        <TextBlock Margin="1,0,0,20"
                    Foreground="{Binding ElementName=m_Root,
                                         Path=Foreground}"
                    Text="{Binding ActiveTimePointName,

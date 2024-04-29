@@ -1,5 +1,8 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Abstractions
 
+open System
+open System.Threading
+open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 
 type IErrorMessageQueue =
@@ -34,12 +37,18 @@ type IDisableSkipBreakSettings =
         abstract DisableSkipBreak : bool with get, set
     end
 
+type ICurrentWorkItemSettings =
+    interface
+        abstract CurrentWork : Work option with get, set
+    end
+
 type IUserSettings =
     inherit IBotSettings
     inherit IPatternSettings
     inherit ITimePointPrototypesSettings
     inherit ITimePointSettings
     inherit IDisableSkipBreakSettings
+    inherit ICurrentWorkItemSettings
 
 
 /// Used in theme switcher on WPF side
@@ -52,5 +61,4 @@ type IThemeSwitcher =
     interface
         abstract SwitchTheme: TimePointKind -> unit
     end
-
 

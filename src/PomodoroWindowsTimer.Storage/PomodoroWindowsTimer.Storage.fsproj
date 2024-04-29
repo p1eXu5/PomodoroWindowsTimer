@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Initializer.fs" />
     <Compile Include="Helpers.fs" />
     <Compile Include="WorkRepository.fs" />
+    <Compile Include="Initializer.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -45,11 +45,14 @@
                         <ControlTemplate TargetType="{x:Type ButtonBase}">
                             <AdornerDecorator CacheMode="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:ShadowAssist.CacheMode)}">
                                 <Grid Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ButtonBase}}, Path=ActualWidth}">
-                                    <Grid Margin="1" HorizontalAlignment="Stretch">
+                                    <Grid Margin="1"
+                                          HorizontalAlignment="Stretch"
+                                          >
                                         <Border x:Name="border"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius),
+                                                                       RelativeSource={RelativeSource TemplatedParent}}"
                                                 Background="{TemplateBinding Background}"
                                                 />
 
@@ -100,16 +103,19 @@
         </StackPanel.Resources>
         <Button Command="{Binding ReplayCommand}"
                 Content="Replay"
-                Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Visibility="{Binding LooperIsRunning,
+                                     Converter={StaticResource BooleanToVisibilityConverter}}"
                 />
-        <Button Margin="20,0,0,0"
-                Command="{Binding PlayStopCommand}"
-                Content="{Binding PlayPauseButtonText, FallbackValue=Resume}"
+        <Button Command="{Binding PlayStopCommand}"
+                Margin="20,0,0,0"
+                Content="{Binding PlayPauseButtonText,
+                                  FallbackValue=Resume}"
                 />
-        <Button Margin="20,0,0,0"
-                Command="{Binding NextCommand}"
+        <Button Command="{Binding NextCommand}"
+                Margin="20,0,0,0"
                 Content="Next"
-                Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                Visibility="{Binding LooperIsRunning,
+                                     Converter={StaticResource BooleanToVisibilityConverter}}"
                 />
         <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
         <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->

@@ -1,14 +1,14 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.TimePointsGeneratorModel.Program
 
 open Elmish
+open Elmish.Extensions
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGeneratorModel
-open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGeneratorModel
 
 
 let private parsePattern pattern model =

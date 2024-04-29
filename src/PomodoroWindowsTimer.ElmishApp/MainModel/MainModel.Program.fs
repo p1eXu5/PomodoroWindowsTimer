@@ -1,5 +1,6 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.MainModel.Program
 
+open System.Threading
 open Microsoft.Extensions.Logging
 open Elmish
 open Elmish.Extensions
@@ -63,13 +64,13 @@ let updateOnPlayerMsg
 let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
     | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfAsync.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnError
+        { model with IsMinimized = true }, Cmd.OfAsync.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
 
     | WindowsMsg.RestoreWindows when model.IsMinimized ->
-        { model with IsMinimized = false }, Cmd.OfAsync.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnError
+        { model with IsMinimized = false }, Cmd.OfAsync.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
 
     | WindowsMsg.RestoreMainWindow ->
-        model, Cmd.OfAsync.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnError
+        model, Cmd.OfAsync.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnExn
 
     | WindowsMsg.SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none
@@ -85,6 +86,7 @@ let update
     updateBotSettingsModel
     updateTimePointGeneratorModel
     initTimePointGeneratorModel
+    updateWorkModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     (msg: Msg)
@@ -107,7 +109,6 @@ let update
     // --------------------
     // Time Points
     // --------------------
-
     | Msg.LoadTimePointsFromSettings ->
         let timePoints = cfg.TimePointStore.Read()
         cfg.TimePointQueue.Reload(timePoints)
@@ -124,10 +125,35 @@ let update
         , Cmd.none
 
     | StartTimePoint (Operation.Start id) ->
-        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) OnError ]
+        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) OnExn ]
 
     | StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg (PlayerMsg.Play |> Msg.PlayerMsg)
+
+    // --------------------
+    // Work
+    // --------------------
+    | Msg.LoadCurrentWork ->
+        match cfg.CurrentWorkItemSettings.CurrentWork with
+        | None -> model, Cmd.none
+        | Some work ->
+            model, Cmd.OfTask.perform (cfg.WorkRepository.FindByIdOrCreate work) CancellationToken.None Msg.SetCurrentWorkIfNone
+
+    | Msg.SetCurrentWorkIfNone res ->
+        match res with
+        | Ok work when model.Work |> Option.isNone ->
+            { model with Work = work |> WorkModel.init |> Some}, Cmd.none
+        | Error err -> model, Cmd.ofMsg (Msg.OnError err)
+        | _ -> model, Cmd.none
+
+    | Msg.WorkModelMsg wmsg ->
+        match model.Work with
+        | Some wmodel ->
+            let (wmodel, wcmd) = updateWorkModel wmsg wmodel
+            model |> withWorkModel (wmodel |> Some)
+            , Cmd.map Msg.WorkModelMsg wcmd
+        | None ->
+            model |> withCmdNone
 
     // --------------------
     // Player, Windows
@@ -152,7 +178,7 @@ let update
         , Cmd.batch [
             cmd
             if switchTheme then
-                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnError
+                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
         ]
 
     | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
@@ -198,7 +224,7 @@ let update
     | Msg.SendToChatBot ->
         let messageText =
             model.ActiveTimePoint |> Option.map (fun tp -> $"It's time to {tp.Name}!!") |> Option.defaultValue "It's time!!"
-        model, Cmd.OfTask.attempt cfg.SendToBot messageText Msg.OnError
+        model, Cmd.OfTask.attempt cfg.SendToBot messageText Msg.OnExn
 
     // --------------------
     // Active time changing
@@ -226,8 +252,12 @@ let update
 
     // --------------------
 
-    | Msg.OnError ex ->
+    | Msg.OnExn ex ->
         errorMessageQueue.EnqueueError ex.Message
+        model, Cmd.none
+
+    | Msg.OnError err ->
+        errorMessageQueue.EnqueueError err
         model, Cmd.none
 
     | _ ->

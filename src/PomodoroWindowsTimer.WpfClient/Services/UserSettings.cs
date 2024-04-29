@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.Types;
 using PomodoroWindowsTimer.WpfClient.Extensions;
 
 
@@ -91,5 +92,30 @@ internal class UserSettings : IUserSettings
         }
 
         set => Properties.Settings.Default.MyChatId = value.FromFSharpOption();
+    }
+
+    public FSharpOption<Work> CurrentWork
+    {
+        get {
+            var currentWork = Properties.Settings.Default.CurrentWork;
+            if (string.IsNullOrWhiteSpace(currentWork))
+            {
+                return FSharpOption<Work>.None;
+            }
+
+            try { 
+                var work = JsonHelpers.Deserialize<Work>(currentWork);
+                return FSharpOption<Work>.Some(work);
+            }
+            catch
+            {
+                Properties.Settings.Default.CurrentWork = null;
+                return FSharpOption<Work>.None;
+            }
+        }
+        set
+        {
+            Properties.Settings.Default.CurrentWork = JsonHelpers.Serialize(value);
+        }
     }
 }

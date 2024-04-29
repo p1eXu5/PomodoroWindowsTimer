@@ -77,6 +77,7 @@
                     <ContentControl x:Name="m_DigitPanel"
                                     DockPanel.Dock="Top"
                                     HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
                                     DataContext="{Binding}"
                                     Content="{Binding IsBreak}"
                                     ContentTemplateSelector="{StaticResource dts_DigitPanel}"

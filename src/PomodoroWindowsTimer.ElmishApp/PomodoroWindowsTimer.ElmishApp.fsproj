@@ -11,6 +11,15 @@
     <Compile Include="Abstractions.fs" />
     <Compile Include="Infrastructure.fs" />
     <Compile Include="LoggerExtensions.fs" />
+    <Compile Include="WorkModel\WorkModel.fs" />
+    <Compile Include="WorkModel\WorkModel.Program.fs" />
+    <Compile Include="WorkModel\WorkModel.Bindings.fs" />
+    <Compile Include="WorkListModel\WorkListModel.fs" />
+    <Compile Include="WorkListModel\WorkListModel.Program.fs" />
+    <Compile Include="WorkListModel\WorkListModel.Bindings.fs" />
+    <Compile Include="WorkSelectorModel\WorkSelectorModel.fs" />
+    <Compile Include="WorkSelectorModel\WorkSelectorModel.Program.fs" />
+    <Compile Include="WorkSelectorModel\WorkSelectorModel.Bindings.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Program.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Bindings.fs" />

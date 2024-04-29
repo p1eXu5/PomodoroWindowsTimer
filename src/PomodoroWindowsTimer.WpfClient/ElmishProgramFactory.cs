@@ -2,11 +2,13 @@
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 
 namespace PomodoroWindowsTimer.WpfClient;
 
 internal sealed class ElmishProgramFactory(
+    IWorkRepository workRepository,
     IThemeSwitcher themeSwitcher,
     IUserSettings userSettings,
     [FromKeyedServices("main")] IErrorMessageQueue mainErrorMessageQueue,
@@ -22,6 +24,7 @@ internal sealed class ElmishProgramFactory(
     =>
         ElmishApp.Program.main(
             mainWindow,
+            workRepository,
             ThemeSwitcher,
             UserSettings,
             MainErrorMessageQueue,

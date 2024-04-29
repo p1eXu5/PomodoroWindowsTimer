@@ -5,12 +5,14 @@ open Elmish.WPF
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Abstractions
 
 [<Literal>]
 let internal tickMilliseconds = 200<ms>
 
 let internal main
     (window: System.Windows.Window)
+    (workRepository: IWorkRepository)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (errorMessageQueue: IErrorMessageQueue)
@@ -20,6 +22,7 @@ let internal main
         CompositionRoot.compose
             "Pomodoro Windows Timer"
             tickMilliseconds
+            workRepository
             themeSwitcher
             userSettings
             errorMessageQueue

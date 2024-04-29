@@ -7,6 +7,7 @@ type AppDialogModel =
     | NoDialog
     | BotSettingsDialog of BotSettingsModel
     | TimePointsGeneratorDialog of TimePointsGeneratorModel
+    | WorkListModelDialog of WorkListModel
 
 
 module AppDialogModel =
@@ -38,11 +39,13 @@ module AppDialogModel =
     type AppDialogId =
         | BotSettingsDialogId
         | TimePointsGeneratorDialogId
+        | WorkListModelId
 
     let appDialogId = function
         | AppDialogModel.NoDialog -> None
         | AppDialogModel.BotSettingsDialog _ -> AppDialogId.BotSettingsDialogId |> Some
         | AppDialogModel.TimePointsGeneratorDialog _ -> AppDialogId.TimePointsGeneratorDialogId |> Some
+        | AppDialogModel.WorkListModelDialog _ -> AppDialogId.WorkListModelId |> Some
 
     let botSettingsModel (model: AppDialogModel) =
         match model with
@@ -52,5 +55,10 @@ module AppDialogModel =
     let timePointsGeneratorModel (model: AppDialogModel) =
         match model with
         | AppDialogModel.TimePointsGeneratorDialog m -> m |> Some
+        | _ -> None
+
+    let workListModel (model: AppDialogModel) =
+        match model with
+        | AppDialogModel.WorkListModelDialog m -> m |> Some
         | _ -> None
 

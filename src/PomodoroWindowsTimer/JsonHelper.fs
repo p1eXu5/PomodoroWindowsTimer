@@ -47,3 +47,7 @@ type JsonHelpers() =
 
     static member Serialize(o: #obj) =
         JsonSerializer.Serialize(o, JsonHelpers.JsonSerializerOptions)
+
+    static member Deserialize<'T>(s: string) =
+        JsonSerializer.Deserialize<'T>(s, JsonHelpers.JsonSerializerOptions)
+

@@ -88,7 +88,10 @@ internal class Bootstrap : IDisposable
 
     public IHost Host { get; private set; } = default!;
 
-    public void StartHost() => Host.Start();
+    public void StartHost()
+    {
+        Host.Start();
+    }
 
     public Task StopHostAsync() => Host.StopAsync();
 
@@ -109,6 +112,7 @@ internal class Bootstrap : IDisposable
         services.AddTimeProvider();
         services.AddThemeSwitcher();
         services.AddUserSettings(hostBuilderCtx.Configuration);
+        services.AddDb(hostBuilderCtx.Configuration);
 
         if (!hostBuilderCtx.Configuration.GetValue<bool>("InTest"))
         {

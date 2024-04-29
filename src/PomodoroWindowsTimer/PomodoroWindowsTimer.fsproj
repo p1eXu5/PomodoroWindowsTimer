@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Helpers.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="Abstractions.fs" />
     <Compile Include="JsonHelper.fs" />

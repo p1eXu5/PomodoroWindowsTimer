@@ -1,4 +1,10 @@
-﻿namespace Elmish.Extensions
+﻿(*
+
+
+
+*)
+
+namespace Elmish.Extensions
 
 open System
 open System.Threading
@@ -61,6 +67,63 @@ type Intent<'TIntent> =
     | Request of 'TIntent
 
 // ----------------------- modules
+[<AutoOpen>]
+module Helpers =
+
+    open Elmish
+
+    let withCmdNone = fun m -> m, Cmd.none
+
+[<AutoOpen>]
+module Model =
+
+    open Elmish
+
+    let flip f b a = f a b
+
+    let map get set f model =
+        model |> get |> f |> flip set model
+
+    let mapFirst predicate updatef modelList =
+        let rec mapFirstRec reverseFront back =
+            match back with
+            | [] ->
+                (*
+                 * Conceptually, the correct value to return is
+                 * reverseFront |> List.rev
+                 * but this is the same as
+                 * input
+                 * so returning that instead.
+                 *)
+                modelList
+            | a :: ma ->
+                if predicate a then
+                    (reverseFront |> List.rev) @ (updatef a :: ma)
+                else
+                    mapFirstRec (a :: reverseFront) ma
+        mapFirstRec [] modelList
+
+    let mapFirstCmd predicate updatef modelList =
+        let rec mapFirstRec reverseFront cmd back =
+            match back with
+            | [] ->
+                (*
+                 * Conceptually, the correct value to return is
+                 * reverseFront |> List.rev
+                 * but this is the same as
+                 * input
+                 * so returning that instead.
+                 *)
+                modelList, cmd
+            | model :: tailModels ->
+                if predicate model then
+                    let (model, cmd) = updatef model
+                    (reverseFront |> List.rev) @ (model :: tailModels), cmd
+                else
+                    mapFirstRec (model :: reverseFront) cmd tailModels
+        mapFirstRec [] Cmd.none modelList
+
+
 module Utils =
     open System.Reflection
 
@@ -74,32 +137,6 @@ module Utils =
             pi.GetValue(bindingsTypeInstance) :?> 'Binding
         )
         |> Array.toList
-
-[<AutoOpen>]
-module Model =
-    let flip f b a = f a b
-
-    let map get set f model =
-        model |> get |> f |> flip set model
-
-    let mapFirst p f originList =
-        let rec mapFirstRec reverseFront back =
-            match back with
-            | [] ->
-                (*
-                 * Conceptually, the correct value to return is
-                 * reverseFront |> List.rev
-                 * but this is the same as
-                 * input
-                 * so returning that instead.
-                 *)
-                originList
-            | a :: ma ->
-                if p a then
-                  (reverseFront |> List.rev) @ (f a :: ma)
-                else
-                  mapFirstRec (a :: reverseFront) ma
-        mapFirstRec [] originList
 
 
 [<RequireQualifiedAccess>]
@@ -127,6 +164,9 @@ module AsyncOperation =
 
     let finish cts =
         fun res -> AsyncOperation.Finish (res, cts)
+
+    let finishWithin msgCtor cts =
+        fun res -> AsyncOperation.Finish (res, cts) |> msgCtor
 
 [<RequireQualifiedAccess>]
 module AsyncPreparingDeferred =
