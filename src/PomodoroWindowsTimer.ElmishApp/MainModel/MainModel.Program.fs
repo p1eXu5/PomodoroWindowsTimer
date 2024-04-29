@@ -82,11 +82,8 @@ let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: 
 
 let update
     (cfg: MainModeConfig)
-    initBotSettingsModel
-    updateBotSettingsModel
-    updateTimePointGeneratorModel
-    initTimePointGeneratorModel
     updateWorkModel
+    updateAppDialogModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     (msg: Msg)
@@ -183,6 +180,7 @@ let update
 
     | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
 
+    (*
     // --------------------
     // TimePoint Generator
     // --------------------
@@ -204,7 +202,9 @@ let update
 
     | Msg.EraseTimePointsGeneratorModel isDrawerOpen when not isDrawerOpen ->
          {model with TimePointsGeneratorModel = None }, Cmd.none
+    *)
 
+    (*
     // --------------------
     // Telegram Bot
     // --------------------
@@ -225,6 +225,7 @@ let update
         let messageText =
             model.ActiveTimePoint |> Option.map (fun tp -> $"It's time to {tp.Name}!!") |> Option.defaultValue "It's time!!"
         model, Cmd.OfTask.attempt cfg.SendToBot messageText Msg.OnExn
+    *)
 
     // --------------------
     // Active time changing
@@ -249,6 +250,13 @@ let update
         | _ ->
             cfg.Looper.Resume()
             model, Cmd.none
+
+    // --------------------
+
+    | Msg.AppDialogModelMsg smsg ->
+        let (m, cmd) = updateAppDialogModel smsg model.AppDialog
+        model |> withAppDialogModel m
+        , Cmd.map Msg.AppDialogModelMsg cmd
 
     // --------------------
 

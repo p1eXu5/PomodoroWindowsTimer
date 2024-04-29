@@ -23,8 +23,12 @@ let update
         , Cmd.none
 
     | MsgWith.BotSettingsModelMsg model (bmsg, bm) ->
-        updateBotSettingsModel bmsg bm |> AppDialogModel.BotSettingsDialog
-        , Cmd.none
+        let (m, intent) = updateBotSettingsModel bmsg bm
+        match intent with
+        | BotSettingsModel.Intent.None ->
+            m |> AppDialogModel.BotSettingsDialog, Cmd.none
+        | BotSettingsModel.Intent.CloseDialogRequested ->
+            AppDialogModel.NoDialog, Cmd.none
 
     | Msg.LoadTimePointsGeneratorDialogModel ->
         let (m, cmd) = initTimePointsGeneratorModel ()
@@ -32,7 +36,7 @@ let update
         , Cmd.map Msg.TimePointsGeneratorModelMsg cmd
 
     | MsgWith.TimePointsGeneratorModelMsg model (gmsg, gm) ->
-        let (m, cmd) = updateTimePointsGeneratorModel gmsg gm
+        let (m, cmd, _) = updateTimePointsGeneratorModel gmsg gm
         m |> AppDialogModel.TimePointsGeneratorDialog
         , Cmd.map Msg.TimePointsGeneratorModelMsg cmd
 

@@ -12,16 +12,25 @@ open PomodoroWindowsTimer.Abstractions
 
 type MainModel =
     {
-        Work: WorkModel option
-        ActiveTimePoint : TimePoint option
+        // BotSettingsModel: BotSettingsModel option
+        // TimePointsGeneratorModel: TimePointsGeneratorModel option
+
         LooperState : LooperState
-        TimePoints: TimePoint list
-        DisableSkipBreak: bool
-        DisableMinimizeMaximizeWindows: bool
-        IsMinimized: bool
         LastCommandInitiator: UIInitiator option
-        BotSettingsModel: BotSettingsModel option
-        TimePointsGeneratorModel: TimePointsGeneratorModel option
+        
+        IsMinimized: bool
+        DisableMinimizeMaximizeWindows: bool
+        DisableSkipBreak: bool
+
+        /// Left drawer model
+        TimePoints: TimePoint list
+        ActiveTimePoint : TimePoint option
+
+        /// Right drawer model
+        WorkSelector: WorkSelectorModel option
+        Work: WorkModel option
+
+        AppDialog: AppDialogModel
     }
 and
     LooperState =
@@ -68,17 +77,19 @@ module MainModel =
         | LooperMsg of LooperEvent
         | WindowsMsg of WindowsMsg
 
-        | InitializeTimePointsGeneratorModel
-        | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
-        | EraseTimePointsGeneratorModel of isDrawerOpen: bool
+        // | InitializeTimePointsGeneratorModel
+        // // | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
+        // | EraseTimePointsGeneratorModel of isDrawerOpen: bool
 
-        | LoadBotSettingsModel
-        | BotSettingsMsg of BotSettingsModel.Msg
+        // | LoadBotSettingsModel
+        // | BotSettingsMsg of BotSettingsModel.Msg
         | SendToChatBot
         
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
         | PostChangeActiveTimeSpan
+
+        | AppDialogModelMsg of AppDialogModel.Msg
         
         | OnError of string
         | OnExn of exn
@@ -107,19 +118,19 @@ module MainModel =
                     PlayerMsg.Next |> Msg.PlayerMsg |> Some
             )
 
-    module MsgWith =
+    //module MsgWith =
 
-        let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
-            match msg, model.TimePointsGeneratorModel with
-            | Msg.TimePointsGeneratorMsg smsg, Some sm ->
-                (smsg, sm) |> Some
-            | _ -> None
+    //    let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
+    //        match msg, model.TimePointsGeneratorModel with
+    //        | Msg.TimePointsGeneratorMsg smsg, Some sm ->
+    //            (smsg, sm) |> Some
+    //        | _ -> None
 
-        let (|BotSettingsMsg|_|) (model: MainModel) (msg: Msg) =
-            match msg, model.BotSettingsModel with
-            | Msg.BotSettingsMsg smsg, Some sm ->
-                (smsg, sm) |> Some
-            | _ -> None
+    //    let (|BotSettingsMsg|_|) (model: MainModel) (msg: Msg) =
+    //        match msg, model.BotSettingsModel with
+    //        | Msg.BotSettingsMsg smsg, Some sm ->
+    //            (smsg, sm) |> Some
+    //        | _ -> None
 
     open Elmish
 
@@ -128,16 +139,22 @@ module MainModel =
         //let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
 
         {
-            Work = None
-            ActiveTimePoint = None
             LooperState = Initialized
-            TimePoints = []
-            BotSettingsModel = None
-            TimePointsGeneratorModel = None
-            IsMinimized = false
             LastCommandInitiator = None
-            DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
+
+            IsMinimized = false
             DisableMinimizeMaximizeWindows = false
+            DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
+            
+            TimePoints = []
+            ActiveTimePoint = None
+
+            WorkSelector = None
+            Work = None
+            //BotSettingsModel = None
+            //TimePointsGeneratorModel = None
+
+            AppDialog = AppDialogModel.NoDialog
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
@@ -213,4 +230,7 @@ module MainModel =
 
     let withWorkModel workModel (model: MainModel) =
          { model with Work = workModel }
+
+    let withAppDialogModel addDialogModel (model: MainModel) =
+         { model with AppDialog = addDialogModel }
 

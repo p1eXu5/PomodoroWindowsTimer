@@ -15,7 +15,8 @@ let internal main
     (workRepository: IWorkRepository)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
-    (errorMessageQueue: IErrorMessageQueue)
+    (mainErrorMessageQueue: IErrorMessageQueue)
+    (dialogErrorMessageQueue: IErrorMessageQueue)
     (loggerFactory: ILoggerFactory)
     =
     let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
@@ -25,7 +26,8 @@ let internal main
             workRepository
             themeSwitcher
             userSettings
-            errorMessageQueue
+            mainErrorMessageQueue
+            dialogErrorMessageQueue
             loggerFactory
 
     WpfProgram.mkProgram

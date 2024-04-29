@@ -23,6 +23,7 @@ let compose
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
+    (dialogErrorMessageQueue: IErrorMessageQueue)
     (loggerFactory: ILoggerFactory)
     =
     let timePointQueue = new TimePointQueue(loggerFactory.CreateLogger<TimePointQueue>())
@@ -62,29 +63,33 @@ let compose
 
     // update
     let updateMainModel =
+        let initBotSettingsModel () =
+            BotSettingsModel.init userSettings
+
         let updateBotSettingsModel =
             BotSettingsModel.Program.update userSettings
-
-        let updateTimePointGeneratorModel =
-            TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore
 
         let initTimePointGeneratorModel () =
             TimePointsGeneratorModel.init timePointPrototypeStore patternStore
 
-        let initBotSettingsModel () =
-            BotSettingsModel.init userSettings
-            |> Some
+        let updateTimePointGeneratorModel =
+            TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore dialogErrorMessageQueue
 
         let updateWorkModel =
             WorkModel.Program.update workRepository (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue
 
+        let updateAppDialogModel =
+            AppDialogModel.Program.update
+                initBotSettingsModel
+                updateBotSettingsModel
+                initTimePointGeneratorModel
+                updateTimePointGeneratorModel
+                dialogErrorMessageQueue
+
         MainModel.Program.update
             mainModelCfg
-            initBotSettingsModel
-            updateBotSettingsModel
-            updateTimePointGeneratorModel
-            initTimePointGeneratorModel
             updateWorkModel
+            updateAppDialogModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
 
@@ -95,7 +100,7 @@ let compose
 
     let mainModelBindings =
         fun () ->
-            MainModel.Bindings.bindings title assemblyVer mainErrorMessageQueue
+            MainModel.Bindings.Bindings.ToList title assemblyVer mainErrorMessageQueue dialogErrorMessageQueue
 
     // subscriptions
     let subscribe _ : (SubId * Subscribe<_>) list =
