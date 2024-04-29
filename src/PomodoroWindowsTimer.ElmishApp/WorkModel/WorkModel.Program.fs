@@ -17,6 +17,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
     match msg with
     | Msg.SetNumber n -> model |> withNumber n |> withCmdNone
     | Msg.SetTitle t -> model |> withTitle t |> withCmdNone
+    
     | MsgWith.``Start of Update`` model (deff, cts) ->
         let updateWork =
             { model.Work with
@@ -43,7 +44,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
         match res with
         | Error err ->
             do errorMessageQueue.EnqueueError err
-            model |> withUpdateState AsyncDeferred.NotRequested |> withCmdNone
+            model |> withCreateNewState AsyncDeferred.NotRequested |> withCmdNone
         | Ok (_, (id, createdAt)) ->
             model |> withCreatedWork id createdAt |> withCreateNewState (AsyncDeferred.NotRequested) |> withCmdNone
 

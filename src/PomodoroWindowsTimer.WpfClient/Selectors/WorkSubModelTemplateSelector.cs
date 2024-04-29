@@ -12,7 +12,7 @@ public sealed class WorkSubModelTemplateSelector : DataTemplateSelector
     {
         if (container is FrameworkElement element && model != null)
         {
-            WorkSelectorModelModule.SubmodelId subModelId = ((dynamic)model).Stage; // List, Create, Update
+            WorkSelectorModelModule.SubmodelId subModelId = ((dynamic)model).SubmodelId; // List, Create, Update
 
             if (subModelId.IsWorkListId)
             {

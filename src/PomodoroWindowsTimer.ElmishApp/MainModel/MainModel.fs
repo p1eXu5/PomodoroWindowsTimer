@@ -23,6 +23,7 @@ type MainModel =
         DisableSkipBreak: bool
 
         /// Left drawer model
+        IsTimePointsShown: bool
         TimePoints: TimePoint list
         ActiveTimePoint : TimePoint option
 
@@ -68,7 +69,8 @@ module MainModel =
         /// Stores and loads generated timepoints from prototypes.
         | LoadTimePoints of TimePoint list
         | StartTimePoint of Operation<Guid, unit>
-        
+        | SetIsTimePointsShown of bool
+
         | LoadCurrentWork
         | SetCurrentWorkIfNone of Result<Work, string>
         | WorkModelMsg of WorkModel.Msg
@@ -90,6 +92,8 @@ module MainModel =
         | PostChangeActiveTimeSpan
 
         | AppDialogModelMsg of AppDialogModel.Msg
+
+        | SetIsWorkSelectorLoaded of bool
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
         
         | OnError of string
@@ -153,7 +157,8 @@ module MainModel =
             IsMinimized = false
             DisableMinimizeMaximizeWindows = false
             DisableSkipBreak = cfg.DisableSkipBreakSettings.DisableSkipBreak
-            
+
+            IsTimePointsShown = false
             TimePoints = []
             ActiveTimePoint = None
 
@@ -245,3 +250,8 @@ module MainModel =
     let withWorkSelectorModel workSelectorModel (model: MainModel) =
          { model with WorkSelector = workSelectorModel |> Some }
 
+    let withoutWorkSelectorModel (model: MainModel) =
+         { model with WorkSelector = None }
+
+    let withIsTimePointsShown v (model: MainModel) =
+         { model with IsTimePointsShown = v }

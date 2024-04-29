@@ -259,6 +259,20 @@ let update
         model |> withAppDialogModel m
         , Cmd.map Msg.AppDialogModelMsg cmd
 
+    | Msg.SetIsWorkSelectorLoaded v ->
+        if v then
+            let (m, cmd) = WorkSelectorModel.init ()
+            model |> withWorkSelectorModel m |> withIsTimePointsShown false
+            , Cmd.map Msg.WorkSelectorModelMsg cmd
+        else
+            model |> withoutWorkSelectorModel |> withCmdNone
+
+    | Msg.SetIsTimePointsShown v ->
+        if v then
+            model |> withoutWorkSelectorModel |> withIsTimePointsShown v |> withCmdNone
+        else
+            model |> withIsTimePointsShown v |> withCmdNone
+
     | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
         let (m, cmd) = updateWorkSelectorModel smsg m
         model |> withWorkSelectorModel m

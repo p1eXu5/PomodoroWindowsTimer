@@ -140,6 +140,9 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
     member val DisableMinimizeMaximizeWindows : Binding =
         nameof __.DisableMinimizeMaximizeWindows |> Binding.twoWay (_.DisableMinimizeMaximizeWindows, Msg.SetDisableMinimizeMaximizeWindows)
 
+    member val IsTimePointsShown : Binding =
+        nameof __.IsTimePointsShown |> Binding.twoWay (_.IsTimePointsShown, Msg.SetIsTimePointsShown)
+
     // ------------------------------------------------------
 
     member val CurrentWork : Binding =
@@ -163,6 +166,9 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
             |> Binding.SubModel.opt (WorkSelectorModel.Bindings.ToList)
             |> Binding.mapModel _.WorkSelector
             |> Binding.mapMsg Msg.WorkSelectorModelMsg
+
+    member val IsWorkSelectorLoaded : Binding =
+        nameof __.IsWorkSelectorLoaded |> Binding.twoWay (_.WorkSelector >> Option.isSome, Msg.SetIsWorkSelectorLoaded)
 
 
 (*

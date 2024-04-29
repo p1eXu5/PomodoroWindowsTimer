@@ -11,6 +11,9 @@
     <Compile Include="Abstractions.fs" />
     <Compile Include="Infrastructure.fs" />
     <Compile Include="LoggerExtensions.fs" />
+    <Compile Include="CreatingWorkModel\CreatingWorkModel.fs" />
+    <Compile Include="CreatingWorkModel\CreatingWorkModel.Program.fs" />
+    <Compile Include="CreatingWorkModel\CreatingWorkModel.Bindings.fs" />
     <Compile Include="WorkModel\WorkModel.fs" />
     <Compile Include="WorkModel\WorkModel.Program.fs" />
     <Compile Include="WorkModel\WorkModel.Bindings.fs" />

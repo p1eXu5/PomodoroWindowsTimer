@@ -20,12 +20,8 @@
                                BorderThickness="0"
                                BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
                                BottomDrawerCornerRadius="20 20 0 0"
-                               IsLeftDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                         AncestorType=Window},
-                                                          Path=(local:UIAssistant.IsLeftLcdDrawerOpen)}"
-                               IsRightDrawerOpen="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                          AncestorType=Window},
-                                                           Path=(local:UIAssistant.IsRightLcdDrawerOpen)}"
+                               IsLeftDrawerOpen="{Binding IsTimePointsShown}"
+                               IsRightDrawerOpen="{Binding IsWorkSelectorLoaded}"
                                LeftDrawerBackground="Transparent"
                                RightDrawerBackground="Transparent"
                                OpenMode="Standard"
@@ -38,11 +34,9 @@
 
         <!--  time points generator  -->
 
-        <!--<materialDesign:DrawerHost.RightDrawerContent>
-        -->
-        <!--<works:WorkSelector DataContext="{Binding W}" />-->
-        <!--
-        </materialDesign:DrawerHost.RightDrawerContent>-->
+        <materialDesign:DrawerHost.RightDrawerContent>
+            <works:WorkSelector />
+        </materialDesign:DrawerHost.RightDrawerContent>
 
         <DockPanel Margin="10,0,10,0"
                    LastChildFill="True"

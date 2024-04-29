@@ -7,6 +7,8 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:MainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="350"
              d:DesignWidth="600"
              d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
@@ -59,22 +61,12 @@
                 <Style TargetType="digitPanel:TimerTable">
                     <Setter Property="DigitWidth" Value="100" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Path=(local:UIAssistant.IsLeftLcdDrawerOpen),
-                                                       RelativeSource={RelativeSource AncestorType=Window}}"
-                                     Value="True"
-                                     >
-                            <DataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
-                                                         To="75"
-                                                         Duration="0:0:0.35"
-                                                         />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </DataTrigger.EnterActions>
-                            <!--  Optionally, define ExitActions if you want the width to animate back when the property is False  -->
-                            <DataTrigger.ExitActions>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding DataContext.IsTimePointsShown, RelativeSource={RelativeSource AncestorType=Window}}" Value="False" />
+                                <Condition Binding="{Binding DataContext.IsWorkSelectorLoaded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
@@ -83,8 +75,18 @@
                                                          />
                                     </Storyboard>
                                 </BeginStoryboard>
-                            </DataTrigger.ExitActions>
-                        </DataTrigger>
+                            </MultiDataTrigger.EnterActions>
+                            <MultiDataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
+                                                         To="75"
+                                                         Duration="0:0:0.35"
+                                                         />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </MultiDataTrigger.ExitActions>
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </digitPanel:TimerTable.Style>

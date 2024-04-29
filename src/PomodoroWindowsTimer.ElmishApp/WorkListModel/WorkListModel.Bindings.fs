@@ -42,4 +42,7 @@ type Bindings() =
             |> Binding.mapModel selectedWorkModel
             |> Binding.mapMsgWithModel (fun msg model -> Msg.WorkModelMsg (model.SelectedWorkId.Value, msg))
 
+    member val HasSelectedWork : Binding =
+        nameof __.HasSelectedWork |> Binding.oneWay (_.SelectedWorkId >> Option.isSome)
+
 

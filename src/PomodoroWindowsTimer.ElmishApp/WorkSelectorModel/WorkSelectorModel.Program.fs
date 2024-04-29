@@ -11,7 +11,9 @@ open PomodoroWindowsTimer.ElmishApp.Models.WorkSelectorModel
 let update updateWorkListModel updateWorkModel (logger: ILogger<WorkSelectorModel>) msg model =
     match msg, model with
     | Msg.WorkListModelMsg smsg, WorkList sm ->
-        let (sm, cmd) = updateWorkListModel smsg sm
+        let (sm, cmd, intent) = updateWorkListModel smsg sm
+
+
         model |> withWorkListModel sm
         , Cmd.map Msg.WorkListModelMsg cmd
 

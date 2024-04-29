@@ -3,13 +3,51 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:WorkListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=WorkListModel:Bindings, IsDesignTimeCreatable=False}"
+             DataContext="{Binding WorkListModel}"
              d:DesignHeight="450"
-             d:DesignWidth="800"
+             d:DesignWidth="300"
              mc:Ignorable="d"
              >
     <DockPanel>
-        
+        <local:WorkListItem DockPanel.Dock="Top"
+                            VerticalAlignment="Center"
+                            IsSelected="True"
+                            Visibility="{Binding HasSelectedWork,
+                                                 Converter={StaticResource BooleanToVisibilityConverter}}"
+                            />
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="0,20,0,0"
+                   Text="SELECT WORK"
+                   TextAlignment="Center"
+                   Foreground="#AAAAAA"
+                   Visibility="{Binding HasSelectedWork,
+                                        Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                   />
+        <Grid DockPanel.Dock="Top"
+              Margin="0,20"
+              VerticalAlignment="Top"
+              >
+            <materialDesign:PackIcon VerticalAlignment="Center"
+                                     Kind="Magnify"
+                                     Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+                                     />
+            <TextBox MinWidth="200"
+                     Margin="0,5"
+                     Padding="25,0,0,5"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Bottom"
+                     />
+        </Grid>
+        <ListBox ItemsSource="{Binding WorkModelList}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:WorkListItem />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </DockPanel>
 </UserControl>

@@ -21,23 +21,24 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
         }
 
     match msg with
-    | Msg.SetSelectedWorkId id -> model |> withSelectedWorkId id |> withCmdNone
+    | Msg.SetSelectedWorkId id -> model |> withSelectedWorkId id |> withCmdNone |> withNoIntent
 
     | MsgWith.``Start of LoadWorkList`` model (deff, cts) ->
         model |> withWorks deff
         , Cmd.OfTask.perform loadWorksTask cts.Token (AsyncOperation.finishWithin Msg.LoadWorkList cts)
+        , Intent.None
 
     | MsgWith.``Finish of LoadWorkList`` model res ->
         match res with
         | Error err ->
             do errorMessageQueue.EnqueueError err
-            model |> withWorks (AsyncDeferred.NotRequested) |> withCmdNone
+            model |> withWorks (AsyncDeferred.NotRequested) |> withCmdNone |> withNoIntent
         | Ok (deff, workModels) ->
             match workModels with
             | [] ->
-                model |> withWorks deff |> withCmdNone
+                model |> withWorks deff |> withSelectedWorkId None |> withCmdNone |> withSwitchToCreateWorkIntent
             | head :: _ ->
-                model |> withWorks deff |> withSelectedWorkId (head.Work.Id |> Some) |> withCmdNone
+                model |> withWorks deff |> withSelectedWorkId (head.Work.Id |> Some) |> withCmdNone |> withNoIntent
 
     | Msg.WorkModelMsg (id, wmsg) ->
         match model.Works with
@@ -47,10 +48,11 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
 
             model |> withWorks (wmodelList |> AsyncDeferred.Retrieved)
             , Cmd.map (fun wmsg -> Msg.WorkModelMsg (id, wmsg)) wcmd
+            , Intent.None
 
-        | _ -> model |> withCmdNone
+        | _ -> model |> withCmdNone |> withNoIntent
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
-        model, Cmd.none
+        model |> withCmdNone |> withNoIntent
 

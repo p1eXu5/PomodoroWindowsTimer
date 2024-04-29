@@ -1,21 +1,27 @@
-﻿using System.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
-namespace PomodoroWindowsTimer.WpfClient;
-
-public sealed class DigitPanelTemplateSelector : DataTemplateSelector
+namespace PomodoroWindowsTimer.WpfClient.Selectors
 {
-    public override DataTemplate? SelectTemplate(object isBreak, DependencyObject container)
+    internal sealed class DigitPanelTemplateSelector : DataTemplateSelector
     {
-        FrameworkElement? element = container as FrameworkElement;
-
-        if (element != null && isBreak != null)
+        public override DataTemplate? SelectTemplate(object isBreak, DependencyObject container)
         {
-            if (isBreak is bool b && b)
-                return element.FindResource("gp_Red") as DataTemplate;
+            FrameworkElement? element = container as FrameworkElement;
 
-            return element.FindResource("gp_Green") as DataTemplate;
+            if (element != null && isBreak != null)
+            {
+                if (isBreak is bool b && b)
+                    return element.FindResource("gp_Red") as DataTemplate;
+
+                return element.FindResource("gp_Green") as DataTemplate;
+            }
+            return null;
         }
-        return null;
     }
 }

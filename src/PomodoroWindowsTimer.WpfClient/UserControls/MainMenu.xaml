@@ -5,8 +5,8 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             d:DataContext="{d:DesignInstance Type=vm:Bindings, IsDesignTimeCreatable=False}"
+             xmlns:MainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="50"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -46,17 +46,13 @@
         <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"
                       ToolTip="Playlist"
                       Style="{StaticResource st_MenuToggleButton}"
-                      IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                         AncestorType=Window},
-                                          Path=(local:UIAssistant.AreRunningTimePointsShown)}"
+                      IsChecked="{Binding IsTimePointsShown}"
                       />
         <!--  time points generator open button  -->
         <ToggleButton Content="{materialDesign:PackIcon TimerCogOutline}"
                       ToolTip="Generator"
                       Style="{StaticResource st_MenuToggleButton}"
-                      IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                         AncestorType=Window},
-                                          Path=(local:UIAssistant.IsRightLcdDrawerOpen)}"
+                      IsChecked="{Binding IsWorkSelectorLoaded}"
                       />
         <!--  telegram bot settings open dialog button  -->
         <Button DockPanel.Dock="Left"

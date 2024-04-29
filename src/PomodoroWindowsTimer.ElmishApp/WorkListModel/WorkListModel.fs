@@ -30,6 +30,16 @@ module WorkListModel =
                 model.Works |> AsyncDeferred.chooseRetrievedResultWithin res cts
             | _ -> None
  
+    [<RequireQualifiedAccess; Struct>]
+    type Intent =
+        | None
+        | SwitchToCreateWork
+
+    let withNoIntent (model, cmd) =
+        (model, cmd, Intent.None)
+
+    let withSwitchToCreateWorkIntent(model, cmd) =
+        (model, cmd, Intent.SwitchToCreateWork)
 
     open Elmish
 
