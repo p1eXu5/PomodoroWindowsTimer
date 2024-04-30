@@ -10,10 +10,15 @@ open PomodoroWindowsTimer.Abstractions
 [<Literal>]
 let internal tickMilliseconds = 200<ms>
 
+[<Literal>]
+let internal title = "Pomodoro Windows Timer"
+
 let internal main
     (window: System.Windows.Window)
     (workRepository: IWorkRepository)
     (workEventRepository: IWorkEventRepository)
+    (telegramBot: ITelegramBot)
+    (windowsMinimizer: IWindowsMinimizer)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
@@ -22,10 +27,12 @@ let internal main
     =
     let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
         CompositionRoot.compose
-            "Pomodoro Windows Timer"
+            title
             tickMilliseconds
             workRepository
             workEventRepository
+            telegramBot
+            windowsMinimizer
             themeSwitcher
             userSettings
             mainErrorMessageQueue

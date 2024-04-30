@@ -5,6 +5,7 @@ open Elmish.Extensions
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.TimePointQueue
+open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.Abstractions
@@ -46,10 +47,10 @@ and
 type MainModeConfig =
     {
         UserSettings: IUserSettings
-        SendToBot: BotSender
+        SendToBot: ITelegramBot
         Looper: Looper
         TimePointQueue: TimePointQueue
-        WindowsMinimizer: WindowsMinimizer
+        WindowsMinimizer: IWindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
         TimePointStore: TimePointStore
         WorkRepository: IWorkRepository
@@ -88,6 +89,9 @@ module MainModel =
         
         | OnError of string
         | OnExn of exn
+
+        /// Using in test
+        | Terminate
     and
         WindowsMsg =
             | MinimizeWindows
@@ -95,6 +99,7 @@ module MainModel =
             | RestoreWindows
             | RestoreMainWindow
     and
+        [<RequireQualifiedAccess>]
         PlayerMsg =
             | Play
             | Next

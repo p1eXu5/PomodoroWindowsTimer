@@ -3,6 +3,7 @@ using MaterialDesignThemes.Wpf;
 using System.Windows;
 using System.Windows.Media;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.ElmishApp;
 
 namespace PomodoroWindowsTimer.WpfClient;
 

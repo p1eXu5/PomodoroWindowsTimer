@@ -4,6 +4,7 @@ open System
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer
 
 
 type TimePointPrototypeStore =
@@ -13,20 +14,10 @@ type TimePointPrototypeStore =
     }
 
 module TimePointPrototypeStore =
-    open System.Text.Json
-    open System.Text.Json.Serialization
-
-    let options =
-        JsonFSharpOptions.Default()
-            .WithUnionExternalTag()
-            .WithUnionNamedFields()
-            .WithUnionUnwrapSingleCaseUnions(false)
-            .ToJsonSerializerOptions()
-
     let read (timePointPrototypeSettings : ITimePointPrototypesSettings) =
         timePointPrototypeSettings.TimePointPrototypesSettings
         |> Option.map (fun s ->
-            JsonSerializer.Deserialize<TimePointPrototype list>(s, options)
+            JsonHelpers.Deserialize<TimePointPrototype list>(s)
         )
         |> Option.defaultValue TimePointPrototype.defaults
 
@@ -36,7 +27,7 @@ module TimePointPrototypeStore =
         | [] ->
             timePointPrototypeSettings.TimePointPrototypesSettings <- None
         | _ ->
-            let s = JsonSerializer.Serialize(timePointPrototypes, options)
+            let s = JsonHelpers.Serialize(timePointPrototypes)
             timePointPrototypeSettings.TimePointPrototypesSettings <- s |> Some
 
 
@@ -54,20 +45,11 @@ type TimePointStore =
     }
 
 module TimePointStore =
-    open System.Text.Json
-    open System.Text.Json.Serialization
-
-    let options =
-        JsonFSharpOptions.Default()
-            .WithUnionExternalTag()
-            .WithUnionNamedFields()
-            .WithUnionUnwrapSingleCaseUnions(false)
-            .ToJsonSerializerOptions()
 
     let read (timePointSettings : ITimePointSettings) =
         timePointSettings.TimePointSettings
         |> Option.map (fun s ->
-            JsonSerializer.Deserialize<TimePoint list>(s, options)
+            JsonHelpers.Deserialize<TimePoint list>(s)
         )
         |> Option.defaultValue TimePoint.defaults
 
@@ -77,7 +59,7 @@ module TimePointStore =
         | [] ->
             timePointSettings.TimePointSettings <- None
         | _ ->
-            let s = JsonSerializer.Serialize(timePoints, options)
+            let s = JsonHelpers.Serialize(timePoints)
             timePointSettings.TimePointSettings <- s |> Some
 
 
@@ -106,21 +88,13 @@ module PatternStore =
         patternSettings.Patterns <- patterns
 
 
-    let initialize (patternSettings : IPatternSettings) : PatternStore =
+    let init (patternSettings : IPatternSettings) : PatternStore =
         {
             Read = fun () -> read patternSettings
             Write = write patternSettings
         }
 
-
-type WindowsMinimizer =
-    {
-        MinimizeOther: unit -> Async<unit>
-        Restore: unit -> Async<unit>
-        RestoreMainWindow: unit -> Async<unit>
-    }
-
-module Windows =
+module WindowsMinimizer =
 
     open System.Runtime.InteropServices
 
@@ -145,51 +119,51 @@ module Windows =
     let [<Literal>] SW_RESTORE = 9;
 
     let minimize ipWindowName =
-        async {
+        task {
             let appWindow = findWindow(null, ipWindowName)
             let shellTrayWnd = findWindow("Shell_TrayWnd", null)
             sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
-            do! Async.Sleep(500)
+            do! Task.Delay(500)
             showWindow(appWindow, SW_RESTORE) |> ignore
         }
 
     let restore () =
-        async {
-            let shellTrayWnd = findWindow("Shell_TrayWnd", null)
-            sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
-        }
+        let shellTrayWnd = findWindow("Shell_TrayWnd", null)
+        sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
+       
 
     let restoreMainWindow ipWindowName =
-        async {
-            let appWindow = findWindow(null, ipWindowName)
-            showWindow(appWindow, SW_RESTORE) |> ignore
-        }
+        let appWindow = findWindow(null, ipWindowName)
+        showWindow(appWindow, SW_RESTORE) |> ignore
 
-    let prodWindowsMinimizer mainWindowTitle =
-        {
-            MinimizeOther = fun () -> minimize mainWindowTitle
-            Restore = restore
-            RestoreMainWindow = fun () -> restoreMainWindow mainWindowTitle
+    let init mainWindowTitle =
+        { new IWindowsMinimizer with
+            member _.MinimizeOther () =
+                minimize mainWindowTitle
+            member _.Restore () =
+                restore ()
+            member _.RestoreMainWindow () =
+                restoreMainWindow mainWindowTitle
         }
 
     /// for debug purpose
-    let simWindowsMinimizer =
-        {
-            MinimizeOther = fun _ -> async.Return ()
-            Restore = async.Return
-            RestoreMainWindow = fun _ -> async.Return ()
+    let initStub _ =
+        { new IWindowsMinimizer with
+            member _.MinimizeOther () =
+                task { return () }
+            member _.Restore () =
+                ()
+            member _.RestoreMainWindow () =
+                ()
         }
 
 
-type Message = string
 
-type BotSender = Message -> Task<unit>
-
-module Telegram =
+module TelegramBot =
 
     open Telegram.Bot
 
-    let sendToBot (botClient: ITelegramBotClient) chatId text =
+    let sendMessage (botClient: ITelegramBotClient) chatId text =
         task {
             let! _ =
                 botClient.SendTextMessageAsync(
@@ -197,4 +171,15 @@ module Telegram =
                     text)
 
             return ()
+        }
+
+    let init (userSettings: IBotSettings) =
+        { new ITelegramBot with
+            member _.SendMessage message =
+                match userSettings.BotToken, userSettings.MyChatId with
+                | Some botToken, Some myChatId ->
+                    let botClient = TelegramBotClient(botToken)
+                    sendMessage botClient (Types.ChatId(myChatId)) message
+                | _ ->
+                    task { return () }
         }

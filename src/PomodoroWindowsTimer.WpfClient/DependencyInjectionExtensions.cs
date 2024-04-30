@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.ElmishApp.Infrastructure;
 using PomodoroWindowsTimer.WpfClient;
 using PomodoroWindowsTimer.WpfClient.Services;
 using PomodoroWindowsTimer.Storage;
@@ -18,7 +19,6 @@ internal static class DependencyInjectionExtensions
     public static void AddDb(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddOptions<WorkDbOptions>().Bind(configuration.GetSection("WorkDb")).ValidateDataAnnotations().ValidateOnStart();
-
 
         services.TryAddSingleton<IWorkRepository>(sp =>
         {
@@ -49,6 +49,23 @@ internal static class DependencyInjectionExtensions
 
     public static void AddTimeProvider(this IServiceCollection services)
         => services.TryAddSingleton(TimeProvider.System);
+
+    public static void AddTelegramBot(this IServiceCollection services)
+        => services.TryAddSingleton(sp =>
+        {
+            var userSettings = sp.GetRequiredService<IUserSettings>();
+            return TelegramBot.init(userSettings);
+        });
+
+    public static void AddWindowsMinimizer(this IServiceCollection services)
+        => services.TryAddSingleton(sp =>
+        {
+#if DEBUG
+            return WindowsMinimizer.initStub(PomodoroWindowsTimer.ElmishApp.Program.title);
+#else
+            return WindowsMinimizer.init(PomodoroWindowsTimer.ElmishApp.Program.title);
+#endif
+        });
 
     public static void AddThemeSwitcher(this IServiceCollection services)
         => services.TryAddSingleton<IThemeSwitcher>(new ThemeSwitcher());

@@ -10,6 +10,8 @@ namespace PomodoroWindowsTimer.WpfClient;
 internal sealed class ElmishProgramFactory(
     IWorkRepository workRepository,
     IWorkEventRepository workEventRepository,
+    ITelegramBot telegramBot,
+    IWindowsMinimizer windowsMinimizer,
     IThemeSwitcher themeSwitcher,
     IUserSettings userSettings,
     [FromKeyedServices("main")] IErrorMessageQueue mainErrorMessageQueue,
@@ -17,20 +19,29 @@ internal sealed class ElmishProgramFactory(
     ILoggerFactory loggerFactory
 )
 {
-    public IUserSettings UserSettings => userSettings;
-    public IThemeSwitcher ThemeSwitcher => themeSwitcher;
-    public IErrorMessageQueue MainErrorMessageQueue => mainErrorMessageQueue;
-    public ILoggerFactory LoggerFactory => loggerFactory;
+    internal IWorkRepository WorkRepository => workRepository;
+    internal IWorkEventRepository WorkEventRepository => workEventRepository;
+    internal ITelegramBot TelegramBot => telegramBot;
+    internal IWindowsMinimizer WindowsMinimizer => windowsMinimizer;
+    internal IThemeSwitcher ThemeSwitcher => themeSwitcher;
+    internal IUserSettings UserSettings => userSettings;
+    internal IErrorMessageQueue MainErrorMessageQueue => mainErrorMessageQueue;
+    internal IErrorMessageQueue DialogErrorMessageQueue => dialogErrorMessageQueue;
+    internal ILoggerFactory LoggerFactory => loggerFactory;
+
+
 
     public void RunElmishProgram(Window mainWindow)
     =>
         ElmishApp.Program.main(
             mainWindow,
-            workRepository,
-            workEventRepository,
+            WorkRepository,
+            WorkEventRepository,
+            TelegramBot,
+            WindowsMinimizer,
             ThemeSwitcher,
             UserSettings,
             MainErrorMessageQueue,
-            dialogErrorMessageQueue,
+            DialogErrorMessageQueue,
             LoggerFactory);
 }

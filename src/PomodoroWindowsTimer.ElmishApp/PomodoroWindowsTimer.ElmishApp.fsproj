@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="Elmish.Extensions.fs" />
+    <Compile Include="Types.fs" />
     <Compile Include="Abstractions.fs" />
     <Compile Include="Infrastructure.fs" />
     <Compile Include="LoggerExtensions.fs" />

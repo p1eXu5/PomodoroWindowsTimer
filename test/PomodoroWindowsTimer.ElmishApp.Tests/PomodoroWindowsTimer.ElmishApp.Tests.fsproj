@@ -10,20 +10,29 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
     <Compile Include="FakerExtensions.fs" />
-    <Compile Include="ShouldExtensions.fs" />
-    <Compile Include="TestState.fs" />
-    <Compile Include="TestServices.fs" />
-    <Compile Include="TestElmishProgram.fs" />
     <Compile Include="Fakers.fs" />
-    <Compile Include="BDD\CommonSteps.fs" />
-    <Compile Include="BDD\StopResumeFeature.fs" />
-    <Compile Include="BDD\GenerateTimePointsFeature.fs" />
+    <Compile Include="ScenarioCE.fs" />
+    <Compile Include="TestDispatcher.fs" />
+    <Compile Include="StubAndMocks.fs" />
+    <Compile Include="TestBootstrap.fs" />
+    <Compile Include="Sut.fs" />
+    <Compile Include="Features\Helpers.fs" />
+    <Compile Include="Features\CommonSteps\GivenSteps.fs" />
+    <Compile Include="Features\CommonSteps\WhenSteps.fs" />
+    <Compile Include="Features\CommonSteps\ThenSteps.fs" />
+    <Compile Include="Features\StopResume\Steps\GivenSteps.fs" />
+    <Compile Include="Features\StopResume\Steps\WhenSteps.fs" />
+    <Compile Include="Features\StopResume\Steps\ThenSteps.fs" />
+    <Compile Include="Features\StopResume\StopResumeFeature.fs" />
+    <Compile Include="Features\GenerateTimePoints\GenerateTimePointsFeature.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.5.0" />
+    <PackageReference Include="Bogus" Version="35.5.1" />
+    <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="4.15.1" />
     <PackageReference Include="FsUnit" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NUnit" Version="4.1.0" />
@@ -41,6 +50,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
+    <ProjectReference Include="..\..\src\PomodoroWindowsTimer.WpfClient\PomodoroWindowsTimer.WpfClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="8.0.300-beta.24178.1" />
   </ItemGroup>
 
 </Project>

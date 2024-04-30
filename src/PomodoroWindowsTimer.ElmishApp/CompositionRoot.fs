@@ -21,6 +21,8 @@ let compose
     (tickMilliseconds: int<ms>)
     (workRepository: IWorkRepository)
     (workEventRepository: IWorkEventRepository)
+    (telegramBot: ITelegramBot)
+    (windowsMinimizer: IWindowsMinimizer)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
@@ -30,27 +32,13 @@ let compose
     let timePointQueue = new TimePointQueue(loggerFactory.CreateLogger<TimePointQueue>())
     let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds, loggerFactory.CreateLogger<Looper>())
 
-    let sendToBot message =
-        match userSettings.BotToken, userSettings.MyChatId with
-        | Some botToken, Some myChatId ->
-            let botClient = TelegramBotClient(botToken)
-            message |> Telegram.sendToBot botClient (Types.ChatId(myChatId))
-        | _ ->
-            task { return () }
-
-#if DEBUG
-    let windowsMinimizer = Windows.simWindowsMinimizer
-#else
-    let windowsMinimizer = Windows.prodWindowsMinimizer title
-#endif
-
-    let patternStore = PatternStore.initialize userSettings
+    let patternStore = PatternStore.init userSettings
     let timePointPrototypeStore = TimePointPrototypeStore.initialize userSettings
 
     let mainModelCfg =
         {
             UserSettings = userSettings
-            SendToBot = sendToBot
+            SendToBot = telegramBot
             Looper = looper
             TimePointQueue = timePointQueue
             WindowsMinimizer = windowsMinimizer

@@ -7,6 +7,7 @@ using DrugRoom.WpfClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using Serilog;
 
@@ -57,7 +58,13 @@ internal class Bootstrap : IDisposable
         {
             opts.SuppressStatusMessages = true;
         });
-        hostBuilder.ConfigureServices(bootstrap.ConfigureServices);
+        
+        hostBuilder.ConfigureServices((ctx, services) => {
+            bootstrap.PreConfigureServices(ctx, services);
+            bootstrap.ConfigureServices(ctx, services);
+        });
+
+        hostBuilder.ConfigureLogging(bootstrap.ConfigureLogging);
 
         bootstrap.PostConfigureHost(hostBuilder);
 
@@ -110,6 +117,8 @@ internal class Bootstrap : IDisposable
     protected virtual void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
     {
         services.AddTimeProvider();
+        services.AddTelegramBot();
+        services.AddWindowsMinimizer();
         services.AddThemeSwitcher();
         services.AddUserSettings(hostBuilderCtx.Configuration);
         services.AddDb(hostBuilderCtx.Configuration);
@@ -129,7 +138,10 @@ internal class Bootstrap : IDisposable
     protected ElmishProgramFactory GetElmishProgramFactory()
         => Host.Services.GetRequiredService<ElmishProgramFactory>();
 
-    protected virtual void PreConfigureHost(HostApplicationBuilder hostBuilder)
+    protected virtual void PreConfigureServices(HostBuilderContext hostBuilder, IServiceCollection services)
+    { }
+
+    protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
     { }
 
     protected virtual void PostConfigureHost(IHostBuilder hostBuilder)

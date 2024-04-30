@@ -4,7 +4,6 @@ open System
 open Bogus
 open PomodoroWindowsTimer.Types
 
-let faker = Faker("en")
 
 let ``0.5 sec`` = TimeSpan.FromMilliseconds(500)
 let ``3 sec`` = TimeSpan.FromSeconds(3)

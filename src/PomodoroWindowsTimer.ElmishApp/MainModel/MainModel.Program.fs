@@ -109,13 +109,13 @@ let updateOnPlayerMsg
 let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
     | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfAsync.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
+        { model with IsMinimized = true }, Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
 
     | WindowsMsg.RestoreWindows when model.IsMinimized ->
-        { model with IsMinimized = false }, Cmd.OfAsync.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
+        { model with IsMinimized = false }, Cmd.OfFunc.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
 
     | WindowsMsg.RestoreMainWindow ->
-        model, Cmd.OfAsync.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnExn
+        model, Cmd.OfFunc.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnExn
 
     | WindowsMsg.SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none

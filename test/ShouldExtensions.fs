@@ -19,13 +19,7 @@ module Helpers =
 [<AutoOpen>]
 module FsUnit =
 
-    let inline writeLine s = TestContext.WriteLine(sprintf "%A%A" s s)
-    let inline writeLineS (s: string) = TestContext.WriteLine(s)
-    let inline writeLinef<'a> (format: Printf.StringFormat<'a -> string>) s =
-        TestContext.WriteLine(sprintf format s)
-
     let toTask computation : Task = Async.StartAsTask computation :> _
-
 
     [<DebuggerNonUserCode>]
     let shouldL (f: 'a -> #Constraint) x message (y: obj) =

@@ -1,9 +1,8 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Abstractions
 
-open System
-open System.Threading
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
 
 type IErrorMessageQueue =
     interface
@@ -51,14 +50,16 @@ type IUserSettings =
     inherit ICurrentWorkItemSettings
 
 
-/// Used in theme switcher on WPF side
-type TimePointKind =
-    | Undefined = 0
-    | Work = 1
-    | Break = 2
-
 type IThemeSwitcher =
     interface
         abstract SwitchTheme: TimePointKind -> unit
     end
+
+type ITelegramBot =
+    abstract SendMessage: string -> Task<unit>
+
+type IWindowsMinimizer =
+    abstract MinimizeOther: unit -> Task<unit>
+    abstract Restore: unit -> unit
+    abstract RestoreMainWindow: unit -> unit
 
