@@ -16,7 +16,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
 
                 <materialDesign:CustomColorTheme BaseTheme="Dark"
-                                                 PrimaryColor="LightSkyBlue"
+                                                 PrimaryColor="LightSteelBlue"
                                                  SecondaryColor="Lime"
                                                  >
                     <materialDesign:CustomColorTheme.ColorAdjustment>
