@@ -261,7 +261,7 @@ let update
 
     | Msg.SetIsWorkSelectorLoaded v ->
         if v then
-            let (m, cmd) = WorkSelectorModel.init ()
+            let (m, cmd) = WorkSelectorModel.init (model.Work |> Option.map (_.Work >> _.Id))
             model |> withWorkSelectorModel (m |> Some) |> withIsTimePointsShown false
             , Cmd.map Msg.WorkSelectorModelMsg cmd
         else

@@ -45,8 +45,8 @@ module WorkSelectorModel =
 
     open Elmish
 
-    let init () =
-        let (m, cmd) = WorkListModel.init None
+    let init selectedWorkId =
+        let (m, cmd) = WorkListModel.init selectedWorkId
         {
             HaveNoWorks = false
             SubModel = m |> WorkSelectorSubModel.WorkList
