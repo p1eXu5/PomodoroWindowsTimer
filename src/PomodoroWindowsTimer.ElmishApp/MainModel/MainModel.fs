@@ -53,6 +53,7 @@ type MainModeConfig =
         ThemeSwitcher: IThemeSwitcher
         TimePointStore: TimePointStore
         WorkRepository: IWorkRepository
+        WorkEventRepository: IWorkEventRepository
     }
     member this.BotSettings = this.UserSettings :> IBotSettings
     member this.DisableSkipBreakSettings = this.UserSettings :> IDisableSkipBreakSettings
@@ -61,6 +62,7 @@ type MainModeConfig =
 
 module MainModel =
 
+    [<RequireQualifiedAccess>]
     type Msg =
         | SetDisableSkipBreak of bool
         | SetDisableMinimizeMaximizeWindows of bool
@@ -71,27 +73,15 @@ module MainModel =
         | StartTimePoint of Operation<Guid, unit>
         | SetIsTimePointsShown of bool
 
+        | PlayerMsg of PlayerMsg
+        | WindowsMsg of WindowsMsg
+        | SendToChatBot
+
+        | AppDialogModelMsg of AppDialogModel.Msg
+
         | LoadCurrentWork
         | SetCurrentWorkIfNone of Result<Work, string>
         | WorkModelMsg of WorkModel.Msg
-
-        | PlayerMsg of PlayerMsg
-        | LooperMsg of LooperEvent
-        | WindowsMsg of WindowsMsg
-
-        // | InitializeTimePointsGeneratorModel
-        // // | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
-        // | EraseTimePointsGeneratorModel of isDrawerOpen: bool
-
-        // | LoadBotSettingsModel
-        // | BotSettingsMsg of BotSettingsModel.Msg
-        | SendToChatBot
-        
-        | PreChangeActiveTimeSpan
-        | ChangeActiveTimeSpan of float
-        | PostChangeActiveTimeSpan
-
-        | AppDialogModelMsg of AppDialogModel.Msg
 
         | SetIsWorkSelectorLoaded of bool
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
@@ -111,6 +101,10 @@ module MainModel =
             | Replay
             | Stop
             | Resume
+            | LooperMsg of LooperEvent
+            | PreChangeActiveTimeSpan
+            | ChangeActiveTimeSpan of float
+            | PostChangeActiveTimeSpan
 
     module Msg = 
         let tryNext (model: MainModel) =
@@ -264,3 +258,26 @@ module MainModel =
 
     let withIsTimePointsShown v (model: MainModel) =
          { model with IsTimePointsShown = v }
+
+    let withStoppedLooper cfg (model: MainModel) =
+        match model.LooperState with
+        | LooperState.Playing ->
+            cfg.Looper.Stop()
+            model |> setLooperState Stopped
+        | _ -> model
+
+    let withShiftedActiveTimePoint cfg (model: MainModel) =
+        match model.ActiveTimePoint with
+        | Some activeTp ->
+            cfg.Looper.Shift(activeTp.TimeSpan.TotalSeconds * 1.0<sec>)
+            model
+        | _ ->
+            model
+
+    let withTimePoints timePoints cfg (model: MainModel) =
+        let model = model |> withStoppedLooper cfg
+        cfg.TimePointQueue.Reload(timePoints)
+        cfg.TimePointStore.Write(timePoints)
+        cfg.Looper.PreloadTimePoint()
+        { model with TimePoints = timePoints }
+

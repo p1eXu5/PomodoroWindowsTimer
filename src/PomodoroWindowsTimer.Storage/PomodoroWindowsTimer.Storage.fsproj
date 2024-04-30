@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <Compile Include="Helpers.fs" />
+    <Compile Include="Types.fs" />
+    <Compile Include="WorkEventRepository.fs" />
     <Compile Include="WorkRepository.fs" />
     <Compile Include="Initializer.fs" />
   </ItemGroup>

@@ -1,5 +1,6 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.CompositionRoot
 
+open System
 open Microsoft.Extensions.Logging
 
 open Elmish
@@ -13,13 +14,13 @@ open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
-open System
 
 
 let compose
     (title: string)
     (tickMilliseconds: int<ms>)
     (workRepository: IWorkRepository)
+    (workEventRepository: IWorkEventRepository)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
@@ -56,6 +57,7 @@ let compose
             ThemeSwitcher = themeSwitcher
             TimePointStore = TimePointStore.initialize userSettings
             WorkRepository = workRepository
+            WorkEventRepository = workEventRepository
         }
     // init
     let initMainModel () =
@@ -118,7 +120,7 @@ let compose
             let onLooperEvt =
                 fun evt ->
                     async {
-                        do dispatch (MainModel.Msg.LooperMsg evt)
+                        do dispatch (MainModel.PlayerMsg.LooperMsg evt |> MainModel.Msg.PlayerMsg)
                     }
             looper.AddSubscriber(onLooperEvt)
             { new IDisposable with 

@@ -10,7 +10,7 @@ type WorkModel =
         Number: string option
         Title: string
         UpdateState: AsyncDeferred<DateTimeOffset>
-        CreateNewState: AsyncDeferred<int * DateTimeOffset>
+        CreateNewState: AsyncDeferred<uint64 * DateTimeOffset>
     }
 
 module WorkModel =
@@ -19,7 +19,7 @@ module WorkModel =
         | SetNumber of string option
         | SetTitle of string
         | Update of AsyncOperation<unit, Result<DateTimeOffset, string>>
-        | CreateNew of AsyncOperation<unit, Result<(int * DateTimeOffset), string>>
+        | CreateNew of AsyncOperation<unit, Result<(uint64 * DateTimeOffset), string>>
         | Select
         | Edit
         | CancelEdit

@@ -9,6 +9,7 @@ namespace PomodoroWindowsTimer.WpfClient;
 
 internal sealed class ElmishProgramFactory(
     IWorkRepository workRepository,
+    IWorkEventRepository workEventRepository,
     IThemeSwitcher themeSwitcher,
     IUserSettings userSettings,
     [FromKeyedServices("main")] IErrorMessageQueue mainErrorMessageQueue,
@@ -26,6 +27,7 @@ internal sealed class ElmishProgramFactory(
         ElmishApp.Program.main(
             mainWindow,
             workRepository,
+            workEventRepository,
             ThemeSwitcher,
             UserSettings,
             MainErrorMessageQueue,

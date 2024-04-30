@@ -32,6 +32,18 @@ internal static class DependencyInjectionExtensions
                 Initializer.initWorkRepository(workDbOptions.ConnectionString, timeProvider);
         });
 
+        services.TryAddSingleton<IWorkEventRepository>(sp =>
+        {
+            // var logger = sp.GetRequiredService<ILogger<IWorkRepository>>
+            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
+
+            using var scope = sp.CreateScope();
+            var workDbOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<WorkDbOptions>>().Value;
+
+            return
+                Initializer.initWorkEventRepository(workDbOptions.ConnectionString, timeProvider);
+        });
+
         services.AddHostedService<DbSeederHostedService>();
     }
 

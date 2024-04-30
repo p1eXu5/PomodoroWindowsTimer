@@ -13,6 +13,7 @@ let internal tickMilliseconds = 200<ms>
 let internal main
     (window: System.Windows.Window)
     (workRepository: IWorkRepository)
+    (workEventRepository: IWorkEventRepository)
     (themeSwitcher: IThemeSwitcher)
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
@@ -24,6 +25,7 @@ let internal main
             "Pomodoro Windows Timer"
             tickMilliseconds
             workRepository
+            workEventRepository
             themeSwitcher
             userSettings
             mainErrorMessageQueue

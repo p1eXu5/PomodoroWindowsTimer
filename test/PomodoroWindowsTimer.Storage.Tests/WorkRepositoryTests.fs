@@ -70,7 +70,7 @@ let ``create test`` () =
         | Error err, _ -> failAssert err
         | _, Error err -> failAssert err
         | Ok (id1, _), Ok (id2, _) ->
-            id1 |> shouldBeGreaterThan 0
+            id1 |> shouldBeGreaterThan 0UL
             id2 |> shouldBeGreaterThan id1
     }
 

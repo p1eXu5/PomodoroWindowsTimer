@@ -20,7 +20,7 @@ let execute (dbConnection: IDbConnection) (sqlScripts: string seq) (sqlParameter
 
         let command = CommandDefinition(sql, sqlParameters, cancellationToken=ct)
         try
-            let! v = dbConnection.ExecuteScalarAsync<int>(command)
+            let! v = dbConnection.ExecuteScalarAsync<uint64>(command)
             return v |> Ok
         with ex ->
             return ex.Message |> Error

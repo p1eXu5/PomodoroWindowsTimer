@@ -25,9 +25,17 @@ type ILooper =
 
 type IWorkRepository =
     interface
-        abstract Create: string option -> string -> CancellationToken -> Task<Result<(int * DateTimeOffset), string>>
+        abstract Create: string option -> string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
         abstract ReadAll: CancellationToken -> Task<Result<Work seq, string>>
-        abstract FindById: int -> CancellationToken -> Task<Result<Work option, string>>
+        abstract FindById: uint64 -> CancellationToken -> Task<Result<Work option, string>>
         abstract FindByIdOrCreate: Work -> CancellationToken -> Task<Result<Work, string>>
         abstract Update: Work -> CancellationToken -> Task<Result<DateTimeOffset, string>>
     end
+
+
+type IWorkEventRepository =
+    interface
+        abstract Create: uint64 -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract ReadAll: CancellationToken -> Task<Result<WorkEvent seq, string>>
+    end
+

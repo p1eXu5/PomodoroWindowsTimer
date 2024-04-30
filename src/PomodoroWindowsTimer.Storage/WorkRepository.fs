@@ -1,26 +1,13 @@
 ﻿module PomodoroWindowsTimer.Storage.WorkRepository
 
 open System
-open System.Data
-open System.Threading.Tasks
-open Dapper
-open Dapper.FSharp.SQLite
-open PomodoroWindowsTimer.Types
-open Dapper
 open System.Collections.Generic
-open PomodoroWindowsTimer.Abstractions
-open Microsoft.Data.Sqlite
 open System.Threading
+open System.Threading.Tasks
 
-[<CLIMutable>]
-type ReadRow =
-    {
-        id: int
-        number: string option
-        title: string
-        created_at: int64
-        updated_at: int64 option
-    }
+open Dapper.FSharp.SQLite
+
+open PomodoroWindowsTimer.Types
 
 type CreateRow =
     {
@@ -29,10 +16,14 @@ type CreateRow =
         created_at: int64
     }
 
-type internal Cfg =
+[<CLIMutable>]
+type ReadRow =
     {
-        DbConnection: IDbConnection
-        TimeProvider: System.TimeProvider
+        id: uint64
+        number: string option
+        title: string
+        created_at: int64
+        updated_at: int64 option
     }
 
 let private readTable = table'<ReadRow> "work"
@@ -40,7 +31,7 @@ let private writeTable = table'<CreateRow> "work"
 
 let create
     (timeProvider: System.TimeProvider)
-    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<int, string>>)
+    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
     (number: string option)
     (title: string)
     (ct: CancellationToken)
@@ -97,7 +88,7 @@ let readAll (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerabl
                 } : Work))
     }
 
-let findById (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: int) ct =
+let findById (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: uint64) ct =
     task {
         let! res =
             select {
@@ -145,7 +136,7 @@ let find (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<R
 let findOrCreate
     (timeProvider: System.TimeProvider)
     (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>)
-    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<int, string>>)
+    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
     (work: Work)
     ct
     =
@@ -185,7 +176,7 @@ let update (timeProvider: System.TimeProvider) (updatef: CancellationToken -> Up
         return res |> Result.map (fun () -> nowDate)
     }
 
-let delete (deletef: CancellationToken -> DeleteQuery -> Task<Result<unit, string>>) (id: int) ct =
+let delete (deletef: CancellationToken -> DeleteQuery -> Task<Result<unit, string>>) (id: uint64) ct =
     task {
         return!
             delete {

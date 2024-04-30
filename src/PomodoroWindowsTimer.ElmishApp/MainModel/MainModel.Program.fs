@@ -53,8 +53,53 @@ let updateOnPlayerMsg
 
     | PlayerMsg.Replay when model.ActiveTimePoint |> Option.isSome ->
         let cmd =
-            Cmd.batch [Cmd.ofMsg Msg.PreChangeActiveTimeSpan; Cmd.ofMsg (ChangeActiveTimeSpan 0.0); Cmd.ofMsg (PlayerMsg.Resume |> Msg.PlayerMsg)]
+            Cmd.batch [Cmd.ofMsg (PlayerMsg.PreChangeActiveTimeSpan |> Msg.PlayerMsg); Cmd.ofMsg (PlayerMsg.ChangeActiveTimeSpan 0.0 |> Msg.PlayerMsg); Cmd.ofMsg (PlayerMsg.Resume |> Msg.PlayerMsg)]
         model, cmd
+
+    | PlayerMsg.LooperMsg evt ->
+        let (activeTimePoint, cmd, switchTheme) =
+            match evt with
+            | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none, false)
+            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none, true)
+            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
+                match nextTp.Kind with
+                | LongBreak -> (nextTp |> Some, Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg), true)
+                | Break -> (nextTp |> Some, Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg), true)
+                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg) ], true)
+                | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg); Cmd.ofMsg Msg.SendToChatBot ], true)
+
+        let model = model |> setActiveTimePoint activeTimePoint
+        model
+        , Cmd.batch [
+            cmd
+            if switchTheme then
+                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
+        ]
+
+    // --------------------
+    // Active time changing
+    // --------------------
+    | PlayerMsg.PreChangeActiveTimeSpan ->
+        match model.LooperState with
+        | Playing ->
+            cfg.Looper.Stop()
+            model, Cmd.none
+        | _ ->
+            { model with LooperState = TimeShiftOnStopped model.LooperState }, Cmd.none
+
+    | PlayerMsg.ChangeActiveTimeSpan v ->
+        let duration = model |> getActiveTimeDuration
+        cfg.Looper.Shift((duration - v) * 1.0<sec>)
+        model, Cmd.none
+
+    | PlayerMsg.PostChangeActiveTimeSpan ->
+        match model.LooperState with
+        | TimeShiftOnStopped s ->
+            { model with LooperState = s }, Cmd.none
+        | _ ->
+            cfg.Looper.Resume()
+            model, Cmd.none
+
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
@@ -122,10 +167,10 @@ let update
         { model with TimePoints = timePoints }
         , Cmd.none
 
-    | StartTimePoint (Operation.Start id) ->
-        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) OnExn ]
+    | Msg.StartTimePoint (Operation.Start id) ->
+        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn ]
 
-    | StartTimePoint (Operation.Finish _) ->
+    | Msg.StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg (PlayerMsg.Play |> Msg.PlayerMsg)
 
     // --------------------
@@ -159,25 +204,7 @@ let update
 
     | Msg.PlayerMsg pmsg -> updateOnPlayerMsg logger pmsg model
 
-    | Msg.LooperMsg evt ->
-        let (activeTimePoint, cmd, switchTheme) =
-            match evt with
-            | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none, false)
-            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none, true)
-            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
-                match nextTp.Kind with
-                | LongBreak -> (nextTp |> Some, Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg), true)
-                | Break -> (nextTp |> Some, Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg), true)
-                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg) ], true)
-                | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg); Cmd.ofMsg Msg.SendToChatBot ], true)
-
-        let model = model |> setActiveTimePoint activeTimePoint
-        model
-        , Cmd.batch [
-            cmd
-            if switchTheme then
-                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
-        ]
+    
 
     | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
 
@@ -228,30 +255,7 @@ let update
         model, Cmd.OfTask.attempt cfg.SendToBot messageText Msg.OnExn
     *)
 
-    // --------------------
-    // Active time changing
-    // --------------------
-    | Msg.PreChangeActiveTimeSpan ->
-        match model.LooperState with
-        | Playing ->
-            cfg.Looper.Stop()
-            model, Cmd.none
-        | _ ->
-            { model with LooperState = TimeShiftOnStopped model.LooperState }, Cmd.none
-
-    | Msg.ChangeActiveTimeSpan v ->
-        let duration = model |> getActiveTimeDuration
-        cfg.Looper.Shift((duration - v) * 1.0<sec>)
-        model, Cmd.none
-
-    | Msg.PostChangeActiveTimeSpan ->
-        match model.LooperState with
-        | TimeShiftOnStopped s ->
-            { model with LooperState = s }, Cmd.none
-        | _ ->
-            cfg.Looper.Resume()
-            model, Cmd.none
-
+    
     // --------------------
 
     | Msg.AppDialogModelMsg smsg ->

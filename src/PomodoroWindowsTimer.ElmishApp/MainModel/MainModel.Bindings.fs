@@ -96,13 +96,13 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
         nameof __.IsActiveTimePointSet |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.isSome)
 
     member val ActiveTimeSeconds : Binding =
-        nameof __.ActiveTimeSeconds |> Binding.twoWay (getActiveSpentTime, Msg.ChangeActiveTimeSpan)
+        nameof __.ActiveTimeSeconds |> Binding.twoWay (getActiveSpentTime, (PlayerMsg.ChangeActiveTimeSpan >> Msg.PlayerMsg))
 
     member val PreChangeActiveTimeSpanCommand : Binding =
-        nameof __.PreChangeActiveTimeSpanCommand |> Binding.cmd Msg.PreChangeActiveTimeSpan
+        nameof __.PreChangeActiveTimeSpanCommand |> Binding.cmd (PlayerMsg.PreChangeActiveTimeSpan |> Msg.PlayerMsg)
 
     member val PostChangeActiveTimeSpanCommand : Binding =
-        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd Msg.PostChangeActiveTimeSpan
+        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd (PlayerMsg.PostChangeActiveTimeSpan |> Msg.PlayerMsg)
 
     member val IsBreak : Binding =
         nameof __.IsBreak
@@ -129,13 +129,13 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
             )
 
     member val StartTimePointCommand : Binding =
-        nameof __.StartTimePointCommand |> Binding.cmdParam (fun id -> (id :?> Guid) |> Operation.Start |> StartTimePoint)
+        nameof __.StartTimePointCommand |> Binding.cmdParam (fun id -> (id :?> Guid) |> Operation.Start |> Msg.StartTimePoint)
 
     member val MinimizeCommand : Binding =
         nameof __.MinimizeCommand |> Binding.cmd (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
 
     member val SendToChatBotCommand : Binding =
-        nameof __.SendToChatBotCommand |> Binding.cmd SendToChatBot
+        nameof __.SendToChatBotCommand |> Binding.cmd Msg.SendToChatBot
 
     member val DisableSkipBreak : Binding =
         nameof __.DisableSkipBreak |> Binding.twoWay (_.DisableSkipBreak, Msg.SetDisableSkipBreak)

@@ -74,6 +74,22 @@ let initWorkRepository (connectionString: string) (timeProvider: System.TimeProv
             }
     }
 
+
+let initWorkEventRepository (connectionString: string) (timeProvider: System.TimeProvider) =
+    { new IWorkEventRepository with
+        member _.Create workId workEvent ct =
+            task {
+                use dbConnection = new SqliteConnection(connectionString)
+                return! WorkEventRepository.create timeProvider (Helpers.execute dbConnection) workId workEvent ct
+            }
+        member _.ReadAll ct =
+            task {
+                use dbConnection = new SqliteConnection(connectionString)
+                return! WorkEventRepository.readAll (Helpers.select dbConnection) ct
+            }
+    }
+
+
 do
     Dapper.FSharp.SQLite.OptionTypes.register()
 

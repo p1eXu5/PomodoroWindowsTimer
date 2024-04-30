@@ -39,12 +39,17 @@ type Pattern = string
 
 type Work =
     {
-        Id: int
+        Id: uint64
         Number: string option
         Title: string
         CreatedAt: DateTimeOffset
         UpdatedAt: DateTimeOffset
     }
+
+type WorkEvent =
+    | WorkStarted of DateTimeOffset * timePointName: string
+    | BreakeStarted of DateTimeOffset * timePointName: string
+    | Stopped of DateTimeOffset
 
 
 module Alias =

@@ -5,7 +5,7 @@ open Elmish.Extensions
 type WorkListModel =
     {
         Works: AsyncDeferred<WorkModel list>
-        SelectedWorkId: int option
+        SelectedWorkId: uint64 option
     }
 
 
@@ -13,8 +13,8 @@ module WorkListModel =
 
     type Msg =
         | LoadWorkList of AsyncOperation<unit, Result<WorkModel list, string>>
-        | SetSelectedWorkId of int option
-        | WorkModelMsg of int * WorkModel.Msg
+        | SetSelectedWorkId of uint64 option
+        | WorkModelMsg of uint64 * WorkModel.Msg
 
     module MsgWith =
 
@@ -35,7 +35,7 @@ module WorkListModel =
         | None
         | SwitchToCreateWork
         | Select
-        | Edit of workModel: WorkModel * selectedWorkId: int option
+        | Edit of workModel: WorkModel * selectedWorkId: uint64 option
 
     [<AutoOpen>]
     module Intent =

@@ -6,7 +6,7 @@ type CreatingWorkModel =
     {
         Number: string option
         Title: string
-        CreatingState: AsyncDeferred<int>
+        CreatingState: AsyncDeferred<uint64>
     }
 
 module CreatingWorkModel =
@@ -14,13 +14,13 @@ module CreatingWorkModel =
     type Msg =
         | SetNumber of string option
         | SetTitle of string
-        | CreateWork of AsyncOperation<unit, Result<int, string>>
+        | CreateWork of AsyncOperation<unit, Result<uint64, string>>
         | Cancel
 
     [<RequireQualifiedAccess; Struct>]
     type Intent =
         | None
-        | SwitchToWorkList of id: int
+        | SwitchToWorkList of id: uint64
         | Cancel
 
     module MsgWith =

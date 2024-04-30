@@ -9,7 +9,7 @@ and
     WorkSelectorSubModel =
         | WorkList of WorkListModel
         | CreatingWork of CreatingWorkModel
-        | UpdatingWork of WorkModel * selectedWorkId: int option
+        | UpdatingWork of WorkModel * selectedWorkId: uint64 option
 
 module WorkSelectorModel =
 
