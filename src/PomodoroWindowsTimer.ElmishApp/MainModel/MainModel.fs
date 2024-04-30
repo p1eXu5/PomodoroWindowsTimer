@@ -76,7 +76,7 @@ module MainModel =
 
         | PlayerMsg of PlayerMsg
         | WindowsMsg of WindowsMsg
-        | SendToChatBot
+        | SendToChatBot of Message
 
         | AppDialogModelMsg of AppDialogModel.Msg
 

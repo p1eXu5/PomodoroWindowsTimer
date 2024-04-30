@@ -113,7 +113,7 @@ module StopResumeFeature =
 
     [<Test>]
     [<Category("Work TimePoint Scenarios")>]
-    let ``UC0-6 - Start-Stop-Next Work TimePoint Scenario`` () =
+    let ``UC0-6 - Start Work -> Stop -> Next Break TimePoint Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
@@ -230,83 +230,163 @@ module StopResumeFeature =
             do! Then.``Telegrtam bot should not be notified`` ()
         }
         |> Scenario.runTestAsync
-    (*
+
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
     let ``UC1-4 - Start-Stop-Resume Break TimePoint Scenario`` () =
-        let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-        Given.``Elmish Program with`` timePoints
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
 
-        When.``Looper starts playing`` ()
-        When.``Looper is stopping`` ()
-        When.``Looper is resuming`` ()
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+            do! When.``Play msg has been dispatched`` ()
+            do! When.``Stop msg has been dispatched`` ()
+            do! When.``Resume msg has been dispatched`` ()
 
-        Then.``Active Point is set on`` timePoints.Head
-        Then.``Active Point remaining time is equal to or less then`` timePoints.Head
-        do! Then.``LooperState is`` LooperState.Playing
-        Then.``Windows should be minimized`` ()
-        Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Active Point is set on`` timePoints.Head
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head
+            do! Then.``LooperState is`` LooperState.Playing
+            do! Then.``Windows should be minimized`` ()
+            do! Then.``Telegrtam bot should not be notified`` ()
+        }
+        |> Scenario.runTestAsync
 
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
     let ``UC1-5 - Start Break Next Work TimePoint Scenario`` () =
-        let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-        Given.``Elmish Program with`` timePoints
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
 
-        When.``Looper starts playing`` ()
-        When.``Looper is playing next`` ()
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+            do! When.``Play msg has been dispatched`` ()
+            do! When.``Next msg has been dispatched`` ()
 
-        Then.``Active Point is set on`` timePoints[1]
-        Then.``Active Point remaining time is equal to or less then`` timePoints[1]
-        do! Then.``LooperState is`` LooperState.Playing
-        Then.``Windows should not be minimized`` ()
-        Then.``Telegrtam bot should not be notified`` ()
-
-    [<Test>]
-    [<Category("Break TimePoint Scenarios")>]
-    let ``UC1-6 - Start-Stop-Break Work TimePoint Scenario`` () =
-        let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-        Given.``Elmish Program with`` timePoints
-
-        When.``Looper starts playing`` ()
-        When.``Looper is stopping`` ()
-        When.``Looper is playing next`` ()
-
-        Then.``Active Point is set on`` timePoints[1]
-        Then.``Active Point remaining time is equal to or less then`` timePoints[1]
-        do! Then.``LooperState is`` LooperState.Playing
-        Then.``Windows should not be minimized`` ()
-        Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Active Point is set on`` timePoints[1]
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints[1]
+            do! Then.``LooperState is`` LooperState.Playing
+            do! Then.``Windows should not be minimized`` ()
+            do! Then.``Telegrtam bot should not be notified`` ()
+        }
+        |> Scenario.runTestAsync
 
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
-    let ``UC1-7 - Breate to Work TimePoint transition Scenario`` () =
-        let timePoints = [ breakTP ``0.5 sec``; workTP ``3 sec`` ]
-        Given.``Elmish Program with`` timePoints
+    let ``UC1-6 - Start Break -> Stop -> Next Work TimePoint Scenario`` () =
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
 
-        When.``Looper starts playing`` ()
-        When.``TimePoint is changed on`` timePoints[1]
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+            do! When.``Play msg has been dispatched`` ()
+            do! When.``Stop msg has been dispatched`` ()
+            do! When.``Next msg has been dispatched`` ()
 
-        Then.``Active Point is set on`` timePoints[1]
-        Then.``Active Point remaining time is equal to or less then`` timePoints[1]
-        do! Then.``LooperState is`` LooperState.Playing
-        Then.``Windows should not be minimized`` ()
-        Then.``Telegrtam bot should be notified`` ()
+            do! Then.``Active Point is set on`` timePoints[1]
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints[1]
+            do! Then.``LooperState is`` LooperState.Playing
+            do! Then.``Windows should not be minimized`` ()
+            do! Then.``Telegrtam bot should not be notified`` ()
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Break TimePoint Scenarios")>]
+    let ``UC1-7 - Break to Work TimePoint transition Scenario`` () =
+        scenario {
+            let timePoints = [ breakTP ``0.5 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+            do! When.``Play msg has been dispatched`` ()
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1] (timePoints[0] |> Some)
+
+
+            do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
+            do! Then.``Active Point is set on`` timePoints[1]
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints[1]
+            do! Then.``LooperState is`` LooperState.Playing
+            do! Then.``Windows should not be minimized`` ()
+        }
+        |> Scenario.runTestAsync
 
     [<Test>]
     [<Category("Break TimePoint Scenarios")>]
     let ``UC1-8 - Start-Replay Break TimePoint Scenario`` () =
-        let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-        Given.``Elmish Program with`` timePoints
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
 
-        When.``Spent 2.5 ticks time`` ()
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+            do! When.``Play msg has been dispatched`` ()
+            do! When.``Replay msg has been dispatched`` ()
 
-        When.``Looper starts playing`` ()
-        When.``Looper is replaying`` ()
+            do! Then.``Active Point is set on`` timePoints.Head
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head
+            do! Then.``LooperState is`` LooperState.Playing
+            do! Then.``Windows should be minimized`` ()
+            do! Then.``Telegrtam bot should not be notified`` ()
+        }
+        |> Scenario.runTestAsync
 
-        Then.``Active Point is set on`` timePoints.Head
-        Then.``Active Point remaining time is equal to or less then`` timePoints.Head
-        do! Then.``LooperState is`` LooperState.Playing
-        Then.``Windows should be minimized`` ()
-        Then.``Telegrtam bot should not be notified`` ()
-    *)
+    // --------
+    //  Slider
+    // --------
+
+    [<Test>]
+    [<Category("Time slider Scenarios")>]
+    let ``UC2-0 - Initial time point move forward scenario`` () =
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Time slider Scenarios")>]
+    let ``UC2-1 - Initial time point move backward scenario`` () =
+        scenario {
+            return ()
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Time slider Scenarios")>]
+    let ``UC2-2 - Initial time point move forward to the end scenario`` () =
+        scenario {
+            return ()
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Time slider Scenarios")>]
+    let ``UC2-3 - Playing time point move forward scenario`` () =
+        scenario {
+            return ()
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Time slider Scenarios")>]
+    let ``UC2-4 - Playing time point move backward scenario`` () =
+        scenario {
+            return ()
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Time slider Scenarios")>]
+    let ``UC2-5 - Playing time point move forward to the end, transition to the next time point scenario`` () =
+        scenario {
+            return ()
+        }
+        |> Scenario.runTestAsync

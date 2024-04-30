@@ -134,8 +134,16 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
     member val MinimizeCommand : Binding =
         nameof __.MinimizeCommand |> Binding.cmd (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
 
+    /// For the test purpose
     member val SendToChatBotCommand : Binding =
-        nameof __.SendToChatBotCommand |> Binding.cmd Msg.SendToChatBot
+        nameof __.SendToChatBotCommand
+        |> Binding.cmd (fun m ->
+            match m.ActiveTimePoint with
+            | Some tp ->
+                Msg.SendToChatBot $"It's time to {tp.Name}!!"
+            | None ->
+                Msg.SendToChatBot $"It's time!!"
+        )
 
     member val DisableSkipBreak : Binding =
         nameof __.DisableSkipBreak |> Binding.twoWay (_.DisableSkipBreak, Msg.SetDisableSkipBreak)

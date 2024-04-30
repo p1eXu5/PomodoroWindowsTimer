@@ -13,6 +13,26 @@ open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
 open PomodoroWindowsTimer.ElmishApp.Logging
 
+
+let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
+    match msg with
+    | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
+        { model with IsMinimized = true }, Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
+
+    | WindowsMsg.RestoreWindows when model.IsMinimized ->
+        { model with IsMinimized = false }, Cmd.OfFunc.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
+
+    | WindowsMsg.RestoreMainWindow ->
+        model, Cmd.OfFunc.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnExn
+
+    | WindowsMsg.SetIsMinimized v ->
+        { model with IsMinimized = v }, Cmd.none
+
+    | _ ->
+        logger.LogUnprocessedMessage(msg, model)
+        model, Cmd.none
+
+
 let updateOnPlayerMsg
     (cfg: MainModeConfig)
     (logger: ILogger<MainModel>)
@@ -63,17 +83,37 @@ let updateOnPlayerMsg
             | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none, true)
             | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
                 match nextTp.Kind with
-                | LongBreak -> (nextTp |> Some, Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg), true)
-                | Break -> (nextTp |> Some, Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg), true)
-                | Work when model |> isUIInitiator oldTp -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg) ], true)
-                | Work -> (nextTp |> Some, Cmd.batch [ Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg); Cmd.ofMsg Msg.SendToChatBot ], true)
+                | LongBreak ->
+                    nextTp |> Some
+                    , Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+                    , true
+
+                | Break ->
+                    nextTp |> Some
+                    , Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+                    , true
+                
+                | Work when model |> isUIInitiator oldTp ->
+                    nextTp |> Some
+                    , Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
+                    , true
+
+                | Work ->
+                    nextTp |> Some
+                    , Cmd.batch [
+                        Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg);
+                        Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
+                    ]
+                    , true
 
         let model = model |> setActiveTimePoint activeTimePoint
+        let timePointKind = model |> timePointKindEnum
+
         model
         , Cmd.batch [
             cmd
             if switchTheme then
-                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
+                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme timePointKind Msg.OnExn
         ]
 
     // --------------------
@@ -100,25 +140,6 @@ let updateOnPlayerMsg
             cfg.Looper.Resume()
             model, Cmd.none
 
-
-    | _ ->
-        logger.LogUnprocessedMessage(msg, model)
-        model, Cmd.none
-
-
-let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
-    match msg with
-    | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
-
-    | WindowsMsg.RestoreWindows when model.IsMinimized ->
-        { model with IsMinimized = false }, Cmd.OfFunc.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
-
-    | WindowsMsg.RestoreMainWindow ->
-        model, Cmd.OfFunc.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnExn
-
-    | WindowsMsg.SetIsMinimized v ->
-        { model with IsMinimized = v }, Cmd.none
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
@@ -248,13 +269,10 @@ let update
             { model with BotSettingsModel = bModel |> Some }, Cmd.none
         | BotSettingsModel.Intent.CloseDialogRequested ->
             { model with BotSettingsModel = None }, Cmd.none
-
-    | Msg.SendToChatBot ->
-        let messageText =
-            model.ActiveTimePoint |> Option.map (fun tp -> $"It's time to {tp.Name}!!") |> Option.defaultValue "It's time!!"
-        model, Cmd.OfTask.attempt cfg.SendToBot messageText Msg.OnExn
     *)
 
+    | Msg.SendToChatBot message ->
+        model, Cmd.OfTask.attempt cfg.SendToBot.SendMessage message Msg.OnExn
     
     // --------------------
 

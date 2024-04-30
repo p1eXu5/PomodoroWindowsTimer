@@ -14,6 +14,8 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 
+open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
+
 let rec ``Active Point is set on`` (timePoint: TimePoint) =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -56,12 +58,19 @@ let rec ``Telegrtam bot should not be notified`` () =
         telegramBotStub.MessageStack |> shouldL be Empty (nameof ``Telegrtam bot should not be notified``)
     }
 
-let rec ``Telegrtam bot should be notified`` () =
+let ``Telegrtam bot should be notified with`` (timePointName: string) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let telegramBotStub = sut.ServiceProvider.GetRequiredService<ITelegramBot>() :?> TelegramBotStub
 
-        telegramBotStub.MessageStack |> shouldL not' (be Empty) (nameof ``Telegrtam bot should be notified``)
+        do! Scenario.msgDispatchedWithin2Sec "SendToChatBot" (fun msg ->
+            match msg with
+            | MainModel.Msg.SendToChatBot msg ->
+                msg.Contains(timePointName, StringComparison.Ordinal)
+            | _ -> false
+        )
+
+        let telegramBotStub = sut.ServiceProvider.GetRequiredService<ITelegramBot>() :?> TelegramBotStub
+        telegramBotStub.MessageStack |> shouldL not' (be Empty) ("TelegramBot message stack is empty")
     }
 
 let rec ``Active Point remaining time is equal to or less then`` (timePoint: TimePoint) =
