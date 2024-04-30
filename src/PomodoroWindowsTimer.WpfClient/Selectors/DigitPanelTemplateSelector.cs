@@ -10,14 +10,16 @@ namespace PomodoroWindowsTimer.WpfClient.Selectors
 {
     internal sealed class DigitPanelTemplateSelector : DataTemplateSelector
     {
-        public override DataTemplate? SelectTemplate(object isBreak, DependencyObject container)
+        public override DataTemplate? SelectTemplate(object model, DependencyObject container)
         {
-            FrameworkElement? element = container as FrameworkElement;
-
-            if (element != null && isBreak != null)
+            if (container is FrameworkElement element && model != null)
             {
-                if (isBreak is bool b && b)
+                bool isBreak = ((dynamic)model).IsBreak;
+
+                if (isBreak)
+                {
                     return element.FindResource("gp_Red") as DataTemplate;
+                }
 
                 return element.FindResource("gp_Green") as DataTemplate;
             }

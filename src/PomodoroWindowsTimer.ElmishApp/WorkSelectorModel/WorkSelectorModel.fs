@@ -1,52 +1,90 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
 type WorkSelectorModel =
-    | WorkList of WorkListModel
-    | CreatingWork of WorkModel
-    | UpdatingWork of WorkModel
+    {
+        HaveNoWorks: bool
+        SubModel: WorkSelectorSubModel
+    }
+and
+    WorkSelectorSubModel =
+        | WorkList of WorkListModel
+        | CreatingWork of CreatingWorkModel
+        | UpdatingWork of WorkModel * selectedWorkId: int option
 
 module WorkSelectorModel =
 
     type Msg =
         | WorkListModelMsg of WorkListModel.Msg
-        | CreatingWorkModelMsg of WorkModel.Msg
+        | CreatingWorkModelMsg of CreatingWorkModel.Msg
         | UpdatingWorkModelMsg of WorkModel.Msg
 
+
     [<Struct; RequireQualifiedAccess>]
-    type SubmodelId =
+    type SubModelId =
         | WorkListId
         | CreatingWorkId
         | UpdatingWorkId
 
+    [<RequireQualifiedAccess; Struct>]
+    type Intent =
+        | None
+        | Close
+        | Select of WorkModel option
+
+    [<AutoOpen>]
+    module Intent =
+
+        let withNoIntent (model, cmd) =
+            (model, cmd, Intent.None)
+
+        let withCloseIntent (model, cmd) =
+            (model, cmd, Intent.Close)
+
+        let withSelectIntent workModel (model, cmd) =
+            (model, cmd, Intent.Select workModel)
+
     open Elmish
 
     let init () =
-        let (m, cmd) = WorkListModel.init ()
-        m |> WorkSelectorModel.WorkList
+        let (m, cmd) = WorkListModel.init None
+        {
+            HaveNoWorks = false
+            SubModel = m |> WorkSelectorSubModel.WorkList
+        }
         , Cmd.map Msg.WorkListModelMsg cmd
 
-    let submodelId = function
-        | WorkList _ -> SubmodelId.WorkListId
-        | CreatingWork _ -> SubmodelId.CreatingWorkId
-        | UpdatingWork _ -> SubmodelId.UpdatingWorkId
+    let subModelId (model: WorkSelectorModel) = 
+        match model.SubModel with
+        | WorkList _ -> SubModelId.WorkListId
+        | CreatingWork _ -> SubModelId.CreatingWorkId
+        | UpdatingWork _ -> SubModelId.UpdatingWorkId
 
-    let workListModel = function
-        | WorkList m -> m |> Some
-        | _ -> None
+    let withHaveNoWorks v (model: WorkSelectorModel) =
+        { model with HaveNoWorks = v }
 
-    let withWorkListModel workListModel (_: WorkSelectorModel) =
-        workListModel |> WorkSelectorModel.WorkList
+    let workListModel =
+        _.SubModel
+        >> function
+            | WorkList m -> m |> Some
+            | _ -> None
 
-    let creatingWorkModel = function
-        | CreatingWork m -> m |> Some
-        | _ -> None
+    let withWorkListModel workListModel (model: WorkSelectorModel) =
+        { model with SubModel = workListModel |> WorkSelectorSubModel.WorkList }
 
-    let withCreatingWorkModel creatingWorkModel (_: WorkSelectorModel) =
-        creatingWorkModel |> WorkSelectorModel.CreatingWork
+    let creatingWorkModel =
+         _.SubModel
+        >> function
+            | CreatingWork m -> m |> Some
+            | _ -> None
 
-    let updatingWorkModel = function
-        | UpdatingWork m -> m |> Some
-        | _ -> None
+    let withCreatingWorkModel creatingWorkModel (model: WorkSelectorModel) =
+        { model with SubModel = creatingWorkModel |> WorkSelectorSubModel.CreatingWork }
 
-    let withUpdatingWorkModel updatingWorkModel (_: WorkSelectorModel) =
-        updatingWorkModel |> WorkSelectorModel.UpdatingWork
+    let updatingWorkModel  =
+         _.SubModel
+        >> function
+            | UpdatingWork (m, _) -> m |> Some
+            | _ -> None
+
+    let withUpdatingWorkModel updatingWorkModel selectedWorkId (model: WorkSelectorModel) =
+        { model with SubModel = (updatingWorkModel, selectedWorkId) |> WorkSelectorSubModel.UpdatingWork }

@@ -241,6 +241,15 @@ module MainModel =
         |> Option.map (fun tp -> tp.TimeSpan.TotalSeconds)
         |> Option.defaultValue 0.0
 
+    let getActiveTimeKind m =
+        m.ActiveTimePoint
+        |> Option.bind (fun atp ->
+            m.TimePoints
+            |> List.tryFind (fun tp -> tp.Id = atp.Id)
+            |> Option.map (fun tp -> tp.Kind)
+        )
+        |> Option.defaultValue Kind.Work
+
     let withWorkModel workModel (model: MainModel) =
          { model with Work = workModel }
 
@@ -248,7 +257,7 @@ module MainModel =
          { model with AppDialog = addDialogModel }
 
     let withWorkSelectorModel workSelectorModel (model: MainModel) =
-         { model with WorkSelector = workSelectorModel |> Some }
+         { model with WorkSelector = workSelectorModel }
 
     let withoutWorkSelectorModel (model: MainModel) =
          { model with WorkSelector = None }

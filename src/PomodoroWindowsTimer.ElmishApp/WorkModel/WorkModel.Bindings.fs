@@ -24,10 +24,16 @@ type Bindings() =
             props
 
     member val Number : Binding =
-        nameof __.Number |> Binding.twoWayOpt (_.Number, Msg.SetNumber)
+        nameof __.Number |> Binding.oneWayOpt (_.Work >> _.Number)
 
     member val Title : Binding =
-        nameof __.Title |> Binding.twoWay (_.Title, Msg.SetTitle)
+        nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
+
+    member val EditNumber : Binding =
+        nameof __.EditNumber |> Binding.twoWayOpt (_.Number, Msg.SetNumber)
+
+    member val EditTitle : Binding =
+        nameof __.EditTitle |> Binding.twoWay (_.Title, Msg.SetTitle)
 
     member val UpdateCommand : Binding =
         nameof __.UpdateCommand
@@ -47,4 +53,12 @@ type Bindings() =
                 | _ -> None
             )
 
+    member val SelectCommand : Binding =
+        nameof __.SelectCommand |> Binding.cmd Msg.Select
+
+    member val EditCommand : Binding =
+        nameof __.EditCommand |> Binding.cmd Msg.Edit
+
+    member val CancelEditCommand : Binding =
+        nameof __.CancelEditCommand |> Binding.cmd Msg.CancelEdit
 

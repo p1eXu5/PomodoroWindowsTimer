@@ -89,6 +89,9 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
     member val ActiveTimeDuration : Binding =
         nameof __.ActiveTimeDuration |> Binding.oneWay getActiveTimeDuration
 
+    member val ActiveTimeKind : Binding =
+        nameof __.ActiveTimeKind |> Binding.oneWay getActiveTimeKind
+
     member val IsActiveTimePointSet : Binding =
         nameof __.IsActiveTimePointSet |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.isSome)
 

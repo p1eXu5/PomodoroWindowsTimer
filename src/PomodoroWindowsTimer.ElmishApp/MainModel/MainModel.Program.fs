@@ -147,7 +147,7 @@ let update
     | Msg.WorkModelMsg wmsg ->
         match model.Work with
         | Some wmodel ->
-            let (wmodel, wcmd) = updateWorkModel wmsg wmodel
+            let (wmodel, wcmd, _) = updateWorkModel wmsg wmodel
             model |> withWorkModel (wmodel |> Some)
             , Cmd.map Msg.WorkModelMsg wcmd
         | None ->
@@ -262,7 +262,7 @@ let update
     | Msg.SetIsWorkSelectorLoaded v ->
         if v then
             let (m, cmd) = WorkSelectorModel.init ()
-            model |> withWorkSelectorModel m |> withIsTimePointsShown false
+            model |> withWorkSelectorModel (m |> Some) |> withIsTimePointsShown false
             , Cmd.map Msg.WorkSelectorModelMsg cmd
         else
             model |> withoutWorkSelectorModel |> withCmdNone
@@ -274,9 +274,17 @@ let update
             model |> withIsTimePointsShown v |> withCmdNone
 
     | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
-        let (m, cmd) = updateWorkSelectorModel smsg m
-        model |> withWorkSelectorModel m
-        , Cmd.map Msg.WorkSelectorModelMsg cmd
+        let (m, cmd, intent) = updateWorkSelectorModel smsg m
+        match intent with
+        | WorkSelectorModel.Intent.None ->
+            model |> withWorkSelectorModel (m |> Some)
+            , Cmd.map Msg.WorkSelectorModelMsg cmd
+        | WorkSelectorModel.Intent.Select workModel ->
+            model |> withWorkSelectorModel (m |> Some) |> withWorkModel workModel
+            , Cmd.map Msg.WorkSelectorModelMsg cmd
+        | WorkSelectorModel.Intent.Close ->
+            model |> withWorkSelectorModel None |> withCmdNone
+
 
     // --------------------
 

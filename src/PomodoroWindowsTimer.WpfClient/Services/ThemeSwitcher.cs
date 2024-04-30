@@ -8,11 +8,10 @@ namespace PomodoroWindowsTimer.WpfClient;
 
 internal class ThemeSwitcher : IThemeSwitcher
 {
-    private readonly PaletteHelper _paletteHelper = new();
-
     public void SwitchTheme(TimePointKind value)
     {
-        Theme theme = _paletteHelper.GetTheme();
+        var paletteHelper = new PaletteHelper(); 
+        Theme theme = new PaletteHelper().GetTheme();
 
         switch (value)
         {
@@ -25,6 +24,6 @@ internal class ThemeSwitcher : IThemeSwitcher
                 break;
         }
 
-        _paletteHelper.SetTheme(theme);
+        paletteHelper.SetTheme(theme);
     }
 }

@@ -13,14 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PomodoroWindowsTimer.WpfClient.UserControls.Works;
-/// <summary>
-/// Interaction logic for CreatingWork.xaml
-/// </summary>
-public partial class CreatingWork : UserControl
+namespace PomodoroWindowsTimer.WpfClient.UserControls.Shared
 {
-    public CreatingWork()
+    /// <summary>
+    /// Interaction logic for Spinner.xaml
+    /// </summary>
+    public partial class Spinner : UserControl
     {
-        InitializeComponent();
+        public Spinner()
+        {
+            InitializeComponent();
+        }
     }
 }

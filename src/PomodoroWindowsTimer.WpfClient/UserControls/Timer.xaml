@@ -8,12 +8,17 @@
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:MainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="350"
              d:DesignWidth="600"
-             d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+             d:Foreground="{Binding ActiveTimeKind,
+                                    Converter={StaticResource conv_KindToBrushConverter}}"
              mc:Ignorable="d"
              >
+    <UserControl.Resources>
+        <conv:BooleansToDigitWidthConverter x:Key="conv_BooleansToDigitWidth" />
+    </UserControl.Resources>
     <StackPanel HorizontalAlignment="Center"
                 Orientation="Vertical"
                 >
@@ -22,15 +27,18 @@
                                          Converter={StaticResource BooleanToVisibilityConverter}}"
                     >
             <TextBlock DataContext="{Binding CurrentWork}"
-                       Margin="1,0,0,10"
+                       Margin="1,0,0,5"
                        Foreground="{Binding ElementName=m_Root,
                                             Path=Foreground}"
                        Text="{Binding Number,
+                                      Converter={StaticResource conv_NoNumberConverter},
                                       FallbackValue='DEV-0001'}"
+                       FontSize="11"
+                       FontWeight="Normal"
                        />
             <TextBlock DataContext="{Binding CurrentWork}"
                        MaxWidth="500"
-                       Margin="0,0,0,22"
+                       Margin="0,0,0,14"
                        Foreground="{Binding ElementName=m_Root,
                                             Path=Foreground}"
                        Text="{Binding Title,
@@ -59,12 +67,19 @@
                                >
             <digitPanel:TimerTable.Style>
                 <Style TargetType="digitPanel:TimerTable">
-                    <Setter Property="DigitWidth" Value="100" />
+                    <Setter Property="DigitWidth">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource conv_BooleansToDigitWidth}">
+                                <Binding Path="IsTimePointsShown" />
+                                <Binding Path="IsWorkSelectorLoaded" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding DataContext.IsTimePointsShown, RelativeSource={RelativeSource AncestorType=Window}}" Value="False" />
-                                <Condition Binding="{Binding DataContext.IsWorkSelectorLoaded, RelativeSource={RelativeSource AncestorType=Window}}" Value="False" />
+                                <Condition Binding="{Binding IsTimePointsShown}" Value="False" />
+                                <Condition Binding="{Binding IsWorkSelectorLoaded}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <MultiDataTrigger.EnterActions>
                                 <BeginStoryboard>

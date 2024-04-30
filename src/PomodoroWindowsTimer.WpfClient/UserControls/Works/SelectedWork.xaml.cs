@@ -18,9 +18,9 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
     /// <summary>
     /// Interaction logic for WorkListItem.xaml
     /// </summary>
-    public partial class WorkListItem : UserControl
+    public partial class SelectedWork : UserControl
     {
-        public WorkListItem()
+        public SelectedWork()
         {
             InitializeComponent();
         }
@@ -38,7 +38,7 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
             DependencyProperty.Register(
                 "IsSelected",
                 typeof(bool),
-                typeof(WorkListItem),
+                typeof(SelectedWork),
                 new PropertyMetadata(false));
     }
 }

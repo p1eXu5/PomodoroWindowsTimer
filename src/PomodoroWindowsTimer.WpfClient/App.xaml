@@ -10,17 +10,23 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Dark"
-                                             PrimaryColor="BlueGrey"
-                                             SecondaryColor="Lime"
-                                             >
-                    <materialDesign:BundledTheme.ColorAdjustment>
+
+                <!--  for IntelliSense, must be placed before BundledTheme  -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
+
+                <materialDesign:CustomColorTheme BaseTheme="Dark"
+                                                 PrimaryColor="LightSkyBlue"
+                                                 SecondaryColor="Lime"
+                                                 >
+                    <materialDesign:CustomColorTheme.ColorAdjustment>
                         <materialDesign:ColorAdjustment Colors="All"
                                                         Contrast="Medium"
-                                                        DesiredContrastRatio="4.5"
+                                                        DesiredContrastRatio="3.0"
                                                         />
-                    </materialDesign:BundledTheme.ColorAdjustment>
-                </materialDesign:BundledTheme>
+                    </materialDesign:CustomColorTheme.ColorAdjustment>
+                </materialDesign:CustomColorTheme>
+
 
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
@@ -35,7 +41,7 @@
 
             </ResourceDictionary.MergedDictionaries>
 
-            <SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />
+            <!--<SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />-->
 
             <SolidColorBrush x:Key="WorkDigitForeground" Color="#00FF00" />
 

@@ -12,6 +12,8 @@
     <converters:KindToTextConverter x:Key="conv_KindToTextConverter" />
     <converters:KindToShortTextConverter x:Key="conv_KindToShortTextConverter" />
     <converters:ToUpperInvariantTextConverter x:Key="conv_ToUpperInvariantText" />
+    <converters:NullToVisibilityConverter x:Key="conv_NullToVisible" />
+    <converters:NoNumberConverter x:Key="conv_NoNumberConverter" />
 
     <Style x:Key="st_IconBase"
            TargetType="materialDesign:PackIcon"
@@ -55,12 +57,12 @@
     </DataTemplate>
 
     <DataTemplate x:Key="dt_WorkList">
-        <works:WorkList DataContext="{Binding WorkList}" />
+        <works:WorkList Width="300" />
     </DataTemplate>
     <DataTemplate x:Key="dt_CreatingWork">
-        <works:CreatingWork DataContext="{Binding CreatingWork}" />
+        <works:EditableWork Width="300" />
     </DataTemplate>
     <DataTemplate x:Key="dt_UpdatingWork">
-        <works:UpdatingWork DataContext="{Binding UpdatingWork}" />
+        <works:EditableWork Width="300" />
     </DataTemplate>
 </ResourceDictionary>

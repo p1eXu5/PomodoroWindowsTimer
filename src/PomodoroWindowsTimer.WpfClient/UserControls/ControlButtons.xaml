@@ -18,7 +18,7 @@
                 >
         <StackPanel.Resources>
             <Style TargetType="{x:Type Button}">
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary}" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary.Light}" />
                 <Setter Property="Cursor" Value="Hand" />
                 <Setter Property="Padding" Value="16,10" />
                 <Setter Property="TextBlock.FontSize" Value="14" />
@@ -27,7 +27,7 @@
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
-                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Secondary.Light}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Width" Value="100" />
                 <Setter Property="Background" Value="{StaticResource br_Base}" />
@@ -57,11 +57,11 @@
                                                 />
 
                                         <ContentPresenter x:Name="MyContentPresenter"
-                                                          Content="{TemplateBinding Content}"
                                                           Height="{TemplateBinding Height}"
                                                           Margin="{TemplateBinding Padding}"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"
+                                                          Content="{TemplateBinding Content}"
                                                           />
                                     </Grid>
                                 </Grid>
@@ -107,13 +107,13 @@
                                      Converter={StaticResource BooleanToVisibilityConverter}}"
                 />
         <Button Command="{Binding PlayStopCommand}"
+                Margin="20,0,0,0"
                 Content="{Binding PlayPauseButtonText,
                                   FallbackValue=Resume}"
-                Margin="20,0,0,0"
                 />
         <Button Command="{Binding NextCommand}"
-                Content="Next"
                 Margin="20,0,0,0"
+                Content="Next"
                 Visibility="{Binding LooperIsRunning,
                                      Converter={StaticResource BooleanToVisibilityConverter}}"
                 />

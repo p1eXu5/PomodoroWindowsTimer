@@ -3,30 +3,82 @@
 open Microsoft.Extensions.Logging
 
 open Elmish
+open Elmish.Extensions.Helpers
 
 open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkSelectorModel
 
-let update updateWorkListModel updateWorkModel (logger: ILogger<WorkSelectorModel>) msg model =
-    match msg, model with
+let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: ILogger<WorkSelectorModel>) msg model =
+    match msg, model.SubModel with
     | Msg.WorkListModelMsg smsg, WorkList sm ->
         let (sm, cmd, intent) = updateWorkListModel smsg sm
 
+        match intent with
+        | WorkListModel.Intent.None ->
+            model |> withWorkListModel sm
+            , Cmd.map Msg.WorkListModelMsg cmd
+            , Intent.None
+            
+            
+        | WorkListModel.Intent.SwitchToCreateWork ->
+            if not model.HaveNoWorks then
+                // we here in first time
+                model |> withCreatingWorkModel (CreatingWorkModel.init ()) |> withHaveNoWorks true
+                , Cmd.map Msg.WorkListModelMsg cmd
+                , Intent.None
+            else
+                model |> withCmdNone |> withCloseIntent
 
-        model |> withWorkListModel sm
-        , Cmd.map Msg.WorkListModelMsg cmd
+        | WorkListModel.Intent.Select ->
+            model |> withWorkListModel sm
+            , Cmd.map Msg.WorkListModelMsg cmd
+            , Intent.Select (sm |> WorkListModel.selectedWorkModel)
+
+        | WorkListModel.Intent.Edit (workModel, selectedWorkId) ->
+            model |> withUpdatingWorkModel workModel selectedWorkId |> withCmdNone |> withNoIntent
 
     | Msg.CreatingWorkModelMsg smsg, CreatingWork sm ->
-        let (sm, cmd) = updateWorkModel smsg sm
-        model |> withCreatingWorkModel sm
-        , Cmd.map Msg.CreatingWorkModelMsg cmd
+        let (sm, cmd, intent) = updateCreatingWorkModel smsg sm
 
-    | Msg.UpdatingWorkModelMsg smsg, UpdatingWork sm ->
-        let (sm, cmd) = updateWorkModel smsg sm
-        model |> withUpdatingWorkModel sm
-        , Cmd.map Msg.UpdatingWorkModelMsg cmd
+        match intent with
+        | CreatingWorkModel.Intent.None ->
+            model |> withCreatingWorkModel sm
+            , Cmd.map Msg.CreatingWorkModelMsg cmd
+            , Intent.None
+
+        | CreatingWorkModel.Intent.Cancel ->
+            let (m, cmd) = WorkListModel.init None
+            model |> withWorkListModel m
+            , Cmd.map Msg.WorkListModelMsg cmd
+            , Intent.None
+
+        | CreatingWorkModel.Intent.SwitchToWorkList newWorkId ->
+            let (m, cmd) = WorkListModel.init None
+            model |> withWorkListModel m |> withHaveNoWorks true
+            , Cmd.batch [
+                Cmd.map Msg.WorkListModelMsg cmd
+                Cmd.ofMsg (WorkListModel.Msg.SetSelectedWorkId (newWorkId |> Some) |> Msg.WorkListModelMsg)
+            ]
+            , Intent.None
+
+    | Msg.UpdatingWorkModelMsg smsg, UpdatingWork (workModel, selectedWorkId) ->
+        let (workModel, cmd, intent) = updateWorkModel smsg workModel
+
+        match intent with
+        | WorkModel.Intent.EndEdit ->
+            let (m, cmd) = WorkListModel.init selectedWorkId
+            model |> withWorkListModel m
+            , Cmd.map Msg.WorkListModelMsg cmd
+            , Intent.Select (workModel |> Some)
+
+        | WorkModel.Intent.StartEdit
+        | WorkModel.Intent.Select  // TODO: add ability to select work from edit mode
+        | WorkModel.Intent.None ->
+            model |> withUpdatingWorkModel workModel selectedWorkId
+            , Cmd.map Msg.UpdatingWorkModelMsg cmd
+            , Intent.None
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
-        model, Cmd.none
+        model |> withCmdNone |> withNoIntent

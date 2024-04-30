@@ -34,19 +34,27 @@ module WorkListModel =
     type Intent =
         | None
         | SwitchToCreateWork
+        | Select
+        | Edit of workModel: WorkModel * selectedWorkId: int option
 
-    let withNoIntent (model, cmd) =
-        (model, cmd, Intent.None)
+    [<AutoOpen>]
+    module Intent =
 
-    let withSwitchToCreateWorkIntent(model, cmd) =
-        (model, cmd, Intent.SwitchToCreateWork)
+        let withNoIntent (model, cmd) =
+            (model, cmd, Intent.None)
+
+        let withSwitchToCreateWorkIntent(model, cmd) =
+            (model, cmd, Intent.SwitchToCreateWork)
+
+        let withSelectIntent (model, cmd) =
+            (model, cmd, Intent.Select)
 
     open Elmish
 
-    let init () =
+    let init selectedWorkId =
         {
             Works = AsyncDeferred.NotRequested
-            SelectedWorkId = None
+            SelectedWorkId = selectedWorkId
         }
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadWorkList)
 
@@ -62,5 +70,5 @@ module WorkListModel =
         |> Option.bind (fun id ->
             model.Works
             |> AsyncDeferred.chooseRetrieved
-            |> Option.map (List.find (_.Work >> _.Id >> (=) id))
+            |> Option.bind (List.tryFind (_.Work >> _.Id >> (=) id))
         )

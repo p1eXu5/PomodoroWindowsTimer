@@ -24,8 +24,8 @@ type Bindings() =
             (Bindings.Instance())
             props
 
-    member val SubmodelId : Binding =
-        nameof __.SubmodelId |> Binding.oneWay submodelId
+    member val SubModelId : Binding =
+        nameof __.SubModelId |> Binding.oneWay subModelId
 
     member val WorkListModel : Binding =
         nameof __.WorkListModel
@@ -35,7 +35,7 @@ type Bindings() =
 
     member val CreatingWorkModel : Binding =
         nameof __.CreatingWorkModel
-            |> Binding.SubModel.opt WorkModel.Bindings.ToList
+            |> Binding.SubModel.opt CreatingWorkModel.Bindings.ToList
             |> Binding.mapModel creatingWorkModel
             |> Binding.mapMsg Msg.CreatingWorkModelMsg
 

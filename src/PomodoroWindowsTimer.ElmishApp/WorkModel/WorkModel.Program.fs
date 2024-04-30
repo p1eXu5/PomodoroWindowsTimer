@@ -15,8 +15,12 @@ open PomodoroWindowsTimer.ElmishApp.Models.WorkModel
 
 let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessageQueue: IErrorMessageQueue) msg model =
     match msg with
-    | Msg.SetNumber n -> model |> withNumber n |> withCmdNone
-    | Msg.SetTitle t -> model |> withTitle t |> withCmdNone
+    | Msg.SetNumber n -> model |> withNumber n |> withCmdNone |> withNoIntent
+    | Msg.SetTitle t -> model |> withTitle t |> withCmdNone |> withNoIntent
+
+    | Msg.Select -> model |> withCmdNone |> withSelectIntent
+    | Msg.Edit -> model |> withCmdNone |> withStartEditIntent
+    | Msg.CancelEdit -> model |> withCmdNone |> withEndEditIntent
     
     | MsgWith.``Start of Update`` model (deff, cts) ->
         let updateWork =
@@ -25,29 +29,35 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
                 Title = model.Title
             }
 
-        model |> withUpdateState deff
-        , Cmd.OfTask.perform (workRepo.Update updateWork) cts.Token (AsyncOperation.finishWithin Msg.Update cts)
+        (
+            model |> withUpdateState deff
+            , Cmd.OfTask.perform (workRepo.Update updateWork) cts.Token (AsyncOperation.finishWithin Msg.Update cts)
+        )
+        |> withNoIntent
 
     | MsgWith.``Finish of Update`` model res ->
         match res with
         | Error err ->
             do errorMessageQueue.EnqueueError err
-            model |> withUpdateState AsyncDeferred.NotRequested |> withCmdNone
+            model |> withUpdateState AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
         | Ok (_, updatedAt) ->
-            model |> withUpdatedWork updatedAt |> withUpdateState (AsyncDeferred.NotRequested) |> withCmdNone
+            model |> withUpdatedWork updatedAt |> withUpdateState (AsyncDeferred.NotRequested) |> withCmdNone |> withEndEditIntent
 
     | MsgWith.``Start of CreateNew`` model (deff, cts) ->
-        model |> withCreateNewState deff
-        , Cmd.OfTask.perform (workRepo.Create model.Number model.Title) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
+        (
+            model |> withCreateNewState deff
+            , Cmd.OfTask.perform (workRepo.Create model.Number model.Title) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
+        )
+        |> withNoIntent
 
     | MsgWith.``Finish of CreateNew`` model res ->
         match res with
         | Error err ->
             do errorMessageQueue.EnqueueError err
-            model |> withCreateNewState AsyncDeferred.NotRequested |> withCmdNone
+            model |> withCreateNewState AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
         | Ok (_, (id, createdAt)) ->
-            model |> withCreatedWork id createdAt |> withCreateNewState (AsyncDeferred.NotRequested) |> withCmdNone
+            model |> withCreatedWork id createdAt |> withCreateNewState (AsyncDeferred.NotRequested) |> withCmdNone |> withNoIntent
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
-        model, Cmd.none
+        model |> withCmdNone |> withNoIntent

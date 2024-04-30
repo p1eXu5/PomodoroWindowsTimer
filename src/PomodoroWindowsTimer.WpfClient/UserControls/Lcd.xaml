@@ -14,6 +14,9 @@
              d:DesignWidth="800"
              mc:Ignorable="d"
              >
+    <UserControl.Resources>
+        <sel:WorkSubModelTemplateSelector x:Key="sel_WorkSubModelTemplate" />
+    </UserControl.Resources>
     <materialDesign:DrawerHost x:Name="DrawerHost"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
@@ -27,15 +30,15 @@
                                OpenMode="Standard"
                                >
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <local:RunningTimePoints DataContext="{Binding}"
-                                     Width="350"
+            <local:RunningTimePoints Width="350"
+                                     DataContext="{Binding}"
                                      />
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <!--  time points generator  -->
 
         <materialDesign:DrawerHost.RightDrawerContent>
-            <works:WorkSelector />
+            <works:WorkSelector DataContext="{Binding WorkSelector}" />
         </materialDesign:DrawerHost.RightDrawerContent>
 
         <DockPanel Margin="10,0,10,0"
@@ -46,42 +49,19 @@
                             />
 
             <materialDesign:ColorZone VerticalAlignment="Center"
+                                      materialDesign:ThemeAssist.Theme="Inherit"
                                       Background="Transparent"
                                       >
                 <!--  Content  -->
                 <Grid Margin="0,0,0,20">
-                    <Grid.Resources>
-                        <DataTemplate x:Key="gp_Green">
-                            <local:Timer DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                              AncestorType=Control},
-                                                               Path=DataContext}"
-                                         DigitBackground="#004000"
-                                         Foreground="#00FF00"
-                                         />
-                        </DataTemplate>
-
-                        <DataTemplate x:Key="gp_Red">
-                            <local:Timer DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                              AncestorType=Control},
-                                                               Path=DataContext}"
-                                         DigitBackground="#400000"
-                                         Foreground="#FF0000"
-                                         />
-                        </DataTemplate>
-
-                        <sel:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
-                    </Grid.Resources>
-
                     <!--  Digit Panel  -->
-                    <ContentControl DockPanel.Dock="Top"
-                                    x:Name="m_DigitPanel"
-                                    DataContext="{Binding}"
-                                    Content="{Binding IsBreak}"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    ContentTemplateSelector="{StaticResource dts_DigitPanel}"
-                                    />
-
+                    <local:Timer x:Name="m_DigitPanel"
+                                 DockPanel.Dock="Top"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 DataContext="{Binding}"
+                                 Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                 />
 
                 </Grid>
             </materialDesign:ColorZone>

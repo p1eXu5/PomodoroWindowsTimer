@@ -20,6 +20,9 @@ module WorkModel =
         | SetTitle of string
         | Update of AsyncOperation<unit, Result<DateTimeOffset, string>>
         | CreateNew of AsyncOperation<unit, Result<(int * DateTimeOffset), string>>
+        | Select
+        | Edit
+        | CancelEdit
 
     module MsgWith =
 
@@ -46,6 +49,27 @@ module WorkModel =
             | Msg.CreateNew (AsyncOperation.Finish (res, cts)) ->
                 model.CreateNewState |> AsyncDeferred.chooseRetrievedResultWithin res cts
             | _ -> None
+
+    [<RequireQualifiedAccess; Struct>]
+    type Intent =
+        | None
+        | Select
+        | StartEdit
+        | EndEdit
+
+    [<AutoOpen>]
+    module Intent =
+        let withNoIntent (m, cmd) =
+            m, cmd, Intent.None
+
+        let withSelectIntent (m, cmd) =
+            m, cmd, Intent.Select
+
+        let withStartEditIntent (m, cmd) =
+            m, cmd, Intent.StartEdit
+
+        let withEndEditIntent (m, cmd) =
+            m, cmd, Intent.EndEdit
 
     let init work =
         {

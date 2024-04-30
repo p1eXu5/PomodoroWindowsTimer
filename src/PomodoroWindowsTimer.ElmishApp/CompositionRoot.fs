@@ -89,8 +89,11 @@ let compose
         let updateWorkListModel =
             WorkListModel.Program.update workRepository (loggerFactory.CreateLogger<WorkListModel>()) mainErrorMessageQueue updateWorkModel
 
+        let updateCreatingWorkModel =
+            CreatingWorkModel.Program.update workRepository mainErrorMessageQueue (loggerFactory.CreateLogger<CreatingWorkModel>())
+
         let updateWorkSelectorModel =
-            WorkSelectorModel.Program.update updateWorkListModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
+            WorkSelectorModel.Program.update updateWorkListModel updateCreatingWorkModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
 
         MainModel.Program.update
             mainModelCfg

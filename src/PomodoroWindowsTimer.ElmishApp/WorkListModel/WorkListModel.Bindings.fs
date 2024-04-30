@@ -43,6 +43,6 @@ type Bindings() =
             |> Binding.mapMsgWithModel (fun msg model -> Msg.WorkModelMsg (model.SelectedWorkId.Value, msg))
 
     member val HasSelectedWork : Binding =
-        nameof __.HasSelectedWork |> Binding.oneWay (_.SelectedWorkId >> Option.isSome)
+        nameof __.HasSelectedWork |> Binding.oneWay (selectedWorkModel >> Option.isSome)
 
 
