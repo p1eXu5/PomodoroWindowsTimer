@@ -280,6 +280,7 @@ let update
             model |> withWorkSelectorModel (m |> Some)
             , Cmd.map Msg.WorkSelectorModelMsg cmd
         | WorkSelectorModel.Intent.Select workModel ->
+            cfg.CurrentWorkItemSettings.CurrentWork <- workModel |> Option.map _.Work
             model |> withWorkSelectorModel (m |> Some) |> withWorkModel workModel
             , Cmd.map Msg.WorkSelectorModelMsg cmd
         | WorkSelectorModel.Intent.Close ->

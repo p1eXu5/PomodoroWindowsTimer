@@ -25,19 +25,31 @@ internal class UserSettings : IUserSettings
     public bool DisableSkipBreak
     {
         get => Properties.Settings.Default.DisableSkipBreak;
-        set => Properties.Settings.Default.DisableSkipBreak = value;
+        set
+        {
+            Properties.Settings.Default.DisableSkipBreak = value;
+            Properties.Settings.Default.Save();
+        }
     }
 
     public FSharpOption<string> TimePointSettings
     {
         get => Properties.Settings.Default.TimePoints.ToFSharpOption();
-        set => Properties.Settings.Default.TimePoints = value.FromFSharpOption();
+        set
+        {
+            Properties.Settings.Default.TimePoints = value.FromFSharpOption();
+            Properties.Settings.Default.Save();
+        }
     }
 
     public FSharpOption<string> TimePointPrototypesSettings
     {
         get => Properties.Settings.Default.TimePointPrototypes.ToFSharpOption();
-        set => Properties.Settings.Default.TimePointPrototypes = value.FromFSharpOption();
+        set
+        {
+            Properties.Settings.Default.TimePointPrototypes = value.FromFSharpOption();
+            Properties.Settings.Default.Save();
+        }
     }
     public FSharpList<string> Patterns
     {
@@ -60,6 +72,7 @@ internal class UserSettings : IUserSettings
             }
 
             Properties.Settings.Default.Patterns = coll;
+            Properties.Settings.Default.Save();
         }
     }
 
@@ -76,7 +89,11 @@ internal class UserSettings : IUserSettings
 
             return botToken.ToFSharpOption();
         }
-        set => Properties.Settings.Default.BotToken = value.FromFSharpOption();
+        set
+        {
+            Properties.Settings.Default.BotToken = value.FromFSharpOption();
+            Properties.Settings.Default.Save();
+        }
     }
     public FSharpOption<string> MyChatId
     {
@@ -91,7 +108,10 @@ internal class UserSettings : IUserSettings
             return myChatId.ToFSharpOption();
         }
 
-        set => Properties.Settings.Default.MyChatId = value.FromFSharpOption();
+        set {
+            Properties.Settings.Default.MyChatId = value.FromFSharpOption();
+            Properties.Settings.Default.Save();
+        }
     }
 
     public FSharpOption<Work> CurrentWork
@@ -115,7 +135,9 @@ internal class UserSettings : IUserSettings
         }
         set
         {
-            Properties.Settings.Default.CurrentWork = JsonHelpers.Serialize(value);
+            var currentWork = JsonHelpers.Serialize(value);
+            Properties.Settings.Default.CurrentWork = currentWork;
+            Properties.Settings.Default.Save();
         }
     }
 }
