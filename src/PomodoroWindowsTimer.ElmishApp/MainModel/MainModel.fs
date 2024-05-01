@@ -39,7 +39,8 @@ and
         | Initialized
         | Playing
         | Stopped
-        | TimeShiftOnStopped of previosState: LooperState
+        /// To restore LooperState when shifting end and previous state was not Playing.
+        | TimeShiftingAfterNotPlaying of previousState: LooperState
 and
     UIInitiator = UIInitiator of TimePoint
 
@@ -195,7 +196,7 @@ module MainModel =
 
     let isLooperRunning m =
         match m.LooperState with
-        | TimeShiftOnStopped s ->
+        | TimeShiftingAfterNotPlaying s ->
             match s with
             | Initialized -> false
             | _ -> true

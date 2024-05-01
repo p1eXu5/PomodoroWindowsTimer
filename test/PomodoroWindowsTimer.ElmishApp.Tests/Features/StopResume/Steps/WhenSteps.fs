@@ -1,9 +1,18 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps.When
 
+open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
+
+let ``Looper TimePointStarted event has been despatched with`` (newTimePoint: TimePoint) (oldTimePoint: TimePoint option) =
+    Common.``Looper TimePointStarted event has been despatched with`` newTimePoint oldTimePoint
+
+let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>)  =
+    Common.``Looper TimePointReduced event has been despatched with`` activeTimePointId expectedSeconds
+
 
 let ``Play msg has been dispatched`` () =
     scenario {
@@ -45,36 +54,27 @@ let ``Replay msg has been dispatched`` () =
         do! Scenario.msgDispatchedWithin2Sec "Replay" ((=) msg)
     }
 
+let ``PreChangeActiveTimeSpan msg has been dispatched`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.PlayerMsg.PreChangeActiveTimeSpan |> MainModel.Msg.PlayerMsg
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec "PreChangeActiveTimeSpan" ((=) msg)
+    }
 
-//let ``Spent 2.5 ticks time`` () =
-//    CommonSteps.``Spent 2.5 ticks time`` testDispatch
+let ``PostChangeActiveTimeSpan msg has been dispatched`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.PlayerMsg.PostChangeActiveTimeSpan |> MainModel.Msg.PlayerMsg
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
+    }
 
-
-//let ``Looper is stopping`` () =
-//    testDispatch.TriggerWithTimeout(Msg.Stop)
-
-//let ``Looper is resuming`` () =
-//    testDispatch.TriggerWithTimeout(Msg.Resume)
-
-//let ``Looper is playing next`` () =
-//    testDispatch.TriggerWithTimeout(Msg.Next)
-
-//let ``Looper is replaying`` () =
-//    testDispatch.TriggerWithTimeout(Msg.Replay)
-
-//let ``TimePoint is changed on`` timePoint =
-//    let tcs = TaskCompletionSource()
-//    looper.AddSubscriber(fun ev ->
-//        async {
-//            match ev with
-//            | LooperEvent.TimePointTimeReduced tp
-//            | LooperEvent.TimePointStarted (tp, _) when tp.Id = timePoint.Id -> tcs.SetResult()
-//            | _ -> ()
-//        }
-//    )
-//    task {
-//        let! _ = tcs.Task
-//        return ()
-//    }
-//    |> Async.AwaitTask
-//    |> Async.RunSynchronously
+let ``ActiveTimeSeconds changed to`` (seconds: float<sec>) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.PlayerMsg.ChangeActiveTimeSpan (float seconds) |> MainModel.Msg.PlayerMsg
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
+    }
+    |> Scenario.log "When.``ActiveTimeSeconds changed to``"

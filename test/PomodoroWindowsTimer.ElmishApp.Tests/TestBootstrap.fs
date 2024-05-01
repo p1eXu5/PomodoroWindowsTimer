@@ -7,6 +7,8 @@ open Microsoft.Extensions.Logging
 
 open Elmish
 open NUnit.Framework
+open p1eXu5.AspNetCore.Testing
+open p1eXu5.AspNetCore.Testing.MockRepository
 
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
@@ -17,9 +19,14 @@ open System.Collections.Generic
 open PomodoroWindowsTimer.Types
 open Serilog
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open p1eXu5.AspNetCore.Testing.Logging
 
 type TestBootstrap () =
     inherit Bootstrap()
+
+    let mutable mockRepository : MockRepository = Unchecked.defaultof<_>
+
+    member _.MockRepository with get() = mockRepository
 
     override _.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
         hostBuilder.Configuration["InTest"] <- "True"
@@ -57,10 +64,15 @@ type TestBootstrap () =
     override _.ConfigureLogging(loggingBuilder: ILoggingBuilder) =
         loggingBuilder.SetMinimumLevel(LogLevel.Error) |> ignore
 
-    override _.PostConfigureHost(_: IHostBuilder) =
-         ()
+    override _.PostConfigureHost(builder: IHostBuilder) =
+        builder.AddMockRepository(
+            [ Service<IWindowsMinimizer>() ],
+            TestLogWriter(TestLogger<IWindowsMinimizer>(TestContextWriters.Default, LogOut.All)),
+            (fun mr -> mockRepository <- mr)
+        )
 
-    member this.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: Stack<MainModel.Msg>, testDispatcher: TestDispatcher) =
+
+    member _.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: Stack<MainModel.Msg>, testDispatcher: TestDispatcher) =
         let factory = base.GetElmishProgramFactory()
         let (initMainModel, updateMainModel, _, subscribe) =
             CompositionRoot.compose

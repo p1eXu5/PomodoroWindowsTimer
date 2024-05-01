@@ -1,19 +1,12 @@
-﻿module PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps.When
+﻿[<RequireQualifiedAccess>]
+module PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps.Common
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
-
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
-open PomodoroWindowsTimer.ElmishApp.Tests.Features
-
-let ``Spent 2.5 ticks`` () =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-        do sut.Dispatcher.WaitTimeout()
-    }
-    |> Scenario.log "Given.``Initialized Program``"
+open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 
 let ``Looper TimePointStarted event has been despatched with`` (newTimePoint: TimePoint) (oldTimePoint: TimePoint option) =
     scenario {
@@ -31,4 +24,20 @@ let ``Looper TimePointStarted event has been despatched with`` (newTimePoint: Ti
         )
     }
     |> Scenario.log "When.``Looper TimePointStarted event has been despatched with``"
+
+let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>)  =
+    scenario {
+        do! Scenario.msgDispatchedWithin2Sec "TimePointReduced" (fun msg ->
+            match msg with
+            | MainModel.Msg.PlayerMsg (
+                PlayerMsg.LooperMsg (
+                    LooperEvent.TimePointTimeReduced tp
+                )) ->
+                    tp.Id = activeTimePointId
+                    && tp.TimeSpan.TotalSeconds = float expectedSeconds
+            | _ -> false
+        )
+    }
+    |> Scenario.log "When.``Looper TimePointReduced event has been despatched with``"
+
 

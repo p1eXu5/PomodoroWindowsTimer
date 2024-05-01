@@ -49,7 +49,7 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
         nameof __.PlayPauseButtonText
             |> Binding.oneWay (fun m ->
                 match m.LooperState with
-                | TimeShiftOnStopped _
+                | TimeShiftingAfterNotPlaying _
                 | Initialized -> "Play"
                 | Playing -> "Stop"
                 | Stopped -> "Resume"
@@ -59,7 +59,7 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
         nameof __.PlayStopCommand
             |> Binding.cmd (fun m ->
                 match m.LooperState with
-                | TimeShiftOnStopped _
+                | TimeShiftingAfterNotPlaying _
                 | Initialized -> PlayerMsg.Play |> Msg.PlayerMsg
                 | Playing -> PlayerMsg.Stop |> Msg.PlayerMsg
                 | Stopped -> PlayerMsg.Resume |> Msg.PlayerMsg

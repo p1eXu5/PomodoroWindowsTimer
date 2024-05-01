@@ -17,7 +17,7 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
     | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeOther () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
+        { model with IsMinimized = true }, Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeOtherAsync () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
 
     | WindowsMsg.RestoreWindows when model.IsMinimized ->
         { model with IsMinimized = false }, Cmd.OfFunc.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
@@ -125,7 +125,7 @@ let updateOnPlayerMsg
             cfg.Looper.Stop()
             model, Cmd.none
         | _ ->
-            { model with LooperState = TimeShiftOnStopped model.LooperState }, Cmd.none
+            { model with LooperState = TimeShiftingAfterNotPlaying model.LooperState }, Cmd.none
 
     | PlayerMsg.ChangeActiveTimeSpan v ->
         let duration = model |> getActiveTimeDuration
@@ -134,7 +134,7 @@ let updateOnPlayerMsg
 
     | PlayerMsg.PostChangeActiveTimeSpan ->
         match model.LooperState with
-        | TimeShiftOnStopped s ->
+        | TimeShiftingAfterNotPlaying s ->
             { model with LooperState = s }, Cmd.none
         | _ ->
             cfg.Looper.Resume()

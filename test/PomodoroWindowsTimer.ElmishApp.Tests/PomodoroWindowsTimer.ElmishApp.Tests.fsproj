@@ -19,9 +19,10 @@
     <Compile Include="TestBootstrap.fs" />
     <Compile Include="Sut.fs" />
     <Compile Include="Features\Helpers.fs" />
-    <Compile Include="Features\CommonSteps\GivenSteps.fs" />
-    <Compile Include="Features\CommonSteps\WhenSteps.fs" />
-    <Compile Include="Features\CommonSteps\ThenSteps.fs" />
+    <Compile Include="Features\CommonSteps\CommonSteps.Given.fs" />
+    <Compile Include="Features\CommonSteps\CommonSteps.When.fs" />
+    <Compile Include="Features\CommonSteps\CommonSteps.Then.fs" />
+    <Compile Include="Features\StopResume\Steps\Common.fs" />
     <Compile Include="Features\StopResume\Steps\GivenSteps.fs" />
     <Compile Include="Features\StopResume\Steps\WhenSteps.fs" />
     <Compile Include="Features\StopResume\Steps\ThenSteps.fs" />
@@ -35,6 +36,7 @@
     <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="4.15.1" />
     <PackageReference Include="FsUnit" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="NUnit" Version="4.1.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="NUnit.Analyzers" Version="4.1.0">
@@ -45,7 +47,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="p1eXu5.AspNetCore.Testing.Logging" Version="1.0.14" />
+    <PackageReference Include="p1eXu5.AspNetCore.Testing" Version="1.0.15" />
+    <PackageReference Include="p1eXu5.AspNetCore.Testing.Logging" Version="1.0.15" />
   </ItemGroup>
 
   <ItemGroup>

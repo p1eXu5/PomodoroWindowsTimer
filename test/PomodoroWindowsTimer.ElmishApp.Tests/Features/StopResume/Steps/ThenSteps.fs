@@ -5,6 +5,7 @@ open Microsoft.Extensions.DependencyInjection
 
 open FsUnit
 open p1eXu5.FSharp.Testing.ShouldExtensions
+open NSubstitute
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
@@ -16,6 +17,15 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 
+
+let ``Looper TimePointStarted event has been despatched with`` (newTimePoint: TimePoint) (oldTimePoint: TimePoint option) =
+    Common.``Looper TimePointStarted event has been despatched with`` newTimePoint oldTimePoint
+
+let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>)  =
+    Common.``Looper TimePointReduced event has been despatched with`` activeTimePointId expectedSeconds
+
+
+/// Comparing Id's.
 let rec ``Active Point is set on`` (timePoint: TimePoint) =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -38,6 +48,13 @@ let ``Windows should not be minimized`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
+        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
+        
+        do
+            wm.Received(0).MinimizeOtherAsync()
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+
         sut.MainModel.IsMinimized
         |> shouldL be False "MainModel.IsMinimized is not false"
     }
@@ -45,7 +62,21 @@ let ``Windows should not be minimized`` () =
 let ``Windows should be minimized`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        
+
+        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
+
+        (*
+            TODO: uncoment when reduce window messages
+            do
+                wm.Received().MinimizeOtherAsync()
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+
+            do
+                wm.Received().RestoreMainWindow()
+
+        *)
+
         sut.MainModel.IsMinimized
         |> shouldL be True "MainModel.IsMinimized is not true"
     }
@@ -84,6 +115,20 @@ let rec ``Active Point remaining time is equal to or less then`` (timePoint: Tim
         |> Option.defaultValue false
         |> shouldL be True (nameof ``Active Point remaining time is equal to or less then``)
     }
+
+let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        match sut.MainModel.ActiveTimePoint with
+        | Some atp ->
+            atp.TimeSpan.TotalSeconds
+            |> shouldL equal (float seconds)
+                $"Active TimePoint time: {atp.TimeSpan.TotalSeconds} sec., expected time: {seconds} sec."
+        | None ->
+            assertionExn "Active TimePoint has not been set"
+    }
+    |> Scenario.log "Then.``Active TimePoint remaining time is equal to``"
 
 
 //let rec ``LooperState is Playing`` () =

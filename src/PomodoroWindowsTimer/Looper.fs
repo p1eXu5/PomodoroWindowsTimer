@@ -33,7 +33,7 @@ type private Msg =
     | Stop
     | Resume
     | Next
-    | Shift of float
+    | Shift of float<sec>
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
@@ -201,10 +201,20 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                     | Stop when not state.IsStopped ->
                         return! loop { state with IsStopped = true; StartTime = DateTime.Now }
 
-                    | Shift v when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
-                        let atp = state.ActiveTimePoint |> Option.map (fun atp -> { atp with TimeSpan = TimeSpan.FromSeconds(v) }) |> Option.get
-                        tryPostEvent (LooperEvent.TimePointTimeReduced atp)
-                        return! loop { state with ActiveTimePoint = atp |> Some }
+                    | Shift v when state.IsStopped ->
+                        use scope = beginScope (nameof Next)
+                        let newState =
+                            match state.ActiveTimePoint with
+                            | Some atp ->
+                                let atp = { atp with TimeSpan = TimeSpan.FromSeconds(float v) }
+                                tryPostEvent (LooperEvent.TimePointTimeReduced atp)
+                                { state with ActiveTimePoint = atp |> Some }
+                            | None ->
+                                logger.LogWarning("It's trying to shift not existing active time point.")
+                                state
+
+                        scope.Dispose()
+                        return! loop newState
 
                     | _ -> return! loop state
                 }
@@ -245,7 +255,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
         agent.Post(PreloadTimePoint)
 
     member _.Shift(seconds: float<sec>) =
-        agent.Post(Shift (int seconds))
+        agent.Post(Shift seconds)
 
     member _.Resume() =
         agent.Post(Resume)

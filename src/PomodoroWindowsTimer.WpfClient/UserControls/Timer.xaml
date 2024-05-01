@@ -114,8 +114,8 @@
                 Maximum="{Binding ActiveTimeDuration}"
                 Minimum="0"
                 Orientation="Horizontal"
-                PreviewMouseDown="Slider_MouseDown"
-                PreviewMouseUp="Slider_MouseUp"
+                PreviewMouseDown="Slider_PreChangeActiveTimeSpanCommand"
+                PreviewMouseUp="Slider_PostChangeActiveTimeSpanCommand"
                 Value="{Binding ActiveTimeSeconds}"
                 />
     </StackPanel>

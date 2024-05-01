@@ -138,7 +138,7 @@ module WindowsMinimizer =
 
     let init mainWindowTitle =
         { new IWindowsMinimizer with
-            member _.MinimizeOther () =
+            member _.MinimizeOtherAsync () =
                 minimize mainWindowTitle
             member _.Restore () =
                 restore ()
@@ -149,7 +149,7 @@ module WindowsMinimizer =
     /// for debug purpose
     let initStub _ =
         { new IWindowsMinimizer with
-            member _.MinimizeOther () =
+            member _.MinimizeOtherAsync () =
                 task { return () }
             member _.Restore () =
                 ()

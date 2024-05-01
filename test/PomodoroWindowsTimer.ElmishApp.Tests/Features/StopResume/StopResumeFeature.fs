@@ -1,7 +1,9 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.Features
 
+open System
 open NUnit.Framework
 
+open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 
@@ -103,6 +105,7 @@ module StopResumeFeature =
             do! When.``Play msg has been dispatched`` ()
             do! When.``Next msg has been dispatched`` ()
 
+            do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1] (timePoints.Head |> Some)
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1]
             do! Then.``LooperState is`` LooperState.Playing
@@ -347,7 +350,16 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints.Head None
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
 
+            do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 1.5<sec>
+            do! Then.``Active Point is set on`` timePoints.Head
+            do! Then.``Active TimePoint remaining time is equal to`` 1.5<sec>
+            do! Then.``LooperState is`` LooperState.Initialized
+            do! Then.``Windows should not be minimized`` ()
+            do! Then.``Telegrtam bot should not be notified`` ()
         }
         |> Scenario.runTestAsync
 

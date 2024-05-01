@@ -37,7 +37,7 @@ public partial class Timer : UserControl
     public static readonly DependencyProperty DigitBackgroundProperty =
         DependencyProperty.Register("DigitBackground", typeof(Brush), typeof(Timer), new PropertyMetadata(null));
 
-    private void Slider_MouseDown(object sender, MouseButtonEventArgs e)
+    private void Slider_PreChangeActiveTimeSpanCommand(object sender, MouseButtonEventArgs e)
     {
         if (e.LeftButton == MouseButtonState.Pressed)
         {
@@ -49,7 +49,7 @@ public partial class Timer : UserControl
         }
     }
 
-    private void Slider_MouseUp(object sender, MouseButtonEventArgs e)
+    private void Slider_PostChangeActiveTimeSpanCommand(object sender, MouseButtonEventArgs e)
     {
         ICommand openFileCommand = ((dynamic)DataContext).PostChangeActiveTimeSpanCommand;
         if (openFileCommand.CanExecute(null))

@@ -59,7 +59,7 @@ type ITelegramBot =
     abstract SendMessage: string -> Task<unit>
 
 type IWindowsMinimizer =
-    abstract MinimizeOther: unit -> Task<unit>
+    abstract MinimizeOtherAsync: unit -> Task<unit>
     abstract Restore: unit -> unit
     abstract RestoreMainWindow: unit -> unit
 

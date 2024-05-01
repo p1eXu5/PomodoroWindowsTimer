@@ -7,6 +7,8 @@ open NUnit.Framework
 open PomodoroWindowsTimer.WpfClient
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open p1eXu5.AspNetCore.Testing
+open p1eXu5.AspNetCore.Testing.MockRepository
 
 type ISut =
     inherit IScenarioContext
@@ -15,6 +17,7 @@ type ISut =
     abstract Dispatcher: TestDispatcher with get
     abstract MainModel: MainModel with get
     abstract MsgStack: Stack<MainModel.Msg> with get
+    abstract MockRepository: MockRepository with get
 
 
 module Sut =
@@ -32,6 +35,8 @@ module Sut =
         try
             bootstrap.StartHost()
 
+            let _ = bootstrap.MockRepository.TrySubstitute<IWindowsMinimizer>()
+
             let sut =
                 {
                     new ISut with
@@ -40,6 +45,8 @@ module Sut =
                         member _.MsgStack with get() = msgStack
                         member _.ServiceProvider with get() =
                             bootstrap.Host.Services
+                        member _.MockRepository with get() =
+                            bootstrap.MockRepository
                     interface IScenarioContext with
                         member _.ScenarioContext with get() = dict
                     
