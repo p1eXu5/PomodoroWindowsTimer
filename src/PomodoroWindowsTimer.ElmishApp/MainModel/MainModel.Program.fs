@@ -48,7 +48,6 @@ let updateOnPlayerMsg
         cfg.Looper.Next()
         model |> setLooperState Playing |> setUIInitiator, Cmd.none
 
-    // TODO: logic can be moved into Msg.LooperMsg handler
     | PlayerMsg.Resume when model.ActiveTimePoint |> Option.isSome ->
         cfg.Looper.Resume()
         let model' = model |> setLooperState Playing
@@ -80,7 +79,7 @@ let updateOnPlayerMsg
         let (activeTimePoint, cmd, switchTheme) =
             match evt with
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none, false)
-            | LooperEvent.TimePointStarted (newTp, None) -> (newTp |> Some, Cmd.none, true)
+            | LooperEvent.TimePointStarted (nextTp, None) -> (nextTp |> Some, Cmd.none, true)
             | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
                 match nextTp.Kind with
                 | LongBreak ->
