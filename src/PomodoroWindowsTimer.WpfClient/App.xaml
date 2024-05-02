@@ -4,8 +4,8 @@
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             Startup="Application_Startup"
              Exit="Application_Exit"
+             Startup="Application_Startup"
              >
     <Application.Resources>
         <ResourceDictionary>

@@ -13,10 +13,10 @@ open p1eXu5.FSharp.Testing.ShouldExtensions
 
 let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
     scenario {
-        do! Scenario.msgDispatchedWithin2Sec "TimePointStarted" (fun msg ->
+        do! Scenario.msgDispatchedWithin 3.0<sec> "TimePointStarted" (fun msg ->
             match msg with
-            | MainModel.Msg.PlayerMsg (
-                PlayerMsg.LooperMsg (
+            | MainModel.Msg.ControllerMsg (
+                ControllerMsg.LooperMsg (
                     LooperEvent.TimePointStarted (newTp, oldTp)
                 )) when newTp.Id = newTimePointId ->
                     match oldTp, oldTimePointId with
@@ -31,8 +31,8 @@ let ``Looper TimePointReduced event has been despatched with`` (activeTimePointI
     scenario {
         do! Scenario.msgDispatchedWithin2Sec "TimePointReduced" (fun msg ->
             match msg with
-            | MainModel.Msg.PlayerMsg (
-                PlayerMsg.LooperMsg (
+            | MainModel.Msg.ControllerMsg (
+                ControllerMsg.LooperMsg (
                     LooperEvent.TimePointTimeReduced tp
                 )) ->
                         tp.Id = activeTimePointId

@@ -138,6 +138,9 @@ internal class Bootstrap : IDisposable
     protected ElmishProgramFactory GetElmishProgramFactory()
         => Host.Services.GetRequiredService<ElmishProgramFactory>();
 
+    internal IThemeSwitcher GetThemeSwitcher()
+        => Host.Services.GetRequiredService<IThemeSwitcher>();
+
     protected virtual void PreConfigureServices(HostBuilderContext hostBuilder, IServiceCollection services)
     { }
 

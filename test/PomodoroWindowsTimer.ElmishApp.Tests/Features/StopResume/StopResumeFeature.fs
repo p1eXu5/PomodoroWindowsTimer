@@ -95,7 +95,7 @@ module StopResumeFeature =
 
     [<Test>]
     [<Category("Work TimePoint Scenarios")>]
-    let ``UC0-5 - Start Work Next Break TimePoint Scenario`` () =
+    let ``UC0-5 - Start Work -> Next to Break TimePoint Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
@@ -116,7 +116,7 @@ module StopResumeFeature =
 
     [<Test>]
     [<Category("Work TimePoint Scenarios")>]
-    let ``UC0-6 - Start Work -> Stop -> Next Break TimePoint Scenario`` () =
+    let ``UC0-6 - Start Work -> Stop -> Next to Break TimePoint Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
@@ -172,6 +172,34 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("Work TimePoint Scenarios")>]
+    let ``UC0-9 - Start Work -> Next to Break -> Next to Work -> LongBreak transition Scenario`` () =
+        scenario {
+            let timePoints = [ namedWorkTP "Work 1" 2.<sec>; breakTP 2.<sec>; namedWorkTP "Work 2" 2.<sec>; longBreakTP 10.<sec>; ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Initialized Program`` ()
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Play msg has been dispatched`` () // Work
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+
+            do! When.``Spent 2.5 ticks`` ()
+            do! When.``Next msg has been dispatched`` () // to Break
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
+
+            do! When.``Spent 2.5 ticks`` ()
+            do! When.``Next msg has been dispatched`` ()  // to Work
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[2].Id (timePoints[1].Id |> Some)
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[3].Id (timePoints[2].Id |> Some) // Wait LongBreak
+            do! Then.``Active Point is set on`` timePoints[3]
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints[3] None
+            do! Then.``LooperState is`` LooperState.Playing
+            do! Then.``Windows should be minimized`` ()
         }
         |> Scenario.runTestAsync
 

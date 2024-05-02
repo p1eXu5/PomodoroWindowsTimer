@@ -75,7 +75,7 @@ module MainModel =
         | StartTimePoint of Operation<Guid, unit>
         | SetIsTimePointsShown of bool
 
-        | PlayerMsg of PlayerMsg
+        | ControllerMsg of ControllerMsg
         | WindowsMsg of WindowsMsg
         | SendToChatBot of Message
 
@@ -101,7 +101,7 @@ module MainModel =
             | RestoreMainWindow
     and
         [<RequireQualifiedAccess>]
-        PlayerMsg =
+        ControllerMsg =
             | Play
             | Next
             | Replay
@@ -120,7 +120,7 @@ module MainModel =
                 | Kind.Break
                 | Kind.LongBreak when model.DisableSkipBreak -> None
                 | _ ->
-                    PlayerMsg.Next |> Msg.PlayerMsg |> Some
+                    ControllerMsg.Next |> Msg.ControllerMsg |> Some
             )
 
     module MsgWith =

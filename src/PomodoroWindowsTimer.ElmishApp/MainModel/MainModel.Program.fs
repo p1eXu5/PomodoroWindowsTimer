@@ -36,19 +36,19 @@ let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: 
 let updateOnPlayerMsg
     (cfg: MainModeConfig)
     (logger: ILogger<MainModel>)
-    (msg: PlayerMsg)
+    (msg: ControllerMsg)
     (model: MainModel)
     =
     match msg with
-    | PlayerMsg.Next ->
+    | ControllerMsg.Next ->
         cfg.Looper.Next()
         model |> setLooperState Playing |> setUIInitiator, Cmd.none
 
-    | PlayerMsg.Play ->
+    | ControllerMsg.Play ->
         cfg.Looper.Next()
         model |> setLooperState Playing |> setUIInitiator, Cmd.none
 
-    | PlayerMsg.Resume when model.ActiveTimePoint |> Option.isSome ->
+    | ControllerMsg.Resume when model.ActiveTimePoint |> Option.isSome ->
         cfg.Looper.Resume()
         let model' = model |> setLooperState Playing
 
@@ -62,7 +62,7 @@ let updateOnPlayerMsg
         | _ ->
             model', Cmd.none
 
-    | PlayerMsg.Stop when model.LooperState = LooperState.Playing ->
+    | ControllerMsg.Stop when model.LooperState = LooperState.Playing ->
         cfg.Looper.Stop()
         model |> setLooperState Stopped
         , Cmd.batch [
@@ -70,12 +70,12 @@ let updateOnPlayerMsg
             Cmd.ofMsg (WindowsMsg.RestoreMainWindow |> Msg.WindowsMsg)
         ]
 
-    | PlayerMsg.Replay when model.ActiveTimePoint |> Option.isSome ->
+    | ControllerMsg.Replay when model.ActiveTimePoint |> Option.isSome ->
         let cmd =
-            Cmd.batch [Cmd.ofMsg (PlayerMsg.PreChangeActiveTimeSpan |> Msg.PlayerMsg); Cmd.ofMsg (PlayerMsg.ChangeActiveTimeSpan 0.0 |> Msg.PlayerMsg); Cmd.ofMsg (PlayerMsg.Resume |> Msg.PlayerMsg)]
+            Cmd.batch [Cmd.ofMsg (ControllerMsg.PreChangeActiveTimeSpan |> Msg.ControllerMsg); Cmd.ofMsg (ControllerMsg.ChangeActiveTimeSpan 0.0 |> Msg.ControllerMsg); Cmd.ofMsg (ControllerMsg.Resume |> Msg.ControllerMsg)]
         model, cmd
 
-    | PlayerMsg.LooperMsg evt ->
+    | ControllerMsg.LooperMsg evt ->
         let (activeTimePoint, cmd, switchTheme) =
             match evt with
             | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none, false)
@@ -118,7 +118,7 @@ let updateOnPlayerMsg
     // --------------------
     // Active time changing
     // --------------------
-    | PlayerMsg.PreChangeActiveTimeSpan ->
+    | ControllerMsg.PreChangeActiveTimeSpan ->
         match model.LooperState with
         | Playing ->
             cfg.Looper.Stop()
@@ -126,12 +126,12 @@ let updateOnPlayerMsg
         | _ ->
             { model with LooperState = TimeShiftingAfterNotPlaying model.LooperState }, Cmd.none
 
-    | PlayerMsg.ChangeActiveTimeSpan v ->
+    | ControllerMsg.ChangeActiveTimeSpan v ->
         let duration = model |> getActiveTimeDuration
         cfg.Looper.Shift((duration - v) * 1.0<sec>)
         model, Cmd.none
 
-    | PlayerMsg.PostChangeActiveTimeSpan ->
+    | ControllerMsg.PostChangeActiveTimeSpan ->
         match model.LooperState with
         | TimeShiftingAfterNotPlaying s ->
             { model with LooperState = s }, Cmd.none
@@ -188,10 +188,10 @@ let update
         , Cmd.none
 
     | Msg.StartTimePoint (Operation.Start id) ->
-        model, Cmd.batch [ Cmd.ofMsg (PlayerMsg.Stop |> Msg.PlayerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn ]
+        model, Cmd.batch [ Cmd.ofMsg (ControllerMsg.Stop |> Msg.ControllerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn ]
 
     | Msg.StartTimePoint (Operation.Finish _) ->
-        model, Cmd.ofMsg (PlayerMsg.Play |> Msg.PlayerMsg)
+        model, Cmd.ofMsg (ControllerMsg.Play |> Msg.ControllerMsg)
 
     // --------------------
     // Work
@@ -222,7 +222,7 @@ let update
     // Player, Windows
     // --------------------
 
-    | Msg.PlayerMsg pmsg -> updateOnPlayerMsg logger pmsg model
+    | Msg.ControllerMsg pmsg -> updateOnPlayerMsg logger pmsg model
 
     
 

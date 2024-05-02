@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
                     >
     <!--  Constructor  -->
@@ -16,9 +16,7 @@
                        VerticalAlignment="Center"
                        Text="{Binding TimeSpan}"
                        />
-            <TextBlock VerticalAlignment="Center"
-                       Text="{Binding Kind}"
-                       />
+            <TextBlock VerticalAlignment="Center" Text="{Binding Kind}" />
         </StackPanel>
     </ControlTemplate>
 

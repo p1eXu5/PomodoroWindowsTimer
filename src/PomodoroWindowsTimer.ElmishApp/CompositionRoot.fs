@@ -108,7 +108,7 @@ let compose
             let onLooperEvt =
                 fun evt ->
                     async {
-                        do dispatch (MainModel.PlayerMsg.LooperMsg evt |> MainModel.Msg.PlayerMsg)
+                        do dispatch (MainModel.ControllerMsg.LooperMsg evt |> MainModel.Msg.ControllerMsg)
                     }
             looper.AddSubscriber(onLooperEvt)
             { new IDisposable with 

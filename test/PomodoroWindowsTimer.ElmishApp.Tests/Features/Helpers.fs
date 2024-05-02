@@ -4,6 +4,7 @@ module PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 open System
 open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Tests
+open PomodoroWindowsTimer.Types
 
 module MainModel =
 
@@ -31,6 +32,15 @@ module Scenario =
                 Func<bool>(fun () -> state.MsgStack |> Seq.exists msgPredicate),
                 2000)
             msgPresents |> shouldL be True $"%s{msgDescription} has not been dispatched within 2 seconds."
+        }
+
+    let msgDispatchedWithin (delay: float<sec>) msgDescription msgPredicate =
+        scenario {
+            let! (state: ISut) = Scenario.getState
+            let msgPresents = SpinWait.SpinUntil(
+                Func<bool>(fun () -> state.MsgStack |> Seq.exists msgPredicate),
+                int (float delay * 1000.0))
+            msgPresents |> shouldL be True $"%s{msgDescription} has not been dispatched within {delay} seconds."
         }
 
     let msgNotDispatchedWithin1Sec msgDescription msgPredicate =

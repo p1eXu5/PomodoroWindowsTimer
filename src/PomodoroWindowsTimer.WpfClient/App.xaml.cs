@@ -35,6 +35,8 @@ namespace PomodoroWindowsTimer.WpfClient
             _bootstrap.StartHost();
 
             _errorMessageQueue = _bootstrap.GetMainWindowErrorMessageQueue();
+            var themeSwitcher = _bootstrap.GetThemeSwitcher();
+            themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);
 
             var wnd = new MainWindow();
             _bootstrap.ShowMainWindow(wnd);

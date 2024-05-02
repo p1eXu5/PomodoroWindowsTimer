@@ -60,9 +60,9 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
             |> Binding.cmd (fun m ->
                 match m.LooperState with
                 | TimeShiftingAfterNotPlaying _
-                | Initialized -> PlayerMsg.Play |> Msg.PlayerMsg
-                | Playing -> PlayerMsg.Stop |> Msg.PlayerMsg
-                | Stopped -> PlayerMsg.Resume |> Msg.PlayerMsg
+                | Initialized -> ControllerMsg.Play |> Msg.ControllerMsg
+                | Playing -> ControllerMsg.Stop |> Msg.ControllerMsg
+                | Stopped -> ControllerMsg.Resume |> Msg.ControllerMsg
             )
 
     member val NextCommand : Binding =
@@ -75,7 +75,7 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
                 | Playing
                 | Stopped ->
                     m.ActiveTimePoint
-                    |> Option.map (fun _ -> PlayerMsg.Replay |> Msg.PlayerMsg)
+                    |> Option.map (fun _ -> ControllerMsg.Replay |> Msg.ControllerMsg)
                 | _ -> None
             )
 
@@ -96,13 +96,13 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
         nameof __.IsActiveTimePointSet |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.isSome)
 
     member val ActiveTimeSeconds : Binding =
-        nameof __.ActiveTimeSeconds |> Binding.twoWay (getActiveSpentTime, (PlayerMsg.ChangeActiveTimeSpan >> Msg.PlayerMsg))
+        nameof __.ActiveTimeSeconds |> Binding.twoWay (getActiveSpentTime, (ControllerMsg.ChangeActiveTimeSpan >> Msg.ControllerMsg))
 
     member val PreChangeActiveTimeSpanCommand : Binding =
-        nameof __.PreChangeActiveTimeSpanCommand |> Binding.cmd (PlayerMsg.PreChangeActiveTimeSpan |> Msg.PlayerMsg)
+        nameof __.PreChangeActiveTimeSpanCommand |> Binding.cmd (ControllerMsg.PreChangeActiveTimeSpan |> Msg.ControllerMsg)
 
     member val PostChangeActiveTimeSpanCommand : Binding =
-        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd (PlayerMsg.PostChangeActiveTimeSpan |> Msg.PlayerMsg)
+        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd (ControllerMsg.PostChangeActiveTimeSpan |> Msg.ControllerMsg)
 
     member val IsBreak : Binding =
         nameof __.IsBreak
