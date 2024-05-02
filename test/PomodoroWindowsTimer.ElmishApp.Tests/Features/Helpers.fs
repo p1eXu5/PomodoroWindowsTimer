@@ -29,7 +29,7 @@ module Scenario =
             let! (state: ISut) = Scenario.getState
             let msgPresents = SpinWait.SpinUntil(
                 Func<bool>(fun () -> state.MsgStack |> Seq.exists msgPredicate),
-                200000)
+                2000)
             msgPresents |> shouldL be True $"%s{msgDescription} has not been dispatched within 2 seconds."
         }
 

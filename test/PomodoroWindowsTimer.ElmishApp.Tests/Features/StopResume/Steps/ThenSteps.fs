@@ -18,11 +18,24 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 
 
-let ``Looper TimePointStarted event has been despatched with`` (newTimePoint: TimePoint) (oldTimePoint: TimePoint option) =
-    Common.``Looper TimePointStarted event has been despatched with`` newTimePoint oldTimePoint
+let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
+    Common.``Looper TimePointStarted event has been despatched with`` newTimePointId oldTimePointId
+    |> Scenario.log (
+        sprintf "Then.``%s new TimePoint Id - %A and %s``."
+            (nameof Common.``Looper TimePointStarted event has been despatched with``)
+            newTimePointId
+            (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
+        )
 
-let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>)  =
-    Common.``Looper TimePointReduced event has been despatched with`` activeTimePointId expectedSeconds
+let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =
+    Common.``Looper TimePointReduced event has been despatched with`` activeTimePointId expectedSeconds tolerance
+    |> Scenario.log (
+        sprintf "Then.``%s %A %A sec with %A tolerance``."
+            (nameof Common.``Looper TimePointReduced event has been despatched with``)
+            activeTimePointId
+            expectedSeconds
+            tolerance
+        )
 
 
 /// Comparing Id's.
@@ -35,6 +48,7 @@ let rec ``Active Point is set on`` (timePoint: TimePoint) =
         |> Option.defaultValue false
         |> shouldL be True (sprintf "%s:\n%A" (nameof ``Active Point is set on``) timePoint)
     }
+    |> Scenario.log "Then.``Active Point is set on``"
 
 let ``LooperState is`` (looperState: LooperState) =
     scenario {
@@ -104,17 +118,20 @@ let ``Telegrtam bot should be notified with`` (timePointName: string) =
         telegramBotStub.MessageStack |> shouldL not' (be Empty) ("TelegramBot message stack is empty")
     }
 
-let rec ``Active Point remaining time is equal to or less then`` (timePoint: TimePoint) =
+let rec ``Active Point remaining time is equal to or less then`` (timePoint: TimePoint) (tolerance: float<sec> option) =
     scenario {
         let! (sut: ISut) = Scenario.getState
 
-        sut.MainModel.ActiveTimePoint
-        |> Option.map (fun atp ->
+        match sut.MainModel.ActiveTimePoint with
+        | Some atp ->
+            let tolerance = tolerance |> Option.map (float >> (*) 1000.0 ) |> Option.defaultValue (float Program.tickMilliseconds)
             // need to add offset cause it can be added to the swithed TimePoint
-            atp.TimeSpan <= timePoint.TimeSpan.Add(TimeSpan.FromMilliseconds(float Program.tickMilliseconds)))
-        |> Option.defaultValue false
-        |> shouldL be True (nameof ``Active Point remaining time is equal to or less then``)
+            let timePointAddTick = timePoint.TimeSpan.Add(TimeSpan.FromMilliseconds(tolerance))
+            atp.TimeSpan |> shouldL be (lessThanOrEqualTo timePointAddTick) $"Active TimePoint is %A{atp}"
+        | None ->
+            assertionExn "Active TimePoint is not set."
     }
+    |> Scenario.log $"Then.``{nameof ``Active Point remaining time is equal to or less then``} {timePoint.TimeSpan}``"
 
 let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
     scenario {
