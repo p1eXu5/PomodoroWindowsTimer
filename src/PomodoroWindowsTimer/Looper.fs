@@ -122,27 +122,36 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                     // printfn "%A: %A\n" msg state
 
                     let initialize state =
-                        async {
-                            let tpOpt = timePointQueue.TryGetNext()
+                        let nextTpOpt =
+                            // in first time next time point is equal to preloaded timepoint
+                            match timePointQueue.TryGetNext(), state.ActiveTimePoint with
+                            | Some nextTp, Some actTp ->
+                                if actTp.Id = nextTp.Id && actTp.TimeSpan = TimeSpan.Zero then
+                                    timePointQueue.TryGetNext()
+                                else
+                                    nextTp |> Some
+                            | Some nextTp, None ->
+                                nextTp |> Some
+                            | None, _ -> None
 
-                            let dt = DateTime.Now
+                        let dt = DateTime.Now
 
-                            match tpOpt with
-                            | Some tp ->
-                                let (newAtp, oldAtp) =
-                                    state.ActiveTimePoint
-                                    |> Option.filter (fun t -> t.Id = tp.Id)
-                                    |> Option.map (fun t -> (t, None))
-                                    |> Option.defaultValue (tp, state.ActiveTimePoint)
+                        match nextTpOpt with
+                        | Some nextTp ->
+                            let (newAtp, oldAtp) =
+                                state.ActiveTimePoint
+                                |> Option.filter (fun t -> t.Id = nextTp.Id)
+                                |> Option.map (fun t -> (t, None))
+                                |> Option.defaultValue (nextTp, state.ActiveTimePoint)
 
-                                tryPostEvent (LooperEvent.TimePointStarted (newAtp, oldAtp))
-                                timer.Change(int tickMilliseconds, 0) |> ignore
-                                return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
+                            tryPostEvent (LooperEvent.TimePointStarted (newAtp, oldAtp))
+                            timer.Change(int tickMilliseconds, 0) |> ignore
+                            { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
 
-                            | _ ->
-                                timer.Change(int tickMilliseconds, 0) |> ignore
-                                return! loop state
-                        }
+                        | _ ->
+                            timer.Change(int tickMilliseconds, 0) |> ignore
+                            state
+                        
 
                     match msg with
                     | PreloadTimePoint when state.ActiveTimePoint |> Option.isNone ->
@@ -162,18 +171,19 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
 
                     | Next ->
                         use scope = beginScope (nameof Next)
+                        let newState = initialize { state with IsStopped = false; StartTime = DateTime.Now }
                         scope.Dispose()
-                        return! initialize { state with IsStopped = false; StartTime = DateTime.Now }
+                        return! loop newState
 
                     | Tick when state.ActiveTimePoint |> Option.isNone && not (state.IsStopped) ->
-                        return! initialize state
+                        return! loop (initialize state)
 
                     | Tick when not (state.IsStopped) ->
                         let atp = state.ActiveTimePoint |> Option.get
                         let dt = DateTime.Now
                         let atp = { atp with TimeSpan = atp.TimeSpan - (dt - state.StartTime) }
 
-                        if MathF.Floor(float32 atp.TimeSpan.TotalSeconds) = 0f then
+                        if MathF.Floor(float32 atp.TimeSpan.TotalSeconds) <= 0f then
                             let tpOpt = timePointQueue.TryGetNext()
                             match tpOpt with
                             | None ->
