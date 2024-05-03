@@ -18,6 +18,7 @@ type CreateRow =
         created_at: int64
     }
 
+[<CLIMutable>]
 type ReadRow =
     {
         id: uint64

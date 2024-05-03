@@ -48,7 +48,7 @@ type Work =
 
 type WorkEvent =
     | WorkStarted of DateTimeOffset * timePointName: string
-    | BreakeStarted of DateTimeOffset * timePointName: string
+    | BreakStarted of DateTimeOffset * timePointName: string
     | Stopped of DateTimeOffset
 
 

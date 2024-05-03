@@ -10,6 +10,9 @@
 
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
+    <Compile Include="Fakers.fs" />
+    <Compile Include="TestDb.fs" />
+    <Compile Include="WorkEventRepositoryTests.fs" />
     <Compile Include="WorkRepositoryTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
