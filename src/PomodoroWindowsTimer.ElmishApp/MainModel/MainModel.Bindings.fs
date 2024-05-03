@@ -159,11 +159,11 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
     member val CurrentWork : Binding =
         nameof __.CurrentWork
             |> Binding.SubModel.opt (WorkModel.Bindings.ToList)
-            |> Binding.mapModel _.Work
+            |> Binding.mapModel _.CurrentWork
             |> Binding.mapMsg Msg.WorkModelMsg
 
     member val IsCurrentWorkSet : Binding =
-        nameof __.IsCurrentWorkSet |> Binding.oneWay (_.Work >> Option.isSome)
+        nameof __.IsCurrentWorkSet |> Binding.oneWay (_.CurrentWork >> Option.isSome)
 
     // ------------------------------------------------------
     member val AppDialog : Binding =

@@ -30,7 +30,7 @@ type ReadRow =
 let private readTable = table'<ReadRow> "work_event"
 let private writeTable = table'<CreateRow> "work_event"
 
-let create
+let createTask
     (timeProvider: System.TimeProvider)
     (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
     (workId: uint64)
@@ -44,7 +44,7 @@ let create
             {
                 work_id = workId
                 event_json = workEvent |> JsonHelpers.Serialize
-                created_at = nowDate.ToUnixTimeMilliseconds()
+                created_at = (workEvent |> WorkEvent.createdAt).ToUnixTimeMilliseconds()
             } : CreateRow
 
         let (insertSql, insertSqlParams) =
@@ -69,13 +69,69 @@ let create
     }
 
 
-let readAll (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) ct =
+let readAllTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) ct =
     task {
         let! res =
             select {
-                for _ in readTable do
-                selectAll
+                for r in readTable do
+                where (r.work_id = workId)
             }
+            |> selectf ct
+
+        return
+            res
+            |> Result.map (Seq.map (fun r ->
+                JsonHelpers.Deserialize<WorkEvent>(r.event_json)
+            ))
+    }
+
+let readAll (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) (workId: uint64) =
+    let res =
+        select {
+            for r in readTable do
+            where (r.work_id = workId)
+        }
+        |> selectf
+
+    res
+    |> Result.map (Seq.map (fun r ->
+        JsonHelpers.Deserialize<WorkEvent>(r.event_json)
+    ))
+
+
+let findByPeriodQuery workId dateMin dateMax =
+    select {
+        for r in readTable do
+        where (r.work_id = workId)
+        andWhere (r.created_at >= dateMin)
+        andWhere (r.created_at < dateMax)
+    }
+
+let findByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =
+    task {
+
+        let dateMin = DateTimeOffset(date, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+        let dateMax = DateTimeOffset(date.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+        let! res =
+            findByPeriodQuery workId dateMin dateMax
+            |> selectf ct
+
+        return
+            res
+            |> Result.map (Seq.map (fun r ->
+                JsonHelpers.Deserialize<WorkEvent>(r.event_json)
+            ))
+    }
+
+let findByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: Period) ct =
+    task {
+
+        let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+        let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+        let! res =
+            findByPeriodQuery workId dateMin dateMax
             |> selectf ct
 
         return

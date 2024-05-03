@@ -91,6 +91,19 @@ let rec ``PostChangeActiveTimeSpan msg has been dispatched`` () =
     }
     |> Scenario.log $"When.``{nameof ``PostChangeActiveTimeSpan msg has been dispatched``}``"
 
+
+let rec ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
+    scenario {
+        do! Scenario.msgDispatchedWithin2Sec "SetCurrentWorkIfNone" (fun msg ->
+            match msg with
+            | MainModel.Msg.SetCurrentWorkIfNone (Ok work) ->
+                work.Number = expectedWork.Number && work.Title = expectedWork.Title
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"When.``{nameof ``SetCurrentWorkIfNone msg has been dispatched with``} {expectedWork}``"
+
+
 let rec ``ActiveTimeSeconds changed to`` (seconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState

@@ -1,5 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Abstractions
 
+open System
+open System.Threading
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
@@ -62,4 +64,5 @@ type IWindowsMinimizer =
     abstract MinimizeOtherAsync: unit -> Task<unit>
     abstract Restore: unit -> unit
     abstract RestoreMainWindow: unit -> unit
+
 

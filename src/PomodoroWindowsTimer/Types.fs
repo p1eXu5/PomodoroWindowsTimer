@@ -47,9 +47,39 @@ type Work =
     }
 
 type WorkEvent =
-    | WorkStarted of DateTimeOffset * timePointName: string
-    | BreakStarted of DateTimeOffset * timePointName: string
-    | Stopped of DateTimeOffset
+    | WorkStarted of createdAt: DateTimeOffset * timePointName: string
+    | BreakStarted of createdAt: DateTimeOffset * timePointName: string
+    | Stopped of createdAt: DateTimeOffset
+
+[<Struct>]
+type Period =
+    {
+        Start: DateOnly
+        EndInclusive: DateOnly
+    }
+    static member Zero =
+        {
+            Start = DateOnly()
+            EndInclusive = DateOnly()
+        }
+
+module WorkEvent =
+
+    let createdAt = function
+        | WorkEvent.WorkStarted (dt, _)
+        | WorkEvent.BreakStarted (dt, _)
+        | WorkEvent.Stopped (dt) -> dt
+
+    let dateOnly = function
+        | WorkEvent.WorkStarted (dt, _)
+        | WorkEvent.BreakStarted (dt, _)
+        | WorkEvent.Stopped (dt) ->
+            DateOnly.FromDateTime(dt.DateTime)
+
+    let tpName = function
+        | WorkEvent.WorkStarted (_, n)
+        | WorkEvent.BreakStarted (_, n) -> n |> Some
+        | WorkEvent.Stopped _ -> None
 
 
 module Alias =

@@ -23,19 +23,23 @@ type ILooper =
     abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
     abstract PreloadTimePoint : unit -> unit
 
+
+
 type IWorkRepository =
     interface
-        abstract Create: string option -> string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract ReadAll: CancellationToken -> Task<Result<Work seq, string>>
-        abstract FindById: uint64 -> CancellationToken -> Task<Result<Work option, string>>
-        abstract FindByIdOrCreate: Work -> CancellationToken -> Task<Result<Work, string>>
-        abstract Update: Work -> CancellationToken -> Task<Result<DateTimeOffset, string>>
+        abstract CreateAsync: string option -> string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract ReadAllAsync: CancellationToken -> Task<Result<Work seq, string>>
+        abstract FindByIdAsync: uint64 -> CancellationToken -> Task<Result<Work option, string>>
+        abstract FindByIdOrCreateAsync: Work -> CancellationToken -> Task<Result<Work, string>>
+        abstract UpdateAsync: Work -> CancellationToken -> Task<Result<DateTimeOffset, string>>
     end
-
 
 type IWorkEventRepository =
     interface
-        abstract Create: uint64 -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract ReadAll: CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract CreateAsync: uint64 -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract ReadAllAsync: uint64 -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract ReadAll: uint64 -> Result<WorkEvent seq, string>
+        abstract FindByDateAsync: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract FindByPeriodAsync: uint64 -> Period -> CancellationToken -> Task<Result<WorkEvent seq, string>>
     end
 

@@ -30,7 +30,7 @@ type MainModel =
 
         /// Right drawer model
         WorkSelector: WorkSelectorModel option
-        Work: WorkModel option
+        CurrentWork: WorkModel option
 
         AppDialog: AppDialogModel
     }
@@ -163,7 +163,7 @@ module MainModel =
             ActiveTimePoint = None
 
             WorkSelector = None
-            Work = None
+            CurrentWork = None
             //BotSettingsModel = None
             //TimePointsGeneratorModel = None
 
@@ -251,7 +251,7 @@ module MainModel =
         |> Option.defaultValue Kind.Work
 
     let withWorkModel workModel (model: MainModel) =
-         { model with Work = workModel }
+         { model with CurrentWork = workModel }
 
     let withAppDialogModel addDialogModel (model: MainModel) =
          { model with AppDialog = addDialogModel }

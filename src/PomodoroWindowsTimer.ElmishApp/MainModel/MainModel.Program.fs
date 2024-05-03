@@ -200,17 +200,17 @@ let update
         match cfg.CurrentWorkItemSettings.CurrentWork with
         | None -> model, Cmd.none
         | Some work ->
-            model, Cmd.OfTask.perform (cfg.WorkRepository.FindByIdOrCreate work) CancellationToken.None Msg.SetCurrentWorkIfNone
+            model, Cmd.OfTask.perform (cfg.WorkRepository.FindByIdOrCreateAsync work) CancellationToken.None Msg.SetCurrentWorkIfNone
 
     | Msg.SetCurrentWorkIfNone res ->
         match res with
-        | Ok work when model.Work |> Option.isNone ->
-            { model with Work = work |> WorkModel.init |> Some}, Cmd.none
+        | Ok work when model.CurrentWork |> Option.isNone ->
+            { model with CurrentWork = work |> WorkModel.init |> Some}, Cmd.none
         | Error err -> model, Cmd.ofMsg (Msg.OnError err)
         | _ -> model, Cmd.none
 
     | Msg.WorkModelMsg wmsg ->
-        match model.Work with
+        match model.CurrentWork with
         | Some wmodel ->
             let (wmodel, wcmd, _) = updateWorkModel wmsg wmodel
             model |> withWorkModel (wmodel |> Some)
@@ -282,7 +282,7 @@ let update
 
     | Msg.SetIsWorkSelectorLoaded v ->
         if v then
-            let (m, cmd) = WorkSelectorModel.init (model.Work |> Option.map (_.Work >> _.Id))
+            let (m, cmd) = WorkSelectorModel.init (model.CurrentWork |> Option.map (_.Work >> _.Id))
             model |> withWorkSelectorModel (m |> Some) |> withIsTimePointsShown false
             , Cmd.map Msg.WorkSelectorModelMsg cmd
         else

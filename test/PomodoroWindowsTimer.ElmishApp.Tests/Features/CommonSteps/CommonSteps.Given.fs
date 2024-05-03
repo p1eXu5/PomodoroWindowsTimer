@@ -27,3 +27,16 @@ let ``Stored TimePoints`` (timePoints) =
             )
     }
     |> Scenario.log "Given.``Stored TimePoints``"
+
+let ``Stored CurrentWork`` (work) =
+    scenario {
+        do!
+            Scenario.replaceStateWith (fun f ->
+                fun sut ->
+                    let (sut': #ISut) = f sut
+                    let userSettings = sut'.ServiceProvider.GetRequiredService<IUserSettings>()
+                    userSettings.CurrentWork <- work |> Some
+                    sut'
+            )
+    }
+    |> Scenario.log "Given.``Stored TimePoints``"

@@ -14,7 +14,7 @@ open PomodoroWindowsTimer.ElmishApp.Models.WorkListModel
 let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMessageQueue: IErrorMessageQueue) updateWorkModel msg model =
     let loadWorksTask ct =
         task {
-            let! works = workRepo.ReadAll ct
+            let! works = workRepo.ReadAllAsync ct
             return
                 works
                 |> Result.map (Seq.map WorkModel.init >> Seq.toList)

@@ -20,17 +20,39 @@ open PomodoroWindowsTimer.Types
 open Serilog
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open p1eXu5.AspNetCore.Testing.Logging
+open Microsoft.Data.Sqlite
 
 type TestBootstrap () =
     inherit Bootstrap()
+    let mutable _disposed = false
 
     let mutable mockRepository : MockRepository = Unchecked.defaultof<_>
 
+    // in-memory database
+    let mutable inMemoryConnection : SqliteConnection = Unchecked.defaultof<_>
+
     member _.MockRepository with get() = mockRepository
+
+    override _.Dispose(disposing: bool) =
+        if not _disposed then
+            if disposing then
+                match inMemoryConnection with
+                | null -> ()
+                | _ -> inMemoryConnection.Dispose()
+
+            _disposed <- true
+
+        base.Dispose(disposing)
 
     override _.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
         hostBuilder.Configuration["InTest"] <- "True"
-        hostBuilder.Configuration["WorkDb:ConnectionString"] <- "Data Source=InMemorySample;Mode=Memory;Cache=Shared"
+
+        let token = Guid.NewGuid().ToString("N")
+        let connectionString = $"Data Source=workdb{token};Mode=Memory;Cache=Shared"
+        inMemoryConnection <- new SqliteConnection(connectionString)
+        inMemoryConnection.Open()
+
+        hostBuilder.Configuration["WorkDb:ConnectionString"] <- connectionString
 
         services
             .AddKeyedSingleton<IErrorMessageQueue>(
@@ -72,7 +94,9 @@ type TestBootstrap () =
         )
 
 
-    member _.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: Stack<MainModel.Msg>, testDispatcher: TestDispatcher) =
+    member this.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: Stack<MainModel.Msg>, testDispatcher: TestDispatcher) =
+        do this.WaitDbSeeding()
+        
         let factory = base.GetElmishProgramFactory()
         let (initMainModel, updateMainModel, _, subscribe) =
             CompositionRoot.compose

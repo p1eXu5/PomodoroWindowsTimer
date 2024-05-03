@@ -29,7 +29,7 @@ type ReadRow =
 let private readTable = table'<ReadRow> "work"
 let private writeTable = table'<CreateRow> "work"
 
-let create
+let createTask
     (timeProvider: System.TimeProvider)
     (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
     (number: string option)
@@ -67,7 +67,7 @@ let create
         return res |> Result.map (fun id -> id, nowDate)
     }
 
-let readAll (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) ct =
+let readAllTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) ct =
     task {
         let! res =
             select {
@@ -88,7 +88,7 @@ let readAll (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerabl
                 } : Work))
     }
 
-let findById (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: uint64) ct =
+let findByIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: uint64) ct =
     task {
         let! res =
             select {
@@ -109,7 +109,7 @@ let findById (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerab
                 } : Work) >> Seq.tryHead)
     }
 
-let find (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (text: string) ct =
+let findTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (text: string) ct =
     task {
         let likeExpr = sprintf "%%%s%%" text
 
@@ -133,7 +133,7 @@ let find (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<R
                 } : Work))
     }
 
-let findOrCreate
+let findOrCreateTask
     (timeProvider: System.TimeProvider)
     (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>)
     (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
@@ -141,10 +141,10 @@ let findOrCreate
     ct
     =
     task {
-        match! findById selectf work.Id ct with
+        match! findByIdTask selectf work.Id ct with
         | Ok (Some work) -> return work |> Ok
         | Ok None ->
-            match! create timeProvider execute work.Number work.Title ct with
+            match! createTask timeProvider execute work.Number work.Title ct with
             | Ok (id, createdAt) ->
                 return
                     {
@@ -158,7 +158,7 @@ let findOrCreate
         | Error err -> return Error err
     }
 
-let update (timeProvider: System.TimeProvider) (updatef: CancellationToken -> UpdateQuery<_> -> Task<Result<unit, string>>) (work: Work) ct =
+let updateTask (timeProvider: System.TimeProvider) (updatef: CancellationToken -> UpdateQuery<_> -> Task<Result<unit, string>>) (work: Work) ct =
     task {
         let nowDate = timeProvider.GetUtcNow()
         let updatedAt = nowDate.ToUnixTimeMilliseconds() |> Some
@@ -176,7 +176,7 @@ let update (timeProvider: System.TimeProvider) (updatef: CancellationToken -> Up
         return res |> Result.map (fun () -> nowDate)
     }
 
-let delete (deletef: CancellationToken -> DeleteQuery -> Task<Result<unit, string>>) (id: uint64) ct =
+let deleteTask (deletef: CancellationToken -> DeleteQuery -> Task<Result<unit, string>>) (id: uint64) ct =
     task {
         return!
             delete {
@@ -185,5 +185,4 @@ let delete (deletef: CancellationToken -> DeleteQuery -> Task<Result<unit, strin
             }
             |> deletef ct
     }
-
 

@@ -9,6 +9,7 @@ open FsUnitTyped.TopLevelOperators
 open p1eXu5.FSharp.Testing.ShouldExtensions.Helpers
 
 open PomodoroWindowsTimer.Storage
+open PomodoroWindowsTimer.Testing.Fakers
 
 
 [<Category("DB. Work")>]
@@ -51,7 +52,7 @@ module WorkRepositoryTests =
         task {
             use conn = getConnection ()
             let create =
-                WorkRepository.create System.TimeProvider.System (Helpers.execute conn)
+                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let! res1 = create (generateNumber ()) (generateTitle ()) ct
             let! res2 = create (generateNumber ()) (generateTitle ()) ct
@@ -69,10 +70,10 @@ module WorkRepositoryTests =
         task {
             use conn = getConnection ()
             let create =
-                WorkRepository.create System.TimeProvider.System (Helpers.execute conn)
+                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let readAll =
-                WorkRepository.readAll (Helpers.select conn)
+                WorkRepository.readAllTask (Helpers.selectTask conn)
 
             let number = generateNumber ()
             let title = generateTitle ()
@@ -92,10 +93,10 @@ module WorkRepositoryTests =
         task {
             let conn = getConnection ()
             let create =
-                WorkRepository.create System.TimeProvider.System (Helpers.execute conn)
+                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let find =
-                WorkRepository.find (Helpers.select conn)
+                WorkRepository.findTask (Helpers.selectTask conn)
 
             let number = generateNumber ()
             let title = generateTitle ()
@@ -115,16 +116,16 @@ module WorkRepositoryTests =
         task {
             let conn = getConnection ()
             let create =
-                WorkRepository.create System.TimeProvider.System (Helpers.execute conn)
+                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let update =
-                WorkRepository.update System.TimeProvider.System (Helpers.update conn)
+                WorkRepository.updateTask System.TimeProvider.System (Helpers.update conn)
 
             let find =
-                WorkRepository.find (Helpers.select conn)
+                WorkRepository.findTask (Helpers.selectTask conn)
 
             let findById =
-                WorkRepository.findById (Helpers.select conn)
+                WorkRepository.findByIdTask (Helpers.selectTask conn)
         
             match! create (generateNumber ()) (generateTitle ()) ct with
             | Error err -> failAssert err
@@ -157,13 +158,13 @@ module WorkRepositoryTests =
         task {
             let conn = getConnection ()
             let create =
-                WorkRepository.create System.TimeProvider.System (Helpers.execute conn)
+                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let delete =
-                WorkRepository.delete (Helpers.delete conn)
+                WorkRepository.deleteTask (Helpers.delete conn)
 
             let findById =
-                WorkRepository.findById (Helpers.select conn)
+                WorkRepository.findByIdTask (Helpers.selectTask conn)
 
             match! create (generateNumber ()) (generateTitle ()) ct with
             | Error err -> failAssert err

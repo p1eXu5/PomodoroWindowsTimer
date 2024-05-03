@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +8,7 @@ using PomodoroWindowsTimer.Storage;
 using PomodoroWindowsTimer.WpfClient.Configuration;
 
 namespace PomodoroWindowsTimer.WpfClient;
+
 internal sealed class DbSeederHostedService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
@@ -20,10 +18,20 @@ internal sealed class DbSeederHostedService : BackgroundService
         _serviceProvider = serviceProvider;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public SemaphoreSlim SemaphoreSlim { get; } = new SemaphoreSlim(0, 1);
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var scope = _serviceProvider.CreateScope();
         var options = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<WorkDbOptions>>().Value;
-        return Initializer.initdb(options.ConnectionString);
+        await Initializer.initdb(options.ConnectionString);
+
+        SemaphoreSlim.Release();
+    }
+
+    public override void Dispose()
+    {
+        SemaphoreSlim.Dispose();
+        base.Dispose();
     }
 }

@@ -26,7 +26,7 @@ let execute (dbConnection: IDbConnection) (sqlScripts: string seq) (sqlParameter
             return ex.Message |> Error
     }
 
-let select<'T> (dbConnection: IDbConnection) (ct: CancellationToken) (selectQuery: SelectQuery) =
+let selectTask<'T> (dbConnection: IDbConnection) (ct: CancellationToken) (selectQuery: SelectQuery) =
     task {
         try
             let! res = dbConnection.SelectAsync<'T>(selectQuery, cancellationToken=ct)
@@ -34,6 +34,21 @@ let select<'T> (dbConnection: IDbConnection) (ct: CancellationToken) (selectQuer
         with ex ->
             return ex.Message |> Error
     }
+
+
+let select<'T> (dbConnection: IDbConnection) (selectQuery: SelectQuery) =
+    try
+        let (sql, parameters) =
+            selectQuery
+            |> Deconstructor.select<'T>
+
+        let command = CommandDefinition(sql, parameters)
+
+        let res = dbConnection.Query<'T>(command)
+        res |> Ok
+    with ex ->
+        ex.Message |> Error
+    
 
 
 let update<'T> (dbConnection: IDbConnection) (ct: CancellationToken) (updateQuery: UpdateQuery<'T>) =

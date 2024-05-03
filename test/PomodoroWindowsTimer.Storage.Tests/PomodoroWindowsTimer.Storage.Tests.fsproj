@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
-    <Compile Include="Fakers.fs" />
     <Compile Include="TestDb.fs" />
     <Compile Include="WorkEventRepositoryTests.fs" />
     <Compile Include="WorkRepositoryTests.fs" />
@@ -29,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Testing.Fakers\PomodoroWindowsTimer.Testing.Fakers.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

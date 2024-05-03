@@ -111,7 +111,14 @@ internal class Bootstrap : IDisposable
 
     public virtual void StartElmishApp(Window mainWindow)
     {
+        WaitDbSeeding();
         GetElmishProgramFactory().RunElmishProgram(mainWindow);
+    }
+
+    protected void WaitDbSeeding()
+    {
+        var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
+        seederService!.SemaphoreSlim.Wait();
     }
 
     protected virtual void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)

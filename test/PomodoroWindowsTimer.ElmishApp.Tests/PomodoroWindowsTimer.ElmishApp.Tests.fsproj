@@ -12,7 +12,6 @@
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
     <Compile Include="FakerExtensions.fs" />
-    <Compile Include="Fakers.fs" />
     <Compile Include="ScenarioCE.fs" />
     <Compile Include="TestDispatcher.fs" />
     <Compile Include="StubAndMocks.fs" />
@@ -27,6 +26,7 @@
     <Compile Include="Features\StopResume\Steps\WhenSteps.fs" />
     <Compile Include="Features\StopResume\Steps\ThenSteps.fs" />
     <Compile Include="Features\StopResume\StopResumeFeature.fs" />
+    <Compile Include="Features\StopResume\WorkEventFeature.fs" />
     <Compile Include="Features\GenerateTimePoints\GenerateTimePointsFeature.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -54,6 +54,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
     <ProjectReference Include="..\..\src\PomodoroWindowsTimer.WpfClient\PomodoroWindowsTimer.WpfClient.csproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Testing.Fakers\PomodoroWindowsTimer.Testing.Fakers.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,13 +2,13 @@
 
 open System
 open NUnit.Framework
+open PomodoroWindowsTimer.Testing.Fakers
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 
 open PomodoroWindowsTimer.ElmishApp.Tests
-open PomodoroWindowsTimer.ElmishApp.Tests.Fakers
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps

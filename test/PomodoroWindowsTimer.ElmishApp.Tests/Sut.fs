@@ -53,8 +53,9 @@ module Sut =
                     interface IAsyncDisposable with
                         member this.DisposeAsync() =
                             task {
-                                testDispatcher.Dispatch(MainModel.Msg.Terminate)
+                                do testDispatcher.Dispatch(MainModel.Msg.Terminate)
                                 do! bootstrap.StopHostAsync()
+                                do (bootstrap :> IDisposable).Dispose()
                                 return ()
                             }
                             |> ValueTask

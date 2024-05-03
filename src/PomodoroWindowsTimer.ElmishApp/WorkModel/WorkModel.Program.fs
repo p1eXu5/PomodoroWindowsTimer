@@ -31,7 +31,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
 
         (
             model |> withUpdateState deff
-            , Cmd.OfTask.perform (workRepo.Update updateWork) cts.Token (AsyncOperation.finishWithin Msg.Update cts)
+            , Cmd.OfTask.perform (workRepo.UpdateAsync updateWork) cts.Token (AsyncOperation.finishWithin Msg.Update cts)
         )
         |> withNoIntent
 
@@ -46,7 +46,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
     | MsgWith.``Start of CreateNew`` model (deff, cts) ->
         (
             model |> withCreateNewState deff
-            , Cmd.OfTask.perform (workRepo.Create model.Number model.Title) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
+            , Cmd.OfTask.perform (workRepo.CreateAsync model.Number model.Title) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
         )
         |> withNoIntent
 
