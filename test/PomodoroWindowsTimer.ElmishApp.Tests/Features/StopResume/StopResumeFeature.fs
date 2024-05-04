@@ -317,7 +317,7 @@ module StopResumeFeature =
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
-            do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
             do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
@@ -340,7 +340,7 @@ module StopResumeFeature =
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
-            do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
             do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
@@ -466,7 +466,7 @@ module StopResumeFeature =
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
-            do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
         }
         |> Scenario.runTestAsync
 

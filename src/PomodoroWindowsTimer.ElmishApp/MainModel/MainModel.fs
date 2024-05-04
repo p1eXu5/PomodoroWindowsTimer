@@ -198,9 +198,13 @@ module MainModel =
         |> Option.defaultValue TimePointKind.Undefined
 
     let withActiveTimePoint tp (model: MainModel) =
-        let newModel =
-            { model with ActiveTimePoint = tp; LastCommandInitiator = None }
-        (newModel, newModel |> timePointKindEnum)
+       { model with ActiveTimePoint = tp; }
+
+    let withNoneLastCommandInitiator (model: MainModel) =
+        { model with LastCommandInitiator = None }
+
+    let zipTimePointKindEnum (model: MainModel) =
+        (model, model |> timePointKindEnum)
 
 
     let isUIInitiator (tp: TimePoint) m =

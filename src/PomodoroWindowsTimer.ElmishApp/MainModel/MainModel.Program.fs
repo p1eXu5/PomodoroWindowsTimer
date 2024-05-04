@@ -76,42 +76,58 @@ let updateOnPlayerMsg
         model, cmd
 
     | ControllerMsg.LooperMsg evt ->
-        let (activeTimePoint, cmd, switchTheme) =
-            match evt with
-            | LooperEvent.TimePointTimeReduced tp -> (tp |> Some, Cmd.none, false)
-            | LooperEvent.TimePointStarted (nextTp, None) -> (nextTp |> Some, Cmd.none, true)
-            | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
-                match nextTp.Kind with
-                | LongBreak ->
-                    nextTp |> Some
-                    , Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
-                    , true
+        match evt with
+        | LooperEvent.TimePointTimeReduced tp ->
+            model
+            |> withActiveTimePoint (tp |> Some)
+            |> withNoneLastCommandInitiator
+            , Cmd.none
 
-                | Break ->
-                    nextTp |> Some
-                    , Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
-                    , true
-                
-                | Work when model |> isUIInitiator oldTp ->
-                    nextTp |> Some
-                    , Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
-                    , true
+        | LooperEvent.TimePointStarted (nextTp, None) ->
+            let model =
+                model
+                |> withActiveTimePoint (nextTp |> Some)
+                |> withNoneLastCommandInitiator
 
-                | Work ->
-                    nextTp |> Some
-                    , Cmd.batch [
-                        Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg);
-                        Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
-                    ]
-                    , true
+            model, Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
 
-        let (model, timePointKind) = model |> withActiveTimePoint activeTimePoint
-        model
-        , Cmd.batch [
-            cmd
-            if switchTheme then
-                Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme timePointKind Msg.OnExn
-        ]
+        | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
+            let model =
+                model
+                |> withActiveTimePoint (nextTp |> Some)
+                |> withNoneLastCommandInitiator
+
+            let switchThemeCmd = Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
+
+            match nextTp.Kind with
+            | LongBreak ->
+                model
+                , Cmd.batch [
+                    switchThemeCmd;
+                    Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+                ]
+
+            | Break ->
+                model
+                , Cmd.batch [
+                    switchThemeCmd;
+                    Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+                ]
+
+            | Work when model |> isUIInitiator oldTp ->
+                model
+                , Cmd.batch [
+                    switchThemeCmd;
+                    Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
+                ]
+
+            | Work ->
+                model
+                , Cmd.batch [
+                    switchThemeCmd;
+                    Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg);
+                    Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
+                ]
 
     // --------------------
     // Active time changing
