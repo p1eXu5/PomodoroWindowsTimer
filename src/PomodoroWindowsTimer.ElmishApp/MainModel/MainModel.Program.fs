@@ -105,9 +105,7 @@ let updateOnPlayerMsg
                     ]
                     , true
 
-        let model = model |> setActiveTimePoint activeTimePoint
-        let timePointKind = model |> timePointKindEnum
-
+        let (model, timePointKind) = model |> withActiveTimePoint activeTimePoint
         model
         , Cmd.batch [
             cmd

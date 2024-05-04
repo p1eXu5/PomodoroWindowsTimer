@@ -187,7 +187,21 @@ module MainModel =
         )
         |> Option.defaultValue m
 
-    let setActiveTimePoint tp m = { m with ActiveTimePoint = tp; LastCommandInitiator = None }
+    let timePointKindEnum m =
+        m.ActiveTimePoint
+        |> Option.map (fun tp ->
+            match tp.Kind with
+            | Work -> TimePointKind.Work
+            | Break -> TimePointKind.Break
+            | LongBreak -> TimePointKind.Break
+        )
+        |> Option.defaultValue TimePointKind.Undefined
+
+    let withActiveTimePoint tp (model: MainModel) =
+        let newModel =
+            { model with ActiveTimePoint = tp; LastCommandInitiator = None }
+        (newModel, newModel |> timePointKindEnum)
+
 
     let isUIInitiator (tp: TimePoint) m =
         match m.LastCommandInitiator with
@@ -208,15 +222,6 @@ module MainModel =
         | Playing -> true
         | _ -> false
 
-    let timePointKindEnum m =
-        m.ActiveTimePoint
-        |> Option.map (fun tp ->
-            match tp.Kind with
-            | Work -> TimePointKind.Work
-            | Break -> TimePointKind.Break
-            | LongBreak -> TimePointKind.Break
-        )
-        |> Option.defaultValue TimePointKind.Undefined
 
     let getActiveTimeSpan m =
         m.ActiveTimePoint

@@ -44,10 +44,11 @@ let rec ``Active Point is set on`` (timePoint: TimePoint) =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        sut.MainModel.ActiveTimePoint
-        |> Option.map (fun atp -> atp.Id = timePoint.Id)
-        |> Option.defaultValue false
-        |> shouldL be True (sprintf "%s:\n%A" (nameof ``Active Point is set on``) timePoint)
+        match sut.MainModel.ActiveTimePoint with
+        | Some apt ->
+            apt.Id |> shouldL equal timePoint.Id $"Expected Active TimePoint is {timePoint} baut was {apt}"
+        | None ->
+            assertionExn "Active TimePoint has not been set."
     }
     |> Scenario.log $"Then.``{nameof ``Active Point is set on``}``"
 
@@ -121,6 +122,22 @@ let rec ``Telegrtam bot should not be notified`` () =
         telegramBotStub.MessageStack |> shouldL be Empty (nameof ``Telegrtam bot should not be notified``)
     }
 
+let rec ``Theme should not been switched`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let themeSwitcher = sut.ServiceProvider.GetRequiredService<IThemeSwitcher>()
+
+        themeSwitcher.ReceivedWithAnyArgs(0).SwitchTheme(Arg.Any<TimePointKind>())
+    }
+
+let rec ``Theme should been switched with`` (timePointKind: TimePointKind) (times: int) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let themeSwitcher = sut.ServiceProvider.GetRequiredService<IThemeSwitcher>()
+
+        themeSwitcher.Received(times).SwitchTheme(timePointKind)
+    }
+
 let ``Telegrtam bot should be notified with`` (timePointName: string) =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -143,7 +160,7 @@ let rec ``Active Point remaining time is equal to or less then`` (timePoint: Tim
         match sut.MainModel.ActiveTimePoint with
         | Some atp ->
             let tolerance = tolerance |> Option.map (float >> (*) 1000.0 ) |> Option.defaultValue (float Program.tickMilliseconds)
-            // need to add offset cause it can be added to the swithed TimePoint
+            // reminder can be appended to the next tp
             let timePointAddTick = timePoint.TimeSpan.Add(TimeSpan.FromMilliseconds(tolerance))
             atp.TimeSpan |> shouldL be (lessThanOrEqualTo timePointAddTick) $"Active TimePoint is %A{atp}"
         | None ->

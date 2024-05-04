@@ -36,6 +36,7 @@ module Sut =
             bootstrap.StartHost()
 
             let _ = bootstrap.MockRepository.TrySubstitute<IWindowsMinimizer>()
+            let _ = bootstrap.MockRepository.TrySubstitute<IThemeSwitcher>()
 
             let sut =
                 {

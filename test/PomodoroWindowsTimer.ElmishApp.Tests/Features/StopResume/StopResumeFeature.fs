@@ -29,6 +29,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Initialized
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
         |> Scenario.runTestAsync
 
@@ -49,6 +50,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
         }
         |> Scenario.runTestAsync
 
@@ -69,6 +71,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Stopped
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
         }
         |> Scenario.runTestAsync
 
@@ -90,6 +93,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
         }
         |> Scenario.runTestAsync
 
@@ -111,6 +115,8 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
+            do! Then.``Theme should been switched with`` TimePointKind.Break 1
         }
         |> Scenario.runTestAsync
 
@@ -132,6 +138,8 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
+            do! Then.``Theme should been switched with`` TimePointKind.Break 1
         }
         |> Scenario.runTestAsync
 
@@ -152,6 +160,8 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
+            do! Then.``Theme should been switched with`` TimePointKind.Break 1
         }
         |> Scenario.runTestAsync
 
@@ -172,6 +182,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 2
         }
         |> Scenario.runTestAsync
 
@@ -194,12 +205,15 @@ module StopResumeFeature =
             do! When.``Spent 2.5 ticks`` ()
             do! When.``Next msg has been dispatched`` ()  // to Work
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[2].Id (timePoints[1].Id |> Some)
+            do! When.``Spent 2.5 ticks`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[3].Id (timePoints[2].Id |> Some) // Wait LongBreak
             do! Then.``Active Point is set on`` timePoints[3]
-            do! Then.``Active Point remaining time is equal to or less then`` timePoints[3] None
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints[3] (0.9<sec> |> Some) // reminder can be appended to the next tp
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should be minimized`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Work 3
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
         |> Scenario.runTestAsync
 
@@ -220,6 +234,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Initialized
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 1
         }
         |> Scenario.runTestAsync
 
@@ -239,6 +254,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
         |> Scenario.runTestAsync
 
@@ -259,6 +275,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Stopped
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
         |> Scenario.runTestAsync
 
@@ -280,6 +297,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
         |> Scenario.runTestAsync
 
@@ -300,6 +318,8 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
+            do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
         |> Scenario.runTestAsync
 
@@ -321,6 +341,8 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
+            do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
         |> Scenario.runTestAsync
 
@@ -342,6 +364,8 @@ module StopResumeFeature =
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should not be minimized`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
+            do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
         |> Scenario.runTestAsync
 
@@ -362,6 +386,7 @@ module StopResumeFeature =
             do! Then.``LooperState is`` LooperState.Playing
             do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
+            do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
         |> Scenario.runTestAsync
 

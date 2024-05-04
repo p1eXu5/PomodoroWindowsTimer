@@ -88,7 +88,7 @@ type TestBootstrap () =
 
     override _.PostConfigureHost(builder: IHostBuilder) =
         builder.AddMockRepository(
-            [ Service<IWindowsMinimizer>() ],
+            [ Service<IWindowsMinimizer>(); Service<IThemeSwitcher>() ],
             TestLogWriter(TestLogger<IWindowsMinimizer>(TestContextWriters.Default, LogOut.All)),
             (fun mr -> mockRepository <- mr)
         )
