@@ -28,8 +28,7 @@
                     >
             <TextBlock DataContext="{Binding CurrentWork}"
                        Margin="1,0,0,5"
-                       Foreground="{Binding ElementName=m_Root,
-                                            Path=Foreground}"
+                       Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
                        Text="{Binding Number,
                                       Converter={StaticResource conv_NoNumberConverter},
                                       FallbackValue='DEV-0001'}"
@@ -39,8 +38,7 @@
             <TextBlock DataContext="{Binding CurrentWork}"
                        MaxWidth="500"
                        Margin="0,0,0,14"
-                       Foreground="{Binding ElementName=m_Root,
-                                            Path=Foreground}"
+                       Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
                        Text="{Binding Title,
                                       FallbackValue='[DEV-0001] Task title and description multilined'}"
                        TextWrapping="Wrap"

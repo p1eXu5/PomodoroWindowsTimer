@@ -16,109 +16,115 @@
     <UserControl.Resources>
         <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
     </UserControl.Resources>
-    <Border x:Name="m_Border"
-            VerticalAlignment="Center"
+    <Border VerticalAlignment="Center"
+            BorderThickness="0,1,0,1"
+            BorderBrush="Black"
             SnapsToDevicePixels="True"
             >
-        <Border.Style>
-            <Style TargetType="Border">
-                <Setter Property="BorderThickness" Value="1,0,0,0" />
-                <Setter Property="Background" Value="#030C10" />
-                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-                <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected,
-                                                   ElementName=m_Root}"
-                                 Value="True"
-                                 >
-                        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
-        <Grid Margin="0"
-              VerticalAlignment="Center"
-              >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="50" />
-            </Grid.ColumnDefinitions>
-            <!--  with Auto height button is not appearing correctly  -->
-            <Button x:Name="m_Stack"
-                    Command="{Binding SelectCommand}"
-                    Height="Auto"
-                    Padding="0"
-                    VerticalAlignment="Center"
-                    HorizontalContentAlignment="Left"
-                    VerticalContentAlignment="Center"
-                    materialDesign:ButtonAssist.CornerRadius="0"
-                    d:Height="52"
-                    Style="{StaticResource MaterialDesignRaisedButton}"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    >
-                <StackPanel VerticalAlignment="Center"
-                            Orientation="Vertical"
-                            TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
-                            >
-                    <TextBlock Grid.Row="0"
-                               Grid.Column="0"
-                               Margin="10,6,0,0"
-                               VerticalAlignment="Bottom"
-                               materialDesign:HintAssist.Hint="Number"
-                               Text="{Binding Number,
-                                              Converter={StaticResource conv_NoNumberConverter},
-                                              FallbackValue='NO NUMBER'}"
-                               FontWeight="Normal"
-                               FontSize="11"
-                               />
-                    <TextBlock Grid.Row="1"
-                               Grid.Column="0"
-                               Margin="10,5,5,5"
-                               VerticalAlignment="Top"
-                               materialDesign:HintAssist.Hint="Number"
-                               Text="{Binding Title,
-                                              FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
-                               FontSize="16"
-                               TextWrapping="NoWrap"
-                               TextTrimming="CharacterEllipsis"
-                               FontWeight="Light"
-                               />
-                </StackPanel>
-            </Button>
-            <Button x:Name="m_Button"
-                    Grid.RowSpan="2"
-                    Grid.Column="1"
-                    Command="{Binding EditCommand}"
-                    Height="{Binding ElementName=m_Stack,
-                                     Path=ActualHeight,
-                                     Mode=OneWay}"
-                    VerticalAlignment="Stretch"
-                    materialDesign:ButtonAssist.CornerRadius="0"
-                    Content="{materialDesign:PackIcon Pencil}"
-                    ToolTip="Edit"
-                    >
-                <Button.Style>
-                    <Style TargetType="Button"
-                           BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
-                           >
-                        <Setter Property="Background" Value="Transparent" />
-                        <Setter Property="BorderThickness" Value="1,0,0,0" />
-                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected,
-                                                           ElementName=m_Root}"
-                                         Value="True"
-                                         >
-                                <!--<Setter Property="Background" Value="#012A3C" />-->
-                                <Setter Property="BorderThickness" Value="1,0,0,0" />
-                                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-        </Grid>
+        <Border x:Name="m_Border"
+                VerticalAlignment="Center"
+                SnapsToDevicePixels="True"
+                >
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Setter Property="BorderThickness" Value="1,0,0,0" />
+                    <Setter Property="Background" Value="#030C10" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected,
+                                                       ElementName=m_Root}"
+                                     Value="True"
+                                     >
+                            <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <Grid Margin="0"
+                  VerticalAlignment="Center"
+                  >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="50" />
+                </Grid.ColumnDefinitions>
+                <!--  with Auto height button is not appearing correctly  -->
+                <Button x:Name="m_Stack"
+                        Command="{Binding SelectCommand}"
+                        Height="Auto"
+                        Padding="0"
+                        VerticalAlignment="Center"
+                        HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        materialDesign:ButtonAssist.CornerRadius="0"
+                        d:Height="52"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        >
+                    <StackPanel VerticalAlignment="Center"
+                                Orientation="Vertical"
+                                TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+                                >
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Margin="10,6,0,0"
+                                   VerticalAlignment="Bottom"
+                                   materialDesign:HintAssist.Hint="Number"
+                                   Text="{Binding Number,
+                                                  Converter={StaticResource conv_NoNumberConverter},
+                                                  FallbackValue='NO NUMBER'}"
+                                   FontWeight="Normal"
+                                   FontSize="11"
+                                   />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Margin="10,5,5,5"
+                                   VerticalAlignment="Top"
+                                   materialDesign:HintAssist.Hint="Number"
+                                   Text="{Binding Title,
+                                                  FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                                   FontSize="16"
+                                   TextWrapping="NoWrap"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontWeight="Light"
+                                   />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="m_Button"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"
+                        Command="{Binding EditCommand}"
+                        Height="{Binding ElementName=m_Stack,
+                                         Path=ActualHeight,
+                                         Mode=OneWay}"
+                        VerticalAlignment="Stretch"
+                        materialDesign:ButtonAssist.CornerRadius="0"
+                        Content="{materialDesign:PackIcon Pencil}"
+                        ToolTip="Edit"
+                        >
+                    <Button.Style>
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
+                               >
+                            <Setter Property="Background" Value="Transparent" />
+                            <Setter Property="BorderThickness" Value="1,0,0,0" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsSelected,
+                                                               ElementName=m_Root}"
+                                             Value="True"
+                                             >
+                                    <!--<Setter Property="Background" Value="#012A3C" />-->
+                                    <Setter Property="BorderThickness" Value="1,0,0,0" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Border>
     </Border>
 </UserControl>
