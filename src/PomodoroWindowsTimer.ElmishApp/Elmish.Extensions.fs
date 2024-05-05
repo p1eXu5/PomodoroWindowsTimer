@@ -73,28 +73,33 @@ module Helpers =
     open Elmish
 
     let withCmdNone = fun m -> m, Cmd.none
+    
+    let flip f b a = f a b
+
 
 [<AutoOpen>]
 module Model =
 
-    open Elmish
-
-    let flip f b a = f a b
-
     let map get set f model =
         model |> get |> f |> flip set model
+
+
+[<AutoOpen>]
+module List =
+
+    open Elmish
 
     let mapFirst predicate updatef modelList =
         let rec mapFirstRec reverseFront back =
             match back with
             | [] ->
                 (*
-                 * Conceptually, the correct value to return is
-                 * reverseFront |> List.rev
-                 * but this is the same as
-                 * input
-                 * so returning that instead.
-                 *)
+                    * Conceptually, the correct value to return is
+                    * reverseFront |> List.rev
+                    * but this is the same as
+                    * input
+                    * so returning that instead.
+                    *)
                 modelList
             | a :: ma ->
                 if predicate a then

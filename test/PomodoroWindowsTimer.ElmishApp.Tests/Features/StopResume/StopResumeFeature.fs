@@ -190,7 +190,7 @@ module StopResumeFeature =
     [<Category("Work TimePoint Scenarios")>]
     let ``UC0-9 - Start Work -> Next to Break -> Next to Work -> LongBreak transition Scenario`` () =
         scenario {
-            let timePoints = [ namedWorkTP "Work 1" 2.<sec>; breakTP 2.<sec>; namedWorkTP "Work 2" 2.<sec>; longBreakTP 10.<sec>; ]
+            let timePoints = [ namedWorkTP "Work 1" 4.<sec>; breakTP 4.<sec>; namedWorkTP "Work 2" 2.<sec>; longBreakTP 10.<sec>; ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
@@ -209,9 +209,9 @@ module StopResumeFeature =
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[3].Id (timePoints[2].Id |> Some) // Wait LongBreak
             do! Then.``Active Point is set on`` timePoints[3]
-            do! Then.``Active Point remaining time is equal to or less then`` timePoints[3] (0.9<sec> |> Some) // reminder can be appended to the next tp
+            do! Then.``Active Point remaining time is equal to or less then`` timePoints[3] (1.0<sec> |> Some) // reminder can be appended to the next tp
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` true
             do! Then.``Theme should been switched with`` TimePointKind.Work 3
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
@@ -252,7 +252,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
@@ -273,7 +273,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Stopped
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
@@ -316,7 +316,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
             do! Then.``Theme should been switched with`` TimePointKind.Work 1
@@ -336,10 +336,11 @@ module StopResumeFeature =
             do! When.``Stop msg has been dispatched`` ()
             do! When.``Next msg has been dispatched`` ()
 
+            do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
             do! Then.``Theme should been switched with`` TimePointKind.Work 1
@@ -356,6 +357,7 @@ module StopResumeFeature =
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``Play msg has been dispatched`` ()
+            do! When.``Spent 2.5 ticks`` ()
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
 
 
@@ -363,7 +365,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
             do! Then.``Theme should been switched with`` TimePointKind.Work 1
         }
@@ -384,7 +386,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` true
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2
         }
@@ -411,7 +413,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active TimePoint remaining time is equal to`` 1.5<sec>
             do! Then.``LooperState is`` LooperState.Initialized
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false // we just started app and move slider
             do! Then.``Telegrtam bot should not be notified`` ()
         }
         |> Scenario.runTestAsync
@@ -439,7 +441,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active TimePoint remaining time is equal to`` 3.0<sec>
             do! Then.``LooperState is`` LooperState.Initialized
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should not be notified`` ()
         }
         |> Scenario.runTestAsync
@@ -448,7 +450,7 @@ module StopResumeFeature =
     [<Category("Time slider Initial Scenarios")>]
     let ``UC2-2 - Initial Break time point move forward to the end then play scenario`` () =
         scenario {
-            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            let timePoints = [ breakTP ``3 sec``; workTP 10.0<sec> ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
@@ -460,12 +462,14 @@ module StopResumeFeature =
 
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 0.0<sec> 0.0<sec>
             do! When.``Play msg has been dispatched`` ()
+            do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
+            do! Then.``MinimizeWindows msg has not been dispatched`` ()
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false // switched to the next Work tp
             do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
         }
         |> Scenario.runTestAsync
@@ -474,7 +478,7 @@ module StopResumeFeature =
     [<Category("Time slider Initial Scenarios")>]
     let ``UC2-3 - Initial Work time point move forward to the end then play scenario`` () =
         scenario {
-            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec``;  ]
+            let timePoints = [ workTP ``3 sec``; breakTP 10.0<sec>;  ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
@@ -491,7 +495,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` true
             do! Then.``Telegrtam bot should not be notified`` ()
         }
         |> Scenario.runTestAsync

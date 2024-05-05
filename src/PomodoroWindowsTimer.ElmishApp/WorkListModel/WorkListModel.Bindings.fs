@@ -45,4 +45,7 @@ type Bindings() =
     member val HasSelectedWork : Binding =
         nameof __.HasSelectedWork |> Binding.oneWay (selectedWorkModel >> Option.isSome)
 
+    member val CreateWorkCommand : Binding =
+        nameof __.CreateWorkCommand |> Binding.cmd Msg.CreateWork
+
 

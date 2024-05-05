@@ -12,7 +12,38 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
 open PomodoroWindowsTimer.ElmishApp.Logging
+open PomodoroWindowsTimer.Abstractions
+open System
 
+
+let storeStartedWorkEventTask (timeProvider: System.TimeProvider) (workEventRepository: IWorkEventRepository) (workId: uint64) (timePoint: TimePoint) =
+    task {
+        let workEvent =
+            match timePoint.Kind with
+            | Kind.Break
+            | Kind.LongBreak ->
+                (timeProvider.GetUtcNow(), timePoint.Name) |> WorkEvent.BreakStarted
+            | Kind.Work ->
+                (timeProvider.GetUtcNow(), timePoint.Name) |> WorkEvent.WorkStarted
+
+        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+
+        match res with
+        | Ok _ -> ()
+        | Error err -> raise (InvalidOperationException(err))
+    }
+
+let storeStoppedWorkEventTask (timeProvider: System.TimeProvider) (workEventRepository: IWorkEventRepository) (workId: uint64) (timePoint: TimePoint) =
+    task {
+        let workEvent =
+            (timeProvider.GetUtcNow()) |> WorkEvent.Stopped
+
+        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+
+        match res with
+        | Ok _ -> ()
+        | Error err -> raise (InvalidOperationException(err))
+    }
 
 let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
@@ -39,14 +70,20 @@ let updateOnPlayerMsg
     (msg: ControllerMsg)
     (model: MainModel)
     =
+    let storeStartedWorkEventTask =
+        storeStartedWorkEventTask cfg.TimeProvider cfg.WorkEventRepository
+
+    let storeStoppedWorkEventTask =
+        storeStoppedWorkEventTask cfg.TimeProvider cfg.WorkEventRepository
+
     match msg with
     | ControllerMsg.Next ->
         cfg.Looper.Next()
-        model |> setLooperState Playing |> setUIInitiator, Cmd.none
+        model |> setLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
 
     | ControllerMsg.Play ->
         cfg.Looper.Next()
-        model |> setLooperState Playing |> setUIInitiator, Cmd.none
+        model |> setLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
 
     | ControllerMsg.Resume when model.ActiveTimePoint |> Option.isSome ->
         cfg.Looper.Resume()
@@ -68,6 +105,12 @@ let updateOnPlayerMsg
         , Cmd.batch [
             Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
             Cmd.ofMsg (WindowsMsg.RestoreMainWindow |> Msg.WindowsMsg)
+
+            match model.CurrentWork, model.ActiveTimePoint with
+            | Some work, Some tp ->
+                Cmd.OfTask.attempt (storeStoppedWorkEventTask work.Work.Id) tp Msg.OnExn
+            | _ ->
+                Cmd.none
         ]
 
     | ControllerMsg.Replay when model.ActiveTimePoint |> Option.isSome ->
@@ -80,44 +123,48 @@ let updateOnPlayerMsg
         | LooperEvent.TimePointTimeReduced tp ->
             model
             |> withActiveTimePoint (tp |> Some)
-            |> withNoneLastCommandInitiator
+            |> withNoneLastAtpWhenLooperNextIsCalled
             , Cmd.none
 
-        | LooperEvent.TimePointStarted (nextTp, None) ->
+        | LooperEvent.TimePointStarted (nextTp, oldTp) ->
             let model =
                 model
                 |> withActiveTimePoint (nextTp |> Some)
-                |> withNoneLastCommandInitiator
-
-            model, Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
-
-        | LooperEvent.TimePointStarted (nextTp, Some oldTp) ->
-            let model =
-                model
-                |> withActiveTimePoint (nextTp |> Some)
-                |> withNoneLastCommandInitiator
+                |> withNoneLastAtpWhenLooperNextIsCalled
 
             let switchThemeCmd = Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
 
-            match nextTp.Kind with
-            | LongBreak ->
-                model
-                , Cmd.batch [
-                    switchThemeCmd;
-                    Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
-                ]
+            let startedWorkEventCmd =
+                match model.CurrentWork, model.LooperState with
+                | Some work, LooperState.Playing ->
+                    Cmd.OfTask.attempt (storeStartedWorkEventTask work.Work.Id) nextTp Msg.OnExn
+                | _ ->
+                    Cmd.none
 
+            match nextTp.Kind with
+            | LongBreak
+            | Break when model.LooperState <> LooperState.Playing ->
+                model, switchThemeCmd
+
+            | LongBreak
             | Break ->
                 model
                 , Cmd.batch [
                     switchThemeCmd;
+                    startedWorkEventCmd
                     Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
                 ]
 
-            | Work when model |> isUIInitiator oldTp ->
+            // initialized
+            | Work when model.LooperState <> LooperState.Playing ->
+                model, switchThemeCmd
+
+            // do not send a notification if the user manually presses the Next button or the Play button
+            | Work when isLastAtpWhenLooperNextWasCalled oldTp model || oldTp |> Option.isNone ->
                 model
                 , Cmd.batch [
                     switchThemeCmd;
+                    startedWorkEventCmd
                     Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
                 ]
 
@@ -125,6 +172,7 @@ let updateOnPlayerMsg
                 model
                 , Cmd.batch [
                     switchThemeCmd;
+                    startedWorkEventCmd
                     Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg);
                     Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
                 ]

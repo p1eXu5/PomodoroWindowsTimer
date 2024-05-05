@@ -4,7 +4,7 @@ open Elmish.Extensions
 
 type CreatingWorkModel =
     {
-        Number: string option
+        Number: string
         Title: string
         CreatingState: AsyncDeferred<uint64>
     }
@@ -12,7 +12,7 @@ type CreatingWorkModel =
 module CreatingWorkModel =
 
     type Msg =
-        | SetNumber of string option
+        | SetNumber of string
         | SetTitle of string
         | CreateWork of AsyncOperation<unit, Result<uint64, string>>
         | Cancel
@@ -52,7 +52,7 @@ module CreatingWorkModel =
 
     let init () =
         {
-            Number = None
+            Number = "PERSONAL"
             Title = "New Work"
             CreatingState = AsyncDeferred.NotRequested
         }

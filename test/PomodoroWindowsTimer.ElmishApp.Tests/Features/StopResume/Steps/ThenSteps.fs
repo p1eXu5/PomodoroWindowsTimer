@@ -11,6 +11,7 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
@@ -77,6 +78,7 @@ let ``LooperState is`` (looperState: LooperState) =
         |> shouldL equal looperState ("LooperState is not Initialized")
     }
 
+[<Obsolete("Use ``MainModel.IsMinimized should be`` and ``WindowsMinimizer.MinimizeOtherAsync is called``")>]
 let ``Windows should not be minimized`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -92,6 +94,39 @@ let ``Windows should not be minimized`` () =
         |> shouldL be False "MainModel.IsMinimized is not false"
     }
 
+let rec ``MinimizeWindows msg has been dispatched`` () =
+    scenario {
+        do! Scenario.msgDispatchedWithin2Sec "MinimizeWindows" (fun msg ->
+            match msg with
+            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeWindows) -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``MinimizeWindows msg has been dispatched``}``"
+
+let rec ``MinimizeWindows msg has not been dispatched`` () =
+    scenario {
+        do! Scenario.msgNotDispatchedWithin1Sec "MinimizeWindows" (fun msg ->
+            match msg with
+            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeWindows) -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``MinimizeWindows msg has been dispatched``}``"
+
+let ``WindowsMinimizer.MinimizeOtherAsync is called`` (times: int) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        
+        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
+        
+        do
+            wm.Received(times).MinimizeOtherAsync()
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+    }
+
+[<Obsolete("Use ``MainModel.IsMinimized should be`` and ``WindowsMinimizer.MinimizeOtherAsync is called``")>]
 let ``Windows should be minimized`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -113,6 +148,15 @@ let ``Windows should be minimized`` () =
         sut.MainModel.IsMinimized
         |> shouldL be True "MainModel.IsMinimized is not true"
     }
+
+let ``MainModel.IsMinimized should be`` (v: bool) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        sut.MainModel.IsMinimized
+        |> shouldL equal v $"MainModel.IsMinimized is {sut.MainModel.IsMinimized}"
+    }
+
 
 let rec ``Telegrtam bot should not be notified`` () =
     scenario {

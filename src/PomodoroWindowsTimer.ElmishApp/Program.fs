@@ -23,6 +23,7 @@ let internal main
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
     (dialogErrorMessageQueue: IErrorMessageQueue)
+    (timeProvider: System.TimeProvider)
     (loggerFactory: ILoggerFactory)
     =
     let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
@@ -37,6 +38,7 @@ let internal main
             userSettings
             mainErrorMessageQueue
             dialogErrorMessageQueue
+            timeProvider
             loggerFactory
 
     WpfProgram.mkProgram

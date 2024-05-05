@@ -7,15 +7,9 @@ open System
 
 let faker = Faker()
 
-let generateNumber () : string option =
-    let numFactory =
-        [|
-            fun () -> None
-            fun () ->
-                sprintf "WORK-%s" (faker.Random.Int(1, 9999).ToString("0000"))
-                |> Some
-        |]
-    (faker.Random.ArrayElement(numFactory)) ()
+let generateNumber () : string =
+    sprintf "WORK-%s" (faker.Random.Int(1, 9999).ToString("0000"))
+
 
 let generateTitle () : string =
     faker.Commerce.ProductName()
@@ -147,7 +141,7 @@ let generateWork () =
     let work =
         {
             Id = _workCounter
-            Number = sprintf "WORK-%i" _workCounter |> Some
+            Number = sprintf "WORK-%i" _workCounter
             Title = faker.Commerce.ProductName()
             CreatedAt = date
             UpdatedAt = date

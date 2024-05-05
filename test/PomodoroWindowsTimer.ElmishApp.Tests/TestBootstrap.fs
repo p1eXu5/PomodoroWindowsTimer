@@ -110,6 +110,7 @@ type TestBootstrap () =
                 factory.UserSettings
                 factory.MainErrorMessageQueue
                 factory.DialogErrorMessageQueue
+                factory.TimeProvider
                 factory.LoggerFactory
 
         let subscribe' mainModel : (SubId * Subscribe<_>) list =

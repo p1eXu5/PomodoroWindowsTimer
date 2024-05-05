@@ -16,6 +16,7 @@ internal sealed class ElmishProgramFactory(
     IUserSettings userSettings,
     [FromKeyedServices("main")] IErrorMessageQueue mainErrorMessageQueue,
     [FromKeyedServices("dialog")] IErrorMessageQueue dialogErrorMessageQueue,
+    System.TimeProvider timeProvider,
     ILoggerFactory loggerFactory
 )
 {
@@ -27,9 +28,8 @@ internal sealed class ElmishProgramFactory(
     internal IUserSettings UserSettings => userSettings;
     internal IErrorMessageQueue MainErrorMessageQueue => mainErrorMessageQueue;
     internal IErrorMessageQueue DialogErrorMessageQueue => dialogErrorMessageQueue;
+    internal System.TimeProvider TimeProvider => timeProvider;
     internal ILoggerFactory LoggerFactory => loggerFactory;
-
-
 
     public void RunElmishProgram(Window mainWindow)
     =>
@@ -43,5 +43,6 @@ internal sealed class ElmishProgramFactory(
             UserSettings,
             MainErrorMessageQueue,
             DialogErrorMessageQueue,
+            TimeProvider,
             LoggerFactory);
 }

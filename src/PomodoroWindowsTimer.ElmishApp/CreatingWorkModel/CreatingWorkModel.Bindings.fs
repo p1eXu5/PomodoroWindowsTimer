@@ -26,7 +26,7 @@ type Bindings() =
             props
 
     member val EditNumber : Binding =
-        nameof __.EditNumber |> Binding.twoWayOpt (_.Number, Msg.SetNumber)
+        nameof __.EditNumber |> Binding.twoWay (_.Number, Msg.SetNumber)
 
     member val EditTitle : Binding =
         nameof __.EditTitle |> Binding.twoWay (_.Title, Msg.SetTitle)

@@ -24,13 +24,13 @@ type Bindings() =
             props
 
     member val Number : Binding =
-        nameof __.Number |> Binding.oneWayOpt (_.Work >> _.Number)
+        nameof __.Number |> Binding.oneWay (_.Work >> _.Number)
 
     member val Title : Binding =
         nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
 
     member val EditNumber : Binding =
-        nameof __.EditNumber |> Binding.twoWayOpt (_.Number, Msg.SetNumber)
+        nameof __.EditNumber |> Binding.twoWay (_.Number, Msg.SetNumber)
 
     member val EditTitle : Binding =
         nameof __.EditTitle |> Binding.twoWay (_.Title, Msg.SetTitle)

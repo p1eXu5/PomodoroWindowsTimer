@@ -11,13 +11,13 @@ let internal CREATE_WORK_TABLE =
     """
     CREATE TABLE IF NOT EXISTS work (
           id INTEGER PRIMARY KEY AUTOINCREMENT
-        , number TEXT
+        , number TEXT NOT NULL
         , title TEXT NOT NULL
         , created_at INTEGER NOT NULL
         , updated_at INTEGER
 
-        , UNIQUE(number, title)
-    )
+        , CONSTRAINT title_number_uct UNIQUE(number, title) ON CONFLICT FAIL
+    );
     """
 
 [<Literal>]
@@ -33,7 +33,7 @@ let internal CREATE_WORK_EVENT_TABLE =
               REFERENCES work (id)
                  ON DELETE CASCADE 
                  ON UPDATE NO ACTION
-    )
+    );
     """
 
 

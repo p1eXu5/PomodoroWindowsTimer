@@ -27,6 +27,7 @@ let compose
     (userSettings: IUserSettings)
     (mainErrorMessageQueue: IErrorMessageQueue)
     (dialogErrorMessageQueue: IErrorMessageQueue)
+    (timeProvider: System.TimeProvider)
     (loggerFactory: ILoggerFactory)
     =
     let timePointQueue = new TimePointQueue(loggerFactory.CreateLogger<TimePointQueue>())
@@ -46,6 +47,7 @@ let compose
             TimePointStore = TimePointStore.initialize userSettings
             WorkRepository = workRepository
             WorkEventRepository = workEventRepository
+            TimeProvider = timeProvider
         }
     // init
     let initMainModel () =

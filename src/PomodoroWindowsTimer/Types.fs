@@ -40,7 +40,7 @@ type Pattern = string
 type Work =
     {
         Id: uint64
-        Number: string option
+        Number: string
         Title: string
         CreatedAt: DateTimeOffset
         UpdatedAt: DateTimeOffset
@@ -170,6 +170,7 @@ module TimePoint =
             { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
             { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
         ]
+
 
 
 module Pattern =

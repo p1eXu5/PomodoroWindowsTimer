@@ -63,7 +63,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
         match model.Works with
         | AsyncDeferred.Retrieved works ->
             let (wmodelList, wcmd, intent) =
-                works |> mapFirstCmdIntent (_.Work >> _.Id >> (=) id) (updateWorkModel wmsg) WorkModel.Intent.None
+                works |> List.mapFirstCmdIntent (_.Work >> _.Id >> (=) id) (updateWorkModel wmsg) WorkModel.Intent.None
 
             match intent with
             | WorkModel.Intent.Select ->
@@ -86,6 +86,9 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
                 , Intent.None
 
         | _ -> model |> withCmdNone |> withNoIntent
+
+    | Msg.CreateWork ->
+        model |> withCmdNone |> withSwitchToCreateWorkIntent
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)

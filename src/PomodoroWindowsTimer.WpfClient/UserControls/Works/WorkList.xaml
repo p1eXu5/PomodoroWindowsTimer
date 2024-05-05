@@ -8,41 +8,101 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_Root"
-             DataContext="{Binding WorkListModel}"
              d:DataContext="{d:DesignInstance Type=WorkListModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="300"
              d:DesignWidth="300"
+             DataContext="{Binding WorkListModel}"
              mc:Ignorable="d"
              >
     <UserControl.Resources />
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top"
-                    Orientation="Vertical"
-                    Visibility="{Binding ElementName=m_Root, Path=DataContext.HasSelectedWork, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    >
+    <DockPanel Grid.IsSharedSizeScope="True">
 
-            <TextBlock DockPanel.Dock="Top"
-                       Margin="0,21.5,0,10"
-                       Text="SELECTED WORK"
-                       TextAlignment="Center"
-                       Foreground="#AAAAAA"
-                       />
-            <local:SelectedWork DockPanel.Dock="Top"
-                                DataContext="{Binding SelectedWorkModel}"
-                                Margin="0,10,0,0"
-                                VerticalAlignment="Center"
-                                IsSelected="True"
-                                />
-        </StackPanel>
+        <!--  `SELECTED WORK` title. It's not shown if there is no any selected work  -->
+        <materialDesign:ColorZone DockPanel.Dock="Top"
+                                  Padding="0"
+                                  materialDesign:ElevationAssist.Elevation="Dp0"
+                                  Mode="Custom"
+                                  Visibility="{Binding ElementName=m_Root,
+                                                       Path=DataContext.HasSelectedWork,
+                                                       Converter={StaticResource BooleanToVisibilityConverter}}"
+                                  >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto"
+                                      SharedSizeGroup="PopupGroup"
+                                      />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Margin="0,21.5,0,10"
+                           Text="SELECTED WORK"
+                           TextAlignment="Center"
+                           Foreground="#AAAAAA"
+                           />
+                <materialDesign:PopupBox Grid.Row="0"
+                                         Grid.Column="1"
+                                         PlacementMode="BottomAndAlignRightEdges"
+                                         StaysOpen="False"
+                                         Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                         >
+                    <Button Command="{Binding CreateWorkCommand}"
+                            Content="Create New"
+                            />
+                </materialDesign:PopupBox>
+                <local:SelectedWork Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="0,10,0,0"
+                                    VerticalAlignment="Center"
+                                    DataContext="{Binding SelectedWorkModel}"
+                                    IsSelected="True"
+                                    />
+            </Grid>
+        </materialDesign:ColorZone>
 
-        <TextBlock DockPanel.Dock="Top"
-                   Margin="0,21.5,0,10"
-                   Text="SELECT WORK"
-                   TextAlignment="Center"
-                   Visibility="{Binding ElementName=m_Root, Path=DataContext.HasSelectedWork, Converter={StaticResource InverseBoolToVisConverter}}"
-                   Foreground="#AAAAAA"
-                   />
-
+        <!--  `SELECT WORK` title. It's not shown if any work is selected  -->
+        <materialDesign:ColorZone DockPanel.Dock="Top"
+                                  Margin="0,11.5,0,0"
+                                  Padding="0,10,0,10"
+                                  materialDesign:ElevationAssist.Elevation="Dp0"
+                                  Mode="Custom"
+                                  Visibility="{Binding ElementName=m_Root,
+                                                       Path=DataContext.HasSelectedWork,
+                                                       Converter={StaticResource InverseBoolToVisConverter}}"
+                                  >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto"
+                                      SharedSizeGroup="PopupGroup"
+                                      />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Text="SELECT WORK"
+                           TextAlignment="Center"
+                           Visibility="{Binding ElementName=m_Root,
+                                                Path=DataContext.HasSelectedWork,
+                                                Converter={StaticResource InverseBoolToVisConverter}}"
+                           Foreground="#AAAAAA"
+                           />
+                <materialDesign:PopupBox Grid.Row="0"
+                                         Grid.Column="1"
+                                         PlacementMode="BottomAndAlignRightEdges"
+                                         StaysOpen="False"
+                                         Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                         >
+                    <Button Command="{Binding CreateWorkCommand}"
+                            Content="Create New"
+                            />
+                </materialDesign:PopupBox>
+            </Grid>
+        </materialDesign:ColorZone>
         <!--<TextBlock DockPanel.Dock="Top"
                    Margin="0,40,0,10"
                    Text="WORK LIST"

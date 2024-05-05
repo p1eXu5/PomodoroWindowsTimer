@@ -17,7 +17,7 @@ type MainModel =
         // TimePointsGeneratorModel: TimePointsGeneratorModel option
 
         LooperState : LooperState
-        LastCommandInitiator: UIInitiator option
+        LastAtpWhenLooperNextWasCalled: UIInitiator option
         
         IsMinimized: bool
         DisableMinimizeMaximizeWindows: bool
@@ -56,6 +56,7 @@ type MainModeConfig =
         TimePointStore: TimePointStore
         WorkRepository: IWorkRepository
         WorkEventRepository: IWorkEventRepository
+        TimeProvider: System.TimeProvider
     }
     member this.BotSettings = this.UserSettings :> IBotSettings
     member this.DisableSkipBreakSettings = this.UserSettings :> IDisableSkipBreakSettings
@@ -152,7 +153,8 @@ module MainModel =
 
         {
             LooperState = Initialized
-            LastCommandInitiator = None
+            /// Last ActiveTimePoint when Looper Next method was called.
+            LastAtpWhenLooperNextWasCalled = None
 
             IsMinimized = false
             DisableMinimizeMaximizeWindows = false
@@ -180,10 +182,10 @@ module MainModel =
     // =========
     let setLooperState state m = { m with LooperState = state }
 
-    let setUIInitiator m  =
+    let setLastAtpWhenLooperNextWasCalled m  =
         m.ActiveTimePoint
         |> Option.map (fun tp ->
-            { m with LastCommandInitiator = tp |> UIInitiator |> Some }
+            { m with LastAtpWhenLooperNextWasCalled = tp |> UIInitiator |> Some }
         )
         |> Option.defaultValue m
 
@@ -200,16 +202,16 @@ module MainModel =
     let withActiveTimePoint tp (model: MainModel) =
        { model with ActiveTimePoint = tp; }
 
-    let withNoneLastCommandInitiator (model: MainModel) =
-        { model with LastCommandInitiator = None }
+    let withNoneLastAtpWhenLooperNextIsCalled (model: MainModel) =
+        { model with LastAtpWhenLooperNextWasCalled = None }
 
     let zipTimePointKindEnum (model: MainModel) =
         (model, model |> timePointKindEnum)
 
 
-    let isUIInitiator (tp: TimePoint) m =
-        match m.LastCommandInitiator with
-        | Some (UIInitiator atp) -> atp.Id = tp.Id
+    let isLastAtpWhenLooperNextWasCalled (tpOpt: TimePoint option) m =
+        match m.LastAtpWhenLooperNextWasCalled, tpOpt with
+        | Some (UIInitiator atp), Some tp -> atp.Id = tp.Id
         | _ -> false
 
     let isLooperRunning m =

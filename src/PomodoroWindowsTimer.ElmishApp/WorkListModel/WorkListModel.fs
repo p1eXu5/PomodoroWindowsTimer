@@ -15,6 +15,7 @@ module WorkListModel =
         | LoadWorkList of AsyncOperation<unit, Result<WorkModel list, string>>
         | SetSelectedWorkId of uint64 option
         | WorkModelMsg of uint64 * WorkModel.Msg
+        | CreateWork
 
     module MsgWith =
 
@@ -43,6 +44,7 @@ module WorkListModel =
         let withNoIntent (model, cmd) =
             (model, cmd, Intent.None)
 
+        /// Appends Intent.SwitchToCreateWork
         let withSwitchToCreateWorkIntent(model, cmd) =
             (model, cmd, Intent.SwitchToCreateWork)
 

@@ -7,7 +7,7 @@ open Elmish.Extensions
 type WorkModel =
     {
         Work: PomodoroWindowsTimer.Types.Work
-        Number: string option
+        Number: string
         Title: string
         UpdateState: AsyncDeferred<DateTimeOffset>
         CreateNewState: AsyncDeferred<uint64 * DateTimeOffset>
@@ -16,7 +16,7 @@ type WorkModel =
 module WorkModel =
 
     type Msg =
-        | SetNumber of string option
+        | SetNumber of string
         | SetTitle of string
         | Update of AsyncOperation<unit, Result<DateTimeOffset, string>>
         | CreateNew of AsyncOperation<unit, Result<(uint64 * DateTimeOffset), string>>
@@ -112,7 +112,7 @@ module WorkModel =
 
     let isModified (model: WorkModel) =
         not (
-            model.Work.Number |> Option.equalOrigin model.Number
+            model.Work.Number |> String.equalOrigin model.Number
             && model.Work.Title |> String.equalOrigin model.Title
         )
 

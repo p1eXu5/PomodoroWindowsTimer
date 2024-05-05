@@ -11,7 +11,7 @@ open PomodoroWindowsTimer.Types
 
 type CreateRow =
     {
-        number: string option
+        number: string
         title: string
         created_at: int64
     }
@@ -20,7 +20,7 @@ type CreateRow =
 type ReadRow =
     {
         id: uint64
-        number: string option
+        number: string
         title: string
         created_at: int64
         updated_at: int64 option
@@ -32,7 +32,7 @@ let private writeTable = table'<CreateRow> "work"
 let createTask
     (timeProvider: System.TimeProvider)
     (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
-    (number: string option)
+    (number: string)
     (title: string)
     (ct: CancellationToken)
     =
