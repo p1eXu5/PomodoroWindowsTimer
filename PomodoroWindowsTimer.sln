@@ -33,7 +33,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AEF376B7-D
 		docs\development-notes.md = docs\development-notes.md
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PomodoroWindowsTimer.Testing.Fakers", "test\PomodoroWindowsTimer.Testing.Fakers\PomodoroWindowsTimer.Testing.Fakers.fsproj", "{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Testing.Fakers", "test\PomodoroWindowsTimer.Testing.Fakers\PomodoroWindowsTimer.Testing.Fakers.fsproj", "{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.fsproj", "{AB7600E3-341C-4E01-B483-F46FBE8BD480}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{DBB76192-0ABE-47FD-BCCA-397203E26FE9} = {1896E5C8-A5DF-4A76-905B-E4ADB313ADEF}
 		{AEF376B7-DCF6-418F-BFCA-840E40450343} = {E3B48FA2-00B4-4035-BBA2-D89F6E3F505D}
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31} = {1896E5C8-A5DF-4A76-905B-E4ADB313ADEF}
+		{AB7600E3-341C-4E01-B483-F46FBE8BD480} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FEFD379F-4D9B-4063-82CF-15AF19AF2B11}
