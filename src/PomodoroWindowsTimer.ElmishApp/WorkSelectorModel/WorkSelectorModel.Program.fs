@@ -19,21 +19,22 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
             model |> withWorkListModel sm
             , Cmd.map Msg.WorkListModelMsg cmd
             , Intent.None
-            
-            
+
         | WorkListModel.Intent.SwitchToCreateWork ->
-            if not model.HaveNoWorks then
-                // we here in first time
-                model |> withCreatingWorkModel (CreatingWorkModel.init ()) |> withHaveNoWorks true
-                , Cmd.map Msg.WorkListModelMsg cmd
-                , Intent.None
-            else
-                model |> withCmdNone |> withCloseIntent
+            model
+            |> withCreatingWorkModel (CreatingWorkModel.init ())
+            |> withCmdNone
+            |> withNoIntent
 
         | WorkListModel.Intent.Select ->
             model |> withWorkListModel sm
             , Cmd.map Msg.WorkListModelMsg cmd
-            , Intent.Select (sm |> WorkListModel.selectedWorkModel)
+            , Intent.SelectCurrentWork (sm |> WorkListModel.selectedWorkModel)
+
+        | WorkListModel.Intent.Unselect ->
+            model |> withWorkListModel sm
+            , Cmd.map Msg.WorkListModelMsg cmd
+            , Intent.UnselectCurrentWork
 
         | WorkListModel.Intent.Edit (workModel, selectedWorkId) ->
             model |> withUpdatingWorkModel workModel selectedWorkId |> withCmdNone |> withNoIntent
@@ -55,7 +56,7 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
 
         | CreatingWorkModel.Intent.SwitchToWorkList newWorkId ->
             let (m, cmd) = WorkListModel.init None
-            model |> withWorkListModel m |> withHaveNoWorks true
+            model |> withWorkListModel m
             , Cmd.batch [
                 Cmd.map Msg.WorkListModelMsg cmd
                 Cmd.ofMsg (WorkListModel.Msg.SetSelectedWorkId (newWorkId |> Some) |> Msg.WorkListModelMsg)
@@ -70,7 +71,7 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
             let (m, cmd) = WorkListModel.init selectedWorkId
             model |> withWorkListModel m
             , Cmd.map Msg.WorkListModelMsg cmd
-            , Intent.Select (workModel |> Some)
+            , Intent.SelectCurrentWork (workModel |> Some)
 
         | WorkModel.Intent.StartEdit
         | WorkModel.Intent.Select  // TODO: add ability to select work from edit mode

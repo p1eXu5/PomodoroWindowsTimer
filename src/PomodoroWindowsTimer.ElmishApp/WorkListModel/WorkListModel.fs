@@ -36,6 +36,7 @@ module WorkListModel =
         | None
         | SwitchToCreateWork
         | Select
+        | Unselect
         | Edit of workModel: WorkModel * selectedWorkId: uint64 option
 
     [<AutoOpen>]
@@ -50,6 +51,9 @@ module WorkListModel =
 
         let withSelectIntent (model, cmd) =
             (model, cmd, Intent.Select)
+
+        let withUnselectIntent (model, cmd) =
+            (model, cmd, Intent.Unselect)
 
     open Elmish
 

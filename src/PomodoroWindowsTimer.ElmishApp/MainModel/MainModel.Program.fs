@@ -234,6 +234,12 @@ let update
     // --------------------
     // Time Points
     // --------------------
+    | Msg.SetIsTimePointsShown v ->
+        if v then
+            model |> withoutWorkSelectorModel |> withIsTimePointsShown v |> withCmdNone
+        else
+            model |> withIsTimePointsShown v |> withCmdNone
+
     | Msg.LoadTimePointsFromSettings ->
         let timePoints = cfg.TimePointStore.Read()
         cfg.TimePointQueue.Reload(timePoints)
@@ -280,68 +286,6 @@ let update
         | None ->
             model |> withCmdNone
 
-    // --------------------
-    // Player, Windows
-    // --------------------
-
-    | Msg.ControllerMsg pmsg -> updateOnPlayerMsg logger pmsg model
-
-    
-
-    | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
-
-    (*
-    // --------------------
-    // TimePoint Generator
-    // --------------------
-
-    | Msg.InitializeTimePointsGeneratorModel ->
-        let (genModel, genCmd) = initTimePointGeneratorModel ()
-        { model with TimePointsGeneratorModel = genModel |> Some }
-        , Cmd.map Msg.TimePointsGeneratorMsg genCmd
-
-    | MsgWith.TimePointsGeneratorMsg model (genMsg, genModel) ->
-        let (genModel, genCmd, intent) = updateTimePointGeneratorModel errorMessageQueue genMsg genModel
-        let model' = { model with TimePointsGeneratorModel = genModel |> Some }
-        let cmd' = Cmd.map TimePointsGeneratorMsg genCmd
-        match intent with
-        | Intent.Request (TimePointsGeneratorModel.Request.ApplyGeneratedTimePoints) ->
-            model', Cmd.batch [cmd'; Cmd.ofMsg (Msg.LoadTimePoints (genModel.TimePoints |> List.map _.TimePoint))]
-        | Intent.None ->
-            model', cmd'
-
-    | Msg.EraseTimePointsGeneratorModel isDrawerOpen when not isDrawerOpen ->
-         {model with TimePointsGeneratorModel = None }, Cmd.none
-    *)
-
-    (*
-    // --------------------
-    // Telegram Bot
-    // --------------------
-
-    | Msg.LoadBotSettingsModel ->
-        { model with BotSettingsModel = initBotSettingsModel () }
-        , Cmd.none
-
-    | MsgWith.BotSettingsMsg model (bmsg, bModel) ->
-        let bModel, intent = updateBotSettingsModel bmsg bModel
-        match intent with
-        | BotSettingsModel.Intent.None ->
-            { model with BotSettingsModel = bModel |> Some }, Cmd.none
-        | BotSettingsModel.Intent.CloseDialogRequested ->
-            { model with BotSettingsModel = None }, Cmd.none
-    *)
-
-    | Msg.SendToChatBot message ->
-        model, Cmd.OfTask.attempt cfg.SendToBot.SendMessage message Msg.OnExn
-    
-    // --------------------
-
-    | Msg.AppDialogModelMsg smsg ->
-        let (m, cmd) = updateAppDialogModel smsg model.AppDialog
-        model |> withAppDialogModel m
-        , Cmd.map Msg.AppDialogModelMsg cmd
-
     | Msg.SetIsWorkSelectorLoaded v ->
         if v then
             let (m, cmd) = WorkSelectorModel.init (model.CurrentWork |> Option.map (_.Work >> _.Id))
@@ -350,25 +294,44 @@ let update
         else
             model |> withoutWorkSelectorModel |> withCmdNone
 
-    | Msg.SetIsTimePointsShown v ->
-        if v then
-            model |> withoutWorkSelectorModel |> withIsTimePointsShown v |> withCmdNone
-        else
-            model |> withIsTimePointsShown v |> withCmdNone
-
     | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
-        let (m, cmd, intent) = updateWorkSelectorModel smsg m
+        let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m
+        let cmd =  Cmd.map Msg.WorkSelectorModelMsg workSelectorCmd
+
         match intent with
         | WorkSelectorModel.Intent.None ->
-            model |> withWorkSelectorModel (m |> Some)
-            , Cmd.map Msg.WorkSelectorModelMsg cmd
-        | WorkSelectorModel.Intent.Select workModel ->
+            model |> withWorkSelectorModel (workSelectorModel |> Some)
+            , cmd
+        | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
             cfg.CurrentWorkItemSettings.CurrentWork <- workModel |> Option.map _.Work
-            model |> withWorkSelectorModel (m |> Some) |> withWorkModel workModel
-            , Cmd.map Msg.WorkSelectorModelMsg cmd
+            model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel workModel
+            , cmd
+
+        | WorkSelectorModel.Intent.UnselectCurrentWork ->
+            cfg.CurrentWorkItemSettings.CurrentWork <- None
+            model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+            , cmd
+
         | WorkSelectorModel.Intent.Close ->
             model |> withWorkSelectorModel None |> withCmdNone
 
+    // --------------------
+    // Player, Windows
+    // --------------------
+
+    | Msg.ControllerMsg pmsg -> updateOnPlayerMsg logger pmsg model
+
+    | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
+
+    // --------------------
+    
+    | Msg.SendToChatBot message ->
+        model, Cmd.OfTask.attempt cfg.SendToBot.SendMessage message Msg.OnExn
+
+    | Msg.AppDialogModelMsg smsg ->
+        let (m, cmd) = updateAppDialogModel smsg model.AppDialog
+        model |> withAppDialogModel m
+        , Cmd.map Msg.AppDialogModelMsg cmd
 
     // --------------------
 

@@ -8,14 +8,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 
-let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
-    Common.``Looper TimePointStarted event has been despatched with`` newTimePointId oldTimePointId
-    |> Scenario.log (
-        sprintf "When.``%s new TimePoint Id - %A and %s``."
-            (nameof Common.``Looper TimePointStarted event has been despatched with``)
-            newTimePointId
-            (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
-        )
+
 
 let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>) tolerance =
     Common.``Looper TimePointReduced event has been despatched with`` activeTimePointId expectedSeconds tolerance
@@ -28,14 +21,6 @@ let ``Looper TimePointReduced event has been despatched with`` (activeTimePointI
         )
 
 
-let rec ``Play msg has been dispatched`` () =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Play |> MainModel.Msg.ControllerMsg
-        do sut.Dispatcher.DispatchWithTimeout(msg)
-        do! Scenario.msgDispatchedWithin2Sec "Play" ((=) msg)
-    }
-    |> Scenario.log $"When.``{nameof ``Play msg has been dispatched``}``"
 
 let rec ``Stop msg has been dispatched`` () =
     scenario {
@@ -92,16 +77,6 @@ let rec ``PostChangeActiveTimeSpan msg has been dispatched`` () =
     |> Scenario.log $"When.``{nameof ``PostChangeActiveTimeSpan msg has been dispatched``}``"
 
 
-let rec ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
-    scenario {
-        do! Scenario.msgDispatchedWithin2Sec "SetCurrentWorkIfNone" (fun msg ->
-            match msg with
-            | MainModel.Msg.SetCurrentWorkIfNone (Ok work) ->
-                work.Number = expectedWork.Number && work.Title = expectedWork.Title
-            | _ -> false
-        )
-    }
-    |> Scenario.log $"When.``{nameof ``SetCurrentWorkIfNone msg has been dispatched with``} {expectedWork}``"
 
 
 let rec ``ActiveTimeSeconds changed to`` (seconds: float<sec>) =

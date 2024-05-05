@@ -2,7 +2,6 @@
 
 type WorkSelectorModel =
     {
-        HaveNoWorks: bool
         SubModel: WorkSelectorSubModel
     }
 and
@@ -29,7 +28,8 @@ module WorkSelectorModel =
     type Intent =
         | None
         | Close
-        | Select of WorkModel option
+        | SelectCurrentWork of WorkModel option
+        | UnselectCurrentWork
 
     [<AutoOpen>]
     module Intent =
@@ -41,14 +41,13 @@ module WorkSelectorModel =
             (model, cmd, Intent.Close)
 
         let withSelectIntent workModel (model, cmd) =
-            (model, cmd, Intent.Select workModel)
+            (model, cmd, Intent.SelectCurrentWork workModel)
 
     open Elmish
 
     let init selectedWorkId =
         let (m, cmd) = WorkListModel.init selectedWorkId
         {
-            HaveNoWorks = false
             SubModel = m |> WorkSelectorSubModel.WorkList
         }
         , Cmd.map Msg.WorkListModelMsg cmd
@@ -58,9 +57,6 @@ module WorkSelectorModel =
         | WorkList _ -> SubModelId.WorkListId
         | CreatingWork _ -> SubModelId.CreatingWorkId
         | UpdatingWork _ -> SubModelId.UpdatingWorkId
-
-    let withHaveNoWorks v (model: WorkSelectorModel) =
-        { model with HaveNoWorks = v }
 
     let workListModel =
         _.SubModel

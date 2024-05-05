@@ -17,7 +17,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
-open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 
 
 let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
@@ -39,7 +39,6 @@ let ``Looper TimePointReduced event has been despatched with`` (activeTimePointI
             tolerance
         )
 
-
 /// Comparing Id's.
 let rec ``Active Point is set on`` (timePoint: TimePoint) =
     scenario {
@@ -52,23 +51,6 @@ let rec ``Active Point is set on`` (timePoint: TimePoint) =
             assertionExn "Active TimePoint has not been set."
     }
     |> Scenario.log $"Then.``{nameof ``Active Point is set on``}``"
-
-
-let rec ``Current Work is set on`` (expectedCurrentWork: Work) =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-        
-        match sut.MainModel.CurrentWork with
-        | Some actualCurrentWork ->
-            actualCurrentWork.Work.Number |> should equal expectedCurrentWork.Number
-            actualCurrentWork.Work.Title |> should equal expectedCurrentWork.Title
-            // Created/UpdatedAt dates is different cause work is created in database
-        | None ->
-            assertionExn "CurrentWork has not been set."
-    }
-    |> Scenario.log $"Then.``{nameof ``Current Work is set on``}``"
-
-
 
 let ``LooperState is`` (looperState: LooperState) =
     scenario {
@@ -225,35 +207,4 @@ let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
             assertionExn "Active TimePoint has not been set"
     }
     |> Scenario.log "Then.``Active TimePoint remaining time is equal to``"
-
-
-let rec ``Have no work events in db within`` (workId: uint64) =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
-
-        match workEventRepository.ReadAll workId with
-        | Ok workEvents ->
-            workEvents |> shouldL be Empty $"Work {workId} have db events"
-        | Error err ->
-            assertionExn err
-    }
-    |> Scenario.log $"Then.``{nameof ``Have no work events in db within``}`` {workId} work Id"
-
-
-let rec ``Work events in db exist`` (workId: uint64) (eventExpr: #Quotations.Expr seq) =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
-
-        match workEventRepository.ReadAll workId with
-        | Ok workEvents ->
-            workEvents |> Seq.length |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> Seq.length}"
-            Seq.zip workEvents eventExpr
-            |> Seq.iter (fun (ev, expr) -> ev |> should be (ofCase expr))
-        | Error err ->
-            assertionExn err
-    }
-    |> Scenario.log $"Then.``{nameof ``Work events in db exist``}`` {workId} work Id"
-
 

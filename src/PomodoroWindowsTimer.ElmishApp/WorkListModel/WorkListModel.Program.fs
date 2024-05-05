@@ -51,11 +51,11 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
                 match model.SelectedWorkId with
                 | Some selId ->
                     if workModels |> List.exists (_.Work >> _.Id >> (=) selId) then
-                        model |> withWorks deff |> withCmdNone |> withNoIntent
+                        model |> withWorks deff |> withCmdNone |> withSelectIntent
                     else
                         model |> withWorks deff
                         , Cmd.ofMsg (Msg.SetSelectedWorkId None)
-                        , Intent.None
+                        , Intent.Unselect
                 | None ->
                     model |> withWorks deff |> withCmdNone |> withNoIntent
 
