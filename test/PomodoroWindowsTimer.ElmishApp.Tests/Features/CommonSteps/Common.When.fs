@@ -35,3 +35,32 @@ let rec ``Play msg has been dispatched`` () =
     }
     |> Scenario.log $"When.``{nameof ``Play msg has been dispatched``}``"
 
+
+let rec ``PreChangeActiveTimeSpan msg has been dispatched`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.ControllerMsg.PreChangeActiveTimeSpan |> MainModel.Msg.ControllerMsg
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec "PreChangeActiveTimeSpan" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``PreChangeActiveTimeSpan msg has been dispatched``}``"
+
+let rec ``PostChangeActiveTimeSpan msg has been dispatched`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.ControllerMsg.PostChangeActiveTimeSpan |> MainModel.Msg.ControllerMsg
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``PostChangeActiveTimeSpan msg has been dispatched``}``"
+
+let rec ``ActiveTimeSeconds changed to`` (seconds: float<sec>) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.ControllerMsg.ChangeActiveTimeSpan (float seconds) |> MainModel.Msg.ControllerMsg
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``ActiveTimeSeconds changed to``} {seconds} sec``."
+
+

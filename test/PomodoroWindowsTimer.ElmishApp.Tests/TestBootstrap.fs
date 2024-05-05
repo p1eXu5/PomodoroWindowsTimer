@@ -1,6 +1,8 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests
 
 open System
+open System.Collections.Generic
+open Microsoft.Data.Sqlite
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
@@ -8,19 +10,15 @@ open Microsoft.Extensions.Logging
 open Elmish
 open NUnit.Framework
 open p1eXu5.AspNetCore.Testing
+open p1eXu5.AspNetCore.Testing.Logging
 open p1eXu5.AspNetCore.Testing.MockRepository
 
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 open PomodoroWindowsTimer.WpfClient
-open System.Collections.Generic
-open PomodoroWindowsTimer.Types
-open Serilog
-open PomodoroWindowsTimer.ElmishApp.Infrastructure
-open p1eXu5.AspNetCore.Testing.Logging
-open Microsoft.Data.Sqlite
 
 type TestBootstrap () =
     inherit Bootstrap()
@@ -101,7 +99,8 @@ type TestBootstrap () =
         let (initMainModel, updateMainModel, _, subscribe) =
             CompositionRoot.compose
                 "Pomodoro Windows Timer under tests"
-                Program.tickMilliseconds
+                factory.Looper
+                factory.TimePointQueue
                 factory.WorkRepository
                 factory.WorkEventRepository
                 factory.TelegramBot

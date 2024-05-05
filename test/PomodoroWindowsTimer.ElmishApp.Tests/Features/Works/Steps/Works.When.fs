@@ -23,6 +23,13 @@ let ``WorkSelector drawer is opening`` () =
         do sut.Dispatcher.Dispatch msg
     }
 
+let ``WorkSelector drawer is closing`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.Msg.SetIsWorkSelectorLoaded false
+        do sut.Dispatcher.Dispatch msg
+    }
+
 let ``CreatingWork sub model has been shown`` () =
     Common.``CreatingWork sub model has been shown`` ()
     |> Scenario.log $"When.``{nameof Common.``CreatingWork sub model has been shown``}``"

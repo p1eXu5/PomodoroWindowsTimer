@@ -40,7 +40,7 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
 
     // -------------------------------------------------------------
     member val LooperIsRunning : Binding =
-        nameof __.LooperIsRunning |> Binding.oneWay isLooperRunning
+        nameof __.LooperIsRunning |> Binding.oneWay isLooperStateIsNotInitialized
 
     member val IsPlaying : Binding =
         nameof __.IsPlaying |> Binding.oneWay isPlaying
@@ -132,7 +132,7 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
         nameof __.StartTimePointCommand |> Binding.cmdParam (fun id -> (id :?> Guid) |> Operation.Start |> Msg.StartTimePoint)
 
     member val MinimizeCommand : Binding =
-        nameof __.MinimizeCommand |> Binding.cmd (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+        nameof __.MinimizeCommand |> Binding.cmd (WindowsMsg.MinimizeAllRestoreApp |> Msg.WindowsMsg)
 
     /// For the test purpose
     member val SendToChatBotCommand : Binding =

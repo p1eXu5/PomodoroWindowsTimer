@@ -12,6 +12,7 @@ type WorkModel =
         UpdateState: AsyncDeferred<DateTimeOffset>
         CreateNewState: AsyncDeferred<uint64 * DateTimeOffset>
     }
+    member this.Id = this.Work.Id
 
 module WorkModel =
 

@@ -13,13 +13,14 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
 
-[<Category("4: Work Scenarios")>]
+[<Category("UC4: Work Scenarios")>]
 module WorkFeature =
 
     [<Test>]
     let ``UC4-1 - No stored works initialization`` () =
         scenario {
-            do! Given.``Program has been initialized without CurrentWork`` ()
+            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            do! Given.``Program has been initialized without CurrentWork`` timePoints
 
             do! Then.``Current Work has not been set`` ()
         }
@@ -28,7 +29,8 @@ module WorkFeature =
     [<Test>]
     let ``UC4-2 - No stored works -> open work selector scenario`` () =
         scenario {
-            do! Given.``Program has been initialized without CurrentWork`` ()
+            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            do! Given.``Program has been initialized without CurrentWork`` timePoints
 
             do! When.``WorkSelector drawer is opening`` ()
 
@@ -37,10 +39,14 @@ module WorkFeature =
         }
         |> Scenario.runTestAsync
 
+    // ---------------------
+    // create work scenarios
+    // ---------------------
     [<Test>]
     let ``UC4-3 - No stored works -> open work selector -> create work scenario`` () =
         scenario {
-            do! Given.``Program has been initialized without CurrentWork`` ()
+            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            do! Given.``Program has been initialized without CurrentWork`` timePoints
 
             do! When.``WorkSelector drawer is opening`` ()
             do! When.``CreatingWork sub model has been shown`` ()
@@ -60,7 +66,8 @@ module WorkFeature =
     [<Test>]
     let ``UC4-4 - No stored works -> open work selector -> create work 2 times scenario`` () =
         scenario {
-            do! Given.``Program has been initialized without CurrentWork`` ()
+            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            do! Given.``Program has been initialized without CurrentWork`` timePoints
 
             do! When.``WorkSelector drawer is opening`` ()
             do! When.``CreatingWork sub model has been shown`` ()
@@ -85,3 +92,4 @@ module WorkFeature =
             do! Then.``Current Work has been set to`` work2
         }
         |> Scenario.runTestAsync
+

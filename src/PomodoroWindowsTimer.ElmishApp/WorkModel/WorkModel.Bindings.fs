@@ -23,6 +23,9 @@ type Bindings() =
             (Bindings.Instance())
             props
 
+    member val Id : Binding =
+        nameof __.Id |> Binding.oneWay (_.Work >> _.Id)
+
     member val Number : Binding =
         nameof __.Number |> Binding.oneWay (_.Work >> _.Number)
 

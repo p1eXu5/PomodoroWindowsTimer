@@ -292,6 +292,8 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
     interface ILooper with
         /// Starts Looper in Stop state
         member this.Start() = this.Start()
+        member this.Stop() = this.Stop()
+        member this.Next() = this.Next()
         member this.Shift(seconds: float<sec>) = this.Shift(seconds)
         member this.Resume() = this.Resume()
         member this.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) = this.AddSubscriber(subscriber)

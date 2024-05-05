@@ -18,7 +18,8 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 let compose
     (title: string)
-    (tickMilliseconds: int<ms>)
+    (looper: ILooper)
+    (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)
     (workEventRepository: IWorkEventRepository)
     (telegramBot: ITelegramBot)
@@ -30,9 +31,6 @@ let compose
     (timeProvider: System.TimeProvider)
     (loggerFactory: ILoggerFactory)
     =
-    let timePointQueue = new TimePointQueue(loggerFactory.CreateLogger<TimePointQueue>())
-    let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds, loggerFactory.CreateLogger<Looper>())
-
     let patternStore = PatternStore.init userSettings
     let timePointPrototypeStore = TimePointPrototypeStore.initialize userSettings
 

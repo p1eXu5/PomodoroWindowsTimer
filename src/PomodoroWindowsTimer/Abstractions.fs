@@ -18,6 +18,8 @@ type ITimePointQueue =
 type ILooper =
     inherit IDisposable
     abstract Start : unit -> unit
+    abstract Stop : unit -> unit
+    abstract Next : unit -> unit
     abstract Shift : float<sec> -> unit
     abstract Resume : unit -> unit
     abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit

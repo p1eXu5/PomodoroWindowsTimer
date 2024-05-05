@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using PomodoroWindowsTimer.Abstractions;
+using PomodoroWindowsTimer;
+using PomodoroWindowsTimer.Types;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Infrastructure;
 using PomodoroWindowsTimer.WpfClient;
@@ -11,6 +13,7 @@ using PomodoroWindowsTimer.WpfClient.Services;
 using PomodoroWindowsTimer.Storage;
 using PomodoroWindowsTimer.WpfClient.Configuration;
 using Microsoft.Extensions.Options;
+using PomodoroWindowsTimer.TimePointQueue;
 
 namespace DrugRoom.WpfClient;
 
@@ -49,6 +52,22 @@ internal static class DependencyInjectionExtensions
 
     public static void AddTimeProvider(this IServiceCollection services)
         => services.TryAddSingleton(TimeProvider.System);
+
+    public static void AddTimePointQueue(this IServiceCollection services)
+        => services.TryAddSingleton<ITimePointQueue>(sp =>
+        {
+            var logger = sp.GetRequiredService<ILogger<TimePointQueue>>();
+            return new TimePointQueue(logger);
+        });
+
+    public static void AddLooper(this IServiceCollection services)
+        => services.TryAddSingleton<ILooper>(sp =>
+        {
+            var timePointQueue = sp.GetRequiredService<ITimePointQueue>();
+            var logger = sp.GetRequiredService<ILogger<Looper.Looper>>();
+            return
+                new Looper.Looper(timePointQueue, PomodoroWindowsTimer.ElmishApp.Program.tickMilliseconds, logger, default);
+        });
 
     public static void AddTelegramBot(this IServiceCollection services)
         => services.TryAddSingleton(sp =>

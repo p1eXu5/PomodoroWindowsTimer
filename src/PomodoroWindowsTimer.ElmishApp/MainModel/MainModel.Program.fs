@@ -33,7 +33,7 @@ let storeStartedWorkEventTask (timeProvider: System.TimeProvider) (workEventRepo
         | Error err -> raise (InvalidOperationException(err))
     }
 
-let storeStoppedWorkEventTask (timeProvider: System.TimeProvider) (workEventRepository: IWorkEventRepository) (workId: uint64) (timePoint: TimePoint) =
+let storeStoppedWorkEventTask (timeProvider: System.TimeProvider) (workEventRepository: IWorkEventRepository) (workId: uint64) (_: TimePoint) =
     task {
         let workEvent =
             (timeProvider.GetUtcNow()) |> WorkEvent.Stopped
@@ -47,14 +47,16 @@ let storeStoppedWorkEventTask (timeProvider: System.TimeProvider) (workEventRepo
 
 let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
-    | WindowsMsg.MinimizeWindows when not model.IsMinimized ->
-        { model with IsMinimized = true }, Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeOtherAsync () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
+    | WindowsMsg.MinimizeAllRestoreApp when not model.IsMinimized ->
+        { model with IsMinimized = true }
+        , Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeAllRestoreAppWindowAsync () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
 
-    | WindowsMsg.RestoreWindows when model.IsMinimized ->
-        { model with IsMinimized = false }, Cmd.OfFunc.either cfg.WindowsMinimizer.Restore () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
+    | WindowsMsg.RestoreAllMinimized when model.IsMinimized ->
+        { model with IsMinimized = false }
+        , Cmd.OfFunc.either cfg.WindowsMinimizer.RestoreAllMinimized () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
 
-    | WindowsMsg.RestoreMainWindow ->
-        model, Cmd.OfFunc.attempt cfg.WindowsMinimizer.RestoreMainWindow () Msg.OnExn
+    | WindowsMsg.RestoreAppWindow ->
+        model, Cmd.OfFunc.attempt cfg.WindowsMinimizer.RestoreAppWindow () Msg.OnExn
 
     | WindowsMsg.SetIsMinimized v ->
         { model with IsMinimized = v }, Cmd.none
@@ -91,10 +93,10 @@ let updateOnPlayerMsg
 
         match model.ActiveTimePoint with
         | Some ({ Kind = Kind.Break }) when not model.IsMinimized ->
-            model', Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+            model', Cmd.ofMsg (WindowsMsg.MinimizeAllRestoreApp |> Msg.WindowsMsg)
 
         | Some ({ Kind = Kind.Work }) when model.IsMinimized ->
-            model', Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
+            model', Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
 
         | _ ->
             model', Cmd.none
@@ -103,8 +105,8 @@ let updateOnPlayerMsg
         cfg.Looper.Stop()
         model |> setLooperState Stopped
         , Cmd.batch [
-            Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
-            Cmd.ofMsg (WindowsMsg.RestoreMainWindow |> Msg.WindowsMsg)
+            Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
+            Cmd.ofMsg (WindowsMsg.RestoreAppWindow |> Msg.WindowsMsg)
 
             match model.CurrentWork, model.ActiveTimePoint with
             | Some work, Some tp ->
@@ -134,7 +136,7 @@ let updateOnPlayerMsg
 
             let switchThemeCmd = Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
 
-            let startedWorkEventCmd =
+            let storeStartedWorkEventCmd =
                 match model.CurrentWork, model.LooperState with
                 | Some work, LooperState.Playing ->
                     Cmd.OfTask.attempt (storeStartedWorkEventTask work.Work.Id) nextTp Msg.OnExn
@@ -147,12 +149,19 @@ let updateOnPlayerMsg
                 model, switchThemeCmd
 
             | LongBreak
+            | Break when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Break || oldTp.Value.Kind = Kind.LongBreak) ->
+                model
+                , Cmd.batch [
+                    storeStartedWorkEventCmd
+                ]
+
+            | LongBreak
             | Break ->
                 model
                 , Cmd.batch [
                     switchThemeCmd;
-                    startedWorkEventCmd
-                    Cmd.ofMsg (WindowsMsg.MinimizeWindows |> Msg.WindowsMsg)
+                    storeStartedWorkEventCmd
+                    Cmd.ofMsg (WindowsMsg.MinimizeAllRestoreApp |> Msg.WindowsMsg)
                 ]
 
             // initialized
@@ -164,16 +173,23 @@ let updateOnPlayerMsg
                 model
                 , Cmd.batch [
                     switchThemeCmd;
-                    startedWorkEventCmd
-                    Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg)
+                    storeStartedWorkEventCmd
+                    Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
+                ]
+
+            | Work when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Work) ->
+                model
+                , Cmd.batch [
+                    storeStartedWorkEventCmd
+                    Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
                 ]
 
             | Work ->
                 model
                 , Cmd.batch [
                     switchThemeCmd;
-                    startedWorkEventCmd
-                    Cmd.ofMsg (WindowsMsg.RestoreWindows |> Msg.WindowsMsg);
+                    storeStartedWorkEventCmd
+                    Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg);
                     Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
                 ]
 
@@ -184,7 +200,14 @@ let updateOnPlayerMsg
         match model.LooperState with
         | Playing ->
             cfg.Looper.Stop()
-            model, Cmd.none
+            model
+            , Cmd.batch [
+                match model.CurrentWork, model.ActiveTimePoint with
+                | Some work, Some tp ->
+                    Cmd.OfTask.attempt (storeStoppedWorkEventTask work.Work.Id) tp Msg.OnExn
+                | _ ->
+                    Cmd.none
+            ]
         | _ ->
             { model with LooperState = TimeShiftingAfterNotPlaying model.LooperState }, Cmd.none
 
@@ -199,7 +222,14 @@ let updateOnPlayerMsg
             { model with LooperState = s }, Cmd.none
         | _ ->
             cfg.Looper.Resume()
-            model, Cmd.none
+            model
+            , Cmd.batch [
+                match model.CurrentWork, model.ActiveTimePoint with
+                | Some work, Some tp ->
+                    Cmd.OfTask.attempt (storeStartedWorkEventTask work.Work.Id) tp Msg.OnExn
+                | _ ->
+                    Cmd.none
+            ]
 
 
     | _ ->
@@ -219,6 +249,12 @@ let update
     =
     let updateOnPlayerMsg = updateOnPlayerMsg cfg
     let updateOnWindowsMsg = updateOnWindowsMsg cfg
+
+    let storeStartedWorkEventTask =
+        storeStartedWorkEventTask cfg.TimeProvider cfg.WorkEventRepository
+
+    let storeStoppedWorkEventTask =
+        storeStoppedWorkEventTask cfg.TimeProvider cfg.WorkEventRepository
 
     match msg with
     // --------------------
@@ -256,7 +292,11 @@ let update
         , Cmd.none
 
     | Msg.StartTimePoint (Operation.Start id) ->
-        model, Cmd.batch [ Cmd.ofMsg (ControllerMsg.Stop |> Msg.ControllerMsg); Cmd.OfFunc.either cfg.Looper.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn ]
+        model
+        , Cmd.batch [
+            Cmd.ofMsg (ControllerMsg.Stop |> Msg.ControllerMsg);
+            Cmd.OfFunc.either cfg.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn
+        ]
 
     | Msg.StartTimePoint (Operation.Finish _) ->
         model, Cmd.ofMsg (ControllerMsg.Play |> Msg.ControllerMsg)
@@ -303,14 +343,48 @@ let update
             model |> withWorkSelectorModel (workSelectorModel |> Some)
             , cmd
         | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
-            cfg.CurrentWorkItemSettings.CurrentWork <- workModel |> Option.map _.Work
-            model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel workModel
-            , cmd
+            cfg.CurrentWorkItemSettings.CurrentWork <- workModel.Work |> Some
+
+            if model.LooperState = LooperState.Playing then
+                match model.CurrentWork with
+                | Some currWork when currWork.Id <> workModel.Id ->
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                    , Cmd.batch [
+                        cmd
+                        Cmd.OfTask.attempt (storeStoppedWorkEventTask currWork.Id) model.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt (storeStartedWorkEventTask workModel.Id) model.ActiveTimePoint.Value Msg.OnExn
+                    ]
+                | Some _ ->
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                    , cmd
+                | None ->
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                    , Cmd.batch [
+                        cmd
+                        Cmd.OfTask.attempt (storeStartedWorkEventTask workModel.Id) model.ActiveTimePoint.Value Msg.OnExn
+                    ]
+            else
+                model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                , cmd
+
 
         | WorkSelectorModel.Intent.UnselectCurrentWork ->
             cfg.CurrentWorkItemSettings.CurrentWork <- None
-            model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
-            , cmd
+
+            if model.LooperState = LooperState.Playing then
+                match model.CurrentWork with
+                | Some currWork ->
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+                    , Cmd.batch [
+                        cmd
+                        Cmd.OfTask.attempt (storeStoppedWorkEventTask currWork.Id) model.ActiveTimePoint.Value Msg.OnExn
+                    ]
+                | None ->
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+                    , cmd
+            else
+                model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+                , cmd
 
         | WorkSelectorModel.Intent.Close ->
             model |> withWorkSelectorModel None |> withCmdNone

@@ -26,6 +26,7 @@
     <Compile Include="Features\StopResume\Steps\StopResume.When.fs" />
     <Compile Include="Features\StopResume\Steps\StopResume.Then.fs" />
     <Compile Include="Features\StopResume\StopResumeFeature.fs" />
+    <Compile Include="Features\StopResume\TimeSliderFeature.fs" />
     <Compile Include="Features\Works\Steps\Works.Common.fs" />
     <Compile Include="Features\Works\Steps\Works.Given.fs" />
     <Compile Include="Features\Works\Steps\Works.When.fs" />

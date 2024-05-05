@@ -137,3 +137,16 @@ let ``WorkList sub model work list contains`` (work: Work) =
     }
     |> Scenario.log $"Then.``{nameof ``WorkList sub model work list contains``}``"
 
+let ``MainModel WorkSelector becomes None`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "MainModel.WorkSelector becomes None" (fun mainModel ->
+            match mainModel.WorkSelector with
+            | None ->
+                writeLine "MainModel.WorkSelector is None"
+                true
+            | Some workSelector ->
+                writeLine $"MainModel.WorkSelector is {workSelector}"
+                false
+        )
+    }
+

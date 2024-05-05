@@ -49,8 +49,8 @@ type MainModeConfig =
     {
         UserSettings: IUserSettings
         SendToBot: ITelegramBot
-        Looper: Looper
-        TimePointQueue: TimePointQueue
+        Looper: ILooper
+        TimePointQueue: ITimePointQueue
         WindowsMinimizer: IWindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
         TimePointStore: TimePointStore
@@ -96,10 +96,11 @@ module MainModel =
         | Terminate
     and
         WindowsMsg =
-            | MinimizeWindows
+            | MinimizeAllRestoreApp
             | SetIsMinimized of bool
-            | RestoreWindows
-            | RestoreMainWindow
+            | RestoreAllMinimized
+            /// Using when dispatch Stop msg
+            | RestoreAppWindow
     and
         [<RequireQualifiedAccess>]
         ControllerMsg =
@@ -214,7 +215,7 @@ module MainModel =
         | Some (UIInitiator atp), Some tp -> atp.Id = tp.Id
         | _ -> false
 
-    let isLooperRunning m =
+    let isLooperStateIsNotInitialized m =
         match m.LooperState with
         | TimeShiftingAfterNotPlaying s ->
             match s with

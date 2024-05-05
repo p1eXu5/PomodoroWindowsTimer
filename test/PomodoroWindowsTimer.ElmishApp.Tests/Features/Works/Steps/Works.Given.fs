@@ -13,9 +13,8 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
 
-let ``Program has been initialized without CurrentWork`` () =
+let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint list) =
     scenario {
-        let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
 
         do! Given.``Stored TimePoints`` timePoints
         do! Given.``Initialized Program`` ()
@@ -25,9 +24,8 @@ let ``Program has been initialized without CurrentWork`` () =
         return ()
     }
 
-let ``Program has been initialized with CurrentWork`` () =
+let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint list) =
     scenario {
-        let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
         let currentWork = generateWork ()
 
         do! Given.``Stored TimePoints`` timePoints

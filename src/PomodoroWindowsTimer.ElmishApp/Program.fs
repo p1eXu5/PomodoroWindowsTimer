@@ -15,6 +15,8 @@ let internal title = "Pomodoro Windows Timer"
 
 let internal main
     (window: System.Windows.Window)
+    (looper: ILooper)
+    (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)
     (workEventRepository: IWorkEventRepository)
     (telegramBot: ITelegramBot)
@@ -29,7 +31,8 @@ let internal main
     let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
         CompositionRoot.compose
             title
-            tickMilliseconds
+            looper
+            timePointQueue
             workRepository
             workEventRepository
             telegramBot
@@ -48,3 +51,4 @@ let internal main
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.withSubscription subscribe
     |> WpfProgram.startElmishLoop window
+

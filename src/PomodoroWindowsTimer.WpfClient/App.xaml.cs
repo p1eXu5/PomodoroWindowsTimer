@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using Microsoft.Extensions.Configuration;
+using PomodoroWindowsTimer.ElmishApp.Models;
+using Microsoft.FSharp.Core;
+using PomodoroWindowsTimer.Types;
 
 namespace PomodoroWindowsTimer.WpfClient
 {
@@ -16,6 +19,7 @@ namespace PomodoroWindowsTimer.WpfClient
     {
         private IErrorMessageQueue _errorMessageQueue = default!;
         private Bootstrap _bootstrap = default!;
+        private MainWindow _mainWindow = default!;
 
         public App()
         {
@@ -38,8 +42,8 @@ namespace PomodoroWindowsTimer.WpfClient
             var themeSwitcher = _bootstrap.GetThemeSwitcher();
             themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);
 
-            var wnd = new MainWindow();
-            _bootstrap.ShowMainWindow(wnd);
+            _mainWindow = new MainWindow();
+            _bootstrap.ShowMainWindow(_mainWindow);
         }
 
         private async void Application_Exit(object sender, ExitEventArgs e)
@@ -48,6 +52,22 @@ namespace PomodoroWindowsTimer.WpfClient
             {
                 using (_bootstrap)
                 {
+                    var looper = _bootstrap.GetLooper();
+                    looper.Stop();
+
+                    bool isPlaying = ((dynamic)_mainWindow.DataContext).IsPlaying;
+                    object currentWork = ((dynamic)_mainWindow.DataContext).CurrentWork;
+
+                    if (isPlaying && currentWork is not null)
+                    {
+                        UInt64 workId = ((dynamic)currentWork).Id;
+                        var timeProvider = _bootstrap.GetTimerProvider();
+                        var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
+
+                        var workEventRepository = _bootstrap.GetWorkEventRepository();
+                        await workEventRepository.CreateAsync(workId, workEvent, default);
+                    }
+
                     await _bootstrap.StopHostAsync();
                 }
             }

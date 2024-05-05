@@ -8,6 +8,8 @@ using PomodoroWindowsTimer.ElmishApp.Abstractions;
 namespace PomodoroWindowsTimer.WpfClient;
 
 internal sealed class ElmishProgramFactory(
+    ILooper looper,
+    ITimePointQueue timePointQueue,
     IWorkRepository workRepository,
     IWorkEventRepository workEventRepository,
     ITelegramBot telegramBot,
@@ -20,6 +22,8 @@ internal sealed class ElmishProgramFactory(
     ILoggerFactory loggerFactory
 )
 {
+    internal ILooper Looper => looper;
+    internal ITimePointQueue TimePointQueue => timePointQueue;
     internal IWorkRepository WorkRepository => workRepository;
     internal IWorkEventRepository WorkEventRepository => workEventRepository;
     internal ITelegramBot TelegramBot => telegramBot;
@@ -35,6 +39,8 @@ internal sealed class ElmishProgramFactory(
     =>
         ElmishApp.Program.main(
             mainWindow,
+            Looper,
+            TimePointQueue,
             WorkRepository,
             WorkEventRepository,
             TelegramBot,

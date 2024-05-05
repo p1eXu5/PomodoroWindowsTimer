@@ -28,7 +28,7 @@ module WorkSelectorModel =
     type Intent =
         | None
         | Close
-        | SelectCurrentWork of WorkModel option
+        | SelectCurrentWork of WorkModel
         | UnselectCurrentWork
 
     [<AutoOpen>]

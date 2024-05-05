@@ -27,9 +27,15 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
             |> withNoIntent
 
         | WorkListModel.Intent.Select ->
-            model |> withWorkListModel sm
-            , Cmd.map Msg.WorkListModelMsg cmd
-            , Intent.SelectCurrentWork (sm |> WorkListModel.selectedWorkModel)
+            match sm |> WorkListModel.selectedWorkModel with
+            | Some workModel ->
+                model |> withWorkListModel sm
+                , Cmd.map Msg.WorkListModelMsg cmd
+                , Intent.SelectCurrentWork workModel
+            | None ->
+                 model |> withWorkListModel sm
+                , Cmd.map Msg.WorkListModelMsg cmd
+                , Intent.UnselectCurrentWork
 
         | WorkListModel.Intent.Unselect ->
             model |> withWorkListModel sm
@@ -71,7 +77,7 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
             let (m, cmd) = WorkListModel.init selectedWorkId
             model |> withWorkListModel m
             , Cmd.map Msg.WorkListModelMsg cmd
-            , Intent.SelectCurrentWork (workModel |> Some)
+            , Intent.SelectCurrentWork workModel
 
         | WorkModel.Intent.StartEdit
         | WorkModel.Intent.Select  // TODO: add ability to select work from edit mode

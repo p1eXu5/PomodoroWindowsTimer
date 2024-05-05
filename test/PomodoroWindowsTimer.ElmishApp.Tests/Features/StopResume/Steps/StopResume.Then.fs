@@ -68,7 +68,7 @@ let ``Windows should not be minimized`` () =
         let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
         
         do
-            wm.Received(0).MinimizeOtherAsync()
+            wm.Received(0).MinimizeAllRestoreAppWindowAsync()
             |> Async.AwaitTask
             |> Async.RunSynchronously
 
@@ -80,7 +80,7 @@ let rec ``MinimizeWindows msg has been dispatched`` () =
     scenario {
         do! Scenario.msgDispatchedWithin2Sec "MinimizeWindows" (fun msg ->
             match msg with
-            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeWindows) -> true
+            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeAllRestoreApp) -> true
             | _ -> false
         )
     }
@@ -90,7 +90,7 @@ let rec ``MinimizeWindows msg has not been dispatched`` () =
     scenario {
         do! Scenario.msgNotDispatchedWithin1Sec "MinimizeWindows" (fun msg ->
             match msg with
-            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeWindows) -> true
+            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeAllRestoreApp) -> true
             | _ -> false
         )
     }
@@ -103,7 +103,7 @@ let ``WindowsMinimizer.MinimizeOtherAsync is called`` (times: int) =
         let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
         
         do
-            wm.Received(times).MinimizeOtherAsync()
+            wm.Received(times).MinimizeAllRestoreAppWindowAsync()
             |> Async.AwaitTask
             |> Async.RunSynchronously
     }
@@ -156,12 +156,12 @@ let rec ``Theme should not been switched`` () =
         themeSwitcher.ReceivedWithAnyArgs(0).SwitchTheme(Arg.Any<TimePointKind>())
     }
 
-let rec ``Theme should been switched with`` (timePointKind: TimePointKind) (times: int) =
+let rec ``Theme should been switched with`` (timePointKind: TimePointKind) (times: int<times>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let themeSwitcher = sut.ServiceProvider.GetRequiredService<IThemeSwitcher>()
 
-        themeSwitcher.Received(times).SwitchTheme(timePointKind)
+        themeSwitcher.Received(int times).SwitchTheme(timePointKind)
     }
 
 let ``Telegrtam bot should be notified with`` (timePointName: string) =

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using Serilog;
 
@@ -124,6 +125,8 @@ internal class Bootstrap : IDisposable
     protected virtual void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
     {
         services.AddTimeProvider();
+        services.AddTimePointQueue();
+        services.AddLooper();
         services.AddTelegramBot();
         services.AddWindowsMinimizer();
         services.AddThemeSwitcher();
@@ -147,6 +150,15 @@ internal class Bootstrap : IDisposable
 
     internal IThemeSwitcher GetThemeSwitcher()
         => Host.Services.GetRequiredService<IThemeSwitcher>();
+
+    internal ILooper GetLooper()
+        => Host.Services.GetRequiredService<ILooper>();
+
+    internal IWorkEventRepository GetWorkEventRepository()
+        => Host.Services.GetRequiredService<IWorkEventRepository>();
+
+    internal System.TimeProvider GetTimerProvider()
+        => Host.Services.GetRequiredService<System.TimeProvider>();
 
     protected virtual void PreConfigureServices(HostBuilderContext hostBuilder, IServiceCollection services)
     { }
