@@ -14,6 +14,7 @@
     <converters:ToUpperInvariantTextConverter x:Key="conv_ToUpperInvariantText" />
     <converters:NullToVisibilityConverter x:Key="conv_NullToVisible" />
     <converters:NoNumberConverter x:Key="conv_NoNumberConverter" />
+    <converters:AsyncDeferredToVisicbilityConverter x:Key="conv_AsyncDeferredToVisicbility" />
 
     <Style x:Key="st_IconBase"
            TargetType="materialDesign:PackIcon"
@@ -54,6 +55,10 @@
 
     <DataTemplate x:Key="dt_BotSettingsDialog">
         <settings:BotSettings />
+    </DataTemplate>
+
+    <DataTemplate x:Key="dt_WorkStatisticsDialog">
+        <works:StatisticTable />
     </DataTemplate>
 
     <DataTemplate x:Key="dt_WorkList">

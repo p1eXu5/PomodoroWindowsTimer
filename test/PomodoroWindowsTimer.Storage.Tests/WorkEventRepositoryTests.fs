@@ -91,7 +91,7 @@ module WorkEventRepositoryTests =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let readAll =
-                WorkEventRepository.readAllTask (Helpers.selectTask conn)
+                WorkEventRepository.findByWorkIdTask (Helpers.selectTask conn)
 
             let workEvent = generateWorkEvent ()
 
@@ -112,10 +112,10 @@ module WorkEventRepositoryTests =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let readAll =
-                WorkEventRepository.readAllTask (Helpers.selectTask conn)
+                WorkEventRepository.findByWorkIdTask (Helpers.selectTask conn)
 
             let findByDate =
-                WorkEventRepository.findByDateTask System.TimeProvider.System (Helpers.selectTask conn)
+                WorkEventRepository.findByWorkIdByDateTask System.TimeProvider.System (Helpers.selectTask conn)
 
             let workEvent1 = generateWorkEvent ()
             let workEvent2 = generateWorkEvent ()
@@ -145,7 +145,7 @@ module WorkEventRepositoryTests =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
             let findByDate =
-                WorkEventRepository.findByDateTask System.TimeProvider.System (Helpers.selectTask conn)
+                WorkEventRepository.findByWorkIdByDateTask System.TimeProvider.System (Helpers.selectTask conn)
 
             let workEvent1 = generateWorkEvent ()
             let workEvent2 = generateWorkEvent ()

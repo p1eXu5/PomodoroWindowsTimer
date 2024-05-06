@@ -5,9 +5,10 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             DataContext="{Binding BotSettingsDialog}"
+             xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
              Width="450"
              Height="200"
+             d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
@@ -15,19 +16,20 @@
     <StackPanel Margin="10"
                 VerticalAlignment="Center"
                 Orientation="Vertical"
+                DataContext="{Binding BotSettingsDialog}"
                 >
-        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Width="350"
+        <TextBox Width="350"
                  Margin="0"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Bot token"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding BotToken}"
                  />
-        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Width="350"
+        <TextBox Width="350"
                  Margin="0,10,0,20"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Chat ID"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding ChatId}"
                  />
 
@@ -36,17 +38,17 @@
                     >
             <Button DockPanel.Dock="Bottom"
                     Command="{Binding ApplyCommand}"
-                    Content="APPLY"
-                    Style="{StaticResource MaterialDesignFlatSecondaryButton}"
                     Margin="10"
                     HorizontalAlignment="Center"
+                    Content="APPLY"
+                    Style="{StaticResource MaterialDesignFlatSecondaryButton}"
                     />
             <Button DockPanel.Dock="Bottom"
                     Command="{Binding CancelCommand}"
-                    Content="CANCEL"
-                    Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="10"
                     HorizontalAlignment="Center"
+                    Content="CANCEL"
+                    Style="{StaticResource MaterialDesignFlatButton}"
                     IsCancel="True"
                     />
         </StackPanel>

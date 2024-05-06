@@ -69,7 +69,7 @@ let createTask
     }
 
 
-let readAllTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) ct =
+let findByWorkIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) ct =
     task {
         let! res =
             select {
@@ -85,7 +85,7 @@ let readAllTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnume
             ))
     }
 
-let readAll (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) (workId: uint64) =
+let findByWorkId (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) (workId: uint64) =
     let res =
         select {
             for r in readTable do
@@ -99,7 +99,7 @@ let readAll (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) (work
     ))
 
 
-let findByPeriodQuery workId dateMin dateMax =
+let findByWorkIdByPeriodQuery workId dateMin dateMax =
     select {
         for r in readTable do
         where (r.work_id = workId)
@@ -107,14 +107,14 @@ let findByPeriodQuery workId dateMin dateMax =
         andWhere (r.created_at < dateMax)
     }
 
-let findByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =
+let findByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =
     task {
 
         let dateMin = DateTimeOffset(date, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
         let dateMax = DateTimeOffset(date.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
 
         let! res =
-            findByPeriodQuery workId dateMin dateMax
+            findByWorkIdByPeriodQuery workId dateMin dateMax
             |> selectf ct
 
         return
@@ -124,14 +124,14 @@ let findByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationTok
             ))
     }
 
-let findByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: Period) ct =
+let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: Period) ct =
     task {
 
         let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
         let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
 
         let! res =
-            findByPeriodQuery workId dateMin dateMax
+            findByWorkIdByPeriodQuery workId dateMin dateMax
             |> selectf ct
 
         return
@@ -141,4 +141,45 @@ let findByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationT
             ))
     }
 
+
+let findAllByPeriodTask
+    (timeProvider: System.TimeProvider)
+    (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow * WorkRepository.ReadRow>, string>>)
+    (period: Period)
+    ct
+    =
+    task {
+
+        let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+        let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+        let! res =
+            select {
+                for r in readTable do
+                innerJoin w in WorkRepository.readTable on (r.work_id = w.id)
+                andWhere (r.created_at >= dateMin)
+                andWhere (r.created_at < dateMax)
+                orderBy r.work_id
+                thenBy r.created_at
+            }
+            |> selectf ct
+
+        return
+            res
+            |> Result.map (fun l ->
+                l
+                |> Seq.map (fun (r, w) ->
+                    let work = w |> WorkRepository.ReadRow.toWork
+                    let ev = JsonHelpers.Deserialize<WorkEvent>(r.event_json)
+                    (work, ev)
+                )
+                |> Seq.groupBy fst
+                |> Seq.map (fun (w, evs) ->
+                    {
+                        Work = w
+                        Events = evs |> Seq.map snd |> Seq.toList
+                    }
+                )
+            )
+    }
 

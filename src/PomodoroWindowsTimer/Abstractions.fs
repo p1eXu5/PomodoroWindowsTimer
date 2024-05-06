@@ -39,9 +39,10 @@ type IWorkRepository =
 type IWorkEventRepository =
     interface
         abstract CreateAsync: workId: uint64 -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract ReadAllAsync: workId: uint64 -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract ReadAll: workId: uint64 -> Result<WorkEvent seq, string>
-        abstract FindByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract FindByPeriodAsync: workId: uint64 -> Period -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract FindByWorkIdAsync: workId: uint64 -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract FindByWorkId: workId: uint64 -> Result<WorkEvent seq, string>
+        abstract FindByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract FindByWorkIdByPeriodAsync: workId: uint64 -> Period -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract FindAllByPeriodAsync: Period -> CancellationToken -> Task<Result<WorkEventList seq, string>>
     end
 

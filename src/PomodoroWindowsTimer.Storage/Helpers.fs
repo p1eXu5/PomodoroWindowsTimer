@@ -35,6 +35,15 @@ let selectTask<'T> (dbConnection: IDbConnection) (ct: CancellationToken) (select
             return ex.Message |> Error
     }
 
+let selectTask2<'T1,'T2> (dbConnection: IDbConnection) (ct: CancellationToken) (selectQuery: SelectQuery) =
+    task {
+        try
+            let! res = dbConnection.SelectAsync<'T1,'T2>(selectQuery, cancellationToken=ct)
+            return res |> Ok
+        with ex ->
+            return ex.Message |> Error
+    }
+
 
 let select<'T> (dbConnection: IDbConnection) (selectQuery: SelectQuery) =
     try
@@ -48,7 +57,6 @@ let select<'T> (dbConnection: IDbConnection) (selectQuery: SelectQuery) =
         res |> Ok
     with ex ->
         ex.Message |> Error
-    
 
 
 let update<'T> (dbConnection: IDbConnection) (ct: CancellationToken) (updateQuery: UpdateQuery<'T>) =

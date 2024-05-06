@@ -50,6 +50,7 @@ type IUserSettings =
     inherit ITimePointSettings
     inherit IDisableSkipBreakSettings
     inherit ICurrentWorkItemSettings
+    abstract LastStatisticPeriod: Period option with get, set
 
 
 type IThemeSwitcher =

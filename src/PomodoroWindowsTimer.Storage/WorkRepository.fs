@@ -26,7 +26,18 @@ type ReadRow =
         updated_at: int64 option
     }
 
-let private readTable = table'<ReadRow> "work"
+module ReadRow =
+
+    let toWork (r: ReadRow) : Work =
+        {
+            Id = r.id
+            Number = r.number
+            Title = r.title
+            CreatedAt = r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
+            UpdatedAt = r.updated_at |> Option.defaultValue r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
+        }
+
+let internal readTable = table'<ReadRow> "work"
 let private writeTable = table'<CreateRow> "work"
 
 let createTask
@@ -78,14 +89,7 @@ let readAllTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnume
 
         return
             res
-            |> Result.map (Seq.map (fun r ->
-                {
-                    Id = r.id
-                    Number = r.number
-                    Title = r.title
-                    CreatedAt = r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
-                    UpdatedAt = r.updated_at |> Option.defaultValue r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
-                } : Work))
+            |> Result.map (Seq.map ReadRow.toWork)
     }
 
 let findByIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: uint64) ct =
@@ -99,14 +103,7 @@ let findByIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnum
 
         return
             res
-            |> Result.map (Seq.map (fun r ->
-                {
-                    Id = r.id
-                    Number = r.number
-                    Title = r.title
-                    CreatedAt = r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
-                    UpdatedAt = r.updated_at |> Option.defaultValue r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
-                } : Work) >> Seq.tryHead)
+            |> Result.map (Seq.map ReadRow.toWork >> Seq.tryHead)
     }
 
 let findTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (text: string) ct =
@@ -123,14 +120,7 @@ let findTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerab
 
         return
             res
-            |> Result.map (Seq.map (fun r ->
-                {
-                    Id = r.id
-                    Number = r.number
-                    Title = r.title
-                    CreatedAt = r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
-                    UpdatedAt = r.updated_at |> Option.defaultValue r.created_at |> DateTimeOffset.FromUnixTimeMilliseconds
-                } : Work))
+            |> Result.map (Seq.map ReadRow.toWork)
     }
 
 let findOrCreateTask

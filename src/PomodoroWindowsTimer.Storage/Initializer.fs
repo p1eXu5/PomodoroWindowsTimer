@@ -90,29 +90,35 @@ let initWorkEventRepository (connectionString: string) (timeProvider: System.Tim
                 do! dbConnection.OpenAsync()
                 return! WorkEventRepository.createTask timeProvider (Helpers.execute dbConnection) workId workEvent ct
             }
-        member _.ReadAllAsync workId ct =
+        member _.FindByWorkIdAsync workId ct =
             task {
                 use dbConnection = new SqliteConnection(connectionString)
                 do! dbConnection.OpenAsync()
-                return! WorkEventRepository.readAllTask (Helpers.selectTask dbConnection) workId ct
+                return! WorkEventRepository.findByWorkIdTask (Helpers.selectTask dbConnection) workId ct
             }
         
-        member _.ReadAll workId =
+        member _.FindByWorkId workId =
             use dbConnection = new SqliteConnection(connectionString)
             dbConnection.Open()
-            WorkEventRepository.readAll (Helpers.select dbConnection) workId
+            WorkEventRepository.findByWorkId (Helpers.select dbConnection) workId
 
-        member _.FindByDateAsync workId date ct =
+        member _.FindByWorkIdByDateAsync workId date ct =
             task {
                 use dbConnection = new SqliteConnection(connectionString)
                 do! dbConnection.OpenAsync()
-                return! WorkEventRepository.findByDateTask timeProvider (Helpers.selectTask dbConnection) workId date ct
+                return! WorkEventRepository.findByWorkIdByDateTask timeProvider (Helpers.selectTask dbConnection) workId date ct
             }
-        member _.FindByPeriodAsync workId period ct =
+        member _.FindByWorkIdByPeriodAsync workId period ct =
             task {
                 use dbConnection = new SqliteConnection(connectionString)
                 do! dbConnection.OpenAsync()
-                return! WorkEventRepository.findByPeriodTask timeProvider (Helpers.selectTask dbConnection) workId period ct
+                return! WorkEventRepository.findByWorkIdByPeriodTask timeProvider (Helpers.selectTask dbConnection) workId period ct
+            }
+        member _.FindAllByPeriodAsync period ct =
+            task {
+                use dbConnection = new SqliteConnection(connectionString)
+                do! dbConnection.OpenAsync()
+                return! WorkEventRepository.findAllByPeriodTask timeProvider (Helpers.selectTask dbConnection) period ct
             }
     }
 

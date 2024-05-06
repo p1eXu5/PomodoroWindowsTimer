@@ -7,17 +7,23 @@ type AppDialogModel =
     | NoDialog
     | BotSettingsDialog of BotSettingsModel
     | TimePointsGeneratorDialog of TimePointsGeneratorModel
-    | WorkListModelDialog of WorkListModel
+    | WorkStatisticsDialog of WorkStatisticListModel
 
 
 module AppDialogModel =
 
     type Msg =
+        | SetIsDialogOpened of bool
+
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
+        
         | LoadTimePointsGeneratorDialogModel
         | TimePointsGeneratorModelMsg of TimePointsGeneratorModel.Msg
-        | SetIsDialogOpened of bool
+        
+        | LoadWorkStatisticsDialogModel
+        | WorkStatisticListModelMsg of WorkStatisticListModel.Msg
+        
         | EnqueueError of string
         | EnqueueExn of exn
 
@@ -34,18 +40,24 @@ module AppDialogModel =
                 (msg, m) |> Some
             | _ -> None
 
+        let (|WorkStatisticListModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
+            match msg, model with
+            | Msg.WorkStatisticListModelMsg msg, AppDialogModel.WorkStatisticsDialog m ->
+                (msg, m) |> Some
+            | _ -> None
+
     [<Struct>]
     [<RequireQualifiedAccess>]
     type AppDialogId =
         | BotSettingsDialogId
         | TimePointsGeneratorDialogId
-        | WorkListModelId
+        | WorkStatisticsDialogId
 
     let appDialogId = function
         | AppDialogModel.NoDialog -> None
         | AppDialogModel.BotSettingsDialog _ -> AppDialogId.BotSettingsDialogId |> Some
         | AppDialogModel.TimePointsGeneratorDialog _ -> AppDialogId.TimePointsGeneratorDialogId |> Some
-        | AppDialogModel.WorkListModelDialog _ -> AppDialogId.WorkListModelId |> Some
+        | AppDialogModel.WorkStatisticsDialog _ -> AppDialogId.WorkStatisticsDialogId |> Some
 
     let botSettingsModel (model: AppDialogModel) =
         match model with
@@ -57,8 +69,8 @@ module AppDialogModel =
         | AppDialogModel.TimePointsGeneratorDialog m -> m |> Some
         | _ -> None
 
-    let workListModel (model: AppDialogModel) =
+    let workStatisticListModel (model: AppDialogModel) =
         match model with
-        | AppDialogModel.WorkListModelDialog m -> m |> Some
+        | AppDialogModel.WorkStatisticsDialog m -> m |> Some
         | _ -> None
 

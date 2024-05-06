@@ -56,7 +56,7 @@ let ``Have no work events in db within`` (workId: uint64) =
         let! (sut: ISut) = Scenario.getState
         let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
 
-        match workEventRepository.ReadAll workId with
+        match workEventRepository.FindByWorkId workId with
         | Ok workEvents ->
             workEvents |> shouldL be Empty $"Work {workId} have db events"
         | Error err ->
@@ -70,7 +70,7 @@ let ``Work events in db exist`` (workId: uint64) (eventExpr: #Quotations.Expr se
         let! (sut: ISut) = Scenario.getState
         let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
 
-        match workEventRepository.ReadAll workId with
+        match workEventRepository.FindByWorkId workId with
         | Ok workEvents ->
             workEvents |> Seq.length |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> Seq.length}"
             Seq.zip workEvents eventExpr

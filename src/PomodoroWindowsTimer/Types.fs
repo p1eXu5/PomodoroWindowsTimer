@@ -7,6 +7,18 @@ type [<Measure>] sec
 
 type Name = string
 
+[<Struct>]
+type Period =
+    {
+        Start: DateOnly
+        EndInclusive: DateOnly
+    }
+    static member Zero =
+        {
+            Start = DateOnly()
+            EndInclusive = DateOnly()
+        }
+
 type Kind =
     | Work
     | Break
@@ -51,17 +63,26 @@ type WorkEvent =
     | BreakStarted of createdAt: DateTimeOffset * timePointName: string
     | Stopped of createdAt: DateTimeOffset
 
-[<Struct>]
-type Period =
+type WorkEventList =
     {
-        Start: DateOnly
-        EndInclusive: DateOnly
+        Work: Work
+        Events: WorkEvent list
     }
-    static member Zero =
-        {
-            Start = DateOnly()
-            EndInclusive = DateOnly()
-        }
+
+type Statistic =
+    {
+        Period: Period
+        WorkTime: TimeSpan
+        BreakTime: TimeSpan
+        TimePointNameStack: string list
+    }
+
+type WorkStatistic =
+    {
+        Work: Work
+        Statistic: Statistic option
+    }
+
 
 module WorkEvent =
 

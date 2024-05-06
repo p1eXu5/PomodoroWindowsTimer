@@ -60,7 +60,6 @@ type AsyncDeferred<'Retrieved> =
     | InProgress of Cts
     | Retrieved of 'Retrieved
 
-
 [<RequireQualifiedAccess>]
 type Intent<'TIntent> =
     | None
@@ -393,11 +392,11 @@ module AsyncDeferred =
 
     /// Is operation cts is equal to in progress deferred cts then return Some with cts disposing
     /// or returns None with disposing operation cts.
-    let chooseRetrievedResultWithin<'Args,'Retrieved,'Error>
-        (asyncOperationResult: Result<'Retrieved,'Error>)
+    let chooseRetrievedResultWithin<'Args,'Res,'Retrieved,'Error>
+        (asyncOperationResult: Result<'Res,'Error>)
         (asyncOperationCts: Cts)
         (asyncDeferred: AsyncDeferred<'Retrieved>)
-        : (Result<AsyncDeferred<'Retrieved> * 'Retrieved,'Error>) option
+        : (Result<AsyncDeferred<'Res> * 'Res,'Error>) option
         =
         match asyncDeferred with
         | AsyncDeferred.InProgress (cts) when obj.ReferenceEquals(cts, asyncOperationCts) ->
@@ -467,9 +466,10 @@ module AsyncDeferred =
             | AsyncDeferred.Retrieved v -> v |> Some
             | _ -> None
 
-    let map f = function
+    let map<'a, 'b> (f: 'a -> 'b) = function
         | AsyncDeferred.Retrieved v -> v |> f |> AsyncDeferred.Retrieved
-        | deff -> deff
+        | AsyncDeferred.NotRequested -> AsyncDeferred.NotRequested
+        | AsyncDeferred.InProgress cts -> AsyncDeferred.InProgress cts
 
     let mapUpdate f = function
         | AsyncDeferred.Retrieved retrieved ->

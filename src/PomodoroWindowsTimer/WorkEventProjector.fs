@@ -3,17 +3,6 @@
 open System
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open System
-open System
-open System
-
-type Statistic =
-    {
-        Period: Period
-        WorkTime: TimeSpan
-        BreakTime: TimeSpan
-        TimePointNameStack: string list
-    }
 
 type private StatisticBuilder =
     | Initialized
@@ -111,21 +100,39 @@ let internal project (workEvents: WorkEvent list) =
             { stat with TimePointNameStack = stat.TimePointNameStack |> List.distinct |> List.rev }
             |> Some
 
-let projectDaily (workEventRepo: IWorkEventRepository) (workId: uint64) (date: DateOnly) ct =
+let projectByWorkIdDaily (workEventRepo: IWorkEventRepository) (workId: uint64) (date: DateOnly) ct =
     task {
-        let! res = workEventRepo.FindByDateAsync workId date ct
+        let! res = workEventRepo.FindByWorkIdByDateAsync workId date ct
         return res |> Result.map (Seq.toList >> project)
     }
 
-let projectPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: Period) ct =
+let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: Period) ct =
     task {
-        let! res = workEventRepo.FindByPeriodAsync workId period ct
+        let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
         return res |> Result.map (Seq.toList >> project)
     }
 
-let projectAll (workEventRepo: IWorkEventRepository) (workId: uint64) ct =
+let projectByWorkId (workEventRepo: IWorkEventRepository) (workId: uint64) ct =
     task {
-        let! res = workEventRepo.ReadAllAsync workId ct
+        let! res = workEventRepo.FindByWorkIdAsync workId ct
         return res |> Result.map (Seq.toList >> project)
+    }
+
+
+let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: Period) ct =
+    task {
+        let! res = workEventRepo.FindAllByPeriodAsync period ct
+        return
+            res
+            |> Result.map (fun workEventsSeq ->
+                workEventsSeq
+                |> Seq.map (fun workEvents ->
+                    {
+                        Work = workEvents.Work
+                        Statistic = workEvents.Events |> project
+                    }
+                )
+                |> Seq.toList
+            )
     }
 

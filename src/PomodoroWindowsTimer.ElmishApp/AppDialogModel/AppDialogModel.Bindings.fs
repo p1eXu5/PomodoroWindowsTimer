@@ -55,3 +55,13 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
             |> Binding.mapModel (timePointsGeneratorModel)
             |> Binding.mapMsg (Msg.TimePointsGeneratorModelMsg)
 
+    member val OpenWorkStatisticsDialogCommand : Binding =
+        nameof __.OpenWorkStatisticsDialogCommand
+            |> Binding.cmdIf (function NoDialog -> Msg.LoadWorkStatisticsDialogModel |> Some | _ -> None)
+
+    member val WorkStatisticsDialog : Binding =
+        nameof __.WorkStatisticsDialog
+            |> Binding.SubModel.opt (fun () -> WorkStatisticListModel.Bindings.ToList(dialogErrorMessageQueue))
+            |> Binding.mapModel (workStatisticListModel)
+            |> Binding.mapMsg (Msg.WorkStatisticListModelMsg)
+

@@ -12,7 +12,9 @@
              mc:Ignorable="d"
              >
     <!--  top menu buttons  -->
-    <DockPanel DockPanel.Dock="Top" VerticalAlignment="Center">
+    <DockPanel DockPanel.Dock="Top"
+               VerticalAlignment="Center"
+               >
         <DockPanel.Resources>
             <Style x:Key="st_MenuToggleButton"
                    TargetType="ToggleButton"
@@ -36,7 +38,8 @@
                    Margin="5,5,10,5"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
-                   Text="{Binding AssemblyVersion, FallbackValue=v 1.0.1.0}"
+                   Text="{Binding AssemblyVersion,
+                                  FallbackValue=v 1.0.1.0}"
                    Foreground="#4E6876"
                    />
         <!--  running time points  -->
@@ -55,10 +58,10 @@
         <Button xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
                 x:Name="m_OpenTelegramBotCredentialsButton"
                 DockPanel.Dock="Left"
-                DataContext="{Binding AppDialog}"
+                Command="{Binding OpenBotSettingsDialogCommand}"
                 HorizontalAlignment="Left"
                 d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
-                Command="{Binding OpenBotSettingsDialogCommand}"
+                DataContext="{Binding AppDialog}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 RenderTransformOrigin="0.5,0.5"
                 Style="{StaticResource MaterialDesignIconButton}"
@@ -74,11 +77,33 @@
             </Button.RenderTransform>
         </Button>
 
+        <!--  telegram bot settings open dialog button  -->
+        <Button xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+                DockPanel.Dock="Left"
+                Command="{Binding OpenWorkStatisticsDialogCommand}"
+                HorizontalAlignment="Left"
+                d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
+                DataContext="{Binding AppDialog}"
+                Content="{materialDesign:PackIcon ListBoxOutline}"
+                RenderTransformOrigin="0.5,0.5"
+                Style="{StaticResource MaterialDesignIconButton}"
+                ToolTip="Telegram bot settings"
+                >
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform />
+                    <TranslateTransform X="3" Y="0" />
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+
         <!--  save time points button  -->
         <Button DockPanel.Dock="Left"
+                Command="{Binding SaveTimePointsFileCommand}"
                 Margin="3,0,0,0"
                 HorizontalAlignment="Left"
-                Command="{Binding SaveTimePointsFileCommand}"
                 Content="{materialDesign:PackIcon ContentSaveOutline}"
                 IsEnabled="False"
                 Style="{StaticResource MaterialDesignIconButton}"
@@ -86,8 +111,8 @@
                 />
         <!--  save time points button  -->
         <Button DockPanel.Dock="Left"
-                HorizontalAlignment="Left"
                 Command="{Binding OpenTimePointsFileCommand}"
+                HorizontalAlignment="Left"
                 Content="{materialDesign:PackIcon FolderOpenOutline}"
                 IsEnabled="False"
                 Style="{StaticResource MaterialDesignIconButton}"

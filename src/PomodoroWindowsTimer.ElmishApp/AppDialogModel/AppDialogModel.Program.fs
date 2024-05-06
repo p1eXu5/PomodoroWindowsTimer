@@ -13,6 +13,8 @@ let update
     updateBotSettingsModel
     initTimePointsGeneratorModel
     updateTimePointsGeneratorModel
+    initWorkStatisticListModel
+    updateWorkStatisticListModel
     (dialogErrorMessageQueue: IErrorMessageQueue)
     (msg: AppDialogModel.Msg)
     (model: AppDialogModel)
@@ -39,6 +41,20 @@ let update
         let (m, cmd, _) = updateTimePointsGeneratorModel gmsg gm
         m |> AppDialogModel.TimePointsGeneratorDialog
         , Cmd.map Msg.TimePointsGeneratorModelMsg cmd
+
+    | Msg.LoadWorkStatisticsDialogModel ->
+        let (m, cmd) = initWorkStatisticListModel ()
+        m |> AppDialogModel.WorkStatisticsDialog
+        , Cmd.map Msg.WorkStatisticListModelMsg cmd
+
+    | MsgWith.WorkStatisticListModelMsg model (gmsg, gm) ->
+        let (m, cmd, intent) = updateWorkStatisticListModel gmsg gm
+        match intent with
+        | WorkStatisticListModel.Intent.None ->
+             m |> AppDialogModel.WorkStatisticsDialog
+            , Cmd.map Msg.WorkStatisticListModelMsg cmd
+        | WorkStatisticListModel.Intent.CloseDialogRequested ->
+            AppDialogModel.NoDialog, Cmd.none
 
     | Msg.EnqueueExn e ->
         dialogErrorMessageQueue.EnqueueError (sprintf "%A" e)

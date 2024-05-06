@@ -28,7 +28,7 @@ module CreatingWorkModel =
         let (|``Start of CreateWork``|_|) (model: CreatingWorkModel) (msg: Msg) =
             match msg, model.CreatingState with
             | Msg.CreateWork (AsyncOperation.Start _), AsyncDeferred.NotRequested ->
-                model.CreatingState |> AsyncDeferred.tryInProgressWithCancellation
+                model.CreatingState |> AsyncDeferred.forceInProgressWithCancellation |> Some
             | _ -> None
 
         let (|``Finish of CreateWork``|_|) (model: CreatingWorkModel) (msg: Msg) =
