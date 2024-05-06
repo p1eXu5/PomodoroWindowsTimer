@@ -42,6 +42,7 @@
                                SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
                                                               Path=MessageQueue}"
                                CloseOnClickAway="False"
+                               IsOpen="{Binding IsDialogOpened}"
                                >
         <!--<Behaviors:Interaction.Triggers>
             <Behaviors:EventTrigger EventName="DialogClosing">

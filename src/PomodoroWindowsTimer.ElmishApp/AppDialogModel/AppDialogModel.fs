@@ -2,8 +2,12 @@
 
 open PomodoroWindowsTimer.ElmishApp.Models
 
-
 type AppDialogModel =
+    {
+        IsOpened: bool
+        Dialog: AppDialogSubModel
+    }
+and AppDialogSubModel =
     | NoDialog
     | BotSettingsDialog of BotSettingsModel
     | TimePointsGeneratorDialog of TimePointsGeneratorModel
@@ -32,26 +36,26 @@ module AppDialogModel =
 
     module MsgWith =
         let (|BotSettingsModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
-            match msg, model with
-            | Msg.BotSettingsModelMsg msg, AppDialogModel.BotSettingsDialog m ->
+            match msg, model.Dialog with
+            | Msg.BotSettingsModelMsg msg, AppDialogSubModel.BotSettingsDialog m ->
                 (msg, m) |> Some
             | _ -> None
 
         let (|ApplyBotSettings|_|) (model: AppDialogModel) (msg: Msg) =
-            match msg, model with
-            | Msg.ApplyBotSettings, AppDialogModel.BotSettingsDialog m ->
+            match msg, model.Dialog with
+            | Msg.ApplyBotSettings, AppDialogSubModel.BotSettingsDialog m ->
                 m |> Some
             | _ -> None
 
         let (|TimePointsGeneratorModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
-            match msg, model with
-            | Msg.TimePointsGeneratorModelMsg msg, AppDialogModel.TimePointsGeneratorDialog m ->
+            match msg, model.Dialog with
+            | Msg.TimePointsGeneratorModelMsg msg, AppDialogSubModel.TimePointsGeneratorDialog m ->
                 (msg, m) |> Some
             | _ -> None
 
         let (|WorkStatisticListModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
-            match msg, model with
-            | Msg.WorkStatisticListModelMsg msg, AppDialogModel.WorkStatisticsDialog m ->
+            match msg, model.Dialog with
+            | Msg.WorkStatisticListModelMsg msg, AppDialogSubModel.WorkStatisticsDialog m ->
                 (msg, m) |> Some
             | _ -> None
 
@@ -62,24 +66,39 @@ module AppDialogModel =
         | TimePointsGeneratorDialogId
         | WorkStatisticsDialogId
 
-    let appDialogId = function
-        | AppDialogModel.NoDialog -> None
-        | AppDialogModel.BotSettingsDialog _ -> AppDialogId.BotSettingsDialogId |> Some
-        | AppDialogModel.TimePointsGeneratorDialog _ -> AppDialogId.TimePointsGeneratorDialogId |> Some
-        | AppDialogModel.WorkStatisticsDialog _ -> AppDialogId.WorkStatisticsDialogId |> Some
+    let appDialogId (model: AppDialogModel) =
+        match model.Dialog with
+        | AppDialogSubModel.NoDialog -> None
+        | AppDialogSubModel.BotSettingsDialog _ -> AppDialogId.BotSettingsDialogId |> Some
+        | AppDialogSubModel.TimePointsGeneratorDialog _ -> AppDialogId.TimePointsGeneratorDialogId |> Some
+        | AppDialogSubModel.WorkStatisticsDialog _ -> AppDialogId.WorkStatisticsDialogId |> Some
 
     let botSettingsModel (model: AppDialogModel) =
-        match model with
-        | AppDialogModel.BotSettingsDialog m -> m |> Some
+        match model.Dialog with
+        | AppDialogSubModel.BotSettingsDialog m -> m |> Some
         | _ -> None
+
+    let withBotSettingsDialogModel botSettingsDialogModel (model: AppDialogModel) =
+        { model with Dialog = botSettingsDialogModel |> AppDialogSubModel.BotSettingsDialog }
 
     let timePointsGeneratorModel (model: AppDialogModel) =
-        match model with
-        | AppDialogModel.TimePointsGeneratorDialog m -> m |> Some
+        match model.Dialog with
+        | AppDialogSubModel.TimePointsGeneratorDialog m -> m |> Some
         | _ -> None
+
+    let withTimePointsGeneratorDialogModel timePointsGeneratorModel (model: AppDialogModel) =
+        { model with Dialog = timePointsGeneratorModel |> AppDialogSubModel.TimePointsGeneratorDialog }
 
     let workStatisticListModel (model: AppDialogModel) =
-        match model with
-        | AppDialogModel.WorkStatisticsDialog m -> m |> Some
+        match model.Dialog with
+        | AppDialogSubModel.WorkStatisticsDialog m -> m |> Some
         | _ -> None
 
+    let withWorkStatisticsDialogModel workStatisticListModel (model: AppDialogModel) =
+        { model with Dialog = workStatisticListModel |> AppDialogSubModel.WorkStatisticsDialog }
+
+    let withIsOpened v (model: AppDialogModel) =
+        { model with IsOpened = v }
+
+    let withNoDialog (model: AppDialogModel) =
+        { model with Dialog = AppDialogSubModel.NoDialog }

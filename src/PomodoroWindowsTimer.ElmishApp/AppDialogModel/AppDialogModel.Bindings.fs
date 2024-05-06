@@ -29,11 +29,11 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val IsDialogOpened : Binding =
         nameof __.IsDialogOpened
-            |> Binding.twoWay ((<>) AppDialogModel.NoDialog, Msg.SetIsDialogOpened)
+            |> Binding.twoWay (_.IsOpened, Msg.SetIsDialogOpened)
 
     member val OpenBotSettingsDialogCommand : Binding =
         nameof __.OpenBotSettingsDialogCommand
-            |> Binding.cmdIf (function NoDialog -> Msg.LoadBotSettingsDialogModel |> Some | _ -> None)
+            |> Binding.cmdIf (_.Dialog >> function NoDialog -> Msg.LoadBotSettingsDialogModel |> Some | _ -> None)
 
     member val BotSettingsDialog : Binding =
         nameof __.BotSettingsDialog
@@ -46,7 +46,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val OpenTimePointsGeneratorDialogCommand : Binding =
         nameof __.OpenTimePointsGeneratorDialogCommand
-            |> Binding.cmdIf (function NoDialog -> Msg.LoadTimePointsGeneratorDialogModel |> Some | _ -> None)
+            |> Binding.cmdIf (_.Dialog >> function NoDialog -> Msg.LoadTimePointsGeneratorDialogModel |> Some | _ -> None)
 
     member val TimePointsGeneratorDialog : Binding =
         nameof __.TimePointsGeneratorDialog
@@ -56,7 +56,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val OpenWorkStatisticsDialogCommand : Binding =
         nameof __.OpenWorkStatisticsDialogCommand
-            |> Binding.cmdIf (function NoDialog -> Msg.LoadWorkStatisticsDialogModel |> Some | _ -> None)
+            |> Binding.cmdIf (_.Dialog >> function NoDialog -> Msg.LoadWorkStatisticsDialogModel |> Some | _ -> None)
 
     member val WorkStatisticsDialog : Binding =
         nameof __.WorkStatisticsDialog

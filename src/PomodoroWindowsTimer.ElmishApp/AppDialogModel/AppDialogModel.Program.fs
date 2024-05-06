@@ -21,50 +21,53 @@ let update
     (model: AppDialogModel)
     =
     match msg with
+    | Msg.SetIsDialogOpened v ->
+        model |> withIsOpened v |> withCmdNone
+
     | Msg.LoadBotSettingsDialogModel ->
-        initBotSettingsModel () |> AppDialogModel.BotSettingsDialog
-        , Cmd.none
+        model
+        |> withBotSettingsDialogModel (initBotSettingsModel ())
+        |> withCmdNone
 
     | MsgWith.BotSettingsModelMsg model (bmsg, bm) ->
         let (m, intent) = updateBotSettingsModel bmsg bm
         match intent with
         | BotSettingsModel.Intent.None ->
-            m |> AppDialogModel.BotSettingsDialog, Cmd.none
-
+            model |> withBotSettingsDialogModel m |> withCmdNone
         | BotSettingsModel.Intent.CloseDialogRequested ->
-            AppDialogModel.NoDialog, Cmd.none
+            model |> withNoDialog |> withCmdNone
 
     | MsgWith.ApplyBotSettings model bm ->
         botConfiguration.MyChatId <- bm.ChatId
         botConfiguration.BotToken <- bm.BotToken
-        AppDialogModel.NoDialog, Cmd.none
+        model |> withNoDialog |> withCmdNone
 
     | Msg.LoadTimePointsGeneratorDialogModel ->
         let (m, cmd) = initTimePointsGeneratorModel ()
-        m |> AppDialogModel.TimePointsGeneratorDialog
+        model |> withTimePointsGeneratorDialogModel m
         , Cmd.map Msg.TimePointsGeneratorModelMsg cmd
 
     | MsgWith.TimePointsGeneratorModelMsg model (gmsg, gm) ->
         let (m, cmd, _) = updateTimePointsGeneratorModel gmsg gm
-        m |> AppDialogModel.TimePointsGeneratorDialog
+        model |> withTimePointsGeneratorDialogModel m
         , Cmd.map Msg.TimePointsGeneratorModelMsg cmd
 
     | Msg.LoadWorkStatisticsDialogModel ->
         let (m, cmd) = initWorkStatisticListModel ()
-        m |> AppDialogModel.WorkStatisticsDialog
+        model |> withWorkStatisticsDialogModel m
         , Cmd.map Msg.WorkStatisticListModelMsg cmd
 
     | MsgWith.WorkStatisticListModelMsg model (gmsg, gm) ->
         let (m, cmd, intent) = updateWorkStatisticListModel gmsg gm
         match intent with
         | WorkStatisticListModel.Intent.None ->
-             m |> AppDialogModel.WorkStatisticsDialog
+            model |> withWorkStatisticsDialogModel m
             , Cmd.map Msg.WorkStatisticListModelMsg cmd
         | WorkStatisticListModel.Intent.CloseDialogRequested ->
-            AppDialogModel.NoDialog, Cmd.none
+            model |> withNoDialog |> withCmdNone
 
     | Msg.Unload ->
-        AppDialogModel.NoDialog, Cmd.none
+        model |> withNoDialog |> withCmdNone
 
     | Msg.EnqueueExn e ->
         dialogErrorMessageQueue.EnqueueError (sprintf "%A" e)
