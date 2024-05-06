@@ -170,11 +170,7 @@ module MainModel =
             //BotSettingsModel = None
             //TimePointsGeneratorModel = None
 
-            AppDialog =
-                {
-                    IsOpened = false
-                    Dialog = AppDialogSubModel.NoDialog
-                }
+            AppDialog = AppDialogModel.NoDialog
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
