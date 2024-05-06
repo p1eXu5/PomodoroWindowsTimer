@@ -20,24 +20,37 @@
         <conv:SubModelIdToVisibilityConverter x:Key="conv_SubModelIdToVisibility" />
     </UserControl.Resources>
     <Grid>
-        <local:WorkList DataContext="{Binding WorkListModel}" Visibility="{Binding DataContext.SubModelId, ElementName=m_Root, Converter={StaticResource conv_SubModelIdToVisibility}, ConverterParameter='WorkListId'}" />
+        <local:WorkList DataContext="{Binding WorkListModel}"
+                        Visibility="{Binding DataContext.SubModelId,
+                                             ElementName=m_Root,
+                                             Converter={StaticResource conv_SubModelIdToVisibility},
+                                             ConverterParameter='WorkListId'}"
+                        />
         <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             Title="CREATE WORK"
-                            DataContext="{Binding CreatingWorkModel}"
                             d:DataContext="{d:DesignInstance Type=CreatingWorkModel:Bindings, IsDesignTimeCreatable=False}"
+                            DataContext="{Binding CreatingWorkModel}"
                             CancelCommand="{Binding CancelCommand}"
                             OkCommand="{Binding CreateCommand}"
                             OkCommandContent="CREATE"
-                            Visibility="{Binding DataContext.SubModelId, ElementName=m_Root, Converter={StaticResource conv_SubModelIdToVisibility}, ConverterParameter='CreatingWorkId', FallbackValue=Collapsed}"
+                            Visibility="{Binding DataContext.SubModelId,
+                                                 ElementName=m_Root,
+                                                 Converter={StaticResource conv_SubModelIdToVisibility},
+                                                 ConverterParameter='CreatingWorkId',
+                                                 FallbackValue=Collapsed}"
                             />
         <local:EditableWork xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             Title="EDIT WORK"
-                            DataContext="{Binding UpdatingWorkModel}"
                             d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
+                            DataContext="{Binding UpdatingWorkModel}"
                             CancelCommand="{Binding CancelEditCommand}"
                             OkCommand="{Binding EditCommand}"
                             OkCommandContent="UPDATE"
-                            Visibility="{Binding DataContext.SubModelId, ElementName=m_Root, Converter={StaticResource conv_SubModelIdToVisibility}, ConverterParameter='UpdatingWorkId', FallbackValue=Collapsed}"
+                            Visibility="{Binding DataContext.SubModelId,
+                                                 ElementName=m_Root,
+                                                 Converter={StaticResource conv_SubModelIdToVisibility},
+                                                 ConverterParameter='UpdatingWorkId',
+                                                 FallbackValue=Collapsed}"
                             />
     </Grid>
 </UserControl>

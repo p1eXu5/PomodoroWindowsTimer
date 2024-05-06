@@ -9,6 +9,7 @@ open PomodoroWindowsTimer.ElmishApp.Models.AppDialogModel
 
 
 let update
+    (botConfiguration: IBotSettings)
     initBotSettingsModel
     updateBotSettingsModel
     initTimePointsGeneratorModel
@@ -29,8 +30,14 @@ let update
         match intent with
         | BotSettingsModel.Intent.None ->
             m |> AppDialogModel.BotSettingsDialog, Cmd.none
+
         | BotSettingsModel.Intent.CloseDialogRequested ->
             AppDialogModel.NoDialog, Cmd.none
+
+    | MsgWith.ApplyBotSettings model bm ->
+        botConfiguration.MyChatId <- bm.ChatId
+        botConfiguration.BotToken <- bm.BotToken
+        AppDialogModel.NoDialog, Cmd.none
 
     | Msg.LoadTimePointsGeneratorDialogModel ->
         let (m, cmd) = initTimePointsGeneratorModel ()
@@ -55,6 +62,9 @@ let update
             , Cmd.map Msg.WorkStatisticListModelMsg cmd
         | WorkStatisticListModel.Intent.CloseDialogRequested ->
             AppDialogModel.NoDialog, Cmd.none
+
+    | Msg.Unload ->
+        AppDialogModel.NoDialog, Cmd.none
 
     | Msg.EnqueueExn e ->
         dialogErrorMessageQueue.EnqueueError (sprintf "%A" e)

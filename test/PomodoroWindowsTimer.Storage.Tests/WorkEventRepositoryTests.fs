@@ -20,7 +20,8 @@ module WorkEventRepositoryTests =
     let private dbFileName = "work_event_test.db"
 
     let mutable private connectionString = Unchecked.defaultof<string>
-    let mutable private workId = Unchecked.defaultof<uint64>
+    let mutable private workId1 = Unchecked.defaultof<uint64>
+    let mutable private workId2 = Unchecked.defaultof<uint64>
 
     let getConnectionString () =
         if String.IsNullOrWhiteSpace(connectionString) then
@@ -52,7 +53,14 @@ module WorkEventRepositoryTests =
             let! res = createWork ()
             match res with
             | Ok (id, _) ->
-                workId <- id
+                workId1 <- id
+            | Error err ->
+                assertionExn err
+
+            let! res = createWork ()
+            match res with
+            | Ok (id, _) ->
+                workId2 <- id
             | Error err ->
                 assertionExn err
         }
@@ -72,8 +80,8 @@ module WorkEventRepositoryTests =
             let create =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
-            let! res1 = create workId (generateWorkEvent ()) ct
-            let! res2 = create workId (generateWorkEvent ()) ct
+            let! res1 = create workId1 (generateWorkEvent ()) ct
+            let! res2 = create workId1 (generateWorkEvent ()) ct
 
             match res1, res2 with
             | Error err, _ -> failAssert err
@@ -84,19 +92,19 @@ module WorkEventRepositoryTests =
         }
 
     [<Test>]
-    let ``readAll test`` () =
+    let ``findByWorkId test`` () =
         task {
             use conn = getConnection ()
             let create =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
-            let readAll =
+            let findByWorkId =
                 WorkEventRepository.findByWorkIdTask (Helpers.selectTask conn)
 
             let workEvent = generateWorkEvent ()
 
-            let! _ = create workId workEvent ct
-            let! res = readAll workId ct
+            let! _ = create workId1 workEvent ct
+            let! res = findByWorkId workId1 ct
 
             match res with
             | Error err -> failAssert err
@@ -105,16 +113,13 @@ module WorkEventRepositoryTests =
         }
 
     [<Test>]
-    let ``findByDate date with event test`` () =
+    let ``findByWorkIdByDate date with event test`` () =
         task {
             use conn = getConnection ()
             let create =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
-            let readAll =
-                WorkEventRepository.findByWorkIdTask (Helpers.selectTask conn)
-
-            let findByDate =
+            let findByWorkIdByDate =
                 WorkEventRepository.findByWorkIdByDateTask System.TimeProvider.System (Helpers.selectTask conn)
 
             let workEvent1 = generateWorkEvent ()
@@ -123,13 +128,13 @@ module WorkEventRepositoryTests =
             let workEvent4 = generateWorkEvent ()
             let workEvent5 = generateWorkEvent ()
 
-            let! _ = create workId workEvent1 ct
-            let! _ = create workId workEvent2 ct
-            let! _ = create workId workEvent3 ct
-            let! _ = create workId workEvent4 ct
-            let! _ = create workId workEvent5 ct
+            let! _ = create workId1 workEvent1 ct
+            let! _ = create workId1 workEvent2 ct
+            let! _ = create workId1 workEvent3 ct
+            let! _ = create workId1 workEvent4 ct
+            let! _ = create workId1 workEvent5 ct
 
-            let! res = findByDate workId (workEvent3 |> WorkEvent.dateOnly) ct
+            let! res = findByWorkIdByDate workId1 (workEvent3 |> WorkEvent.dateOnly) ct
 
             match res with
             | Error err -> failAssert err
@@ -138,13 +143,13 @@ module WorkEventRepositoryTests =
         }
 
     [<Test>]
-    let ``findByDate date without event test`` () =
+    let ``findByWorkIdByDate date without event test`` () =
         task {
             use conn = getConnection ()
             let create =
                 WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
 
-            let findByDate =
+            let findByWorkIdByDate =
                 WorkEventRepository.findByWorkIdByDateTask System.TimeProvider.System (Helpers.selectTask conn)
 
             let workEvent1 = generateWorkEvent ()
@@ -153,18 +158,81 @@ module WorkEventRepositoryTests =
             let workEvent4 = generateWorkEvent ()
             let workEvent5 = generateWorkEvent ()
 
-            let! _ = create workId workEvent1 ct
-            let! _ = create workId workEvent2 ct
-            let! _ = create workId workEvent3 ct
-            let! _ = create workId workEvent4 ct
-            let! _ = create workId workEvent5 ct
+            let! _ = create workId1 workEvent1 ct
+            let! _ = create workId1 workEvent2 ct
+            let! _ = create workId1 workEvent3 ct
+            let! _ = create workId1 workEvent4 ct
+            let! _ = create workId1 workEvent5 ct
 
             let date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().DateTime.AddDays(1))
 
-            let! res = findByDate workId date ct
+            let! res = findByWorkIdByDate workId1 date ct
 
             match res with
             | Error err -> failAssert err
             | Ok rows ->
                 rows |> should be Empty
+        }
+
+    [<Test>]
+    let ``findAllByPeriod period with events test`` () =
+        task {
+            use conn = getConnection ()
+            let create =
+                WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
+
+            let work1Events =
+                [
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                ]
+
+            let work2Events =
+                [
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                    generateWorkEvent ()
+                ]
+
+            for i in 0 .. 4 do
+                let! _ = create workId1 work1Events[i] ct
+                ()
+
+            for i in 0 .. 4 do
+                let! _ = create workId2 work2Events[i] ct
+                ()
+
+            let minDate =
+                DateOnly.FromDateTime(
+                    (work1Events @ work2Events)
+                    |> List.map WorkEvent.createdAt
+                    |> List.min
+                    |> fun dt -> dt.DateTime
+                )
+
+            let maxDate =
+                DateOnly.FromDateTime(
+                    (work1Events @ work2Events)
+                    |> List.map WorkEvent.createdAt
+                    |> List.max
+                    |> fun dt -> dt.DateTime
+                )
+
+            let findAllByPeriod =
+                WorkEventRepository.findAllByPeriodTask System.TimeProvider.System (Helpers.selectTask2 conn)
+
+            let! res = findAllByPeriod ({ Start = minDate; EndInclusive = maxDate }) ct
+
+            match res with
+            | Error err -> failAssert err
+            | Ok rows ->
+                let list = rows |> Seq.toList
+                list |> should haveLength 2
+                list[0].Events |> should haveLength 5
+                list[1].Events |> should haveLength 5
         }

@@ -10,16 +10,16 @@ public sealed class MainDialogContentTemplateSelector : DataTemplateSelector
     {
         if (container is FrameworkElement element && model != null)
         {
-            AppDialogModelModule.AppDialogId appDialogId = ((dynamic)model).AppDialogId;
+            AppDialogModelModule.AppDialogId? appDialogId = ((dynamic)model).AppDialogId;
 
-            if (appDialogId.IsBotSettingsDialogId)
+            if (appDialogId.HasValue && appDialogId.Value.IsBotSettingsDialogId )
             {
                 return element.FindResource("dt_BotSettingsDialog") as DataTemplate;
             }
 
-            if (appDialogId.IsWorkStatisticsDialogId)
+            if (appDialogId.HasValue && appDialogId.Value.IsWorkStatisticsDialogId)
             {
-                return element.FindResource("dt_WorkStatisticsDialog") as DataTemplate;
+                return element.FindResource("dt_BotSettingsDialog") as DataTemplate;
             }
         }
         return null;

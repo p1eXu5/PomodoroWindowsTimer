@@ -23,4 +23,18 @@ public partial class PwtDatePicker : UserControl
     {
         InitializeComponent();
     }
+
+
+
+    public ICommand OkCommand
+    {
+        get { return (ICommand)GetValue(OkCommandProperty); }
+        set { SetValue(OkCommandProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for OkCommand.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty OkCommandProperty =
+        DependencyProperty.Register("OkCommand", typeof(ICommand), typeof(PwtDatePicker), new PropertyMetadata(null));
+
+
 }

@@ -27,10 +27,6 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val ErrorMessageQueue =
         nameof __.ErrorMessageQueue |> Binding.oneWay (fun _ -> dialogErrorMessageQueue) : Binding
 
-    member val AppDialogId : Binding =
-        nameof __.AppDialogId
-            |> Binding.oneWayOpt appDialogId
-
     member val IsDialogOpened : Binding =
         nameof __.IsDialogOpened
             |> Binding.twoWay ((<>) AppDialogModel.NoDialog, Msg.SetIsDialogOpened)
@@ -44,6 +40,9 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
             |> Binding.SubModel.opt (BotSettingsModel.Bindings.ToList)
             |> Binding.mapModel (botSettingsModel)
             |> Binding.mapMsg (Msg.BotSettingsModelMsg)
+
+    member val ApplyBotSettingsCommand : Binding =
+        nameof __.ApplyBotSettingsCommand |> Binding.cmd Msg.ApplyBotSettings
 
     member val OpenTimePointsGeneratorDialogCommand : Binding =
         nameof __.OpenTimePointsGeneratorDialogCommand
@@ -64,4 +63,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
             |> Binding.SubModel.opt (fun () -> WorkStatisticListModel.Bindings.ToList(dialogErrorMessageQueue))
             |> Binding.mapModel (workStatisticListModel)
             |> Binding.mapMsg (Msg.WorkStatisticListModelMsg)
+
+    member val UnloadDialogModelCommand : Binding =
+        nameof __.UnloadDialogModelCommand |> Binding.cmd Msg.Unload
 

@@ -118,7 +118,7 @@ let initWorkEventRepository (connectionString: string) (timeProvider: System.Tim
             task {
                 use dbConnection = new SqliteConnection(connectionString)
                 do! dbConnection.OpenAsync()
-                return! WorkEventRepository.findAllByPeriodTask timeProvider (Helpers.selectTask dbConnection) period ct
+                return! WorkEventRepository.findAllByPeriodTask timeProvider (Helpers.selectTask2 dbConnection) period ct
             }
     }
 

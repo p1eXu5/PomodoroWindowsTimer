@@ -6,6 +6,10 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
+             xmlns:behaviors="clr-namespace:PomodoroWindowsTimer.WpfClient.Behaviors"
+             xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="50"
              d:DesignWidth="800"
@@ -44,79 +48,90 @@
                    />
         <!--  running time points  -->
         <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"
-                      IsChecked="{Binding IsTimePointsShown}"
-                      Style="{StaticResource st_MenuToggleButton}"
                       ToolTip="Playlist"
+                      Style="{StaticResource st_MenuToggleButton}"
+                      IsChecked="{Binding IsTimePointsShown}"
                       />
         <!--  time points generator open button  -->
         <ToggleButton Content="{materialDesign:PackIcon TimerCogOutline}"
-                      IsChecked="{Binding IsWorkSelectorLoaded}"
-                      Style="{StaticResource st_MenuToggleButton}"
                       ToolTip="Generator"
+                      Style="{StaticResource st_MenuToggleButton}"
+                      IsChecked="{Binding IsWorkSelectorLoaded}"
                       />
         <!--  telegram bot settings open dialog button  -->
-        <Button xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+        <Button DockPanel.Dock="Left"
                 x:Name="m_OpenTelegramBotCredentialsButton"
-                DockPanel.Dock="Left"
-                Command="{Binding OpenBotSettingsDialogCommand}"
-                HorizontalAlignment="Left"
-                d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
+                xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+                d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
-                RenderTransformOrigin="0.5,0.5"
-                Style="{StaticResource MaterialDesignIconButton}"
                 ToolTip="Telegram bot settings"
+                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                Style="{StaticResource MaterialDesignIconButton}"
+                HorizontalAlignment="Left"
+                RenderTransformOrigin="0.5,0.5"
                 >
             <Button.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform />
-                    <SkewTransform />
-                    <RotateTransform />
                     <TranslateTransform X="2" Y="1" />
                 </TransformGroup>
             </Button.RenderTransform>
+            <Button.CommandParameter>
+                <settings:BotSettings />
+            </Button.CommandParameter>
+            <Behaviors:Interaction.Behaviors>
+                <behaviors:DialogEventHandlerBehavior LoadDialogModelCommand="{Binding OpenBotSettingsDialogCommand}"
+                                                      CancelCommand="{Binding UnloadDialogModelCommand}"
+                                                      />
+            </Behaviors:Interaction.Behaviors>
         </Button>
 
         <!--  telegram bot settings open dialog button  -->
-        <Button xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
-                DockPanel.Dock="Left"
-                Command="{Binding OpenWorkStatisticsDialogCommand}"
-                HorizontalAlignment="Left"
-                d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
+        <Button DockPanel.Dock="Left"
+                xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+                d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
                 Content="{materialDesign:PackIcon ListBoxOutline}"
-                RenderTransformOrigin="0.5,0.5"
+                ToolTip="Works statistic"
+                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
                 Style="{StaticResource MaterialDesignIconButton}"
-                ToolTip="Telegram bot settings"
+                HorizontalAlignment="Left"
+                RenderTransformOrigin="0.5,0.5"
                 >
             <Button.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform />
-                    <SkewTransform />
-                    <RotateTransform />
-                    <TranslateTransform X="3" Y="0" />
+                    <TranslateTransform X="3" />
                 </TransformGroup>
             </Button.RenderTransform>
+            <Button.CommandParameter>
+                <works:StatisticTable />
+            </Button.CommandParameter>
+            <Behaviors:Interaction.Behaviors>
+                <behaviors:DialogEventHandlerBehavior LoadDialogModelCommand="{Binding OpenWorkStatisticsDialogCommand}"
+                                                      CancelCommand="{Binding UnloadDialogModelCommand}"
+                                                      OkCommand="{Binding UnloadDialogModelCommand}"
+                                                      />
+            </Behaviors:Interaction.Behaviors>
         </Button>
 
         <!--  save time points button  -->
         <Button DockPanel.Dock="Left"
+                Content="{materialDesign:PackIcon ContentSaveOutline}"
+                ToolTip="Playlist constructor"
                 Command="{Binding SaveTimePointsFileCommand}"
+                Style="{StaticResource MaterialDesignIconButton}"
                 Margin="3,0,0,0"
                 HorizontalAlignment="Left"
-                Content="{materialDesign:PackIcon ContentSaveOutline}"
                 IsEnabled="False"
-                Style="{StaticResource MaterialDesignIconButton}"
-                ToolTip="Playlist constructor"
                 />
         <!--  save time points button  -->
         <Button DockPanel.Dock="Left"
-                Command="{Binding OpenTimePointsFileCommand}"
-                HorizontalAlignment="Left"
                 Content="{materialDesign:PackIcon FolderOpenOutline}"
-                IsEnabled="False"
-                Style="{StaticResource MaterialDesignIconButton}"
                 ToolTip="Playlist constructor"
+                Command="{Binding OpenTimePointsFileCommand}"
+                Style="{StaticResource MaterialDesignIconButton}"
+                HorizontalAlignment="Left"
+                IsEnabled="False"
                 />
     </DockPanel>
 </UserControl>

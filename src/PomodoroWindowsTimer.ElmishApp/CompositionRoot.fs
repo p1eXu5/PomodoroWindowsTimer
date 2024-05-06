@@ -73,6 +73,7 @@ let compose
 
         let updateAppDialogModel =
             AppDialogModel.Program.update
+                userSettings
                 initBotSettingsModel
                 updateBotSettingsModel
                 initTimePointGeneratorModel

@@ -5,10 +5,10 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:dialogVm="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
              Width="450"
              Height="200"
-             d:DataContext="{d:DesignInstance Type=dialogVm:Bindings, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
@@ -37,19 +37,13 @@
                     Orientation="Horizontal"
                     >
             <Button DockPanel.Dock="Bottom"
-                    Command="{Binding ApplyCommand}"
-                    Margin="10"
-                    HorizontalAlignment="Center"
                     Content="APPLY"
-                    Style="{StaticResource MaterialDesignFlatSecondaryButton}"
+                    Style="{StaticResource PomodoroOkDialogButton}"
                     />
+
             <Button DockPanel.Dock="Bottom"
-                    Command="{Binding CancelCommand}"
-                    Margin="10"
-                    HorizontalAlignment="Center"
                     Content="CANCEL"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    IsCancel="True"
+                    Style="{StaticResource PomodoroCancelDialogButton}"
                     />
         </StackPanel>
     </StackPanel>

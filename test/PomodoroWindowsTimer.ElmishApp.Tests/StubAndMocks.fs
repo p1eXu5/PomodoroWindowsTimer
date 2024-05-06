@@ -19,6 +19,7 @@ type UserSettingsStub () =
         dict.Add("TimePointPrototypesSettings", Option<string>.None)
         dict.Add("TimePointSettings", Option<string>.None)
         dict.Add("CurrentWork", Option<Work>.None)
+        dict.Add("LastStatisticPeriod", Option<Work>.None)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
@@ -28,6 +29,7 @@ type UserSettingsStub () =
         member _.TimePointSettings with get () = dict["TimePointSettings"] :?> string option and set v = dict["TimePointSettings"] <- v
         member _.DisableSkipBreak with get () = dict["DisableSkipBreak"] :?> bool and set v = dict["DisableSkipBreak"] <- v
         member _.CurrentWork with get () = dict["CurrentWork"] :?> Work option and set v = dict["CurrentWork"] <- v
+        member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> Period option and set v = dict["LastStatisticPeriod"] <- v
 
 
 [<RequireQualifiedAccess>]

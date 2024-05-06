@@ -27,15 +27,13 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal"
                     >
-            <Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                    CommandParameter="0"
-                    Content="CANCEL"
-                    Style="{StaticResource MaterialDesignFlatButton}"
+            <Button Content="OK"
+                    CommandParameter="{Binding ElementName=Calendar,
+                                               Path=SelectedDate}"
+                    Style="{StaticResource PomodoroOkDialogButton}"
                     />
-            <Button Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                    CommandParameter="1"
-                    Content="OK"
-                    Style="{StaticResource MaterialDesignFlatButton}"
+            <Button Content="CANCEL"
+                    Style="{StaticResource PomodoroCancelDialogButton}"
                     />
         </StackPanel>
     </Grid>

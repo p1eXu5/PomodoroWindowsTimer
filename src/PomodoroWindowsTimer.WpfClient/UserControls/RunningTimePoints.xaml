@@ -69,25 +69,28 @@
                        />
         </StackPanel>
 
-        <DockPanel DockPanel.Dock="Top" LastChildFill="True">
+        <DockPanel DockPanel.Dock="Top"
+                   LastChildFill="True"
+                   >
             <Grid DockPanel.Dock="Top">
-                <Button HorizontalAlignment="Left"
-                        VerticalAlignment="Center"
-                        Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                <Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
                         CommandParameter="{x:Static Dock.Left}"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
                         Content="{materialDesign:PackIcon ArrowLeft}"
                         Style="{StaticResource MaterialDesignIconButton}"
                         />
                 <TextBlock Margin="10,16,0,16"
                            HorizontalAlignment="Center"
                            Style="{StaticResource MaterialDesignButtonTextBlock}"
-                           Text="{Binding Path=Header, FallbackValue=TIME POINTS}"
+                           Text="{Binding Path=Header,
+                                          FallbackValue=TIME POINTS}"
                            />
             </Grid>
 
             <!--  time points  -->
-            <shared:TimePointList DataContext="{Binding TimePoints}"
-                                  HorizontalAlignment="Stretch"
+            <shared:TimePointList HorizontalAlignment="Stretch"
+                                  DataContext="{Binding TimePoints}"
                                   SearchToolbarVisibility="Collapsed"
                                   TimePointListBoxItemTemplate="{StaticResource dt_PlaylistTimePointV2}"
                                   TimePointListBoxScrollBarVisibility="Auto"

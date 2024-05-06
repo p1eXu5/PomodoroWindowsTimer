@@ -23,4 +23,46 @@ public partial class MainMenu : UserControl
     {
         InitializeComponent();
     }
+
+    private void OpenBotSettings(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+    {
+        if (DataContext is null)
+        {
+            return;
+        }
+
+        object appDialog = ((dynamic)DataContext).AppDialog;
+
+        if (appDialog is null)
+        {
+            return;
+        }
+
+        ICommand command = ((dynamic)appDialog).OpenBotSettingsDialogCommand;
+        if (command != null && command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+    }
+
+    private void CloseBotSettings(object sender, MaterialDesignThemes.Wpf.DialogClosingEventArgs eventArgs)
+    {
+        if (DataContext is null)
+        {
+            return;
+        }
+
+        object appDialog = ((dynamic)DataContext).AppDialog;
+
+        if (appDialog is null)
+        {
+            return;
+        }
+
+        ICommand command = ((dynamic)appDialog).OpenBotSettingsDialogCommand;
+        if (command != null && command.CanExecute(null))
+        {
+            command.Execute(null);
+        }
+    }
 }

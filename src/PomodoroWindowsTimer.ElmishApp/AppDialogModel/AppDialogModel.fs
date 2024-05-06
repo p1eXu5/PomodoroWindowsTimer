@@ -17,6 +17,7 @@ module AppDialogModel =
 
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
+        | ApplyBotSettings
         
         | LoadTimePointsGeneratorDialogModel
         | TimePointsGeneratorModelMsg of TimePointsGeneratorModel.Msg
@@ -24,6 +25,8 @@ module AppDialogModel =
         | LoadWorkStatisticsDialogModel
         | WorkStatisticListModelMsg of WorkStatisticListModel.Msg
         
+        | Unload
+
         | EnqueueError of string
         | EnqueueExn of exn
 
@@ -32,6 +35,12 @@ module AppDialogModel =
             match msg, model with
             | Msg.BotSettingsModelMsg msg, AppDialogModel.BotSettingsDialog m ->
                 (msg, m) |> Some
+            | _ -> None
+
+        let (|ApplyBotSettings|_|) (model: AppDialogModel) (msg: Msg) =
+            match msg, model with
+            | Msg.ApplyBotSettings, AppDialogModel.BotSettingsDialog m ->
+                m |> Some
             | _ -> None
 
         let (|TimePointsGeneratorModelMsg|_|) (model: AppDialogModel) (msg: Msg) =

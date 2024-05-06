@@ -1,5 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.WorkStatisticListModel
 
+open System
+
 open Elmish.WPF
 open Elmish.Extensions
 
@@ -34,6 +36,14 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val StartDate : Binding =
         nameof __.StartDate |> Binding.twoWay (_.StartDate, Msg.SetStartDate)
+
+    member val SetStartDateCommand : Binding =
+        nameof __.SetStartDateCommand |> Binding.cmdParamIf (fun o model ->
+            match o with
+            | :? DateTime as dt ->
+                Msg.SetStartDate (DateOnly.FromDateTime(dt)) |> Some
+            | _ -> None
+        )
 
     member val EndDate : Binding =
         nameof __.EndDate |> Binding.twoWay (_.EndDate, Msg.SetEndDate)
