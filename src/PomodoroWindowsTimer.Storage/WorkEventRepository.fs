@@ -124,7 +124,7 @@ let findByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: Cancell
             ))
     }
 
-let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: Period) ct =
+let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: DateOnlyPeriod) ct =
     task {
 
         let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
@@ -145,7 +145,7 @@ let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: Cance
 let findAllByPeriodTask
     (timeProvider: System.TimeProvider)
     (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow * WorkRepository.ReadRow>, string>>)
-    (period: Period)
+    (period: DateOnlyPeriod)
     ct
     =
     task {

@@ -13,7 +13,7 @@ let internal project (workEvents: WorkEvent list) =
     |> List.fold (fun builder ev ->
         match builder with
         | Initialized ->
-            let evDate = ev |> WorkEvent.dateOnly
+            let evDate = ev |> WorkEvent.localDateTime
             let tpName = ev |> WorkEvent.tpName
             let statistic =
                 {
@@ -28,7 +28,7 @@ let internal project (workEvents: WorkEvent list) =
                 }
             (statistic, ev) |> Calculating
         | Calculating (stat, lastEvent) ->
-            let evDate = ev |> WorkEvent.dateOnly
+            let evDate = ev |> WorkEvent.localDateTime
             match ev, lastEvent with
             | WorkEvent.WorkStarted (currDt, n), WorkEvent.WorkStarted (createdAt = prevDt) ->
                 Calculating (
@@ -106,7 +106,7 @@ let projectByWorkIdDaily (workEventRepo: IWorkEventRepository) (workId: uint64) 
         return res |> Result.map (Seq.toList >> project)
     }
 
-let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: Period) ct =
+let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: DateOnlyPeriod) ct =
     task {
         let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
         return res |> Result.map (Seq.toList >> project)
@@ -119,7 +119,7 @@ let projectByWorkId (workEventRepo: IWorkEventRepository) (workId: uint64) ct =
     }
 
 
-let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: Period) ct =
+let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
     task {
         let! res = workEventRepo.FindAllByPeriodAsync period ct
         return

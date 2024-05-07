@@ -42,6 +42,7 @@ let update (userSettings: IUserSettings) (workEventRepo: IWorkEventRepository) (
                 Start = model.StartDate
                 EndInclusive = model.EndDate
             }
+            : DateOnlyPeriod
 
         model |> withStatistics deff
         , Cmd.OfTask.perform (WorkEventProjector.projectAllByPeriod workEventRepo period) cts.Token (AsyncOperation.finishWithin Msg.LoadStatistics cts)

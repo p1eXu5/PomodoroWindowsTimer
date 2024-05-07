@@ -8,7 +8,7 @@ type [<Measure>] sec
 type Name = string
 
 [<Struct>]
-type Period =
+type DateOnlyPeriod =
     {
         Start: DateOnly
         EndInclusive: DateOnly
@@ -17,6 +17,18 @@ type Period =
         {
             Start = DateOnly()
             EndInclusive = DateOnly()
+        }
+
+[<Struct>]
+type DateTimePeriod =
+    {
+        Start: DateTime
+        EndInclusive: DateTime
+    }
+    static member Zero =
+        {
+            Start = DateTime()
+            EndInclusive = DateTime()
         }
 
 type Kind =
@@ -71,7 +83,7 @@ type WorkEventList =
 
 type Statistic =
     {
-        Period: Period
+        Period: DateTimePeriod
         WorkTime: TimeSpan
         BreakTime: TimeSpan
         TimePointNameStack: string list
@@ -83,6 +95,7 @@ type WorkStatistic =
         Statistic: Statistic option
     }
 
+// ------------------------------- modules
 
 module WorkEvent =
 
@@ -96,6 +109,12 @@ module WorkEvent =
         | WorkEvent.BreakStarted (dt, _)
         | WorkEvent.Stopped (dt) ->
             DateOnly.FromDateTime(dt.DateTime)
+
+    let localDateTime = function
+        | WorkEvent.WorkStarted (dt, _)
+        | WorkEvent.BreakStarted (dt, _)
+        | WorkEvent.Stopped (dt) ->
+            dt.LocalDateTime
 
     let tpName = function
         | WorkEvent.WorkStarted (_, n)

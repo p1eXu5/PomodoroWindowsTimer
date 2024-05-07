@@ -63,3 +63,12 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val CloseCommand : Binding =
         nameof __.CloseCommand |> Binding.cmd Msg.Close
 
+    member val OverallTotalTime : Binding =
+        nameof __.OverallTotalTime |> Binding.oneWayOpt overallTotalTime
+
+    member val WorkTotalTime : Binding =
+        nameof __.WorkTotalTime |> Binding.oneWayOpt workTotalTime
+
+    member val BreakTotalTime : Binding =
+        nameof __.BreakTotalTime |> Binding.oneWayOpt breakTotalTime
+

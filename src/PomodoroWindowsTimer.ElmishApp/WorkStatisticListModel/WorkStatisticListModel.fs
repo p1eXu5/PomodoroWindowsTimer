@@ -84,7 +84,7 @@ module WorkStatisticListModel =
             else 
                 model.EndDate
 
-        userSettings.LastStatisticPeriod <- ({ Start = startDate; EndInclusive = endDate } : Period) |> Some
+        userSettings.LastStatisticPeriod <- ({ Start = startDate; EndInclusive = endDate } : DateOnlyPeriod) |> Some
 
         { model with
             StartDate = startDate
@@ -98,7 +98,7 @@ module WorkStatisticListModel =
             else
                 model.StartDate
 
-        userSettings.LastStatisticPeriod <- ({ Start = startDate; EndInclusive = endDate } : Period) |> Some
+        userSettings.LastStatisticPeriod <- ({ Start = startDate; EndInclusive = endDate } : DateOnlyPeriod) |> Some
 
         { model with
             EndDate = endDate
@@ -112,7 +112,7 @@ module WorkStatisticListModel =
             else
                 model.EndDate
 
-        userSettings.LastStatisticPeriod <- ({ Start = model.StartDate; EndInclusive = endDate } : Period) |> Some
+        userSettings.LastStatisticPeriod <- ({ Start = model.StartDate; EndInclusive = endDate } : DateOnlyPeriod) |> Some
 
         { model with
             IsByDay = isByDay;
@@ -126,3 +126,28 @@ module WorkStatisticListModel =
         match model.WorkStatistics with
         | AsyncDeferred.Retrieved models -> models
         | _ -> List.empty
+
+    let time (timeSpan: TimeSpan) =
+        // let hours = MathF.Floor(float32 timeSpan.TotalHours)
+        // let minutes = timeSpan.Minutes
+        $"{timeSpan.Hours} h  {timeSpan.Minutes} m"
+
+    let overallTotalTime (model: WorkStatisticListModel) =
+        model.WorkStatistics
+        |> AsyncDeferred.toOption
+        |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.WorkTime + s.BreakTime) >> List.reduce (+))
+        |> Option.map time
+
+    let workTotalTime (model: WorkStatisticListModel) =
+        model.WorkStatistics
+        |> AsyncDeferred.toOption
+        |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.WorkTime) >> List.reduce (+))
+        |> Option.map time
+
+    let breakTotalTime (model: WorkStatisticListModel) =
+        model.WorkStatistics
+        |> AsyncDeferred.toOption
+        |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.BreakTime) >> List.reduce (+))
+        |> Option.map time
+
+

@@ -16,6 +16,10 @@ type Bindings() =
         // let minutes = timeSpan.Minutes
         $"{timeSpan.Hours} h  {timeSpan.Minutes} m"
 
+    let date (dateTime: DateTime) =
+        let d = dateTime.ToShortDateString()
+        let t = dateTime.ToShortTimeString()
+        $"{d} {t}"
 
     static let props = Utils.bindingProperties typeof<Bindings>
     static let mutable __ = Unchecked.defaultof<Bindings>
@@ -40,10 +44,10 @@ type Bindings() =
         nameof __.WorkTitle |> Binding.oneWay (_.Work >> _.Title)
 
     member val StartPeriod : Binding =
-        nameof __.StartPeriod |> Binding.oneWayOpt (_.Statistic >> Option.map (_.Period >> _.Start >> fun d -> d.ToShortDateString()))
+        nameof __.StartPeriod |> Binding.oneWayOpt (_.Statistic >> Option.map (_.Period >> _.Start >> date))
 
     member val EndPeriod : Binding =
-        nameof __.EndPeriod |> Binding.oneWayOpt (_.Statistic >> Option.map (_.Period >> _.EndInclusive >> fun d -> d.ToShortDateString()))
+        nameof __.EndPeriod |> Binding.oneWayOpt (_.Statistic >> Option.map (_.Period >> _.EndInclusive >> date))
 
     member val WorkTime : Binding =
         nameof __.WorkTime

@@ -6,11 +6,18 @@
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "dev-db": {
+    "dev-db-pc": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
         "WorkDb__ConnectionString": "Data Source=E:\\db\\PomodoroWindowsTimer\\work.db;"
+      }
+    },
+    "dev-db-laptop": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "WorkDb__ConnectionString": "Data Source=C:\\Go\\src\\srv-gitlab.techno.mos\\_account\\work.db;"
       }
     }
   }

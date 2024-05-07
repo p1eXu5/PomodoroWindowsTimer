@@ -42,7 +42,7 @@ type IWorkEventRepository =
         abstract FindByWorkIdAsync: workId: uint64 -> CancellationToken -> Task<Result<WorkEvent seq, string>>
         abstract FindByWorkId: workId: uint64 -> Result<WorkEvent seq, string>
         abstract FindByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract FindByWorkIdByPeriodAsync: workId: uint64 -> Period -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract FindAllByPeriodAsync: Period -> CancellationToken -> Task<Result<WorkEventList seq, string>>
+        abstract FindByWorkIdByPeriodAsync: workId: uint64 -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent seq, string>>
+        abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList seq, string>>
     end
 

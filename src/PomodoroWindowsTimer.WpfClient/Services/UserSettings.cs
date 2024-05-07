@@ -141,25 +141,25 @@ internal class UserSettings : IUserSettings
         }
     }
 
-    public FSharpOption<Period> LastStatisticPeriod
+    public FSharpOption<DateOnlyPeriod> LastStatisticPeriod
     {
         get
         {
             var lastStatisticPeriod = Properties.Settings.Default.LastStatisticPeriod;
             if (string.IsNullOrWhiteSpace(lastStatisticPeriod))
             {
-                return FSharpOption<Period>.None;
+                return FSharpOption<DateOnlyPeriod>.None;
             }
 
             try
             {
-                var period = JsonHelpers.Deserialize<Period>(lastStatisticPeriod);
-                return FSharpOption<Period>.Some(period);
+                var period = JsonHelpers.Deserialize<DateOnlyPeriod>(lastStatisticPeriod);
+                return FSharpOption<DateOnlyPeriod>.Some(period);
             }
             catch
             {
                 Properties.Settings.Default.LastStatisticPeriod = null;
-                return FSharpOption<Period>.None;
+                return FSharpOption<DateOnlyPeriod>.None;
             }
         }
         set
