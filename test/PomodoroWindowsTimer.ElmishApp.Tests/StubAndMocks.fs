@@ -29,7 +29,7 @@ type UserSettingsStub () =
         member _.TimePointSettings with get () = dict["TimePointSettings"] :?> string option and set v = dict["TimePointSettings"] <- v
         member _.DisableSkipBreak with get () = dict["DisableSkipBreak"] :?> bool and set v = dict["DisableSkipBreak"] <- v
         member _.CurrentWork with get () = dict["CurrentWork"] :?> Work option and set v = dict["CurrentWork"] <- v
-        member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> Period option and set v = dict["LastStatisticPeriod"] <- v
+        member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
 
 
 [<RequireQualifiedAccess>]
