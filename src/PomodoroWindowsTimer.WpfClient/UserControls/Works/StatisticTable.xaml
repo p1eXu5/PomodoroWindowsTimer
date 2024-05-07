@@ -153,22 +153,45 @@
                     </DataGrid.Columns>
                 </DataGrid>
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <TextBlock Width="{Binding ElementName=m_OverallTimeColumn, Path=ActualWidth}"
+                    <TextBlock x:Name="m_OverallTotalTime"
+                               Width="{Binding ElementName=m_OverallTimeColumn, Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding OverallTotalTime}"
                                TextAlignment="Left"
                                />
-                    <TextBlock Width="{Binding ElementName=m_WorkTimeColumn, Path=ActualWidth}"
+                    <TextBlock x:Name="m_WorkTotalTime"
+                               Width="{Binding ElementName=m_WorkTimeColumn, Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding WorkTotalTime}"
                                TextAlignment="Left"
                                />
-                    <TextBlock Width="{Binding ElementName=m_BreakTimeColumn, Path=ActualWidth}"
+                    <TextBlock x:Name="m_BreakTotalTime"
+                               Width="{Binding ElementName=m_BreakTimeColumn, Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding BreakTotalTime}"
+                               TextAlignment="Left"
+                               />
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <TextBlock Width="{Binding ElementName=m_OverallTimeColumn, Path=ActualWidth}"
+                               Padding="16,10"
+                               FontWeight="Bold"
+                               Text="{Binding OverallTotalTimeRemains}"
+                               TextAlignment="Left"
+                               />
+                    <TextBlock Width="{Binding ElementName=m_WorkTimeColumn, Path=ActualWidth}"
+                               Padding="16,10"
+                               FontWeight="Bold"
+                               Text="{Binding WorkTotalTimeRemains}"
+                               TextAlignment="Left"
+                               />
+                    <TextBlock Width="{Binding ElementName=m_BreakTimeColumn, Path=ActualWidth}"
+                               Padding="16,10"
+                               FontWeight="Bold"
+                               Text="{Binding BreakTotalTimeRemains}"
                                TextAlignment="Left"
                                />
                 </StackPanel>

@@ -127,27 +127,36 @@ module WorkStatisticListModel =
         | AsyncDeferred.Retrieved models -> models
         | _ -> List.empty
 
-    let time (timeSpan: TimeSpan) =
-        // let hours = MathF.Floor(float32 timeSpan.TotalHours)
-        // let minutes = timeSpan.Minutes
-        $"{timeSpan.Hours} h  {timeSpan.Minutes} m"
+    
 
     let overallTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
         |> AsyncDeferred.toOption
         |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.WorkTime + s.BreakTime) >> List.reduce (+))
-        |> Option.map time
 
     let workTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
         |> AsyncDeferred.toOption
         |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.WorkTime) >> List.reduce (+))
-        |> Option.map time
 
     let breakTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
         |> AsyncDeferred.toOption
         |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.BreakTime) >> List.reduce (+))
-        |> Option.map time
 
+
+    [<Literal>]
+    let private workHoursMax = 25.0 * 4.0 * 3.0 + 25.0 + 25.0 + 15.0
+
+    let overallTotalTimeRemains (model: WorkStatisticListModel) =
+        overallTotalTime model
+        |> Option.map (fun ts -> ts - TimeSpan.FromHours(8))
+
+    let workTotalTimeRemains (model: WorkStatisticListModel) =
+        workTotalTime model
+        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(workHoursMax))
+
+    let breakTotalTimeRemains (model: WorkStatisticListModel) =
+        breakTotalTime model
+        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(8.0 * 60.0 - workHoursMax))
 

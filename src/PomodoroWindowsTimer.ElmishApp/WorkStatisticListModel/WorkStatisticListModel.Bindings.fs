@@ -18,6 +18,22 @@ type private Binding = Binding<WorkStatisticListModel, WorkStatisticListModel.Ms
 
 [<Sealed>]
 type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
+    let time (timeSpan: TimeSpan) =
+        // let hours = MathF.Floor(float32 timeSpan.TotalHours)
+        let minutes =
+            if timeSpan.Seconds <> 0 then
+                timeSpan.Minutes + 1
+            else
+                timeSpan.Minutes
+        $"{timeSpan.Hours} h  {minutes} m"
+
+    let timeRemains (timeSpan: TimeSpan) =
+        // let hours = MathF.Floor(float32 timeSpan.TotalHours)
+        let minutes =
+            Math.Abs(timeSpan.Minutes)
+
+        $"{timeSpan.Hours} h  {minutes} m"
+
     static let props = Utils.bindingProperties typeof<Bindings>
     static let mutable __ = Unchecked.defaultof<Bindings>
     static member Instance(dialogErrorMessageQueue: IErrorMessageQueue) =
@@ -64,11 +80,20 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
         nameof __.CloseCommand |> Binding.cmd Msg.Close
 
     member val OverallTotalTime : Binding =
-        nameof __.OverallTotalTime |> Binding.oneWayOpt overallTotalTime
+        nameof __.OverallTotalTime |> Binding.oneWayOpt (overallTotalTime >> Option.map time)
 
     member val WorkTotalTime : Binding =
-        nameof __.WorkTotalTime |> Binding.oneWayOpt workTotalTime
+        nameof __.WorkTotalTime |> Binding.oneWayOpt (workTotalTime >> Option.map time)
 
     member val BreakTotalTime : Binding =
-        nameof __.BreakTotalTime |> Binding.oneWayOpt breakTotalTime
+        nameof __.BreakTotalTime |> Binding.oneWayOpt (breakTotalTime >> Option.map time)
+
+    member val OverallTotalTimeRemains : Binding =
+        nameof __.OverallTotalTimeRemains |> Binding.oneWayOpt (overallTotalTimeRemains >> Option.map timeRemains)
+
+    member val WorkTotalTimeRemains : Binding =
+        nameof __.WorkTotalTimeRemains |> Binding.oneWayOpt (workTotalTimeRemains >> Option.map timeRemains)
+
+    member val BreakTotalTimeRemains : Binding =
+        nameof __.BreakTotalTimeRemains |> Binding.oneWayOpt (breakTotalTimeRemains >> Option.map timeRemains)
 
