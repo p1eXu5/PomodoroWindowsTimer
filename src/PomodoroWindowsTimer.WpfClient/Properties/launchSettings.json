@@ -5,6 +5,13 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "dev-db": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "WorkDb__ConnectionString": "Data Source=E:\\db\\PomodoroWindowsTimer\\work.db;"
+      }
     }
   }
 }

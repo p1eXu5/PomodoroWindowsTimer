@@ -5,154 +5,157 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:PomodoroWindowsTimer.WpfClient.Behaviors"
              xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
              d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
-             Width="800"
-             Height="450"
+             MinWidth="800"
+             MinHeight="450"
              mc:Ignorable="d"
              >
-    <materialDesign:DialogHost VerticalAlignment="Stretch"
-                               CloseOnClickAway="False"
-                               DialogTheme="Inherit"
-                               OverlayBackground="{DynamicResource PrimaryHueDarkBrush}"
-                               Placement="Center"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
-                                                              Path=MessageQueue}"
-                               Identifier="StatisticTableDialog"
-                               >
-        <DockPanel xmlns:workStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
-                   d:DataContext="{d:DesignInstance Type=workStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
-                   DataContext="{Binding WorkStatisticsDialog}"
-                   >
-            <ToolBarTray DockPanel.Dock="Top">
-                <ToolBar Style="{StaticResource MaterialDesignToolBar}"
-                         ClipToBounds="False"
-                         >
-                    <!--<DatePicker Width="100"
-                            materialDesign:HintAssist.Hint="Pick Date"
-                            materialDesign:TextFieldAssist.HasClearButton="True"
-                            Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
-                            />-->
-                    <CheckBox Content="By Day"
-                              Margin="8,3,16,3"
-                              />
-                    <Border Padding="5,3"
-                            VerticalAlignment="Center"
-                            Background="#333333"
-                            BorderBrush="#555555"
-                            BorderThickness="1"
-                            >
-                        <TextBlock Style="{StaticResource MaterialDesignBodySmallTextBlock}"
-                                   Width="100"
-                                   VerticalAlignment="Center"
-                                   Text="January 12th, 2024"
-                                   TextAlignment="Right"
-                                   />
-                    </Border>
-                    <Button ToolTip="Save"
-                            Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                            Padding="10,5"
-                            VerticalAlignment="Center"
-                            >
-                        <Button.CommandParameter>
-                            <shared:PwtDatePicker />
-                        </Button.CommandParameter>
-                        <Behaviors:Interaction.Behaviors>
-                            <behaviors:DialogEventHandlerBehavior OkCommand="{Binding SetStartDateCommand}" />
-                        </Behaviors:Interaction.Behaviors>
-                        <materialDesign:PackIcon Width="18"
-                                                 Kind="Calendar"
-                                                 />
-                    </Button>
-                    <TextBlock Style="{StaticResource MaterialDesignBodySmallTextBlock}"
-                               VerticalAlignment="Center"
-                               TextAlignment="Right"
-                               >
-                        <Run Text=" - " />
-                    </TextBlock>
-                    <Border Margin="10,5,0,5"
-                            Padding="5,3"
-                            VerticalAlignment="Center"
-                            Background="#333333"
-                            BorderBrush="#555555"
-                            BorderThickness="1"
-                            >
-                        <TextBlock Style="{StaticResource MaterialDesignBodySmallTextBlock}"
-                                   Width="100"
-                                   VerticalAlignment="Center"
-                                   Text="January 12th, 2024"
-                                   TextAlignment="Right"
-                                   />
-                    </Border>
-                    <Button ToolTip="Save"
-                            Padding="10,5"
-                            VerticalAlignment="Center"
-                            >
-                        <Button.CommandParameter>
-                            <Grid Width="300"
-                                  Height="410"
-                                  >
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
 
-                                <Viewbox />
-                                <Calendar x:Name="m_EndDate"
-                                          Margin="2"
-                                          />
+    <!--<materialDesign:DialogHost.DialogContent>
+            <shared:PwtDatePicker />
+        </materialDesign:DialogHost.DialogContent>-->
+    <DockPanel xmlns:workStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+               d:DataContext="{d:DesignInstance Type=workStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
+               DataContext="{Binding WorkStatisticsDialog}"
+               >
+        <!--<DatePicker DockPanel.Dock="Top"
+                        MinWidth="200"
+                        />-->
+        <!--<Button DockPanel.Dock="Top"
+                    ToolTip="Save"
+                    Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                    Padding="10,5"
+                    VerticalAlignment="Center"
+                    >
+                <Button.CommandParameter>
+                    <shared:PwtDatePicker />
+                </Button.CommandParameter>
+                <Behaviors:Interaction.Behaviors>
+                    <behaviors:DialogEventHandlerBehavior OkCommand="{Binding SetStartDateCommand}" />
+                </Behaviors:Interaction.Behaviors>
+                <materialDesign:PackIcon Width="18"
+                                         Kind="Calendar"
+                                         />
+            </Button>-->
 
-                                <StackPanel Grid.Row="1"
-                                            Margin="8"
-                                            HorizontalAlignment="Right"
-                                            Orientation="Horizontal"
-                                            >
-                                    <Button Content="CANCEL"
-                                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                                            CommandParameter="0"
-                                            Style="{StaticResource MaterialDesignFlatButton}"
-                                            />
-                                    <Button Content="OK"
-                                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                                            CommandParameter="1"
-                                            Style="{StaticResource MaterialDesignFlatButton}"
-                                            />
-                                </StackPanel>
-                            </Grid>
-                        </Button.CommandParameter>
-                        <materialDesign:PackIcon Width="18"
-                                                 Kind="Calendar"
-                                                 />
-                    </Button>
-                </ToolBar>
-            </ToolBarTray>
-
-            <materialDesign:Snackbar DockPanel.Dock="Bottom"
-                                     x:Name="m_ErrorMessageQueueSnackbar"
-                                     HorizontalAlignment="Stretch"
-                                     ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
-                                     MessageQueue="{Binding ErrorMessageQueue}"
-                                     />
-            <StackPanel DockPanel.Dock="Bottom"
-                        HorizontalAlignment="Center"
-                        Orientation="Horizontal"
-                        >
-                <Button DockPanel.Dock="Bottom"
-                        Content="CLOSE"
-                        Style="{StaticResource PomodoroOkDialogButton}"
-                        />
-            </StackPanel>
-
-            <Grid>
-                <DataGrid CanUserAddRows="False"
-                          ItemsSource="{Binding WorkStatistics}"
-                          SelectionMode="Extended"
-                          SelectionUnit="Cell"
+        <ToolBarTray DockPanel.Dock="Top"
+                     DataContext="{Binding}"
+                     >
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}"
+                     ClipToBounds="False"
+                     >
+                <CheckBox x:Name="m_ByDayCheckBox"
+                          Content="By Day"
+                          Margin="8,3,16,3"
                           />
-                <shared:Spinner Visibility="{Binding WorkStatisticsDeff, Converter={StaticResource conv_AsyncDeferredToVisicbility}}" />
-            </Grid>
-        </DockPanel>
-    </materialDesign:DialogHost>
+                <Border VerticalAlignment="Center"
+                        BorderThickness="1"
+                        Background="#333333"
+                        BorderBrush="#555555"
+                        >
+                    <DatePicker Width="150"
+                                Height="25"
+                                Padding="5,0"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="Start Date"
+                                BorderThickness="0"
+                                SelectedDate="{Binding StartDate,
+                                                       Converter={StaticResource conv_DateOnlyToDateTime}}"
+                                />
+                </Border>
+
+
+                <Border Margin="18,1"
+                        VerticalAlignment="Center"
+                        BorderThickness="1"
+                        Background="#333333"
+                        BorderBrush="#555555"
+                        IsEnabled="{Binding ElementName=m_ByDayCheckBox,
+                                            Path=IsChecked,
+                                            Converter={StaticResource InvertBooleanConverter}}"
+                        >
+                    <DatePicker Width="150"
+                                Height="25"
+                                Padding="5,0"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="End Date"
+                                BorderThickness="0"
+                                SelectedDate="{Binding EndDate,
+                                                       Converter={StaticResource conv_DateOnlyToDateTime}}"
+                                />
+                </Border>
+            </ToolBar>
+        </ToolBarTray>
+
+        <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                                 x:Name="m_ErrorMessageQueueSnackbar"
+                                 HorizontalAlignment="Stretch"
+                                 ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                                 MessageQueue="{Binding ErrorMessageQueue}"
+                                 />
+        <StackPanel DockPanel.Dock="Bottom"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
+            <Button DockPanel.Dock="Bottom"
+                    Content="CLOSE"
+                    Style="{StaticResource PomodoroOkDialogButton}"
+                    />
+        </StackPanel>
+
+        <Grid>
+            <DataGrid ItemsSource="{Binding WorkStatistics}"
+                      SelectionMode="Extended"
+                      SelectionUnit="CellOrRowHeader"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      HeadersVisibility="All"
+                      IsReadOnly="False"
+                      >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding WorkId}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="ID"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding WorkNumber}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Number"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding WorkTitle}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Title"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding StartPeriod}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Start"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding EndPeriod}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="End"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding OverallTime}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Overall Time"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding WorkTime}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Work Time"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding BreakTime}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Break Time"
+                                        />
+                </DataGrid.Columns>
+            </DataGrid>
+            <shared:Spinner Visibility="{Binding WorkStatisticsDeff, Converter={StaticResource conv_AsyncDeferredToVisicbility}}" />
+        </Grid>
+    </DockPanel>
 </UserControl>

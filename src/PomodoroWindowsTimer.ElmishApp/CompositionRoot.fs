@@ -69,7 +69,7 @@ let compose
             fun () -> WorkStatisticListModel.init userSettings timeProvider
 
         let updateWorkStatisticListModel =
-            WorkStatisticListModel.Program.update workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkStatisticListModel>())
+            WorkStatisticListModel.Program.update userSettings workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkStatisticListModel>())
 
         let updateAppDialogModel =
             AppDialogModel.Program.update

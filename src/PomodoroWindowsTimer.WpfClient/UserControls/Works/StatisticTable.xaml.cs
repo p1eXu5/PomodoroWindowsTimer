@@ -10,8 +10,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MaterialDesignThemes.Wpf;
 
 namespace PomodoroWindowsTimer.WpfClient.UserControls.Works;
 /// <summary>
@@ -22,5 +24,10 @@ public partial class StatisticTable : UserControl
     public StatisticTable()
     {
         InitializeComponent();
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        DialogHost.Show(null);
     }
 }

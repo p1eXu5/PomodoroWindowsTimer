@@ -36,7 +36,8 @@
         <sel:MainDialogContentTemplateSelector x:Key="set_MainDialogContentTemplate" />
     </Window.Resources>
 
-    <materialDesign:DialogHost DataContext="{Binding AppDialog}"
+    <materialDesign:DialogHost x:Name="m_RootDialogHost"
+                               DataContext="{Binding AppDialog}"
                                DialogTheme="Inherit"
                                Identifier="RootDialog"
                                SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,

@@ -42,7 +42,7 @@ module WorkStatisticListModel =
         let (|``Start of LoadStatistics``|_|) (model: WorkStatisticListModel) (msg: Msg) =
             match msg with
             | Msg.LoadStatistics (AsyncOperation.Start _) ->
-                model.WorkStatistics |> AsyncDeferred.tryInProgressWithCancellation
+                model.WorkStatistics |> AsyncDeferred.forceInProgressWithCancellation |> Some
             | _ -> None
 
         let (|``Finish of LoadStatistics``|_|) (model: WorkStatisticListModel) (msg: Msg) =
@@ -77,34 +77,46 @@ module WorkStatisticListModel =
         }
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadStatistics)
 
-    let withStartDate startDate (model: WorkStatisticListModel) =
+    let withStartDate (userSettings: IUserSettings) startDate (model: WorkStatisticListModel) =
+        let endDate =
+            if startDate > model.EndDate then
+                startDate
+            else 
+                model.EndDate
+
+        userSettings.LastStatisticPeriod <- ({ Start = startDate; EndInclusive = endDate } : Period) |> Some
+
         { model with
             StartDate = startDate
-            EndDate =
-                if startDate > model.EndDate then
-                    startDate
-                else 
-                    model.EndDate
+            EndDate = endDate
         }
 
-    let withEndDate endDate (model: WorkStatisticListModel) =
+    let withEndDate (userSettings: IUserSettings) endDate (model: WorkStatisticListModel) =
+        let startDate =
+            if endDate < model.StartDate then
+                endDate
+            else
+                model.StartDate
+
+        userSettings.LastStatisticPeriod <- ({ Start = startDate; EndInclusive = endDate } : Period) |> Some
+
         { model with
             EndDate = endDate
-            StartDate =
-                if endDate < model.StartDate then
-                    endDate
-                else
-                    model.StartDate
+            StartDate = startDate
         }
 
-    let withIsByDay isByDay (model: WorkStatisticListModel) =
+    let withIsByDay (userSettings: IUserSettings) isByDay (model: WorkStatisticListModel) =
+        let endDate =
+            if isByDay then
+                model.StartDate
+            else
+                model.EndDate
+
+        userSettings.LastStatisticPeriod <- ({ Start = model.StartDate; EndInclusive = endDate } : Period) |> Some
+
         { model with
             IsByDay = isByDay;
-            EndDate =
-                if isByDay then
-                    model.StartDate
-                else
-                    model.EndDate
+            EndDate = endDate
         }
 
     let withStatistics deff (model: WorkStatisticListModel) =

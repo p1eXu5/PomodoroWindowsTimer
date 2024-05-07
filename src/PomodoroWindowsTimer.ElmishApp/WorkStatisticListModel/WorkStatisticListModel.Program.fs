@@ -15,20 +15,20 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkStatisticListModel
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 
-let update (workEventRepo: IWorkEventRepository) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<WorkStatisticListModel>) msg (model: WorkStatisticListModel) =
+let update (userSettings: IUserSettings) (workEventRepo: IWorkEventRepository) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<WorkStatisticListModel>) msg (model: WorkStatisticListModel) =
     match msg with
     | Msg.SetStartDate startDate when model.StartDate <> startDate ->
-        model |> withStartDate startDate
+        model |> withStartDate userSettings startDate
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadStatistics)
         , Intent.None
 
     | Msg.SetEndDate endDate when model.EndDate <> endDate ->
-        model |> withEndDate endDate
+        model |> withEndDate userSettings endDate
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadStatistics)
         , Intent.None
 
     | Msg.SetIsByDay v ->
-        let model' = model |> withIsByDay v
+        let model' = model |> withIsByDay userSettings v
         if model'.StartDate <> model.StartDate || model'.EndDate <> model.EndDate then
             model'
             , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadStatistics)

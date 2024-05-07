@@ -15,6 +15,7 @@
     <converters:NullToVisibilityConverter x:Key="conv_NullToVisible" />
     <converters:NoNumberConverter x:Key="conv_NoNumberConverter" />
     <converters:AsyncDeferredToVisicbilityConverter x:Key="conv_AsyncDeferredToVisicbility" />
+    <converters:DateOnlyToDateTimeConverter x:Key="conv_DateOnlyToDateTime" />
 
     <Style x:Key="st_IconBase"
            TargetType="materialDesign:PackIcon"

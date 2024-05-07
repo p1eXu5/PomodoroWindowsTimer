@@ -10,6 +10,7 @@
              xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
              xmlns:behaviors="clr-namespace:PomodoroWindowsTimer.WpfClient.Behaviors"
              xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+             xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
              d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="50"
              d:DesignWidth="800"
@@ -36,6 +37,17 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+
+            <Style x:Key="st_MenuButton"
+                   TargetType="Button"
+                   BasedOn="{StaticResource MaterialDesignIconButton}"
+                   >
+                <Setter Property="DockPanel.Dock" Value="Left" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.OpenDialogCommand}" />
+                <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+
+            </Style>
         </DockPanel.Resources>
         <!--  version  -->
         <TextBlock DockPanel.Dock="Right"
@@ -58,18 +70,13 @@
                       Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding IsWorkSelectorLoaded}"
                       />
+
         <!--  telegram bot settings open dialog button  -->
-        <Button DockPanel.Dock="Left"
-                x:Name="m_OpenTelegramBotCredentialsButton"
-                xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
-                d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
+        <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 ToolTip="Telegram bot settings"
-                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                Style="{StaticResource MaterialDesignIconButton}"
-                HorizontalAlignment="Left"
-                RenderTransformOrigin="0.5,0.5"
+                Style="{StaticResource st_MenuButton}"
                 >
             <Button.RenderTransform>
                 <TransformGroup>
@@ -87,16 +94,11 @@
         </Button>
 
         <!--  telegram bot settings open dialog button  -->
-        <Button DockPanel.Dock="Left"
-                xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
-                d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
+        <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
                 Content="{materialDesign:PackIcon ListBoxOutline}"
                 ToolTip="Works statistic"
-                Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                Style="{StaticResource MaterialDesignIconButton}"
-                HorizontalAlignment="Left"
-                RenderTransformOrigin="0.5,0.5"
+                Style="{StaticResource st_MenuButton}"
                 >
             <Button.RenderTransform>
                 <TransformGroup>
@@ -115,23 +117,24 @@
         </Button>
 
         <!--  save time points button  -->
+        <!--
         <Button DockPanel.Dock="Left"
                 Content="{materialDesign:PackIcon ContentSaveOutline}"
                 ToolTip="Playlist constructor"
-                Command="{Binding SaveTimePointsFileCommand}"
                 Style="{StaticResource MaterialDesignIconButton}"
                 Margin="3,0,0,0"
                 HorizontalAlignment="Left"
                 IsEnabled="False"
                 />
+        -->
         <!--  save time points button  -->
+        <!--
         <Button DockPanel.Dock="Left"
                 Content="{materialDesign:PackIcon FolderOpenOutline}"
                 ToolTip="Playlist constructor"
-                Command="{Binding OpenTimePointsFileCommand}"
                 Style="{StaticResource MaterialDesignIconButton}"
                 HorizontalAlignment="Left"
                 IsEnabled="False"
-                />
+                />-->
     </DockPanel>
 </UserControl>
