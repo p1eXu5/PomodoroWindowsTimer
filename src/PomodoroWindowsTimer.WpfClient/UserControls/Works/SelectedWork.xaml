@@ -27,18 +27,13 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
                 <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding IsSelected,
-                                                   ElementName=m_Root}"
-                                 Value="True"
-                                 >
+                    <DataTrigger Binding="{Binding IsSelected, ElementName=m_Root}" Value="True">
                         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Border.Style>
-        <Grid Margin="0"
-              VerticalAlignment="Center"
-              >
+        <Grid Margin="0" VerticalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="50" />
@@ -55,9 +50,7 @@
                            materialDesign:HintAssist.Hint="Number"
                            FontSize="11"
                            FontWeight="Normal"
-                           Text="{Binding Number,
-                                          Converter={StaticResource conv_NoNumberConverter},
-                                          FallbackValue='NO NUMBER'}"
+                           Text="{Binding Number, Converter={StaticResource conv_NoNumberConverter}, FallbackValue='NO NUMBER'}"
                            />
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
@@ -66,8 +59,7 @@
                            materialDesign:HintAssist.Hint="Number"
                            FontSize="16"
                            FontWeight="Normal"
-                           Text="{Binding Title,
-                                          FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                           Text="{Binding Title, FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
                            TextTrimming="CharacterEllipsis"
                            TextWrapping="NoWrap"
                            />
@@ -75,27 +67,21 @@
             <Button x:Name="m_Button"
                     Grid.RowSpan="2"
                     Grid.Column="1"
-                    Command="{Binding EditCommand}"
-                    Height="{Binding ElementName=m_Stack,
-                                     Path=ActualHeight}"
+                    Height="{Binding ElementName=m_Stack, Path=ActualHeight}"
                     VerticalAlignment="Stretch"
                     materialDesign:ButtonAssist.CornerRadius="0"
+                    Command="{Binding EditCommand}"
                     Content="{materialDesign:PackIcon Pencil}"
                     ToolTip="Edit"
                     >
                 <Button.Style>
-                    <Style TargetType="Button"
-                           BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
-                           >
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}">
                         <Setter Property="Background" Value="Transparent" />
                         <Setter Property="BorderThickness" Value="1,0,0,0" />
                         <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
                         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsSelected,
-                                                           ElementName=m_Root}"
-                                         Value="True"
-                                         >
+                            <DataTrigger Binding="{Binding IsSelected, ElementName=m_Root}" Value="True">
                                 <!--<Setter Property="Background" Value="#012A3C" />-->
                                 <Setter Property="BorderThickness" Value="1,0,0,0" />
                                 <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />

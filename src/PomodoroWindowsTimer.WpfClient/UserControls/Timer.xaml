@@ -24,7 +24,7 @@
                 >
         <StackPanel Orientation="Vertical"
                     Visibility="{Binding IsCurrentWorkSet,
-                                         Converter={StaticResource BooleanToVisibilityConverter}}"
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
                     >
             <TextBlock DataContext="{Binding CurrentWork}"
                        Margin="1,0,0,5"

@@ -16,25 +16,19 @@
     <converters:NoNumberConverter x:Key="conv_NoNumberConverter" />
     <converters:AsyncDeferredToVisicbilityConverter x:Key="conv_AsyncDeferredToVisicbility" />
     <converters:DateOnlyToDateTimeConverter x:Key="conv_DateOnlyToDateTime" />
+    <converters:BooleanToVisibilityConverter x:Key="conv_BooleanToVisibility" />
+    <converters:InverseBooleanToVisibilityConverter x:Key="conv_InverseBooleanToVisibility" />
 
-    <Style x:Key="st_IconBase"
-           TargetType="materialDesign:PackIcon"
-           >
+    <Style x:Key="st_IconBase" TargetType="materialDesign:PackIcon">
         <Setter Property="Width" Value="18" />
         <Setter Property="Height" Value="20" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <BitmapImage x:Key="img_Metal"
-                 UriSource="metalArtboard-50.png"
-                 />
-    <BitmapImage x:Key="img_Base"
-                 UriSource="base_texture.png"
-                 />
-    <BitmapImage x:Key="img_Gloss"
-                 UriSource="gloss_texture.png"
-                 />
+    <BitmapImage x:Key="img_Metal" UriSource="metalArtboard-50.png" />
+    <BitmapImage x:Key="img_Base" UriSource="base_texture.png" />
+    <BitmapImage x:Key="img_Gloss" UriSource="gloss_texture.png" />
 
     <ImageBrush x:Key="br_Base"
                 TileMode="FlipXY"
@@ -45,9 +39,7 @@
             <DrawingImage>
                 <DrawingImage.Drawing>
                     <DrawingGroup>
-                        <ImageDrawing ImageSource="{StaticResource img_Base}"
-                                      Rect="0,0,256,256"
-                                      />
+                        <ImageDrawing ImageSource="{StaticResource img_Base}" Rect="0,0,256,256" />
                     </DrawingGroup>
                 </DrawingImage.Drawing>
             </DrawingImage>

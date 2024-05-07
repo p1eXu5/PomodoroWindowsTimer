@@ -73,7 +73,7 @@
                         BorderBrush="#555555"
                         IsEnabled="{Binding ElementName=m_ByDayCheckBox,
                                             Path=IsChecked,
-                                            Converter={StaticResource InvertBooleanConverter}}"
+                                            Converter={StaticResource conv_InverseBooleanToVisibility}}"
                         >
                     <DatePicker Width="150"
                                 Height="25"
