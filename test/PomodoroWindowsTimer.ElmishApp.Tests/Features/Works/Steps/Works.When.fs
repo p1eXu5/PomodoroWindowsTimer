@@ -42,10 +42,12 @@ let ``WorkList sub model has been shown`` times =
     Common.``WorkList sub model has been shown`` times
     |> Scenario.log $"When.``{nameof Common.``WorkList sub model has been shown``}``"
 
+let ``UpdatingWork sub model has been shown`` () =
+    Common.``UpdatingWork sub model has been shown`` ()
+    |> Scenario.log $"When.``{nameof Common.``UpdatingWork sub model has been shown``}``"
 
 
-
-let ``SetNumber msg has been dispatched with`` workNumber =
+let ``CreatingWork SetNumber msg has been dispatched with`` workNumber =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let msg =
@@ -55,10 +57,10 @@ let ``SetNumber msg has been dispatched with`` workNumber =
         do sut.Dispatcher.Dispatch msg
         do! Scenario.msgDispatchedWithin2Sec "SetNumber" ((=) msg)
     }
-    |> Scenario.log $"When.``{nameof ``SetNumber msg has been dispatched with``}``"
+    |> Scenario.log $"When.``{nameof ``CreatingWork SetNumber msg has been dispatched with``}``"
 
 
-let ``SetTitle msg has been dispatched with`` workTitle =
+let ``CreatingWork SetTitle msg has been dispatched with`` workTitle =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let msg =
@@ -68,8 +70,7 @@ let ``SetTitle msg has been dispatched with`` workTitle =
         do sut.Dispatcher.Dispatch msg
         do! Scenario.msgDispatchedWithin2Sec "SetTitle" ((=) msg)
     }
-    |> Scenario.log $"When.``{nameof ``SetTitle msg has been dispatched with``}``"
-
+    |> Scenario.log $"When.``{nameof ``CreatingWork SetTitle msg has been dispatched with``}``"
 
 let ``CreatingWorkModel CreateWork msg has been dispatched`` () =
     scenario {
@@ -90,6 +91,51 @@ let ``CreatingWorkModel CreateWork msg has been dispatched`` () =
         )
     }
 
+let ``UpdatingWork SetNumber msg has been dispatched with`` workNumber =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg =
+            WorkModel.Msg.SetNumber workNumber
+            |> WorkSelectorModel.Msg.UpdatingWorkModelMsg
+            |> MainModel.Msg.WorkSelectorModelMsg
+        do sut.Dispatcher.Dispatch msg
+        do! Scenario.msgDispatchedWithin2Sec "SetNumber" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``UpdatingWork SetNumber msg has been dispatched with``}``"
+
+
+let ``UpdatingWork SetTitle msg has been dispatched with`` workTitle =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg =
+            WorkModel.Msg.SetTitle workTitle
+            |> WorkSelectorModel.Msg.UpdatingWorkModelMsg
+            |> MainModel.Msg.WorkSelectorModelMsg
+        do sut.Dispatcher.Dispatch msg
+        do! Scenario.msgDispatchedWithin2Sec "SetTitle" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``UpdatingWork SetTitle msg has been dispatched with``}``"
+
+let ``Update WorkModel msg has been dispatched`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        do sut.Dispatcher.Dispatch (
+            WorkModel.Msg.Update
+            |> AsyncOperation.startUnit
+            |> WorkSelectorModel.Msg.UpdatingWorkModelMsg
+            |> MainModel.Msg.WorkSelectorModelMsg
+        )
+
+        do! Scenario.msgDispatchedWithin2Sec "Update WorkModel Finish" (function
+            | MainModel.Msg.WorkSelectorModelMsg (
+                WorkSelectorModel.Msg.UpdatingWorkModelMsg (
+                    WorkModel.Msg.Update (AsyncOperation.Finish _)
+                )) -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"When.``{nameof ``Update WorkModel msg has been dispatched``}``"
+
 /// Dispatches and wait WorkListModel.Msg.CreateWork
 let ``WorkListModel CreateWork msg has been dispatched`` () =
     scenario {
@@ -103,6 +149,22 @@ let ``WorkListModel CreateWork msg has been dispatched`` () =
         do sut.Dispatcher.Dispatch msg
 
         do! Scenario.msgDispatchedWithin2Sec "WorkListModel CreateWork" ((=) msg)
+    }
+
+/// Dispatches and wait WorkListModel.Msg.CreateWork
+let ``WorkListModel Edit WorkModel msg has been dispatched`` (work: Work) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let msg = 
+            WorkModel.Msg.Edit
+            |> fun smsg ->  WorkListModel.Msg.WorkModelMsg (work.Id, smsg)
+            |> WorkSelectorModel.Msg.WorkListModelMsg
+            |> MainModel.Msg.WorkSelectorModelMsg
+
+        do sut.Dispatcher.Dispatch msg
+
+        do! Scenario.msgDispatchedWithin2Sec "WorkListModel WorkModel Edit" ((=) msg)
     }
 
 

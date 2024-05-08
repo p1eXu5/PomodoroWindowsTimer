@@ -101,8 +101,8 @@ module WorkEventFeature =
             do! When.``CreatingWork sub model has been shown`` ()
 
             let work2 = generateWork ()
-            do! When.``SetNumber msg has been dispatched with`` work2.Number
-            do! When.``SetTitle msg has been dispatched with`` work2.Title
+            do! When.``CreatingWork SetNumber msg has been dispatched with`` work2.Number
+            do! When.``CreatingWork SetTitle msg has been dispatched with`` work2.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
             do! When.``WorkList sub model has been shown`` 2<times>
             do! When.``WorkSelector drawer is closing`` ()
@@ -130,8 +130,8 @@ module WorkEventFeature =
             do! When.``CreatingWork sub model has been shown`` ()
 
             let work2 = generateWork ()
-            do! When.``SetNumber msg has been dispatched with`` work2.Number
-            do! When.``SetTitle msg has been dispatched with`` work2.Title
+            do! When.``CreatingWork SetNumber msg has been dispatched with`` work2.Number
+            do! When.``CreatingWork SetTitle msg has been dispatched with`` work2.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
             do! When.``WorkList sub model has been shown`` 2<times>
             do! When.``WorkSelector drawer is closing`` ()

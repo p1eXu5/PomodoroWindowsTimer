@@ -44,7 +44,7 @@
                             d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
                             DataContext="{Binding UpdatingWorkModel}"
                             CancelCommand="{Binding CancelEditCommand}"
-                            OkCommand="{Binding EditCommand}"
+                            OkCommand="{Binding UpdateCommand}"
                             OkCommandContent="UPDATE"
                             Visibility="{Binding DataContext.SubModelId,
                                                  ElementName=m_Root,

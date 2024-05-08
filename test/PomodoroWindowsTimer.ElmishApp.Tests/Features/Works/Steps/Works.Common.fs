@@ -51,3 +51,16 @@ let ``WorkList sub model has been shown`` (times: int<times>) =
             | _ -> false
         )
     }
+
+
+let ``UpdatingWork sub model has been shown`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "UpdatingWork selector sub model expected" (fun mainModel ->
+            match mainModel.WorkSelector with
+            | Some workSelectorModel ->
+                match workSelectorModel.SubModel with
+                | WorkSelectorSubModel.UpdatingWork _ -> true
+                | _ -> false
+            | _ -> false
+        )
+    }

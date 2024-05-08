@@ -52,8 +52,8 @@ module WorkFeature =
             do! When.``CreatingWork sub model has been shown`` ()
 
             let work = generateWork ()
-            do! When.``SetNumber msg has been dispatched with`` work.Number
-            do! When.``SetTitle msg has been dispatched with`` work.Title
+            do! When.``CreatingWork SetNumber msg has been dispatched with`` work.Number
+            do! When.``CreatingWork SetTitle msg has been dispatched with`` work.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
 
             do! Then.``WorkList sub model has been shown`` 2<times>
@@ -73,8 +73,8 @@ module WorkFeature =
             do! When.``CreatingWork sub model has been shown`` ()
 
             let work1 = generateWork ()
-            do! When.``SetNumber msg has been dispatched with`` work1.Number
-            do! When.``SetTitle msg has been dispatched with`` work1.Title
+            do! When.``CreatingWork SetNumber msg has been dispatched with`` work1.Number
+            do! When.``CreatingWork SetTitle msg has been dispatched with`` work1.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
             do! When.``WorkList sub model has been shown`` 2<times>
             
@@ -82,8 +82,8 @@ module WorkFeature =
             do! When.``CreatingWork sub model has been shown`` ()
 
             let work2 = generateWork ()
-            do! When.``SetNumber msg has been dispatched with`` work2.Number
-            do! When.``SetTitle msg has been dispatched with`` work2.Title
+            do! When.``CreatingWork SetNumber msg has been dispatched with`` work2.Number
+            do! When.``CreatingWork SetTitle msg has been dispatched with`` work2.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
             do! When.``WorkList sub model has been shown`` 3<times>
 
@@ -110,5 +110,31 @@ module WorkFeature =
 
             do! Then.``WorkList sub model has been shown`` 2<times>
             do! Then.``WorkList sub model selected work is set on`` work.Id
+        }
+        |> Scenario.runTestAsync
+
+    // ---------------------
+    // update work scenarios
+    // ---------------------
+    [<Test>]
+    let ``UC4-6 - Work selected -> update work -> work updated, return to WorkList`` () =
+        scenario {
+            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            let! work = Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``WorkSelector drawer is opening`` ()
+            do! When.``WorkList sub model has been shown`` 1<times>
+            do! When.``WorkListModel Edit WorkModel msg has been dispatched`` work
+            do! When.``UpdatingWork sub model has been shown`` ()
+
+            let updatedWork = generateWork ()
+            do! When.``UpdatingWork SetNumber msg has been dispatched with`` updatedWork.Number
+            do! When.``UpdatingWork SetTitle msg has been dispatched with`` updatedWork.Title
+            do! When.``Update WorkModel msg has been dispatched`` ()
+
+            do! Then.``WorkList sub model has been shown`` 2<times>
+            do! Then.``WorkList sub model selected work is set on`` work.Id
+            do! Then.``WorkList sub model work list contains`` updatedWork
+            do! Then.``WorkList sub model work list does not contain`` work
         }
         |> Scenario.runTestAsync

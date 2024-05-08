@@ -119,7 +119,7 @@ let ``WorkList sub model selected work is not set`` () =
     }
     |> Scenario.log $"Then.``{nameof ``WorkList sub model selected work is set on``}``"
 
-
+/// Asserts work number and title
 let ``WorkList sub model work list contains`` (work: Work) =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -136,6 +136,24 @@ let ``WorkList sub model work list contains`` (work: Work) =
         | _ -> assertionExn "WorkSelector is None."
     }
     |> Scenario.log $"Then.``{nameof ``WorkList sub model work list contains``}``"
+
+/// Asserts work number and title
+let ``WorkList sub model work list does not contain`` (work: Work) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        match sut.MainModel.WorkSelector with
+        | Some ws ->
+            match ws.SubModel with
+            | WorkSelectorSubModel.WorkList workListModel ->
+                match workListModel.Works with
+                | AsyncDeferred.Retrieved workList ->
+                    workList |> List.map _.Title |> should not' (contain work.Title)
+                    workList |> List.map _.Number |> should not' (contain work.Number)
+                | _ -> assertionExn "WorkListModel Works are not retrieved."
+            | _ -> assertionExn "Is not WorkList submodel."
+        | _ -> assertionExn "WorkSelector is None."
+    }
+    |> Scenario.log $"Then.``{nameof ``WorkList sub model work list does not contain``}``"
 
 let ``MainModel WorkSelector becomes None`` () =
     scenario {
