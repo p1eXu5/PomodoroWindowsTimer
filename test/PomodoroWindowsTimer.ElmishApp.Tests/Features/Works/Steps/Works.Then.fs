@@ -178,7 +178,7 @@ let ``Work time is greater than`` (workId: uint64) (seconds: float<sec>) =
 
         match eventsRes with
         | Ok events ->
-            match WorkEventProjector.project (events |> Seq.toList) with
+            match WorkEventProjector.project events with
             | Some statistic ->
                 statistic.WorkTime.TotalSeconds |> shouldL lessThanOrEqualTo (float seconds) $"WorkTime TotalSeconds is {statistic.WorkTime.TotalSeconds}"
             | None ->
@@ -197,7 +197,7 @@ let ``Work time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSecon
 
         match eventsRes with
         | Ok events ->
-            match WorkEventProjector.project (events |> Seq.toList) with
+            match WorkEventProjector.project events with
             | Some statistic ->
                 statistic.WorkTime.TotalSeconds - (float minSeconds) |> shouldL lessThanOrEqualTo (float maxSeconds) $"WorkTime TotalSeconds is {statistic.WorkTime.TotalSeconds}"
             | None ->
@@ -216,7 +216,7 @@ let ``Break time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeco
 
         match eventsRes with
         | Ok events ->
-            match WorkEventProjector.project (events |> Seq.toList) with
+            match WorkEventProjector.project events with
             | Some statistic ->
                 statistic.BreakTime.TotalSeconds - (float minSeconds) |> shouldL lessThanOrEqualTo (float maxSeconds) $"BreakTime TotalSeconds is {statistic.BreakTime.TotalSeconds}"
             | None ->
@@ -234,7 +234,7 @@ let ``Break time is zero`` (workId: uint64) =
 
         match eventsRes with
         | Ok events ->
-            match WorkEventProjector.project (events |> Seq.toList) with
+            match WorkEventProjector.project events with
             | Some statistic ->
                 statistic.BreakTime.TotalSeconds |> shouldL equal 0.0 $"BreakTime TotalSeconds is {statistic.BreakTime.TotalSeconds}"
             | None ->

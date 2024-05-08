@@ -33,6 +33,10 @@ type MainModel =
         CurrentWork: WorkModel option
 
         AppDialog: AppDialogModel
+
+        // to decide where to add time when Work time point shifting down:
+        PreShiftActiveTimePointTimeSpan: float<sec>
+        ShiftTime: float<sec>
     }
 and
     LooperState =
@@ -171,6 +175,9 @@ module MainModel =
             //TimePointsGeneratorModel = None
 
             AppDialog = AppDialogModel.NoDialog
+
+            PreShiftActiveTimePointTimeSpan = -1.0<sec>
+            ShiftTime = -1.0<sec>
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
@@ -181,7 +188,8 @@ module MainModel =
     // =========
     // accessors
     // =========
-    let setLooperState state m = { m with LooperState = state }
+    let withLooperState looperState (model: MainModel) =
+        { model with LooperState = looperState }
 
     let setLastAtpWhenLooperNextWasCalled m  =
         m.ActiveTimePoint
@@ -281,7 +289,7 @@ module MainModel =
         match model.LooperState with
         | LooperState.Playing ->
             cfg.Looper.Stop()
-            model |> setLooperState Stopped
+            model |> withLooperState Stopped
         | _ -> model
 
     let withShiftedActiveTimePoint cfg (model: MainModel) =
@@ -298,4 +306,14 @@ module MainModel =
         cfg.TimePointStore.Write(timePoints)
         cfg.Looper.PreloadTimePoint()
         { model with TimePoints = timePoints }
+
+    let withShiftTime seconds (model: MainModel) =
+        { model with ShiftTime = seconds }
+
+    let withoutShiftAndPreShiftTimes (model: MainModel) =
+        { model with ShiftTime = -1.0<sec>; PreShiftActiveTimePointTimeSpan = -1.0<sec>; }
+
+    let withPreShiftActiveTimePointTimeSpan (model: MainModel) =
+        { model with PreShiftActiveTimePointTimeSpan = model.ActiveTimePoint.Value.TimeSpan.TotalSeconds * 1.0<sec> }
+
 

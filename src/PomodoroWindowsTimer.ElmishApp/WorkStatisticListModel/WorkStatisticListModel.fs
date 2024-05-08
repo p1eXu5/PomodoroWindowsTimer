@@ -66,7 +66,7 @@ module WorkStatisticListModel =
             | Some period ->
                 (period.Start, period.EndInclusive)
             | None ->
-                let nowDate = DateOnly.FromDateTime(timeProvider.GetUtcNow().DateTime)
+                let nowDate = DateOnly.FromDateTime(timeProvider.GetUtcNow().LocalDateTime)
                 (nowDate, nowDate)
 
         {

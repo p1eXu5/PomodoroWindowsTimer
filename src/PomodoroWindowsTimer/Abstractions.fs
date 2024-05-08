@@ -21,6 +21,7 @@ type ILooper =
     abstract Stop : unit -> unit
     abstract Next : unit -> unit
     abstract Shift : float<sec> -> unit
+    abstract ShiftAck : float<sec> -> unit
     abstract Resume : unit -> unit
     abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
     abstract PreloadTimePoint : unit -> unit

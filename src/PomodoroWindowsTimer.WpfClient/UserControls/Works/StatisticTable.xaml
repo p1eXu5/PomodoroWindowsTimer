@@ -44,6 +44,7 @@
                 <CheckBox x:Name="m_ByDayCheckBox"
                           Margin="8,3,16,3"
                           Content="By Day"
+                          IsChecked="{Binding IsByDay}"
                           />
                 <Border VerticalAlignment="Center"
                         BorderBrush="#555555"

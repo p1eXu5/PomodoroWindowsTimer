@@ -34,6 +34,8 @@ type private Msg =
     | Resume
     | Next
     | Shift of float<sec>
+    | ShiftAck of float<sec> * AsyncReplyChannel<unit>
+
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
@@ -95,63 +97,59 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
         , defaultArg cancellationToken CancellationToken.None
     )
 
+    let tryPostEvent (state: State) event =
+        if state.Subscribers |> (not << List.isEmpty) then
+            invoker.Post(Choice1Of2 (state.Subscribers |> List.map (fun f -> f event)))
+
+    let initialize (state: State) =
+        let nextTpOpt =
+            // in first time next time point is equal to preloaded timepoint
+            match timePointQueue.TryGetNext(), state.ActiveTimePoint with
+            | Some nextTp, Some actTp ->
+                if actTp.Id = nextTp.Id && actTp.TimeSpan = TimeSpan.Zero then
+                    timePointQueue.TryGetNext()
+                else
+                    nextTp |> Some
+            | Some nextTp, None ->
+                nextTp |> Some
+            | None, _ -> None
+
+        let dt = DateTime.Now
+
+        match nextTpOpt with
+        | Some nextTp ->
+            let (newAtp, oldAtp) =
+                state.ActiveTimePoint
+                |> Option.filter (fun t -> t.Id = nextTp.Id)
+                |> Option.map (fun t -> (t, None))
+                |> Option.defaultValue (nextTp, state.ActiveTimePoint)
+
+            tryPostEvent state (LooperEvent.TimePointStarted (newAtp, oldAtp))
+            timer.Change(int tickMilliseconds, 0) |> ignore
+            { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
+
+        | _ ->
+            timer.Change(int tickMilliseconds, 0) |> ignore
+            state
+
+    let withActiveTimePointTimeSpan (seconds: float<sec>) (state: State) =
+        match state.ActiveTimePoint with
+        | Some atp ->
+            let atp = { atp with TimeSpan = TimeSpan.FromSeconds(float seconds) }
+            tryPostEvent state (LooperEvent.TimePointTimeReduced atp)
+            { state with ActiveTimePoint = atp |> Some }
+        | None ->
+            logger.LogWarning("It's trying to shift not existing active time point.")
+            state
+
     let agent = new MailboxProcessor<Msg>(
         (fun inbox ->
-            let rec loop state =
-                let isStopMsgQueued =
-                    async {
-                        let! stopMsgOpt = inbox.TryScan(fun m ->
-                            match m with
-                            | Stop ->
-                                async {
-                                    return ()
-                                }
-                                |> Some
-                            | _ -> None
-                        )
-
-                        return stopMsgOpt |> Option.isSome
-                    }
-
-                let tryPostEvent event =
-                    if state.Subscribers |> (not << List.isEmpty) then
-                        invoker.Post(Choice1Of2 (state.Subscribers |> List.map (fun f -> f event)))
+            let rec loop (state: State) =
+                let tryPostEvent = tryPostEvent state
 
                 async {
                     let! msg = inbox.Receive()
                     // printfn "%A: %A\n" msg state
-
-                    let initialize state =
-                        let nextTpOpt =
-                            // in first time next time point is equal to preloaded timepoint
-                            match timePointQueue.TryGetNext(), state.ActiveTimePoint with
-                            | Some nextTp, Some actTp ->
-                                if actTp.Id = nextTp.Id && actTp.TimeSpan = TimeSpan.Zero then
-                                    timePointQueue.TryGetNext()
-                                else
-                                    nextTp |> Some
-                            | Some nextTp, None ->
-                                nextTp |> Some
-                            | None, _ -> None
-
-                        let dt = DateTime.Now
-
-                        match nextTpOpt with
-                        | Some nextTp ->
-                            let (newAtp, oldAtp) =
-                                state.ActiveTimePoint
-                                |> Option.filter (fun t -> t.Id = nextTp.Id)
-                                |> Option.map (fun t -> (t, None))
-                                |> Option.defaultValue (nextTp, state.ActiveTimePoint)
-
-                            tryPostEvent (LooperEvent.TimePointStarted (newAtp, oldAtp))
-                            timer.Change(int tickMilliseconds, 0) |> ignore
-                            { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
-
-                        | _ ->
-                            timer.Change(int tickMilliseconds, 0) |> ignore
-                            state
-                        
 
                     match msg with
                     | PreloadTimePoint when state.ActiveTimePoint |> Option.isNone ->
@@ -211,18 +209,16 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                     | Stop when not state.IsStopped ->
                         return! loop { state with IsStopped = true; StartTime = DateTime.Now }
 
-                    | Shift v when state.IsStopped ->
+                    | Shift seconds when state.IsStopped ->
                         use scope = beginScope (nameof Next)
-                        let newState =
-                            match state.ActiveTimePoint with
-                            | Some atp ->
-                                let atp = { atp with TimeSpan = TimeSpan.FromSeconds(float v) }
-                                tryPostEvent (LooperEvent.TimePointTimeReduced atp)
-                                { state with ActiveTimePoint = atp |> Some }
-                            | None ->
-                                logger.LogWarning("It's trying to shift not existing active time point.")
-                                state
+                        let newState = state |> withActiveTimePointTimeSpan seconds
+                        scope.Dispose()
+                        return! loop newState
 
+                    | ShiftAck (seconds, reply) when state.IsStopped ->
+                        use scope = beginScope (nameof Next)
+                        let newState = state |> withActiveTimePointTimeSpan seconds
+                        reply.Reply ()
                         scope.Dispose()
                         return! loop newState
 
@@ -265,7 +261,16 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
         agent.Post(PreloadTimePoint)
 
     member _.Shift(seconds: float<sec>) =
-        agent.Post(Shift seconds)
+        if seconds < 0.0<sec> then
+            logger.LogWarning("It's trying to shift to negative time")
+        else
+            agent.Post(Shift seconds)
+
+    member _.ShiftAck(seconds: float<sec>) =
+        if seconds < 0.0<sec> then
+            logger.LogWarning("It's trying to shift to negative time")
+        else
+            agent.PostAndReply(fun r -> ShiftAck (seconds, r))
 
     member _.Resume() =
         agent.Post(Resume)
@@ -295,6 +300,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
         member this.Stop() = this.Stop()
         member this.Next() = this.Next()
         member this.Shift(seconds: float<sec>) = this.Shift(seconds)
+        member this.ShiftAck(seconds: float<sec>) = this.ShiftAck(seconds)
         member this.Resume() = this.Resume()
         member this.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) = this.AddSubscriber(subscriber)
         member this.PreloadTimePoint() = this.PreloadTimePoint()

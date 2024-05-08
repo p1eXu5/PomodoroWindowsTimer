@@ -81,17 +81,17 @@ let updateOnPlayerMsg
     match msg with
     | ControllerMsg.Next ->
         cfg.Looper.Next()
-        model |> setLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
+        model |> withLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
 
     | ControllerMsg.Play ->
         cfg.Looper.Next()
-        model |> setLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
+        model |> withLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
 
     | ControllerMsg.Resume when model.ActiveTimePoint |> Option.isSome && model.LooperState = LooperState.Stopped ->
         let time = cfg.TimeProvider.GetUtcNow()
         cfg.Looper.Resume() // next looper event is TimePointReduced
 
-        let model = model |> setLooperState Playing
+        let model = model |> withLooperState Playing
 
         model
         , Cmd.batch [
@@ -113,7 +113,7 @@ let updateOnPlayerMsg
     | ControllerMsg.Stop when model.LooperState = LooperState.Playing ->
         cfg.Looper.Stop()
         let time = cfg.TimeProvider.GetUtcNow()
-        model |> setLooperState Stopped
+        model |> withLooperState Stopped
         , Cmd.batch [
             Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
             Cmd.ofMsg (WindowsMsg.RestoreAppWindow |> Msg.WindowsMsg)
@@ -207,16 +207,17 @@ let updateOnPlayerMsg
     // --------------------
     // Active time changing
     // --------------------
-    | ControllerMsg.PreChangeActiveTimeSpan ->
+    | ControllerMsg.PreChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
+
         match model.LooperState with
         | Playing ->
             cfg.Looper.Stop()
             let time = cfg.TimeProvider.GetUtcNow()
             model
             , Cmd.batch [
-                match model.CurrentWork, model.ActiveTimePoint with
-                | Some work, Some tp ->
-                    Cmd.OfTask.attempt (storeStoppedWorkEventTask work.Work.Id time) tp Msg.OnExn
+                match model.CurrentWork with
+                | Some work->
+                    Cmd.OfTask.attempt (storeStoppedWorkEventTask work.Work.Id time) model.ActiveTimePoint.Value Msg.OnExn
                 | _ ->
                     Cmd.none
             ]
@@ -225,17 +226,21 @@ let updateOnPlayerMsg
 
     | ControllerMsg.ChangeActiveTimeSpan v ->
         let duration = model |> getActiveTimeDuration
-        cfg.Looper.Shift((duration - v) * 1.0<sec>)
-        model, Cmd.none
+        let shiftTime = (duration - v) * 1.0<sec>
+        cfg.Looper.Shift(shiftTime)
+
+        model |> withShiftTime shiftTime |> withCmdNone
 
     | ControllerMsg.PostChangeActiveTimeSpan ->
+        // TODO: check model.ShiftTime and ActiveTimePoint
         match model.LooperState with
         | TimeShiftingAfterNotPlaying s ->
-            { model with LooperState = s }, Cmd.none
+            model |> withLooperState s |> withoutShiftAndPreShiftTimes |> withCmdNone
         | _ ->
             let time = cfg.TimeProvider.GetUtcNow()
             cfg.Looper.Resume()
-            model
+
+            model |> withoutShiftAndPreShiftTimes
             , Cmd.batch [
                 match model.CurrentWork, model.ActiveTimePoint with
                 | Some work, Some tp ->
@@ -243,7 +248,6 @@ let updateOnPlayerMsg
                 | _ ->
                     Cmd.none
             ]
-
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
