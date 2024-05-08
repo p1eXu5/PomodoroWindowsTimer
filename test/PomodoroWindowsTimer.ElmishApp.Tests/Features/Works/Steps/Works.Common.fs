@@ -20,7 +20,6 @@ let ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
         )
     }
 
-
 let ``CreatingWork sub model has been shown`` () =
     scenario {
         do! Scenario.modelSatisfiesWithin2Sec "CreatingWork selector sub model expected" (fun mainModel ->

@@ -22,7 +22,7 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
 
         | WorkListModel.Intent.SwitchToCreateWork ->
             model
-            |> withCreatingWorkModel (CreatingWorkModel.init ())
+            |> withCreatingWorkModel (CreatingWorkModel.init (), sm.SelectedWorkId)
             |> withCmdNone
             |> withNoIntent
 
@@ -45,27 +45,27 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
         | WorkListModel.Intent.Edit (workModel, selectedWorkId) ->
             model |> withUpdatingWorkModel workModel selectedWorkId |> withCmdNone |> withNoIntent
 
-    | Msg.CreatingWorkModelMsg smsg, CreatingWork sm ->
+    | Msg.CreatingWorkModelMsg smsg, CreatingWork (sm, selectedWorkId) ->
         let (sm, cmd, intent) = updateCreatingWorkModel smsg sm
 
         match intent with
         | CreatingWorkModel.Intent.None ->
-            model |> withCreatingWorkModel sm
+            model |> withCreatingWorkModel (sm, selectedWorkId)
             , Cmd.map Msg.CreatingWorkModelMsg cmd
             , Intent.None
 
         | CreatingWorkModel.Intent.Cancel ->
-            let (m, cmd) = WorkListModel.init None
+            let (m, cmd) = WorkListModel.init selectedWorkId
             model |> withWorkListModel m
             , Cmd.map Msg.WorkListModelMsg cmd
             , Intent.None
 
         | CreatingWorkModel.Intent.SwitchToWorkList newWorkId ->
-            let (m, cmd) = WorkListModel.init None
+            let (m, cmd) = WorkListModel.init (newWorkId |> Some)
             model |> withWorkListModel m
             , Cmd.batch [
                 Cmd.map Msg.WorkListModelMsg cmd
-                Cmd.ofMsg (WorkListModel.Msg.SetSelectedWorkId (newWorkId |> Some) |> Msg.WorkListModelMsg)
+                // Cmd.ofMsg (WorkListModel.Msg.SetSelectedWorkId (newWorkId |> Some) |> Msg.WorkListModelMsg)
             ]
             , Intent.None
 

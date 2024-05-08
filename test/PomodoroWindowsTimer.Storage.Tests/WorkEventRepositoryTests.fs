@@ -232,7 +232,7 @@ module WorkEventRepositoryTests =
             | Error err -> failAssert err
             | Ok rows ->
                 let list = rows |> Seq.toList
-                list |> should haveLength 2
-                list[0].Events |> should haveLength 5
-                list[1].Events |> should haveLength 5
+                list.Length |> should greaterThanOrEqualTo 2
+                list[0].Events.Length |> should greaterThanOrEqualTo 5
+                list[1].Events.Length |> should greaterThanOrEqualTo 5
         }

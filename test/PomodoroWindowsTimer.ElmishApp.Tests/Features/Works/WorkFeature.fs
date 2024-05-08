@@ -93,3 +93,22 @@ module WorkFeature =
         }
         |> Scenario.runTestAsync
 
+    // ---------------------
+    // select work scenarios
+    // ---------------------
+    [<Test>]
+    let ``UC4-5 - Work selected -> try to create a new one and cancel -> selected work preserves`` () =
+        scenario {
+            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            let! work = Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``WorkSelector drawer is opening`` ()
+            do! When.``WorkList sub model has been shown`` 1<times>
+            do! When.``WorkListModel CreateWork msg has been dispatched`` ()
+            do! When.``CreatingWork sub model has been shown`` ()
+            do! When.``Canceling the creation of work`` ()
+
+            do! Then.``WorkList sub model has been shown`` 2<times>
+            do! Then.``WorkList sub model selected work is set on`` work.Id
+        }
+        |> Scenario.runTestAsync

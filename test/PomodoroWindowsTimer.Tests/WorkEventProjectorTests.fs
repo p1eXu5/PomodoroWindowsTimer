@@ -39,8 +39,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:00:00``.DateTime
-                            EndInclusive = ``23:00:00``.DateTime
+                            Start = ``23:00:00``.LocalDateTime
+                            EndInclusive = ``23:00:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.Zero
                     BreakTime = TimeSpan.Zero
@@ -56,8 +56,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:00:00``.DateTime
-                            EndInclusive = ``23:00:00``.DateTime
+                            Start = ``23:00:00``.LocalDateTime
+                            EndInclusive = ``23:10:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.FromMinutes(10)
                     BreakTime = TimeSpan.Zero
@@ -74,8 +74,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:00:00``.DateTime
-                            EndInclusive = ``23:20:00``.DateTime
+                            Start = ``23:00:00``.LocalDateTime
+                            EndInclusive = ``23:20:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.FromMinutes(10)
                     BreakTime = TimeSpan.FromMinutes(10)
@@ -93,8 +93,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:00:00``.DateTime
-                            EndInclusive = ``23:30:00``.DateTime
+                            Start = ``23:00:00``.LocalDateTime
+                            EndInclusive = ``23:30:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.FromMinutes(20)
                     BreakTime = TimeSpan.FromMinutes(10)
@@ -110,8 +110,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:00:00``.DateTime
-                            EndInclusive = ``23:10:00``.DateTime
+                            Start = ``23:00:00``.LocalDateTime
+                            EndInclusive = ``23:10:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.FromMinutes(10)
                     BreakTime = TimeSpan.Zero
@@ -127,8 +127,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:50:00``.DateTime
-                            EndInclusive = ``00:00:00``.DateTime
+                            Start = ``23:50:00``.LocalDateTime
+                            EndInclusive = ``00:00:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.FromMinutes(10)
                     BreakTime = TimeSpan.Zero
@@ -147,8 +147,8 @@ module WorkEventProjectorTests =
                 {
                     Period =
                         {
-                            Start = ``23:00:00``.DateTime
-                            EndInclusive = ``23:40:00``.DateTime
+                            Start = ``23:00:00``.LocalDateTime
+                            EndInclusive = ``23:40:00``.LocalDateTime
                         }
                     WorkTime = TimeSpan.FromMinutes(20)
                     BreakTime = TimeSpan.FromMinutes(10)

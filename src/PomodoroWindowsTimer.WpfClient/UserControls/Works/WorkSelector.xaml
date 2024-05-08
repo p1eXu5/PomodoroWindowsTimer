@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkSelector"
+             x:Name="m_Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:WorkSelectorModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkSelectorModel;assembly=PomodoroWindowsTimer.ElmishApp"
@@ -8,9 +9,8 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
-             x:Name="m_Root"
-             Width="300"
              d:DataContext="{d:DesignInstance Type=WorkSelectorModel:Bindings, IsDesignTimeCreatable=False}"
+             Width="300"
              d:DesignHeight="300"
              d:DesignWidth="300"
              d:Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
@@ -26,8 +26,8 @@
                                              Converter={StaticResource conv_SubModelIdToVisibility},
                                              ConverterParameter='WorkListId'}"
                         />
-        <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
-                            Title="CREATE WORK"
+        <local:EditableWork Title="CREATE WORK"
+                            xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             d:DataContext="{d:DesignInstance Type=CreatingWorkModel:Bindings, IsDesignTimeCreatable=False}"
                             DataContext="{Binding CreatingWorkModel}"
                             CancelCommand="{Binding CancelCommand}"
@@ -39,8 +39,8 @@
                                                  ConverterParameter='CreatingWorkId',
                                                  FallbackValue=Collapsed}"
                             />
-        <local:EditableWork xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
-                            Title="EDIT WORK"
+        <local:EditableWork Title="EDIT WORK"
+                            xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
                             DataContext="{Binding UpdatingWorkModel}"
                             CancelCommand="{Binding CancelEditCommand}"

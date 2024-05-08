@@ -13,6 +13,13 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
 
+/// Implements the next steps:
+///
+/// 1. Given.``Stored TimePoints``
+///
+/// 2. Given.``Initialized Program``
+///
+/// 3. Common.``Looper TimePointStarted event has been despatched with``
 let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint list) =
     scenario {
 
@@ -24,6 +31,17 @@ let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint 
         return ()
     }
 
+/// Implements the next steps:
+///
+/// 1. Given.``Stored TimePoints``
+///
+/// 2. Given.``Stored CurrentWork``
+///
+/// 3. Given.``Initialized Program``
+///
+/// 4. Common.``Looper TimePointStarted event has been despatched with``
+///
+/// 5. Common.``SetCurrentWorkIfNone msg has been dispatched with``
 let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint list) =
     scenario {
         let currentWork = generateWork ()
@@ -35,5 +53,7 @@ let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint lis
         do! Common.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
         do! Common.``SetCurrentWorkIfNone msg has been dispatched with`` currentWork
 
-        return currentWork
+        let! (sut: ISut) = Scenario.getState
+
+        return sut.MainModel.CurrentWork.Value.Work
     }

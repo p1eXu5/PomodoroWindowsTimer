@@ -16,11 +16,15 @@ let ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
     |> Scenario.log $"When.``{nameof Common.``SetCurrentWorkIfNone msg has been dispatched with``} {expectedWork}``"
 
 
+/// Dispatches and wh=ait `MainModel.Msg.SetIsWorkSelectorLoaded true`.
+///
+/// To wait result call When.``WorkList sub model has been shown``.
 let ``WorkSelector drawer is opening`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let msg = MainModel.Msg.SetIsWorkSelectorLoaded true
         do sut.Dispatcher.Dispatch msg
+        do! Scenario.msgDispatchedWithin2Sec "SetIsWorkSelectorLoaded" ((=) msg)
     }
 
 let ``WorkSelector drawer is closing`` () =
@@ -86,6 +90,7 @@ let ``CreatingWorkModel CreateWork msg has been dispatched`` () =
         )
     }
 
+/// Dispatches and wait WorkListModel.Msg.CreateWork
 let ``WorkListModel CreateWork msg has been dispatched`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -98,5 +103,20 @@ let ``WorkListModel CreateWork msg has been dispatched`` () =
         do sut.Dispatcher.Dispatch msg
 
         do! Scenario.msgDispatchedWithin2Sec "WorkListModel CreateWork" ((=) msg)
+    }
+
+
+let ``Canceling the creation of work`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let msg =
+            CreatingWorkModel.Msg.Cancel
+            |> WorkSelectorModel.Msg.CreatingWorkModelMsg
+            |> MainModel.Msg.WorkSelectorModelMsg
+
+        do sut.Dispatcher.Dispatch msg
+
+        do! Scenario.msgDispatchedWithin2Sec "CreatingWorkModel Cancel" ((=) msg)
     }
 

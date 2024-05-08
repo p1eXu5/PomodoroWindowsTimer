@@ -7,7 +7,7 @@ type WorkSelectorModel =
 and
     WorkSelectorSubModel =
         | WorkList of WorkListModel
-        | CreatingWork of CreatingWorkModel
+        | CreatingWork of CreatingWorkModel * selectedWorkId: uint64 option
         | UpdatingWork of WorkModel * selectedWorkId: uint64 option
 
 module WorkSelectorModel =
@@ -70,7 +70,7 @@ module WorkSelectorModel =
     let creatingWorkModel =
          _.SubModel
         >> function
-            | CreatingWork m -> m |> Some
+            | CreatingWork (m, _) -> m |> Some
             | _ -> None
 
     let withCreatingWorkModel creatingWorkModel (model: WorkSelectorModel) =

@@ -99,9 +99,9 @@ let ``WorkList sub model selected work is set on`` (workId: uint64) =
             | WorkSelectorSubModel.WorkList workList ->
                 match workList.SelectedWorkId with
                 | Some id -> id |> shouldL equal workId $"SelectedWorkId is {id}"
-                | _ -> assertionExn $"SelectedWorkId is {workList.SelectedWorkId}"
-            | _ -> assertionExn "Is not WorkList submodel"
-        | _ -> assertionExn "WorkSelector is None"
+                | _ -> assertionExn $"SelectedWorkId is None!"
+            | _ -> assertionExn "Is not WorkList submodel!"
+        | _ -> assertionExn "MainModel.WorkSelector is None!"
     }
     |> Scenario.log $"Then.``{nameof ``WorkList sub model selected work is set on``}``"
 
