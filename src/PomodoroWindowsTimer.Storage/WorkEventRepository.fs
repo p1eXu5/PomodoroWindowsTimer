@@ -80,9 +80,10 @@ let findByWorkIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<I
 
         return
             res
-            |> Result.map (Seq.map (fun r ->
-                JsonHelpers.Deserialize<WorkEvent>(r.event_json)
-            ))
+            |> Result.map (
+                Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
+                >> Seq.toList
+            )
     }
 
 let findByWorkId (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) (workId: uint64) =
@@ -94,9 +95,10 @@ let findByWorkId (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) 
         |> selectf
 
     res
-    |> Result.map (Seq.map (fun r ->
-        JsonHelpers.Deserialize<WorkEvent>(r.event_json)
-    ))
+    |> Result.map (
+        Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
+        >> Seq.toList
+    )
 
 
 let findByWorkIdByPeriodQuery workId dateMin dateMax =
@@ -119,9 +121,10 @@ let findByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: Cancell
 
         return
             res
-            |> Result.map (Seq.map (fun r ->
-                JsonHelpers.Deserialize<WorkEvent>(r.event_json)
-            ))
+            |> Result.map (
+                Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
+                >> Seq.toList
+            )
     }
 
 let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: DateOnlyPeriod) ct =
@@ -136,9 +139,10 @@ let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: Cance
 
         return
             res
-            |> Result.map (Seq.map (fun r ->
-                JsonHelpers.Deserialize<WorkEvent>(r.event_json)
-            ))
+            |> Result.map (
+                Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
+                >> Seq.toList
+            )
     }
 
 
@@ -180,6 +184,7 @@ let findAllByPeriodTask
                         Events = evs |> Seq.map snd |> Seq.toList
                     }
                 )
+                |> Seq.toList
             )
     }
 

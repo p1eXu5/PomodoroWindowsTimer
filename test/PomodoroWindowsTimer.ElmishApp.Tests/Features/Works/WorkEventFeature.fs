@@ -36,16 +36,100 @@ module WorkEventFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
-            do! Then.``Work events in db exist`` 1UL [ <@ WorkEvent.WorkStarted @> ] // newly created work Id
+            do! Then.``Work events in db exist`` currentWork.Id [ <@ WorkEvent.WorkStarted @> ] // newly created work Id
         }
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-3: Moving time slider when Initialized -> does not add events Scenario`` () =
+    let ``UC5-3: Start Work -> Stop Work -> Resume Work -> adds 3 events`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Resume msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent`` 1.0<sec>
+
+            do! Then.``Current Work has been set to`` currentWork
+            do! Then.``Work events in db exist`` currentWork.Id [
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+            ]
+            do! Then.``Work time is between`` currentWork.Id 1.0<sec> 1.9<sec>
+            do! Then.``Break time is zero`` currentWork.Id
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    let ``UC5-4: Start Work -> Stop Work -> Resume Work -> Next to Break -> adds 4 events`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP 10.0<sec> ]
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Play msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Stop msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Resume msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Next msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+
+            do! Then.``Current Work has been set to`` currentWork
+            do! Then.``Work events in db exist`` currentWork.Id [
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.BreakStarted @@>
+            ]
+            do! Then.``Work time is between`` currentWork.Id 2.0<sec> 2.9<sec>
+            do! Then.``Break time is zero`` currentWork.Id
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    let ``UC5-5: Start Work -> Stop Work -> Resume Work -> Next to Break -> Next to Work -> adds 4 events`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP 10.0<sec> ]
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Play msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Stop msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Resume msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Next msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+            do! When.``Next msg has been dispatched`` 1<times>
+            do! When.``Spent`` 1.0<sec>
+
+            do! Then.``Current Work has been set to`` currentWork
+            do! Then.``Work events in db exist`` currentWork.Id [
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.BreakStarted @@>
+                <@@ WorkEvent.WorkStarted @@>
+            ]
+            do! Then.``Work time is between`` currentWork.Id 2.0<sec> 2.9<sec>
+            do! Then.``Break time is between`` currentWork.Id 1.0<sec> 1.9<sec>
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    let ``UC5-6: Moving time slider when Initialized -> does not add events Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             let! currentWork =
@@ -62,13 +146,13 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-4: Moving time slider when Playing -> adds events Scenario`` () =
+    let ``UC5-7: Moving time slider when Playing -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
@@ -89,7 +173,7 @@ module WorkEventFeature =
     // change work scenarios
     // ---------------------
     [<Test>]
-    let ``UC5-5: Current Work set -> new Work is created and selected -> does not add events`` () =
+    let ``UC5-8: Current Work set -> new Work is created and selected -> does not add events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! _ =
@@ -115,13 +199,13 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-6: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
+    let ``UC5-9: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! _ =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``WorkSelector drawer is opening`` ()

@@ -42,7 +42,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
@@ -63,8 +63,8 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
-            do! When.``Stop msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
@@ -84,9 +84,9 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
-            do! When.``Stop msg has been dispatched`` ()
-            do! When.``Resume msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Resume msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
@@ -106,7 +106,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
@@ -129,8 +129,8 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
-            do! When.``Stop msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
 
             do! Then.``Active Point is set on`` timePoints[1]
@@ -152,7 +152,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
 
             do! Then.``Active Point is set on`` timePoints[1]
@@ -174,7 +174,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Replay msg has been dispatched`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
@@ -195,7 +195,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` () // Work
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` () // Work
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
 
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times> // to Break
@@ -244,7 +244,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
@@ -264,8 +264,8 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
-            do! When.``Stop msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
@@ -285,9 +285,9 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
-            do! When.``Stop msg has been dispatched`` ()
-            do! When.``Resume msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Resume msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
@@ -307,7 +307,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
 
             do! Then.``Active Point is set on`` timePoints[1]
@@ -329,8 +329,8 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
-            do! When.``Stop msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
@@ -353,7 +353,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
 
@@ -377,7 +377,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Replay msg has been dispatched`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head

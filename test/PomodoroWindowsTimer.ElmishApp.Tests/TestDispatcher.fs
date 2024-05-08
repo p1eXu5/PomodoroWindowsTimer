@@ -2,6 +2,7 @@
 
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.Types
 
 type TestDispatcher () =
     let timeout = ((int Program.tickMilliseconds) * 2 + ((int Program.tickMilliseconds) / 2))
@@ -21,9 +22,15 @@ type TestDispatcher () =
         }
         |> Async.RunSynchronously
 
-     member this.WaitTimeout() =
+     member _.WaitTimeout() =
         async {
            do! Async.Sleep timeout
+        }
+        |> Async.RunSynchronously
+
+    member _.WaitTimeout(seconds: float<sec>) =
+        async {
+           do! Async.Sleep (int (float seconds * 1000.0))
         }
         |> Async.RunSynchronously
 

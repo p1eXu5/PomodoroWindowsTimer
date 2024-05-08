@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    <InternalsVisibleTo Include="$(AssemblyName).ElmishApp.Tests" />
   </ItemGroup>
 
   <ItemGroup>

@@ -81,7 +81,7 @@ module TimeSliderFeature =
             do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
 
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 0.0<sec> 0.0<sec>
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
@@ -109,7 +109,7 @@ module TimeSliderFeature =
             do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
 
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 0.0<sec> 0.0<sec>
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
             do! Then.``Active Point is set on`` timePoints[1]
@@ -131,7 +131,7 @@ module TimeSliderFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
@@ -157,7 +157,7 @@ module TimeSliderFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
@@ -188,7 +188,7 @@ module TimeSliderFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``Play msg has been dispatched`` ()
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()

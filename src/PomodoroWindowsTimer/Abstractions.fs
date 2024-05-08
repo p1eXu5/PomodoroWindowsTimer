@@ -30,7 +30,7 @@ type ILooper =
 type IWorkRepository =
     interface
         abstract CreateAsync: number: string -> title: string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract ReadAllAsync: CancellationToken -> Task<Result<Work seq, string>>
+        abstract ReadAllAsync: CancellationToken -> Task<Result<Work list, string>>
         abstract FindByIdAsync: workId: uint64 -> CancellationToken -> Task<Result<Work option, string>>
         abstract FindByIdOrCreateAsync: Work -> CancellationToken -> Task<Result<Work, string>>
         abstract UpdateAsync: Work -> CancellationToken -> Task<Result<DateTimeOffset, string>>
@@ -39,10 +39,10 @@ type IWorkRepository =
 type IWorkEventRepository =
     interface
         abstract CreateAsync: workId: uint64 -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract FindByWorkIdAsync: workId: uint64 -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract FindByWorkId: workId: uint64 -> Result<WorkEvent seq, string>
-        abstract FindByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract FindByWorkIdByPeriodAsync: workId: uint64 -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent seq, string>>
-        abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList seq, string>>
+        abstract FindByWorkIdAsync: workId: uint64 -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkId: workId: uint64 -> Result<WorkEvent list, string>
+        abstract FindByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkIdByPeriodAsync: workId: uint64 -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
     end
 

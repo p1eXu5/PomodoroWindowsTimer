@@ -21,6 +21,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 open NUnit.Framework
 open Elmish.Extensions
+open PomodoroWindowsTimer
 
 
 let ``Current Work has been set to`` (expectedCurrentWork: Work) =
@@ -72,7 +73,7 @@ let ``Work events in db exist`` (workId: uint64) (eventExpr: #Quotations.Expr se
 
         match workEventRepository.FindByWorkId workId with
         | Ok workEvents ->
-            workEvents |> Seq.length |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> Seq.length}"
+            workEvents |> List.length |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> List.length}. The events are {workEvents}"
             Seq.zip workEvents eventExpr
             |> Seq.iter (fun (ev, expr) -> ev |> should be (ofCase expr))
         | Error err ->
@@ -167,4 +168,79 @@ let ``MainModel WorkSelector becomes None`` () =
                 false
         )
     }
+    |> Scenario.log $"Then.``{nameof ``MainModel WorkSelector becomes None``}``"
+
+let ``Work time is greater than`` (workId: uint64) (seconds: float<sec>) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepo.FindByWorkId workId
+
+        match eventsRes with
+        | Ok events ->
+            match WorkEventProjector.project (events |> Seq.toList) with
+            | Some statistic ->
+                statistic.WorkTime.TotalSeconds |> shouldL lessThanOrEqualTo (float seconds) $"WorkTime TotalSeconds is {statistic.WorkTime.TotalSeconds}"
+            | None ->
+                assertionExn "Have no work time"
+        | Error err ->
+            assertionExn err
+    }
+    |> Scenario.log $"Then.``{nameof ``Work time is greater than``}``"
+
+
+let ``Work time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeconds: float<sec>) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepo.FindByWorkId workId
+
+        match eventsRes with
+        | Ok events ->
+            match WorkEventProjector.project (events |> Seq.toList) with
+            | Some statistic ->
+                statistic.WorkTime.TotalSeconds - (float minSeconds) |> shouldL lessThanOrEqualTo (float maxSeconds) $"WorkTime TotalSeconds is {statistic.WorkTime.TotalSeconds}"
+            | None ->
+                assertionExn "Have no work time"
+        | Error err ->
+            assertionExn err
+    }
+    |> Scenario.log $"Then.``{nameof ``Work time is between``}``"
+
+
+let ``Break time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeconds: float<sec>) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepo.FindByWorkId workId
+
+        match eventsRes with
+        | Ok events ->
+            match WorkEventProjector.project (events |> Seq.toList) with
+            | Some statistic ->
+                statistic.BreakTime.TotalSeconds - (float minSeconds) |> shouldL lessThanOrEqualTo (float maxSeconds) $"BreakTime TotalSeconds is {statistic.BreakTime.TotalSeconds}"
+            | None ->
+                assertionExn "Have no break time"
+        | Error err ->
+            assertionExn err
+    }
+    |> Scenario.log $"Then.``{nameof ``Break time is between``}``"
+
+let ``Break time is zero`` (workId: uint64) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepo.FindByWorkId workId
+
+        match eventsRes with
+        | Ok events ->
+            match WorkEventProjector.project (events |> Seq.toList) with
+            | Some statistic ->
+                statistic.BreakTime.TotalSeconds |> shouldL equal 0.0 $"BreakTime TotalSeconds is {statistic.BreakTime.TotalSeconds}"
+            | None ->
+                return ()
+        | Error err ->
+            assertionExn err
+    }
+    |> Scenario.log $"Then.``{nameof ``Break time is zero``}``"
 

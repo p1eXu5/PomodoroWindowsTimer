@@ -89,7 +89,7 @@ let readAllTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnume
 
         return
             res
-            |> Result.map (Seq.map ReadRow.toWork)
+            |> Result.map (Seq.map ReadRow.toWork >> Seq.toList)
     }
 
 let findByIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (id: uint64) ct =
@@ -120,7 +120,7 @@ let findTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerab
 
         return
             res
-            |> Result.map (Seq.map ReadRow.toWork)
+            |> Result.map (Seq.map ReadRow.toWork >> Seq.toList)
     }
 
 let findOrCreateTask

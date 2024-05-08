@@ -17,7 +17,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
             let! works = workRepo.ReadAllAsync ct
             return
                 works
-                |> Result.map (Seq.map WorkModel.init >> Seq.toList)
+                |> Result.map (List.map WorkModel.init)
         }
 
     match msg with

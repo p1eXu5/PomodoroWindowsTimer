@@ -103,19 +103,19 @@ let internal project (workEvents: WorkEvent list) =
 let projectByWorkIdDaily (workEventRepo: IWorkEventRepository) (workId: uint64) (date: DateOnly) ct =
     task {
         let! res = workEventRepo.FindByWorkIdByDateAsync workId date ct
-        return res |> Result.map (Seq.toList >> project)
+        return res |> Result.map project
     }
 
 let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: DateOnlyPeriod) ct =
     task {
         let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
-        return res |> Result.map (Seq.toList >> project)
+        return res |> Result.map project
     }
 
 let projectByWorkId (workEventRepo: IWorkEventRepository) (workId: uint64) ct =
     task {
         let! res = workEventRepo.FindByWorkIdAsync workId ct
-        return res |> Result.map (Seq.toList >> project)
+        return res |> Result.map project
     }
 
 
@@ -124,15 +124,14 @@ let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPe
         let! res = workEventRepo.FindAllByPeriodAsync period ct
         return
             res
-            |> Result.map (fun workEventsSeq ->
-                workEventsSeq
-                |> Seq.map (fun workEvents ->
+            |> Result.map (fun workEvents ->
+                workEvents
+                |> List.map (fun workEvents ->
                     {
                         Work = workEvents.Work
                         Statistic = workEvents.Events |> project
                     }
                 )
-                |> Seq.toList
             )
     }
 

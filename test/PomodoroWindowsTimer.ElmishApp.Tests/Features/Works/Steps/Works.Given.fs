@@ -42,6 +42,8 @@ let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint 
 /// 4. Common.``Looper TimePointStarted event has been despatched with``
 ///
 /// 5. Common.``SetCurrentWorkIfNone msg has been dispatched with``
+///
+/// Returns `MainModel.CurrentWork.Value.Work`.
 let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint list) =
     scenario {
         let currentWork = generateWork ()
