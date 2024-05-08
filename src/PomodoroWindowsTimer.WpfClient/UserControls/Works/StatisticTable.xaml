@@ -65,7 +65,7 @@
                         VerticalAlignment="Center"
                         BorderBrush="#555555"
                         BorderThickness="1"
-                        IsEnabled="{Binding ElementName=m_ByDayCheckBox, Path=IsChecked, Converter={StaticResource conv_InverseBooleanToVisibility}}"
+                        IsEnabled="{Binding ElementName=m_ByDayCheckBox, Path=IsChecked, Converter={StaticResource conv_InverseBoolean}}"
                         Background="#333333"
                         >
                     <DatePicker Width="150"

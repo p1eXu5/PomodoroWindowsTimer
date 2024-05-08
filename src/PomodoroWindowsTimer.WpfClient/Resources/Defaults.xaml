@@ -18,6 +18,7 @@
     <converters:DateOnlyToDateTimeConverter x:Key="conv_DateOnlyToDateTime" />
     <converters:BooleanToVisibilityConverter x:Key="conv_BooleanToVisibility" />
     <converters:InverseBooleanToVisibilityConverter x:Key="conv_InverseBooleanToVisibility" />
+    <converters:InverseBooleanConverter x:Key="conv_InverseBoolean" />
 
     <Style x:Key="st_IconBase" TargetType="materialDesign:PackIcon">
         <Setter Property="Width" Value="18" />

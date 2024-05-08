@@ -79,7 +79,7 @@ module WorkStatisticListModel =
 
     let withStartDate (userSettings: IUserSettings) startDate (model: WorkStatisticListModel) =
         let endDate =
-            if startDate > model.EndDate then
+            if model.IsByDay || startDate > model.EndDate then
                 startDate
             else 
                 model.EndDate
@@ -93,7 +93,7 @@ module WorkStatisticListModel =
 
     let withEndDate (userSettings: IUserSettings) endDate (model: WorkStatisticListModel) =
         let startDate =
-            if endDate < model.StartDate then
+            if model.IsByDay || endDate < model.StartDate then
                 endDate
             else
                 model.StartDate
