@@ -259,6 +259,8 @@ let update
     updateWorkModel
     updateAppDialogModel
     updateWorkSelectorModel
+    initWorkStatisticListModel
+    updateWorkStatisticListModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     (msg: Msg)
@@ -415,6 +417,26 @@ let update
     | Msg.ControllerMsg pmsg -> updateOnPlayerMsg logger pmsg model
 
     | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
+
+    | Msg.SetIsWorkStatisticShown v ->
+        if v then
+            let (m, cmd) = initWorkStatisticListModel ()
+            model |> MainModel.withWorkStatistic (m |> Some)
+            , Cmd.map Msg.WorkStatisticListModelMsg cmd
+        else
+            model |> MainModel.withWorkStatistic None
+            , Cmd.none
+
+
+    | MsgWith.WorkStatisticListModelMsg model (smsg, sm) ->
+        let (m, cmd, intent) = updateWorkStatisticListModel smsg sm
+        match intent with
+        | WorkStatisticListModel.Intent.None ->
+            model |> MainModel.withWorkStatistic (m |> Some)
+            , Cmd.map Msg.WorkStatisticListModelMsg cmd
+        | WorkStatisticListModel.Intent.CloseDialogRequested ->
+            model |> MainModel.withWorkStatistic None
+            , Cmd.none
 
     // --------------------
     

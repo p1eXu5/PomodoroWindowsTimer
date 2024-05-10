@@ -6,19 +6,17 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+             xmlns:workStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=workStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
              MinWidth="800"
              MinHeight="450"
-             d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
              mc:Ignorable="d"
              >
 
     <!--<materialDesign:DialogHost.DialogContent>
             <shared:PwtDatePicker />
         </materialDesign:DialogHost.DialogContent>-->
-    <DockPanel xmlns:workStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
-               DataContext="{Binding WorkStatisticsDialog}"
-               d:DataContext="{d:DesignInstance Type=workStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
-               >
+    <DockPanel>
         <!--<DatePicker DockPanel.Dock="Top"
                         MinWidth="200"
                         />-->
@@ -39,11 +37,15 @@
                                          />
             </Button>-->
 
-        <ToolBarTray DockPanel.Dock="Top" DataContext="{Binding}">
-            <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
+        <ToolBarTray DockPanel.Dock="Top"
+                     DataContext="{Binding}"
+                     >
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}"
+                     ClipToBounds="False"
+                     >
                 <CheckBox x:Name="m_ByDayCheckBox"
-                          Margin="8,3,16,3"
                           Content="By Day"
+                          Margin="8,3,16,3"
                           IsChecked="{Binding IsByDay}"
                           />
                 <Border VerticalAlignment="Center"
@@ -57,7 +59,8 @@
                                 VerticalContentAlignment="Center"
                                 materialDesign:HintAssist.Hint="Start Date"
                                 BorderThickness="0"
-                                SelectedDate="{Binding StartDate, Converter={StaticResource conv_DateOnlyToDateTime}}"
+                                SelectedDate="{Binding StartDate,
+                                                       Converter={StaticResource conv_DateOnlyToDateTime}}"
                                 />
                 </Border>
 
@@ -66,7 +69,9 @@
                         VerticalAlignment="Center"
                         BorderBrush="#555555"
                         BorderThickness="1"
-                        IsEnabled="{Binding ElementName=m_ByDayCheckBox, Path=IsChecked, Converter={StaticResource conv_InverseBoolean}}"
+                        IsEnabled="{Binding ElementName=m_ByDayCheckBox,
+                                            Path=IsChecked,
+                                            Converter={StaticResource conv_InverseBoolean}}"
                         Background="#333333"
                         >
                     <DatePicker Width="150"
@@ -75,14 +80,15 @@
                                 VerticalContentAlignment="Center"
                                 materialDesign:HintAssist.Hint="End Date"
                                 BorderThickness="0"
-                                SelectedDate="{Binding EndDate, Converter={StaticResource conv_DateOnlyToDateTime}}"
+                                SelectedDate="{Binding EndDate,
+                                                       Converter={StaticResource conv_DateOnlyToDateTime}}"
                                 />
                 </Border>
             </ToolBar>
         </ToolBarTray>
 
-        <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
-                                 DockPanel.Dock="Bottom"
+        <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                                 x:Name="m_ErrorMessageQueueSnackbar"
                                  HorizontalAlignment="Stretch"
                                  ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
                                  MessageQueue="{Binding ErrorMessageQueue}"
@@ -97,9 +103,10 @@
                     />
         </StackPanel>
 
-        <Grid>
+        <Grid HorizontalAlignment="Stretch">
             <StackPanel Orientation="Vertical">
-                <DataGrid AutoGenerateColumns="False"
+                <DataGrid x:Name="m_StatisticTable"
+                          AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           HeadersVisibility="All"
                           IsReadOnly="False"
@@ -153,43 +160,53 @@
                                             />
                     </DataGrid.Columns>
                 </DataGrid>
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Right"
+                            Orientation="Horizontal"
+                            >
                     <TextBlock x:Name="m_OverallTotalTime"
-                               Width="{Binding ElementName=m_OverallTimeColumn, Path=ActualWidth}"
+                               Width="{Binding ElementName=m_OverallTimeColumn,
+                                               Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding OverallTotalTime}"
                                TextAlignment="Left"
                                />
                     <TextBlock x:Name="m_WorkTotalTime"
-                               Width="{Binding ElementName=m_WorkTimeColumn, Path=ActualWidth}"
+                               Width="{Binding ElementName=m_WorkTimeColumn,
+                                               Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding WorkTotalTime}"
                                TextAlignment="Left"
                                />
                     <TextBlock x:Name="m_BreakTotalTime"
-                               Width="{Binding ElementName=m_BreakTimeColumn, Path=ActualWidth}"
+                               Width="{Binding ElementName=m_BreakTimeColumn,
+                                               Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding BreakTotalTime}"
                                TextAlignment="Left"
                                />
                 </StackPanel>
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                    <TextBlock Width="{Binding ElementName=m_OverallTimeColumn, Path=ActualWidth}"
+                <StackPanel HorizontalAlignment="Right"
+                            Orientation="Horizontal"
+                            >
+                    <TextBlock Width="{Binding ElementName=m_OverallTimeColumn,
+                                               Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding OverallTotalTimeRemains}"
                                TextAlignment="Left"
                                />
-                    <TextBlock Width="{Binding ElementName=m_WorkTimeColumn, Path=ActualWidth}"
+                    <TextBlock Width="{Binding ElementName=m_WorkTimeColumn,
+                                               Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding WorkTotalTimeRemains}"
                                TextAlignment="Left"
                                />
-                    <TextBlock Width="{Binding ElementName=m_BreakTimeColumn, Path=ActualWidth}"
+                    <TextBlock Width="{Binding ElementName=m_BreakTimeColumn,
+                                               Path=ActualWidth}"
                                Padding="16,10"
                                FontWeight="Bold"
                                Text="{Binding BreakTotalTimeRemains}"

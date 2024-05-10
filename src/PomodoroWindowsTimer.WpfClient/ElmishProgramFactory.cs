@@ -35,10 +35,11 @@ internal sealed class ElmishProgramFactory(
     internal System.TimeProvider TimeProvider => timeProvider;
     internal ILoggerFactory LoggerFactory => loggerFactory;
 
-    public void RunElmishProgram(Window mainWindow)
+    public void RunElmishProgram(Window mainWindow, Func<WorkStatisticWindow> workStatisticWindowFactory)
     =>
         ElmishApp.Program.main(
             mainWindow,
+            workStatisticWindowFactory,
             Looper,
             TimePointQueue,
             WorkRepository,

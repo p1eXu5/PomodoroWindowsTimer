@@ -103,17 +103,17 @@ internal class Bootstrap : IDisposable
 
     public Task StopHostAsync() => Host.StopAsync();
 
-    public void ShowMainWindow(Window window)
+    public void ShowMainWindow(Window window, Func<WorkStatisticWindow> workStatisticWindowFactory)
     {
         var elmishProgramFactory = GetElmishProgramFactory();
-        elmishProgramFactory.RunElmishProgram(window);
+        elmishProgramFactory.RunElmishProgram(window, workStatisticWindowFactory);
         window.Show();
     }
 
-    public virtual void StartElmishApp(Window mainWindow)
+    public virtual void StartElmishApp(Window mainWindow, Func<WorkStatisticWindow> workStatisticWindowFactory)
     {
         WaitDbSeeding();
-        GetElmishProgramFactory().RunElmishProgram(mainWindow);
+        GetElmishProgramFactory().RunElmishProgram(mainWindow, workStatisticWindowFactory);
     }
 
     protected void WaitDbSeeding()

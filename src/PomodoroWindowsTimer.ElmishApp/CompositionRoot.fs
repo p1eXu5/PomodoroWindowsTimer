@@ -18,6 +18,7 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 let compose
     (title: string)
+    (workStatisticWindowFactory: System.Func<#System.Windows.Window>)
     (looper: ILooper)
     (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)
@@ -99,6 +100,8 @@ let compose
             updateWorkModel
             updateAppDialogModel
             updateWorkSelectorModel
+            initWorkStatisticListModel
+            updateWorkStatisticListModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
 
@@ -109,7 +112,7 @@ let compose
 
     let mainModelBindings =
         fun () ->
-            MainModel.Bindings.ToList title assemblyVer mainErrorMessageQueue dialogErrorMessageQueue
+            MainModel.Bindings.ToList title assemblyVer workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue
 
     // subscriptions
     let subscribe _ : (SubId * Subscribe<_>) list =

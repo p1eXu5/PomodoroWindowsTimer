@@ -43,7 +43,7 @@ namespace PomodoroWindowsTimer.WpfClient
             themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);
 
             _mainWindow = new MainWindow();
-            _bootstrap.ShowMainWindow(_mainWindow);
+            _bootstrap.ShowMainWindow(_mainWindow, () => new WorkStatisticWindow());
         }
 
         private async void Application_Exit(object sender, ExitEventArgs e)

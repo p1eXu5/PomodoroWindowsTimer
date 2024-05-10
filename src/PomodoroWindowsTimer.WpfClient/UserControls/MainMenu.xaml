@@ -93,8 +93,8 @@
             </Behaviors:Interaction.Behaviors>
         </Button>
 
-        <!--  telegram bot settings open dialog button  -->
-        <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
+        <!--  work statistic open dialog button  -->
+        <!--<Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
                 Content="{materialDesign:PackIcon ListBoxOutline}"
                 ToolTip="Works statistic"
@@ -114,7 +114,20 @@
                                                       OkCommand="{Binding UnloadDialogModelCommand}"
                                                       />
             </Behaviors:Interaction.Behaviors>
-        </Button>
+        </Button>-->
+
+        <!--  work statistic open window button  -->
+        <ToggleButton Content="{materialDesign:PackIcon ListBoxOutline}"
+                      ToolTip="Works statistic"
+                      Style="{StaticResource st_MenuToggleButton}"
+                      IsChecked="{Binding IsWorkStatisticShown}"
+                      >
+            <ToggleButton.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform X="3" />
+                </TransformGroup>
+            </ToggleButton.RenderTransform>
+        </ToggleButton>
 
         <!--  save time points button  -->
         <!--

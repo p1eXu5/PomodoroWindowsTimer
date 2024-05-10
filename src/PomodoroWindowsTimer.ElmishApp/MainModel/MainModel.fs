@@ -32,6 +32,8 @@ type MainModel =
         WorkSelector: WorkSelectorModel option
         CurrentWork: WorkModel option
 
+        WorkStatistic: WorkStatisticListModel option
+
         AppDialog: AppDialogModel
 
         // to decide where to add time when Work time point shifting down:
@@ -92,6 +94,9 @@ module MainModel =
 
         | SetIsWorkSelectorLoaded of bool
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
+
+        | SetIsWorkStatisticShown of bool
+        | WorkStatisticListModelMsg of WorkStatisticListModel.Msg
         
         | OnError of string
         | OnExn of exn
@@ -137,6 +142,11 @@ module MainModel =
                 (smsg, sm) |> Some
             | _ -> None
 
+        let (|WorkStatisticListModelMsg|_|) (model: MainModel) (msg: Msg) =
+            match msg, model.WorkStatistic with
+            | Msg.WorkStatisticListModelMsg msg, Some m ->
+                (msg, m) |> Some
+            | _ -> None
 
     //    let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
     //        match msg, model.TimePointsGeneratorModel with
@@ -173,6 +183,8 @@ module MainModel =
             CurrentWork = None
             //BotSettingsModel = None
             //TimePointsGeneratorModel = None
+
+            WorkStatistic = None
 
             AppDialog = AppDialogModel.NoDialog
 
@@ -316,4 +328,5 @@ module MainModel =
     let withPreShiftActiveTimePointTimeSpan (model: MainModel) =
         { model with PreShiftActiveTimePointTimeSpan = model.ActiveTimePoint.Value.TimeSpan.TotalSeconds * 1.0<sec> }
 
-
+    let withWorkStatistic workStatisticListModel (model: MainModel) =
+        { model with WorkStatistic = workStatisticListModel }

@@ -15,18 +15,18 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 type private Binding = Binding<MainModel, MainModel.Msg>
 
 [<Sealed>]
-type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IErrorMessageQueue, dialogErrorMessageQueue: IErrorMessageQueue) =
+type Bindings(title: string, assemblyVersion: string, workStatisticWindowFactory: System.Func<System.Windows.Window>, mainErrorMessageQueue: IErrorMessageQueue, dialogErrorMessageQueue: IErrorMessageQueue) =
     static let props = Utils.bindingProperties typeof<Bindings>
     static let mutable __ = Unchecked.defaultof<Bindings>
-    static member Instance title assemblyVersion mainErrorMessageQueue dialogErrorMessageQueue =
+    static member Instance title assemblyVersion (workStatisticWindowFactory: System.Func<System.Windows.Window>) mainErrorMessageQueue dialogErrorMessageQueue =
         if System.Object.ReferenceEquals(__, null) then
-            __ <- Bindings(title, assemblyVersion, mainErrorMessageQueue, dialogErrorMessageQueue)
+            __ <- Bindings(title, assemblyVersion, workStatisticWindowFactory, mainErrorMessageQueue, dialogErrorMessageQueue)
             __
         else __
 
-    static member ToList title assemblyVersion mainErrorMessageQueue dialogErrorMessageQueue =
+    static member ToList title assemblyVersion (workStatisticWindowFactory: System.Func<System.Windows.Window>) mainErrorMessageQueue dialogErrorMessageQueue =
         Utils.bindings<Binding>
-            (Bindings.Instance title assemblyVersion mainErrorMessageQueue dialogErrorMessageQueue)
+            (Bindings.Instance title assemblyVersion workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue)
             props
 
     member val Title : Binding =
@@ -181,6 +181,21 @@ type Bindings(title: string, assemblyVersion: string, mainErrorMessageQueue: IEr
     member val IsWorkSelectorLoaded : Binding =
         nameof __.IsWorkSelectorLoaded |> Binding.twoWay (_.WorkSelector >> Option.isSome, Msg.SetIsWorkSelectorLoaded)
 
+    member val IsWorkStatisticShown : Binding =
+        nameof __.IsWorkStatisticShown |> Binding.twoWay (_.WorkStatistic >> Option.isSome, Msg.SetIsWorkStatisticShown)
+
+    member val WorkStatisticWindow : Binding =
+        nameof __.WorkStatisticWindow
+            |> Binding.subModelWin (
+                (_.WorkStatistic >> WindowState.ofOption),
+                snd,
+                Msg.WorkStatisticListModelMsg,
+                (fun () -> WorkStatisticListModel.Bindings.ToList(dialogErrorMessageQueue)),
+                (fun _ _ -> workStatisticWindowFactory.Invoke()),
+                isModal = false
+            )
+            //|> Binding.mapModel _.WorkSelector
+            //|> Binding.mapMsg Msg.WorkSelectorModelMsg
 
 (*
 let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> list =

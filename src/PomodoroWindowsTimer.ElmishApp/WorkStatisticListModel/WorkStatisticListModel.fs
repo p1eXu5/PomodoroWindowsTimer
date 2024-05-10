@@ -132,17 +132,23 @@ module WorkStatisticListModel =
     let overallTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
         |> AsyncDeferred.toOption
-        |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.WorkTime + s.BreakTime) >> List.reduce (+))
+        |> Option.bind (function
+            | [] -> None
+            | l -> l |> List.choose _.Statistic |> List.map (fun s -> s.WorkTime + s.BreakTime) |> List.reduce (+) |> Some)
 
     let workTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
         |> AsyncDeferred.toOption
-        |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.WorkTime) >> List.reduce (+))
+        |> Option.bind (function
+            | [] -> None
+            | l -> l |> List.choose _.Statistic |> List.map (fun s -> s.WorkTime) |> List.reduce (+) |> Some)
 
     let breakTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
         |> AsyncDeferred.toOption
-        |> Option.map (List.choose _.Statistic >> List.map (fun s -> s.BreakTime) >> List.reduce (+))
+        |> Option.bind (function
+            | [] -> None
+            | l -> l |> List.choose _.Statistic |> List.map (fun s -> s.BreakTime) |> List.reduce (+) |> Some)
 
 
     [<Literal>]
