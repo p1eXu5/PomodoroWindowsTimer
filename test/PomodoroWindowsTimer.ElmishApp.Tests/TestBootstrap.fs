@@ -99,6 +99,7 @@ type TestBootstrap () =
         let (initMainModel, updateMainModel, _, subscribe) =
             CompositionRoot.compose
                 "Pomodoro Windows Timer under tests"
+                (Func<System.Windows.Window>(fun () -> Unchecked.defaultof<System.Windows.Window>))
                 factory.Looper
                 factory.TimePointQueue
                 factory.WorkRepository
