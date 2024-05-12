@@ -1,6 +1,7 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps.Given
 
 open System
+open Microsoft.Extensions.DependencyInjection
 open NUnit.Framework
 open PomodoroWindowsTimer.Testing.Fakers
 
@@ -12,6 +13,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
+open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 /// Implements the next steps:
 ///
@@ -22,7 +24,6 @@ open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
 /// 3. Common.``Looper TimePointStarted event has been despatched with``
 let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint list) =
     scenario {
-
         do! Given.``Stored TimePoints`` timePoints
         do! Given.``Initialized Program`` ()
 
@@ -58,4 +59,15 @@ let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint lis
         let! (sut: ISut) = Scenario.getState
 
         return sut.MainModel.CurrentWork.Value.Work
+    }
+
+let ``RollbackWorkStrategy is SubstractWorkAddBreak`` () =
+    scenario {
+        do! Scenario.replaceStateWith (fun f ->
+            fun sut ->
+                let (sut': #ISut) = f sut
+                let userSettings = sut'.ServiceProvider.GetRequiredService<IUserSettings>()
+                userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.SubstractWorkAddBreak
+                sut'
+        )
     }

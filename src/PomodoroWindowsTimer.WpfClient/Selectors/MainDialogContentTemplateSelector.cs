@@ -8,18 +8,16 @@ public sealed class MainDialogContentTemplateSelector : DataTemplateSelector
 {
     public override DataTemplate? SelectTemplate(object model, DependencyObject container)
     {
-        if (container is FrameworkElement element && model != null)
+        if (container is FrameworkElement element && model is AppDialogModelModule.AppDialogId appDialogId)
         {
-            AppDialogModelModule.AppDialogId? appDialogId = ((dynamic)model).AppDialogId;
-
-            if (appDialogId.HasValue && appDialogId.Value.IsBotSettingsDialogId )
+            if (appDialogId.IsBotSettingsDialogId )
             {
                 return element.FindResource("dt_BotSettingsDialog") as DataTemplate;
             }
 
-            if (appDialogId.HasValue && appDialogId.Value.IsWorkStatisticsDialogId)
+            if (appDialogId.IsRollbackWorkDialogId)
             {
-                return element.FindResource("dt_BotSettingsDialog") as DataTemplate;
+                return element.FindResource("dt_RollbackWorkDialog") as DataTemplate;
             }
         }
         return null;

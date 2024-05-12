@@ -76,9 +76,9 @@
             <Button Grid.RowSpan="2"
                     Grid.Column="1"
                     x:Name="m_Button"
+                    Command="{Binding EditCommand}"
                     Content="{materialDesign:PackIcon Pencil}"
                     ToolTip="Edit"
-                    Command="{Binding EditCommand}"
                     Height="{Binding ElementName=m_Stack,
                                      Path=ActualHeight}"
                     VerticalAlignment="Stretch"

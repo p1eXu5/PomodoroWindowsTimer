@@ -24,13 +24,15 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
             (Bindings.Instance(dialogErrorMessageQueue))
             props
 
-    member val ErrorMessageQueue =
-        nameof __.ErrorMessageQueue |> Binding.oneWay (fun _ -> dialogErrorMessageQueue) : Binding
-
     member val IsDialogOpened : Binding =
         nameof __.IsDialogOpened
             |> Binding.twoWay ((<>) AppDialogModel.NoDialog, Msg.SetIsDialogOpened)
 
+    member val AppDialogId : Binding =
+        nameof __.AppDialogId
+            |> Binding.oneWayOpt appDialogId
+
+    // -------------------------------------------------
     member val OpenBotSettingsDialogCommand : Binding =
         nameof __.OpenBotSettingsDialogCommand
             |> Binding.cmdIf (function NoDialog -> Msg.LoadBotSettingsDialogModel |> Some | _ -> None)
@@ -41,28 +43,15 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
             |> Binding.mapModel (botSettingsModel)
             |> Binding.mapMsg (Msg.BotSettingsModelMsg)
 
-    member val ApplyBotSettingsCommand : Binding =
-        nameof __.ApplyBotSettingsCommand |> Binding.cmd Msg.ApplyBotSettings
+    // -------------------------------------------------
 
-    member val OpenTimePointsGeneratorDialogCommand : Binding =
-        nameof __.OpenTimePointsGeneratorDialogCommand
-            |> Binding.cmdIf (function NoDialog -> Msg.LoadTimePointsGeneratorDialogModel |> Some | _ -> None)
+    member val RollbackWorkDialog : Binding =
+        nameof __.RollbackWorkDialog
+            |> Binding.SubModel.opt (RollbackWorkModel.Bindings.bindings)
+            |> Binding.mapModel (rollbackWorkModel)
+            |> Binding.mapMsg (Msg.RollbackWorkModelMsg)
 
-    member val TimePointsGeneratorDialog : Binding =
-        nameof __.TimePointsGeneratorDialog
-            |> Binding.SubModel.opt (TimePointsGeneratorModel.Bindings.bindings)
-            |> Binding.mapModel (timePointsGeneratorModel)
-            |> Binding.mapMsg (Msg.TimePointsGeneratorModelMsg)
-
-    member val OpenWorkStatisticsDialogCommand : Binding =
-        nameof __.OpenWorkStatisticsDialogCommand
-            |> Binding.cmdIf (function NoDialog -> Msg.LoadWorkStatisticsDialogModel |> Some | _ -> None)
-
-    member val WorkStatisticsDialog : Binding =
-        nameof __.WorkStatisticsDialog
-            |> Binding.SubModel.opt (fun () -> WorkStatisticListModel.Bindings.ToList(dialogErrorMessageQueue))
-            |> Binding.mapModel (workStatisticListModel)
-            |> Binding.mapMsg (Msg.WorkStatisticListModelMsg)
+    // -------------------------------------------------
 
     member val UnloadDialogModelCommand : Binding =
         nameof __.UnloadDialogModelCommand |> Binding.cmd Msg.Unload

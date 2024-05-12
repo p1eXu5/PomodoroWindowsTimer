@@ -45,6 +45,30 @@ let storeStoppedWorkEventTask (workEventRepository: IWorkEventRepository) (workI
         | Error err -> raise (InvalidOperationException(err))
     }
 
+let storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (offset: TimeSpan) =
+    task {
+        let workEvent =
+            WorkEvent.WorkReduced (time, offset)
+
+        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+
+        match res with
+        | Ok _ -> ()
+        | Error err -> raise (InvalidOperationException(err))
+    }
+
+let storeBreakIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (offset: TimeSpan) =
+    task {
+        let workEvent =
+            WorkEvent.BreakIncreased (time, offset)
+
+        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+
+        match res with
+        | Ok _ -> ()
+        | Error err -> raise (InvalidOperationException(err))
+    }
+
 let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
     match msg with
     | WindowsMsg.MinimizeAllRestoreApp when not model.IsMinimized ->
@@ -77,6 +101,12 @@ let updateOnPlayerMsg
 
     let storeStoppedWorkEventTask =
         storeStoppedWorkEventTask cfg.WorkEventRepository
+
+    let storeWorkReducedEventTask =
+        storeWorkReducedEventTask cfg.WorkEventRepository
+
+    let storeBreakIncreasedEventTask =
+        storeBreakIncreasedEventTask cfg.WorkEventRepository
 
     match msg with
     | ControllerMsg.Next ->
@@ -213,25 +243,22 @@ let updateOnPlayerMsg
         | Playing ->
             cfg.Looper.Stop()
             let time = cfg.TimeProvider.GetUtcNow()
-            model
+            model |> withPreShiftActiveTimePointTimeSpan
             , Cmd.batch [
-                match model.CurrentWork with
-                | Some work->
-                    Cmd.OfTask.attempt (storeStoppedWorkEventTask work.Work.Id time) model.ActiveTimePoint.Value Msg.OnExn
-                | _ ->
-                    Cmd.none
+                if model.CurrentWork |> Option.isSome then
+                    Cmd.OfTask.attempt (storeStoppedWorkEventTask model.CurrentWork.Value.Id time) model.ActiveTimePoint.Value Msg.OnExn
             ]
         | _ ->
             { model with LooperState = TimeShiftingAfterNotPlaying model.LooperState }, Cmd.none
 
-    | ControllerMsg.ChangeActiveTimeSpan v ->
+    | ControllerMsg.ChangeActiveTimeSpan v when model.ActiveTimePoint |> Option.isSome ->
         let duration = model |> getActiveTimeDuration
         let shiftTime = (duration - v) * 1.0<sec>
         cfg.Looper.Shift(shiftTime)
 
         model |> withShiftTime shiftTime |> withCmdNone
 
-    | ControllerMsg.PostChangeActiveTimeSpan ->
+    | ControllerMsg.PostChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
         // TODO: check model.ShiftTime and ActiveTimePoint
         match model.LooperState with
         | TimeShiftingAfterNotPlaying s ->
@@ -240,15 +267,37 @@ let updateOnPlayerMsg
             let time = cfg.TimeProvider.GetUtcNow()
             cfg.Looper.Resume()
 
-            model |> withoutShiftAndPreShiftTimes
-            , Cmd.batch [
-                match model.CurrentWork, model.ActiveTimePoint with
-                | Some work, Some tp ->
-                    Cmd.OfTask.attempt (storeStartedWorkEventTask work.Work.Id time) tp Msg.OnExn
-                | _ ->
-                    Cmd.none
+            let atp = model.ActiveTimePoint.Value
+            let rollbackWorkStrategy = cfg.UserSettings.RollbackWorkStrategy
+
+            let cmds = [
+                if model.CurrentWork |> Option.isSome then
+                    Cmd.OfTask.attempt (storeStartedWorkEventTask model.CurrentWork.Value.Id time) atp Msg.OnExn
             ]
 
+            if atp.Kind = Kind.Work && model.NewActiveTimeSpan > model.PreShiftActiveTimeSpan && model.CurrentWork |> Option.isSome then
+                let diff = TimeSpan.FromSeconds(float (model.NewActiveTimeSpan - model.PreShiftActiveTimeSpan))
+                match rollbackWorkStrategy with
+                | RollbackWorkStrategy.SubstractWorkAddBreak ->
+                    model |> withoutShiftAndPreShiftTimes
+                    , Cmd.batch [
+                        Cmd.OfTask.attempt (storeWorkReducedEventTask model.CurrentWork.Value.Id (time.AddMilliseconds(-2))) diff Msg.OnExn
+                        Cmd.OfTask.attempt (storeBreakIncreasedEventTask model.CurrentWork.Value.Id (time.AddMilliseconds(-1))) diff Msg.OnExn
+                        yield! cmds
+                    ]
+                | RollbackWorkStrategy.UserChoiceIsRequired ->
+                    model |> withoutShiftAndPreShiftTimes
+                    , Cmd.batch [
+                        Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (model.CurrentWork.Value.Id, time, diff)))
+                        yield! cmds
+                    ]
+                | RollbackWorkStrategy.Default ->
+                    model |> withoutShiftAndPreShiftTimes
+                    , Cmd.batch cmds
+
+            else
+                model |> withoutShiftAndPreShiftTimes
+                , Cmd.batch cmds
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
         model, Cmd.none

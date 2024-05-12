@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
+using PomodoroWindowsTimer.ElmishApp;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Types;
 using PomodoroWindowsTimer.WpfClient.Extensions;
@@ -164,8 +165,37 @@ internal class UserSettings : IUserSettings
         }
         set
         {
-            var currentWork = JsonHelpers.Serialize(value);
-            Properties.Settings.Default.LastStatisticPeriod = currentWork;
+            var lastStatisticPeriod = JsonHelpers.Serialize(value);
+            Properties.Settings.Default.LastStatisticPeriod = lastStatisticPeriod;
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    public RollbackWorkStrategy RollbackWorkStrategy
+    {
+        get
+        {
+            var rollbackWorkStrategy = Properties.Settings.Default.RollbackWorkStrategy;
+            if (string.IsNullOrWhiteSpace(rollbackWorkStrategy))
+            {
+                return RollbackWorkStrategy.UserChoiceIsRequired;
+            }
+
+            try
+            {
+                var strategy = JsonHelpers.Deserialize<RollbackWorkStrategy>(rollbackWorkStrategy);
+                return strategy;
+            }
+            catch
+            {
+                Properties.Settings.Default.RollbackWorkStrategy = null;
+                return RollbackWorkStrategy.UserChoiceIsRequired;
+            }
+        }
+        set
+        {
+            var rollbackWorkStrategy = JsonHelpers.Serialize(value);
+            Properties.Settings.Default.RollbackWorkStrategy = rollbackWorkStrategy;
             Properties.Settings.Default.Save();
         }
     }

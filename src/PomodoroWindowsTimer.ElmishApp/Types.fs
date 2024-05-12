@@ -8,3 +8,9 @@ type TimePointKind =
 
 type Message = string
 
+[<Struct>]
+type RollbackWorkStrategy = 
+    | UserChoiceIsRequired
+    | SubstractWorkAddBreak
+    | Default
+

@@ -25,9 +25,9 @@ module TimeSliderFeature =
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
 
             do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 1.5<sec> 0.0<sec>
             do! Then.``Active Point is set on`` timePoints.Head
@@ -48,14 +48,14 @@ module TimeSliderFeature =
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
             
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 1.5<sec> 0.0<sec>
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
             do! When.``ActiveTimeSeconds changed to`` 0.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 2<times>
 
             do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 3.0<sec> 0.0<sec>
             do! Then.``Active Point is set on`` timePoints.Head
@@ -76,9 +76,9 @@ module TimeSliderFeature =
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 3.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
 
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 0.0<sec> 0.0<sec>
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
@@ -104,9 +104,9 @@ module TimeSliderFeature =
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 3.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
 
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 0.0<sec> 0.0<sec>
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
@@ -134,9 +134,9 @@ module TimeSliderFeature =
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 2.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
 
 
             do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 2.0<sec> 0.25<sec>
@@ -150,7 +150,7 @@ module TimeSliderFeature =
 
     [<Test>]
     [<Category("UC3: Time slider Playing Scenarios")>]
-    let ``UC3-1 - Playing time point move backward scenario`` () =
+    let ``UC3-1 - Playing time point move forward then backward scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec``;  ]
             do! Given.``Stored TimePoints`` timePoints
@@ -160,15 +160,15 @@ module TimeSliderFeature =
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 2.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
             
             do! When.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 8.0<sec> 0.5<sec>
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
             do! When.``ActiveTimeSeconds changed to`` 0.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 2<times>
 
             do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 10.0<sec> 0.0<sec>
             do! Then.``Active Point is set on`` timePoints[0]
@@ -191,9 +191,9 @@ module TimeSliderFeature =
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 5.0<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
             do! Then.``Active Point is set on`` timePoints[1]

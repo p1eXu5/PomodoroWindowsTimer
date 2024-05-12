@@ -7,6 +7,7 @@ open p1eXu5.FSharp.Testing.ShouldExtensions
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp
 
 
 type UserSettingsStub () =
@@ -20,6 +21,7 @@ type UserSettingsStub () =
         dict.Add("TimePointSettings", Option<string>.None)
         dict.Add("CurrentWork", Option<Work>.None)
         dict.Add("LastStatisticPeriod", Option<Work>.None)
+        dict.Add("RollbackWorkStrategy", RollbackWorkStrategy.Default)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
@@ -30,6 +32,7 @@ type UserSettingsStub () =
         member _.DisableSkipBreak with get () = dict["DisableSkipBreak"] :?> bool and set v = dict["DisableSkipBreak"] <- v
         member _.CurrentWork with get () = dict["CurrentWork"] :?> Work option and set v = dict["CurrentWork"] <- v
         member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
+        member _.RollbackWorkStrategy with get () = dict["RollbackWorkStrategy"] :?> RollbackWorkStrategy and set v = dict["RollbackWorkStrategy"] <- v
 
 
 [<RequireQualifiedAccess>]

@@ -74,6 +74,7 @@
         <!--  telegram bot settings open dialog button  -->
         <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
+                Command="{Binding OpenBotSettingsDialogCommand}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 ToolTip="Telegram bot settings"
                 Style="{StaticResource st_MenuButton}"
@@ -83,14 +84,14 @@
                     <TranslateTransform X="2" Y="1" />
                 </TransformGroup>
             </Button.RenderTransform>
-            <Button.CommandParameter>
+            <!--<Button.CommandParameter>
                 <settings:BotSettings />
             </Button.CommandParameter>
             <Behaviors:Interaction.Behaviors>
                 <behaviors:DialogEventHandlerBehavior LoadDialogModelCommand="{Binding OpenBotSettingsDialogCommand}"
                                                       CancelCommand="{Binding UnloadDialogModelCommand}"
                                                       />
-            </Behaviors:Interaction.Behaviors>
+            </Behaviors:Interaction.Behaviors>-->
         </Button>
 
         <!--  work statistic open dialog button  -->

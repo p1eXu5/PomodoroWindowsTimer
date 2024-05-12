@@ -48,6 +48,14 @@ let compose
             WorkEventRepository = workEventRepository
             TimeProvider = timeProvider
         }
+
+    let appDialogModelCfg : AppDialogModel.Cfg =
+        {
+            UserSettings = userSettings
+            WorkEventRepository = workEventRepository
+            MainErrorMessageQueue = mainErrorMessageQueue
+        }
+
     // init
     let initMainModel () =
         MainModel.init mainModelCfg
@@ -72,16 +80,15 @@ let compose
         let updateWorkStatisticListModel =
             WorkStatisticListModel.Program.update userSettings workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkStatisticListModel>())
 
+        let updateRollbackWorkModel =
+            RollbackWorkModel.Program.update userSettings
+
         let updateAppDialogModel =
             AppDialogModel.Program.update
-                userSettings
+                appDialogModelCfg
                 initBotSettingsModel
                 updateBotSettingsModel
-                initTimePointGeneratorModel
-                updateTimePointGeneratorModel
-                initWorkStatisticListModel
-                updateWorkStatisticListModel
-                dialogErrorMessageQueue
+                updateRollbackWorkModel
 
         let updateWorkModel =
             WorkModel.Program.update workRepository (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue

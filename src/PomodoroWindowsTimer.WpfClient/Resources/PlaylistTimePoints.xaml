@@ -14,7 +14,9 @@
         <Setter Property="Margin" Value="0,4,0,0" />
     </Style>
 
-    <Style x:Key="st_TimePointBase" TargetType="shared:TimePoint">
+    <Style x:Key="st_TimePointBase"
+           TargetType="shared:TimePoint"
+           >
         <Setter Property="shared:TimePointAssistant.TimePointKind" Value="{Binding Kind}" />
         <Setter Property="shared:TimePointAssistant.TimePointKindAlias" Value="{Binding KindAlias}" />
         <Setter Property="shared:TimePointAssistant.TimePointName" Value="{Binding Name}" />
@@ -46,7 +48,9 @@
         <shared:TimePoint Style="{StaticResource st_UnselectedTimePoint}">
             <shared:TimePoint.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Kind="Play" Style="{StaticResource st_VerticalStackButtonIcon}" />
+                    <materialDesign:PackIcon Style="{StaticResource st_VerticalStackButtonIcon}"
+                                             Kind="Play"
+                                             />
                 </ControlTemplate>
             </shared:TimePoint.ButtonIcon>
         </shared:TimePoint>
@@ -57,7 +61,9 @@
         <shared:TimePoint Style="{StaticResource st_SelectedTimePoint}">
             <shared:TimePoint.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Kind="Play" Style="{StaticResource st_VerticalStackButtonIcon}" />
+                    <materialDesign:PackIcon Style="{StaticResource st_VerticalStackButtonIcon}"
+                                             Kind="Play"
+                                             />
                 </ControlTemplate>
             </shared:TimePoint.ButtonIcon>
         </shared:TimePoint>
@@ -68,7 +74,9 @@
         <shared:TimePoint Style="{StaticResource st_SelectedTimePoint}">
             <shared:TimePoint.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Kind="Stop" Style="{StaticResource st_VerticalStackButtonIcon}" />
+                    <materialDesign:PackIcon Style="{StaticResource st_VerticalStackButtonIcon}"
+                                             Kind="Stop"
+                                             />
                 </ControlTemplate>
             </shared:TimePoint.ButtonIcon>
         </shared:TimePoint>

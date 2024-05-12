@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Elmish.WPF;
+using MaterialDesignThemes.Wpf;
+using PomodoroWindowsTimer.WpfClient.UserControls.Settings;
 
 namespace PomodoroWindowsTimer.WpfClient.UserControls;
 

@@ -37,8 +37,8 @@ type MainModel =
         AppDialog: AppDialogModel
 
         // to decide where to add time when Work time point shifting down:
-        PreShiftActiveTimePointTimeSpan: float<sec>
-        ShiftTime: float<sec>
+        PreShiftActiveTimeSpan: float<sec>
+        NewActiveTimeSpan: float<sec>
     }
 and
     LooperState =
@@ -188,8 +188,8 @@ module MainModel =
 
             AppDialog = AppDialogModel.NoDialog
 
-            PreShiftActiveTimePointTimeSpan = -1.0<sec>
-            ShiftTime = -1.0<sec>
+            PreShiftActiveTimeSpan = -1.0<sec>
+            NewActiveTimeSpan = -1.0<sec>
         }
         , Cmd.batch [
             Cmd.ofMsg Msg.LoadTimePointsFromSettings
@@ -320,13 +320,13 @@ module MainModel =
         { model with TimePoints = timePoints }
 
     let withShiftTime seconds (model: MainModel) =
-        { model with ShiftTime = seconds }
+        { model with NewActiveTimeSpan = seconds }
 
     let withoutShiftAndPreShiftTimes (model: MainModel) =
-        { model with ShiftTime = -1.0<sec>; PreShiftActiveTimePointTimeSpan = -1.0<sec>; }
+        { model with NewActiveTimeSpan = -1.0<sec>; PreShiftActiveTimeSpan = -1.0<sec>; }
 
     let withPreShiftActiveTimePointTimeSpan (model: MainModel) =
-        { model with PreShiftActiveTimePointTimeSpan = model.ActiveTimePoint.Value.TimeSpan.TotalSeconds * 1.0<sec> }
+        { model with PreShiftActiveTimeSpan = model.ActiveTimePoint.Value.TimeSpan.TotalSeconds * 1.0<sec> }
 
     let withWorkStatistic workStatisticListModel (model: MainModel) =
         { model with WorkStatistic = workStatisticListModel }

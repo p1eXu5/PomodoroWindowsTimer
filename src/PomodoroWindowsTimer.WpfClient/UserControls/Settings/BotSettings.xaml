@@ -5,10 +5,10 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:botSettingsModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.BotSettingsModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=botSettingsModel:Bindings, IsDesignTimeCreatable=False}"
              Width="450"
              Height="200"
-             d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
@@ -16,20 +16,19 @@
     <StackPanel Margin="10"
                 VerticalAlignment="Center"
                 Orientation="Vertical"
-                DataContext="{Binding BotSettingsDialog}"
                 >
-        <TextBox Width="350"
+        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Width="350"
                  Margin="0"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Bot token"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding BotToken}"
                  />
-        <TextBox Width="350"
+        <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Width="350"
                  Margin="0,10,0,20"
                  HorizontalAlignment="Center"
                  materialDesign:HintAssist.Hint="Chat ID"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                  Text="{Binding ChatId}"
                  />
 
@@ -37,11 +36,13 @@
                     Orientation="Horizontal"
                     >
             <Button DockPanel.Dock="Bottom"
+                    Command="{Binding ApplyCommand}"
                     Content="APPLY"
                     Style="{StaticResource PomodoroOkDialogButton}"
                     />
 
             <Button DockPanel.Dock="Bottom"
+                    Command="{Binding CancelCommand}"
                     Content="CANCEL"
                     Style="{StaticResource PomodoroCancelDialogButton}"
                     />

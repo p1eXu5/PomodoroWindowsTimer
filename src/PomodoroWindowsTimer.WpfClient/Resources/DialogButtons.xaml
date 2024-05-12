@@ -7,14 +7,14 @@
            TargetType="Button"
            BasedOn="{StaticResource MaterialDesignFlatButton}"
            >
-        <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
+        <!--<Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
         <Setter Property="CommandParameter">
             <Setter.Value>
                 <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
                     True
                 </system:Boolean>
             </Setter.Value>
-        </Setter>
+        </Setter>-->
         <Setter Property="Margin" Value="10" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="IsDefault" Value="True" />
@@ -24,14 +24,14 @@
            TargetType="Button"
            BasedOn="{StaticResource MaterialDesignFlatButton}"
            >
-        <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
+        <!--<Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
         <Setter Property="CommandParameter">
             <Setter.Value>
                 <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
                     False
                 </system:Boolean>
             </Setter.Value>
-        </Setter>
+        </Setter>-->
         <Setter Property="Margin" Value="10" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="IsCancel" Value="True" />

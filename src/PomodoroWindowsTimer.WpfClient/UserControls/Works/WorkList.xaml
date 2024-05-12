@@ -50,8 +50,8 @@
                                          StaysOpen="False"
                                          Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                          >
-                    <Button Content="Create New"
-                            Command="{Binding CreateWorkCommand}"
+                    <Button Command="{Binding CreateWorkCommand}"
+                            Content="Create New"
                             />
                 </materialDesign:PopupBox>
                 <local:SelectedWork Grid.Row="1"
@@ -97,8 +97,8 @@
                                          StaysOpen="False"
                                          Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                          >
-                    <Button Content="Create New"
-                            Command="{Binding CreateWorkCommand}"
+                    <Button Command="{Binding CreateWorkCommand}"
+                            Content="Create New"
                             />
                 </materialDesign:PopupBox>
             </Grid>

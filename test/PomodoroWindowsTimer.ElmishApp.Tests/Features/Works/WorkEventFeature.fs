@@ -135,9 +135,9 @@ module WorkEventFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
@@ -155,9 +155,9 @@ module WorkEventFeature =
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` ()
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
@@ -169,11 +169,76 @@ module WorkEventFeature =
         }
         |> Scenario.runTestAsync
 
+    [<Test>]
+    let ``UC5-8: Moving time slider forward and backward when Playing and RollbackWorkStrategy is Default -> adds events Scenario`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent 2.5 ticks`` ()
+
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``Spent 2.5 ticks`` ()
+
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
+            do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 2<times>
+            do! When.``Spent 2.5 ticks`` ()
+
+            do! Then.``Current Work has been set to`` currentWork
+            do! Then.``Work events in db exist`` 1UL [ // newly created work Id
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+            ]
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    let ``UC5-8: Moving time slider forward and backward when Playing and RollbackWorkStrategy is SubstractWorkAddBreak -> adds events Scenario`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
+            do! Given.``RollbackWorkStrategy is SubstractWorkAddBreak`` ()
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent 2.5 ticks`` ()
+
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``Spent 2.5 ticks`` ()
+
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
+            do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
+            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 2<times>
+            do! When.``Spent 2.5 ticks`` ()
+
+            do! Then.``Current Work has been set to`` currentWork
+            do! Then.``Work events in db exist`` 1UL [ // newly created work Id
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkReduced @@>
+                <@@ WorkEvent.BreakIncreased @@>
+                <@@ WorkEvent.WorkStarted @@>
+            ]
+        }
+        |> Scenario.runTestAsync
+
     // ---------------------
     // change work scenarios
     // ---------------------
     [<Test>]
-    let ``UC5-8: Current Work set -> new Work is created and selected -> does not add events`` () =
+    let ``UC5-9: Current Work set -> new Work is created and selected -> does not add events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! _ =
@@ -199,7 +264,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-9: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
+    let ``UC5-10: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! _ =

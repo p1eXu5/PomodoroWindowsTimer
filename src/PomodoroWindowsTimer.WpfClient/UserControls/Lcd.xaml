@@ -30,7 +30,9 @@
                                RightDrawerBackground="Transparent"
                                >
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <local:RunningTimePoints DataContext="{Binding}" Width="350" />
+            <local:RunningTimePoints DataContext="{Binding}"
+                                     Width="350"
+                                     />
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <!--  time points generator  -->
@@ -39,8 +41,12 @@
             <works:WorkSelector DataContext="{Binding WorkSelector}" />
         </materialDesign:DrawerHost.RightDrawerContent>
 
-        <DockPanel Margin="10,0,10,0" LastChildFill="True">
-            <local:MainMenu DockPanel.Dock="Top" DataContext="{Binding}" />
+        <DockPanel Margin="10,0,10,0"
+                   LastChildFill="True"
+                   >
+            <local:MainMenu DockPanel.Dock="Top"
+                            DataContext="{Binding}"
+                            />
 
             <materialDesign:ColorZone VerticalAlignment="Center"
                                       materialDesign:ThemeAssist.Theme="Inherit"
@@ -49,8 +55,8 @@
                 <!--  Content  -->
                 <Grid Margin="0,0,0,20">
                     <!--  Digit Panel  -->
-                    <local:Timer x:Name="m_DigitPanel"
-                                 DockPanel.Dock="Top"
+                    <local:Timer DockPanel.Dock="Top"
+                                 x:Name="m_DigitPanel"
                                  DataContext="{Binding}"
                                  HorizontalAlignment="Center"
                                  VerticalAlignment="Center"

@@ -93,6 +93,30 @@ let internal project (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
+            | WorkEvent.WorkReduced (_, v), _ ->
+                Calculating (
+                    { stat with
+                        WorkTime = stat.WorkTime - v
+                    }, lastWorkEvent = lastEvent)
+
+            | WorkEvent.WorkIncreased (_, v), _ ->
+                Calculating (
+                    { stat with
+                        WorkTime = stat.WorkTime + v
+                    }, lastWorkEvent = lastEvent)
+
+            | WorkEvent.BreakReduced (_, v), _ ->
+                Calculating (
+                    { stat with
+                        BreakTime = stat.BreakTime - v
+                    }, lastWorkEvent = lastEvent)
+
+            | WorkEvent.BreakIncreased (_, v), _ ->
+                Calculating (
+                    { stat with
+                        BreakTime = stat.BreakTime + v
+                    }, lastWorkEvent = lastEvent)
+
     ) StatisticBuilder.Initialized
     |> function
         | Initialized -> None

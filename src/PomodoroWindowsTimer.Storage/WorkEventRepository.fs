@@ -75,6 +75,7 @@ let findByWorkIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<I
             select {
                 for r in readTable do
                 where (r.work_id = workId)
+                orderBy r.created_at
             }
             |> selectf ct
 
@@ -91,6 +92,7 @@ let findByWorkId (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) 
         select {
             for r in readTable do
             where (r.work_id = workId)
+            orderBy r.created_at
         }
         |> selectf
 
@@ -107,6 +109,7 @@ let findByWorkIdByPeriodQuery workId dateMin dateMax =
         where (r.work_id = workId)
         andWhere (r.created_at >= dateMin)
         andWhere (r.created_at < dateMax)
+        orderBy r.created_at
     }
 
 let findByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =

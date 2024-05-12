@@ -74,6 +74,10 @@ type WorkEvent =
     | WorkStarted of createdAt: DateTimeOffset * timePointName: string
     | BreakStarted of createdAt: DateTimeOffset * timePointName: string
     | Stopped of createdAt: DateTimeOffset
+    | WorkReduced of createdAt: DateTimeOffset * value: TimeSpan
+    | WorkIncreased of createdAt: DateTimeOffset * value: TimeSpan
+    | BreakReduced of createdAt: DateTimeOffset * value: TimeSpan
+    | BreakIncreased of createdAt: DateTimeOffset * value: TimeSpan
 
 type WorkEventList =
     {
@@ -102,24 +106,40 @@ module WorkEvent =
     let createdAt = function
         | WorkEvent.WorkStarted (dt, _)
         | WorkEvent.BreakStarted (dt, _)
-        | WorkEvent.Stopped (dt) -> dt
+        | WorkEvent.Stopped (dt)
+        | WorkEvent.WorkReduced (dt,_)
+        | WorkEvent.WorkIncreased (dt,_) 
+        | WorkEvent.BreakReduced (dt,_)
+        | WorkEvent.BreakIncreased (dt,_) -> dt
 
     let dateOnly = function
         | WorkEvent.WorkStarted (dt, _)
         | WorkEvent.BreakStarted (dt, _)
-        | WorkEvent.Stopped (dt) ->
+        | WorkEvent.Stopped (dt) 
+        | WorkEvent.WorkReduced (dt,_)
+        | WorkEvent.WorkIncreased (dt,_) 
+        | WorkEvent.BreakReduced (dt,_)
+        | WorkEvent.BreakIncreased (dt,_) ->
             DateOnly.FromDateTime(dt.DateTime)
 
     let localDateTime = function
         | WorkEvent.WorkStarted (dt, _)
         | WorkEvent.BreakStarted (dt, _)
-        | WorkEvent.Stopped (dt) ->
+        | WorkEvent.Stopped (dt)
+        | WorkEvent.WorkReduced (dt,_)
+        | WorkEvent.WorkIncreased (dt,_) 
+        | WorkEvent.BreakReduced (dt,_)
+        | WorkEvent.BreakIncreased (dt,_) ->
             dt.LocalDateTime
 
     let tpName = function
         | WorkEvent.WorkStarted (_, n)
         | WorkEvent.BreakStarted (_, n) -> n |> Some
-        | WorkEvent.Stopped _ -> None
+        | WorkEvent.Stopped _
+        | WorkEvent.WorkReduced _
+        | WorkEvent.WorkIncreased _ 
+        | WorkEvent.BreakReduced _
+        | WorkEvent.BreakIncreased _ -> None
 
 
 module Alias =

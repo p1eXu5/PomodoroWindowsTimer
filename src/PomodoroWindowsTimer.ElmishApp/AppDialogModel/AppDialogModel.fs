@@ -1,30 +1,35 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
 open PomodoroWindowsTimer.ElmishApp.Models
+open System
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Abstractions
 
 
 type AppDialogModel =
     | NoDialog
     | BotSettingsDialog of BotSettingsModel
-    | TimePointsGeneratorDialog of TimePointsGeneratorModel
-    | WorkStatisticsDialog of WorkStatisticListModel
+    | RollbackWorkDialog of RollbackWorkModel
 
 
 module AppDialogModel =
+
+    type Cfg =
+        {
+            UserSettings: IUserSettings
+            WorkEventRepository: IWorkEventRepository
+            MainErrorMessageQueue: IErrorMessageQueue
+        }
 
     type Msg =
         | SetIsDialogOpened of bool
 
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
-        | ApplyBotSettings
-        
-        | LoadTimePointsGeneratorDialogModel
-        | TimePointsGeneratorModelMsg of TimePointsGeneratorModel.Msg
-        
-        | LoadWorkStatisticsDialogModel
-        | WorkStatisticListModelMsg of WorkStatisticListModel.Msg
-        
+
+        | LoadRollbackWorkDialogModel of workId: uint64 * DateTimeOffset * TimeSpan
+        | RollbackWorkModelMsg of RollbackWorkModel.Msg
+
         | Unload
 
         | EnqueueError of string
@@ -37,23 +42,12 @@ module AppDialogModel =
                 (msg, m) |> Some
             | _ -> None
 
-        let (|ApplyBotSettings|_|) (model: AppDialogModel) (msg: Msg) =
+        let (|RollbackWorkModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
             match msg, model with
-            | Msg.ApplyBotSettings, AppDialogModel.BotSettingsDialog m ->
-                m |> Some
-            | _ -> None
-
-        let (|TimePointsGeneratorModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
-            match msg, model with
-            | Msg.TimePointsGeneratorModelMsg msg, AppDialogModel.TimePointsGeneratorDialog m ->
+            | Msg.RollbackWorkModelMsg msg, AppDialogModel.RollbackWorkDialog m ->
                 (msg, m) |> Some
             | _ -> None
 
-        let (|WorkStatisticListModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
-            match msg, model with
-            | Msg.WorkStatisticListModelMsg msg, AppDialogModel.WorkStatisticsDialog m ->
-                (msg, m) |> Some
-            | _ -> None
 
     [<Struct>]
     [<RequireQualifiedAccess>]
@@ -61,25 +55,21 @@ module AppDialogModel =
         | BotSettingsDialogId
         | TimePointsGeneratorDialogId
         | WorkStatisticsDialogId
+        | RollbackWorkDialogId
 
     let appDialogId = function
         | AppDialogModel.NoDialog -> None
         | AppDialogModel.BotSettingsDialog _ -> AppDialogId.BotSettingsDialogId |> Some
-        | AppDialogModel.TimePointsGeneratorDialog _ -> AppDialogId.TimePointsGeneratorDialogId |> Some
-        | AppDialogModel.WorkStatisticsDialog _ -> AppDialogId.WorkStatisticsDialogId |> Some
+        | AppDialogModel.RollbackWorkDialog _ -> AppDialogId.RollbackWorkDialogId |> Some
 
     let botSettingsModel (model: AppDialogModel) =
         match model with
         | AppDialogModel.BotSettingsDialog m -> m |> Some
         | _ -> None
 
-    let timePointsGeneratorModel (model: AppDialogModel) =
+    let rollbackWorkModel (model: AppDialogModel) =
         match model with
-        | AppDialogModel.TimePointsGeneratorDialog m -> m |> Some
+        | AppDialogModel.RollbackWorkDialog m -> m |> Some
         | _ -> None
 
-    let workStatisticListModel (model: AppDialogModel) =
-        match model with
-        | AppDialogModel.WorkStatisticsDialog m -> m |> Some
-        | _ -> None
 

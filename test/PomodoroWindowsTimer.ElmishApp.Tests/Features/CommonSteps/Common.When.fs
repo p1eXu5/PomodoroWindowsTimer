@@ -118,21 +118,21 @@ let rec ``Replay msg has been dispatched`` () =
     |> Scenario.log $"When.``{nameof ``Replay msg has been dispatched``}``"
 
 
-let rec ``PreChangeActiveTimeSpan msg has been dispatched`` () =
+let rec ``PreChangeActiveTimeSpan msg has been dispatched`` times =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let msg = MainModel.ControllerMsg.PreChangeActiveTimeSpan |> MainModel.Msg.ControllerMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
-        do! Scenario.msgDispatchedWithin2Sec "PreChangeActiveTimeSpan" ((=) msg)
+        do! Scenario.msgDispatchedWithin2SecT "PreChangeActiveTimeSpan" times ((=) msg)
     }
     |> Scenario.log $"When.``{nameof ``PreChangeActiveTimeSpan msg has been dispatched``}``"
 
-let rec ``PostChangeActiveTimeSpan msg has been dispatched`` () =
+let rec ``PostChangeActiveTimeSpan msg has been dispatched`` times =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let msg = MainModel.ControllerMsg.PostChangeActiveTimeSpan |> MainModel.Msg.ControllerMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
-        do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
+        do! Scenario.msgDispatchedWithin2SecT "PostChangeActiveTimeSpan" times ((=) msg)
     }
     |> Scenario.log $"When.``{nameof ``PostChangeActiveTimeSpan msg has been dispatched``}``"
 

@@ -26,10 +26,10 @@
                                              Converter={StaticResource conv_SubModelIdToVisibility},
                                              ConverterParameter='WorkListId'}"
                         />
-        <local:EditableWork Title="CREATE WORK"
-                            xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
+        <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             d:DataContext="{d:DesignInstance Type=CreatingWorkModel:Bindings, IsDesignTimeCreatable=False}"
                             DataContext="{Binding CreatingWorkModel}"
+                            Title="CREATE WORK"
                             CancelCommand="{Binding CancelCommand}"
                             OkCommand="{Binding CreateCommand}"
                             OkCommandContent="CREATE"
@@ -39,10 +39,10 @@
                                                  ConverterParameter='CreatingWorkId',
                                                  FallbackValue=Collapsed}"
                             />
-        <local:EditableWork Title="EDIT WORK"
-                            xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
+        <local:EditableWork xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
                             DataContext="{Binding UpdatingWorkModel}"
+                            Title="EDIT WORK"
                             CancelCommand="{Binding CancelEditCommand}"
                             OkCommand="{Binding UpdateCommand}"
                             OkCommandContent="UPDATE"

@@ -33,6 +33,7 @@
     <Compile Include="BotSettingsModel\BotSettingsModel.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Program.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Bindings.fs" />
+    <Compile Include="RollbackWorkModel\RollbackWorkModel.fs" />
     <Compile Include="TimePointPrototypeModel\TimePointPrototypeModel.fs" />
     <Compile Include="TimePointModel\TimePointModel.fs" />
     <Compile Include="TimePointsGeneratorModel\TimePointsGeneratorModel.fs" />
