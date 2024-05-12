@@ -78,16 +78,12 @@ internal static class DependencyInjectionExtensions
         });
 
     public static void AddWindowsMinimizer(this IServiceCollection services)
-        => services.TryAddSingleton<Func<System.Windows.Window, IWindowsMinimizer>>(sp =>
+        => services.TryAddSingleton<IWindowsMinimizer>(sp =>
         {
 #if DEBUG
-            return new Func<System.Windows.Window, IWindowsMinimizer>(_ => WindowsMinimizer.initStub(default));
+            return WindowsMinimizer.initStub();
 #else
-            return new Func<System.Windows.Window, IWindowsMinimizer>(mainWindow =>
-            {
-                var mainWindowPtr = new WindowInteropHelper(mainWindow).Handle;
-                return WindowsMinimizer.init(mainWindowPtr);
-            });
+            return new WindowsMinimizer.WindowsMinimizer();
 #endif
         });
 

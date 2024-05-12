@@ -65,5 +65,6 @@ type IWindowsMinimizer =
     abstract MinimizeAllRestoreAppWindowAsync: unit -> Task<unit>
     abstract RestoreAllMinimized: unit -> unit
     abstract RestoreAppWindow: unit -> unit
+    abstract AppWindowPtr: IntPtr with set
 
 

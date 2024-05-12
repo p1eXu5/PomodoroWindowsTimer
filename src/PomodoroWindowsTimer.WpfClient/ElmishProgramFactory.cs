@@ -13,7 +13,7 @@ internal sealed class ElmishProgramFactory(
     IWorkRepository workRepository,
     IWorkEventRepository workEventRepository,
     ITelegramBot telegramBot,
-    Func<System.Windows.Window, IWindowsMinimizer> windowsMinimizer,
+    IWindowsMinimizer windowsMinimizer,
     IThemeSwitcher themeSwitcher,
     IUserSettings userSettings,
     [FromKeyedServices("main")] IErrorMessageQueue mainErrorMessageQueue,
@@ -27,7 +27,7 @@ internal sealed class ElmishProgramFactory(
     internal IWorkRepository WorkRepository => workRepository;
     internal IWorkEventRepository WorkEventRepository => workEventRepository;
     internal ITelegramBot TelegramBot => telegramBot;
-    internal Func<System.Windows.Window, IWindowsMinimizer> WindowsMinimizer => windowsMinimizer;
+    internal IWindowsMinimizer WindowsMinimizer => windowsMinimizer;
     internal IThemeSwitcher ThemeSwitcher => themeSwitcher;
     internal IUserSettings UserSettings => userSettings;
     internal IErrorMessageQueue MainErrorMessageQueue => mainErrorMessageQueue;
@@ -45,7 +45,7 @@ internal sealed class ElmishProgramFactory(
             WorkRepository,
             WorkEventRepository,
             TelegramBot,
-            WindowsMinimizer(mainWindow),
+            WindowsMinimizer,
             ThemeSwitcher,
             UserSettings,
             MainErrorMessageQueue,

@@ -94,18 +94,10 @@ module PatternStore =
             Write = write patternSettings
         }
 
+
 module WindowsMinimizer =
 
     open System.Runtime.InteropServices
-
-    [<DllImport("user32.dll", EntryPoint="FindWindow", SetLastError=true, CharSet=CharSet.Auto)>]
-    extern IntPtr findWindow (string lpClassName, string lpWindowName)
-
-    [<DllImport("user32.dll", EntryPoint = "SendMessage", SetLastError = true)>]
-    extern IntPtr sendMessage(IntPtr hWnd, Int32 Msg, IntPtr wParam, IntPtr lParam)
-
-    [<DllImport("user32.dll", EntryPoint = "ShowWindow")>]
-    extern bool showWindow(IntPtr hWnd, int nCmdShow)
 
     let [<Literal>] WM_COMMAND : Int32 = 0x111;
 
@@ -118,34 +110,19 @@ module WindowsMinimizer =
     let [<Literal>] SW_MINIMIZE = 6;
     let [<Literal>] SW_RESTORE = 9;
 
-    let minimizeAllRestoreAppWindowTask mainWindowPtr =
-        task {
-            let shellTrayWnd = findWindow("Shell_TrayWnd", null)
-            sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
-            do! Task.Delay(500)
-            showWindow(mainWindowPtr, SW_RESTORE) |> ignore
-        }
 
-    let restoreAllMinimized () =
-        let shellTrayWnd = findWindow("Shell_TrayWnd", null)
-        sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
-       
+    [<DllImport("user32.dll", EntryPoint="FindWindow", SetLastError=true, CharSet=CharSet.Auto)>]
+    extern IntPtr findWindow (string lpClassName, string lpWindowName)
 
-    let restoreMainWindow mainWindowPtr =
-        showWindow(mainWindowPtr, SW_RESTORE) |> ignore
+    [<DllImport("user32.dll", EntryPoint = "SendMessage", SetLastError = true)>]
+    extern IntPtr sendMessage(IntPtr hWnd, Int32 Msg, IntPtr wParam, IntPtr lParam)
 
-    let init mainWindowPtr =
-        { new IWindowsMinimizer with
-            member _.MinimizeAllRestoreAppWindowAsync () =
-                minimizeAllRestoreAppWindowTask mainWindowPtr
-            member _.RestoreAllMinimized () =
-                restoreAllMinimized ()
-            member _.RestoreAppWindow () =
-                restoreMainWindow mainWindowPtr
-        }
+    [<DllImport("user32.dll", EntryPoint = "ShowWindow")>]
+    extern bool showWindow(IntPtr hWnd, int nCmdShow)
+
 
     /// for debug purpose
-    let initStub (_: IntPtr) =
+    let initStub () =
         { new IWindowsMinimizer with
             member _.MinimizeAllRestoreAppWindowAsync () =
                 task { return () }
@@ -153,8 +130,43 @@ module WindowsMinimizer =
                 ()
             member _.RestoreAppWindow () =
                 ()
+            member _.AppWindowPtr with set _ = ()
         }
 
+
+    type WindowsMinimizer() =
+
+        member val internal AppWindowPtr: IntPtr = IntPtr.Zero with get, set
+
+        member this.MinimizeAllRestoreAppWindowAsync () =
+            task {
+                if this.AppWindowPtr = IntPtr.Zero then
+                    return ()
+                else
+                    let shellTrayWnd = findWindow("Shell_TrayWnd", null)
+                    sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
+                    do! Task.Delay(500)
+                    showWindow(this.AppWindowPtr, SW_RESTORE) |> ignore
+            }
+
+        member _.RestoreAllMinimized () =
+            let shellTrayWnd = findWindow("Shell_TrayWnd", null)
+            sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
+       
+        member this.RestoreAppWindow () =
+            if this.AppWindowPtr = IntPtr.Zero then
+                ()
+            else
+                showWindow(this.AppWindowPtr, SW_RESTORE) |> ignore
+
+        interface IWindowsMinimizer with
+            member this.MinimizeAllRestoreAppWindowAsync () =
+                this.MinimizeAllRestoreAppWindowAsync()
+            member this.RestoreAllMinimized() =
+                this.RestoreAllMinimized()
+            member this.RestoreAppWindow () =
+                this.RestoreAppWindow ()
+            member this.AppWindowPtr with set ptr = this.AppWindowPtr <- ptr
 
 
 module TelegramBot =

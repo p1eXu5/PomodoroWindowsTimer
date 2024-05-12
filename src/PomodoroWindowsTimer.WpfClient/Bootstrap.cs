@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Interop;
 using DrugRoom.WpfClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -108,6 +109,12 @@ internal class Bootstrap : IDisposable
         var elmishProgramFactory = GetElmishProgramFactory();
         elmishProgramFactory.RunElmishProgram(window, workStatisticWindowFactory);
         window.Show();
+
+#if DEBUG
+#else
+        var mainWindowPtr = new WindowInteropHelper(window).Handle;
+        elmishProgramFactory.WindowsMinimizer.AppWindowPtr = mainWindowPtr;
+#endif
     }
 
     public virtual void StartElmishApp(Window mainWindow, Func<WorkStatisticWindow> workStatisticWindowFactory)

@@ -74,8 +74,8 @@ type TestBootstrap () =
             .AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
 
         services
-            .AddSingleton<Func<System.Windows.Window, IWindowsMinimizer>>(fun _ ->
-                Func<System.Windows.Window, IWindowsMinimizer>(fun _ -> this.MockWindowsMinimizer)
+            .AddSingleton<IWindowsMinimizer>(fun _ ->
+                WindowsMinimizer.initStub ()
             )
             |> ignore
 
@@ -91,7 +91,7 @@ type TestBootstrap () =
 
     override _.PostConfigureHost(builder: IHostBuilder) =
         builder.AddMockRepository(
-            [ Service<IThemeSwitcher>() ],
+            [ Service<IThemeSwitcher>(); Service<IWindowsMinimizer>() ],
             TestLogWriter(TestLogger<TestBootstrap>(TestContextWriters.Default, LogOut.All)),
             (fun mr -> mockRepository <- mr)
         )
@@ -110,7 +110,7 @@ type TestBootstrap () =
                 factory.WorkRepository
                 factory.WorkEventRepository
                 factory.TelegramBot
-                (factory.WindowsMinimizer.Invoke Unchecked.defaultof<System.Windows.Window>)
+                factory.WindowsMinimizer
                 factory.ThemeSwitcher
                 factory.UserSettings
                 factory.MainErrorMessageQueue
