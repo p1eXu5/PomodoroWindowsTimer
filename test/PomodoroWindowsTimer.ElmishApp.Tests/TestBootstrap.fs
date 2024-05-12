@@ -30,6 +30,8 @@ type TestBootstrap () =
     let mutable inMemoryConnection : SqliteConnection = Unchecked.defaultof<_>
 
     member _.MockRepository with get() = mockRepository
+    
+    member val MockWindowsMinimizer : IWindowsMinimizer = NSubstitute.Substitute.For<IWindowsMinimizer>() with get
 
     override _.Dispose(disposing: bool) =
         if not _disposed then
@@ -42,7 +44,7 @@ type TestBootstrap () =
 
         base.Dispose(disposing)
 
-    override _.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
+    override this.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
         hostBuilder.Configuration["InTest"] <- "True"
 
         let token = Guid.NewGuid().ToString("N")
@@ -72,7 +74,10 @@ type TestBootstrap () =
             .AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
 
         services
-            .AddSingleton<IWindowsMinimizer>(WindowsMinimizer.initStub "") |> ignore
+            .AddSingleton<Func<System.Windows.Window, IWindowsMinimizer>>(fun _ ->
+                Func<System.Windows.Window, IWindowsMinimizer>(fun _ -> this.MockWindowsMinimizer)
+            )
+            |> ignore
 
         services
             .AddSingleton<IThemeSwitcher>(
@@ -86,8 +91,8 @@ type TestBootstrap () =
 
     override _.PostConfigureHost(builder: IHostBuilder) =
         builder.AddMockRepository(
-            [ Service<IWindowsMinimizer>(); Service<IThemeSwitcher>() ],
-            TestLogWriter(TestLogger<IWindowsMinimizer>(TestContextWriters.Default, LogOut.All)),
+            [ Service<IThemeSwitcher>() ],
+            TestLogWriter(TestLogger<TestBootstrap>(TestContextWriters.Default, LogOut.All)),
             (fun mr -> mockRepository <- mr)
         )
 
@@ -105,7 +110,7 @@ type TestBootstrap () =
                 factory.WorkRepository
                 factory.WorkEventRepository
                 factory.TelegramBot
-                factory.WindowsMinimizer
+                (factory.WindowsMinimizer.Invoke Unchecked.defaultof<System.Windows.Window>)
                 factory.ThemeSwitcher
                 factory.UserSettings
                 factory.MainErrorMessageQueue

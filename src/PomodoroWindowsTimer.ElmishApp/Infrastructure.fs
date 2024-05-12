@@ -118,13 +118,12 @@ module WindowsMinimizer =
     let [<Literal>] SW_MINIMIZE = 6;
     let [<Literal>] SW_RESTORE = 9;
 
-    let minimizeAllRestoreAppWindowTask ipWindowName =
+    let minimizeAllRestoreAppWindowTask mainWindowPtr =
         task {
-            let appWindow = findWindow(null, ipWindowName)
             let shellTrayWnd = findWindow("Shell_TrayWnd", null)
             sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL), IntPtr.Zero) |> ignore
             do! Task.Delay(500)
-            showWindow(appWindow, SW_RESTORE) |> ignore
+            showWindow(mainWindowPtr, SW_RESTORE) |> ignore
         }
 
     let restoreAllMinimized () =
@@ -132,22 +131,21 @@ module WindowsMinimizer =
         sendMessage(shellTrayWnd, WM_COMMAND, IntPtr(MIN_ALL_UNDO), IntPtr.Zero) |> ignore
        
 
-    let restoreMainWindow ipWindowName =
-        let appWindow = findWindow(null, ipWindowName)
-        showWindow(appWindow, SW_RESTORE) |> ignore
+    let restoreMainWindow mainWindowPtr =
+        showWindow(mainWindowPtr, SW_RESTORE) |> ignore
 
-    let init mainWindowTitle =
+    let init mainWindowPtr =
         { new IWindowsMinimizer with
             member _.MinimizeAllRestoreAppWindowAsync () =
-                minimizeAllRestoreAppWindowTask mainWindowTitle
+                minimizeAllRestoreAppWindowTask mainWindowPtr
             member _.RestoreAllMinimized () =
                 restoreAllMinimized ()
             member _.RestoreAppWindow () =
-                restoreMainWindow mainWindowTitle
+                restoreMainWindow mainWindowPtr
         }
 
     /// for debug purpose
-    let initStub _ =
+    let initStub (_: IntPtr) =
         { new IWindowsMinimizer with
             member _.MinimizeAllRestoreAppWindowAsync () =
                 task { return () }

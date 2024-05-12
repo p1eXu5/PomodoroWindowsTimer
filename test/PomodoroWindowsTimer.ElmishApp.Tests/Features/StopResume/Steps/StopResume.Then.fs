@@ -65,7 +65,7 @@ let ``Windows should not be minimized`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
+        let wm = sut.MockWindowsMinimizer
         
         do
             wm.Received(0).MinimizeAllRestoreAppWindowAsync()
@@ -100,7 +100,7 @@ let ``WindowsMinimizer.MinimizeOtherAsync is called`` (times: int) =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
+        let wm = sut.MockWindowsMinimizer
         
         do
             wm.Received(times).MinimizeAllRestoreAppWindowAsync()
@@ -113,7 +113,7 @@ let ``Windows should be minimized`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
 
-        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
+        let wm = sut.MockWindowsMinimizer
 
         (*
             TODO: uncoment when reduce window messages

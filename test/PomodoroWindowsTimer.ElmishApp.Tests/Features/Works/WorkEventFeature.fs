@@ -112,7 +112,7 @@ module WorkEventFeature =
             do! When.``Spent`` 1.0<sec>
             do! When.``Next msg has been dispatched`` 1<times>
             do! When.``Spent`` 1.0<sec>
-            do! When.``Next msg has been dispatched`` 1<times>
+            do! When.``Next msg has been dispatched`` 2<times>
             do! When.``Spent`` 1.0<sec>
 
             do! Then.``Current Work has been set to`` currentWork

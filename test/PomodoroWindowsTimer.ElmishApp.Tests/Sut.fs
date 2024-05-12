@@ -18,6 +18,7 @@ type ISut =
     abstract MainModel: MainModel with get
     abstract MsgStack: Stack<MainModel.Msg> with get
     abstract MockRepository: MockRepository with get
+    abstract MockWindowsMinimizer: IWindowsMinimizer with get
 
 
 module Sut =
@@ -35,7 +36,6 @@ module Sut =
         try
             bootstrap.StartHost()
 
-            let _ = bootstrap.MockRepository.TrySubstitute<IWindowsMinimizer>()
             let _ = bootstrap.MockRepository.TrySubstitute<IThemeSwitcher>()
 
             let sut =
@@ -48,6 +48,8 @@ module Sut =
                             bootstrap.Host.Services
                         member _.MockRepository with get() =
                             bootstrap.MockRepository
+                        member _.MockWindowsMinimizer with get() =
+                            bootstrap.MockWindowsMinimizer
                     interface IScenarioContext with
                         member _.ScenarioContext with get() = dict
                     

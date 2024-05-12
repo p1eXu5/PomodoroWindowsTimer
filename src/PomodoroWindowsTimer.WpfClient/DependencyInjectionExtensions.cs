@@ -14,6 +14,7 @@ using PomodoroWindowsTimer.Storage;
 using PomodoroWindowsTimer.WpfClient.Configuration;
 using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.TimePointQueue;
+using System.Windows.Interop;
 
 namespace DrugRoom.WpfClient;
 
@@ -77,12 +78,16 @@ internal static class DependencyInjectionExtensions
         });
 
     public static void AddWindowsMinimizer(this IServiceCollection services)
-        => services.TryAddSingleton(sp =>
+        => services.TryAddSingleton<Func<System.Windows.Window, IWindowsMinimizer>>(sp =>
         {
 #if DEBUG
-            return WindowsMinimizer.initStub(PomodoroWindowsTimer.ElmishApp.Program.title);
+            return new Func<System.Windows.Window, IWindowsMinimizer>(_ => WindowsMinimizer.initStub(default));
 #else
-            return WindowsMinimizer.init(PomodoroWindowsTimer.ElmishApp.Program.title);
+            return new Func<System.Windows.Window, IWindowsMinimizer>(mainWindow =>
+            {
+                var mainWindowPtr = new WindowInteropHelper(mainWindow).Handle;
+                return WindowsMinimizer.init(mainWindowPtr);
+            });
 #endif
         });
 
