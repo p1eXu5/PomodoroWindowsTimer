@@ -8,7 +8,7 @@
         xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
         xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
         Style="{StaticResource MaterialDesignWindow}"
-        Width="1000"
+        Width="1340"
         Height="450"
         TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
         mc:Ignorable="d"
