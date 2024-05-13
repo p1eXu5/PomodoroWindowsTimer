@@ -120,6 +120,12 @@ let initWorkEventRepository (connectionString: string) (timeProvider: System.Tim
                 do! dbConnection.OpenAsync()
                 return! WorkEventRepository.findAllByPeriodTask timeProvider (Helpers.selectTask2 dbConnection) period ct
             }
+        member _.FindLastByWorkIdByDateAsync workId date ct =
+            task {
+                use dbConnection = new SqliteConnection(connectionString)
+                do! dbConnection.OpenAsync()
+                return! WorkEventRepository.findLastByWorkIdByDateTask timeProvider (Helpers.selectTask dbConnection) workId date ct
+            }
     }
 
 

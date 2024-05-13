@@ -191,3 +191,20 @@ let findAllByPeriodTask
             )
     }
 
+let findLastByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =
+    task {
+
+        let dateMin = DateTimeOffset(date, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+        let dateMax = DateTimeOffset(date.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+        let! res =
+            findByWorkIdByPeriodQuery workId dateMin dateMax
+            |> selectf ct
+
+        return
+            res
+            |> Result.map (
+                Seq.tryLast
+                >> Option.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
+            )
+    }

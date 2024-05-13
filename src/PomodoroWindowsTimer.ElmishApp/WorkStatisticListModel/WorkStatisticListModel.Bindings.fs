@@ -97,3 +97,22 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val BreakTotalTimeRemains : Binding =
         nameof __.BreakTotalTimeRemains |> Binding.oneWayOpt (breakTotalTimeRemains >> Option.map timeRemains)
 
+    member val LoadAddWorkTimeModelCommand : Binding =
+        nameof __.LoadAddWorkTimeModelCommand
+            |> Binding.cmdParam (fun p ->
+                Msg.LoadAddWorkTimeModel (p :?> uint64)
+            )
+
+    member val AddWorkTimeDialog : Binding =
+        nameof __.AddWorkTimeDialog
+            |> Binding.SubModel.opt (AddWorkTimeModel.Bindings.ToList)
+            |> Binding.mapModel _.AddWorkTime
+            |> Binding.mapMsg Msg.AddWorkTimeModelMsg
+
+    member val UnloadAddWorkTimeModelCommand : Binding =
+        nameof __.UnloadAddWorkTimeModelCommand
+            |> Binding.cmdIf (_.AddWorkTime >> Option.map (fun _ -> Msg.UnloadAddWorkTimeModel))
+
+    member val AddWorkTimeOffsetCommand : Binding =
+        nameof __.AddWorkTimeOffsetCommand |> Binding.cmdIf (_.AddWorkTime >> Option.map (fun _ -> Msg.AddWorkTimeOffset))
+

@@ -11,6 +11,7 @@ type WorkStatisticListModel =
         StartDate: DateOnly
         EndDate: DateOnly
         IsByDay: bool
+        AddWorkTime: AddWorkTimeModel option
     }
 
 module WorkStatisticListModel =
@@ -22,6 +23,11 @@ module WorkStatisticListModel =
         | LoadStatistics of AsyncOperation<unit, Result<WorkStatistic list, string>>
         | WorkStatisticMsg of workId: uint64 * WorkStatisticModel.Msg
         | Close
+        | LoadAddWorkTimeModel of workId: uint64
+        | UnloadAddWorkTimeModel
+        | AddWorkTimeModelMsg of AddWorkTimeModel.Msg
+        | AddWorkTimeOffset
+        | EnqueueExn of exn
 
     [<RequireQualifiedAccess>]
     type Intent =
@@ -58,6 +64,27 @@ module WorkStatisticListModel =
                 )
             | _ -> None
 
+        let (|LoadAddWorkTimeModel|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.WorkStatistics with
+            | Msg.LoadAddWorkTimeModel workId, AsyncDeferred.Retrieved statistic ->
+                statistic
+                |> List.tryFind (fun sm -> sm.WorkId = workId)
+                |> Option.map (fun sm -> sm.Work)
+            | _ -> None
+
+        let (|AddWorkTimeModelMsg|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.AddWorkTime with
+            | Msg.AddWorkTimeModelMsg amsg, Some am ->
+                (amsg, am) |> Some
+            | _ -> None
+
+        let (|AddWorkTimeOffset|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.AddWorkTime with
+            | Msg.AddWorkTimeOffset, Some am ->
+                am |> Some
+            | _ -> None
+
+
     open Elmish
 
     let init (userSettings: IUserSettings) (timeProvider: System.TimeProvider) =
@@ -74,6 +101,7 @@ module WorkStatisticListModel =
             StartDate = startDate
             EndDate = endDate
             IsByDay = (startDate = endDate)
+            AddWorkTime = None
         }
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadStatistics)
 
@@ -165,4 +193,7 @@ module WorkStatisticListModel =
     let breakTotalTimeRemains (model: WorkStatisticListModel) =
         breakTotalTime model
         |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(8.0 * 60.0 - workHoursMax))
+
+    let withAddWorkTimeModel addWorkTimeModel (model: WorkStatisticListModel) =
+        { model with AddWorkTime = addWorkTimeModel }
 

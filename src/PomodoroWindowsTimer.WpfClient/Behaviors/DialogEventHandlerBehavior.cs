@@ -116,6 +116,26 @@ internal sealed class DialogEventHandlerBehavior : Behavior<Button>
 
 
 
+    public static object? GetLoadDialogModelCommandParameter(DependencyObject obj)
+    {
+        return (object?)obj.GetValue(LoadDialogModelCommandParameterProperty);
+    }
+
+    public static void SetLoadDialogModelCommandParameter(DependencyObject obj, object? value)
+    {
+        obj.SetValue(LoadDialogModelCommandParameterProperty, value);
+    }
+
+    // Using a DependencyProperty as the backing store for LoadDialogModelCommandParameter.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty LoadDialogModelCommandParameterProperty =
+        DependencyProperty.RegisterAttached(
+            "LoadDialogModelCommandParameter",
+            typeof(object),
+            typeof(DialogEventHandlerBehavior),
+            new PropertyMetadata(null));
+
+
+
     public static ICommand GetLoadDialogModelCommand(DependencyObject obj)
     {
         return (ICommand)obj.GetValue(LoadDialogModelCommandProperty);
@@ -146,9 +166,10 @@ internal sealed class DialogEventHandlerBehavior : Behavior<Button>
             behavior._openedEventHandler = (sender, eventArgs) =>
             {
                 eventArgs.Handled = true;
-                if (loadDialogModelCommand.CanExecute(null))
+                object? parameter = GetLoadDialogModelCommandParameter(behavior);
+                if (loadDialogModelCommand.CanExecute(parameter))
                 {
-                    loadDialogModelCommand.Execute(null);
+                    loadDialogModelCommand.Execute(parameter);
                 }
             };
         }

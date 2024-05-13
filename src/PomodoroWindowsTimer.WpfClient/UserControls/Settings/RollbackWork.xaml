@@ -1,14 +1,14 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.RollbackWork"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="380"
              Height="185"
+             mc:Ignorable="d"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
-             mc:Ignorable="d"
              >
     <StackPanel Margin="10"
                 VerticalAlignment="Top"
@@ -16,23 +16,19 @@
                 >
 
         <TextBlock HorizontalAlignment="Center"
-                   Text="How to interpret rollback Work time?"
                    FontSize="20"
-                   TextWrapping="Wrap"
+                   Text="How to interpret rollback Work time?"
                    TextAlignment="Center"
+                   TextWrapping="Wrap"
                    />
         <TextBlock Margin="0,20,0,10"
                    HorizontalAlignment="Center"
-                   Text="{Binding Time,
-                                  Converter={StaticResource conv_TimeSpanToMinutes},
-                                  FallbackValue='20 mimutes'}"
                    FontSize="20"
-                   TextWrapping="Wrap"
+                   Text="{Binding Time, Converter={StaticResource conv_TimeSpanToMinutes}, FallbackValue='20 mimutes'}"
                    TextAlignment="Center"
+                   TextWrapping="Wrap"
                    />
-        <StackPanel HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    >
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
             <Button DockPanel.Dock="Bottom"
                     Command="{Binding SubstractWorkAddBreakCommand}"
                     Content="AS BREAK"
@@ -46,9 +42,9 @@
                     />
         </StackPanel>
 
-        <CheckBox Content="Remember my choice"
-                  Margin="0,10,0,0"
+        <CheckBox Margin="0,10,0,0"
                   HorizontalAlignment="Center"
+                  Content="Remember my choice"
                   IsChecked="{Binding RememberChoice}"
                   />
     </StackPanel>

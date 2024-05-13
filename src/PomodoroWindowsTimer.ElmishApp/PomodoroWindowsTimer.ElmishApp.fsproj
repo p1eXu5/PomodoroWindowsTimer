@@ -15,6 +15,7 @@
     <Compile Include="WorkModel\WorkModel.fs" />
     <Compile Include="WorkModel\WorkModel.Program.fs" />
     <Compile Include="WorkModel\WorkModel.Bindings.fs" />
+    <Compile Include="AddWorkTimeModel\AddWorkTimeModel.fs" />
     <Compile Include="WorkStatisticModel\WorkStatisticModel.fs" />
     <Compile Include="WorkStatisticModel\WorkStatisticModel.Program.fs" />
     <Compile Include="WorkStatisticModel\WorkStatisticModel.Bindings.fs" />
