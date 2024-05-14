@@ -11,11 +11,6 @@ type private Binding = Binding<WorkStatisticModel, WorkStatisticModel.Msg>
 
 [<Sealed>]
 type Bindings() =
-    let time (timeSpan: TimeSpan) =
-        // let hours = MathF.Floor(float32 timeSpan.TotalHours)
-        // let minutes = timeSpan.Minutes
-        $"{timeSpan.Hours} h  {timeSpan.Minutes} m"
-
     let date (dateTime: DateTime) =
         let d = dateTime.ToShortDateString()
         let t = dateTime.ToShortTimeString()
@@ -51,11 +46,11 @@ type Bindings() =
 
     member val WorkTime : Binding =
         nameof __.WorkTime
-        |> Binding.oneWayOpt (_.Statistic >> Option.map (_.WorkTime >> time))
+        |> Binding.oneWayOpt (_.Statistic >> Option.map (_.WorkTime))
 
     member val BreakTime : Binding =
-        nameof __.BreakTime |> Binding.oneWayOpt (_.Statistic >> Option.map (_.BreakTime >> time))
+        nameof __.BreakTime |> Binding.oneWayOpt (_.Statistic >> Option.map (_.BreakTime))
 
     member val OverallTime : Binding =
-        nameof __.OverallTime |> Binding.oneWayOpt (_.Statistic >> Option.map (fun s -> (s.BreakTime + s.WorkTime) |> time))
+        nameof __.OverallTime |> Binding.oneWayOpt (_.Statistic >> Option.map (fun s -> (s.BreakTime + s.WorkTime)))
 

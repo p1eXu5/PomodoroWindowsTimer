@@ -155,6 +155,8 @@ module WorkStatisticListModel =
         | AsyncDeferred.Retrieved models -> models
         | _ -> List.empty
 
+    let withAddWorkTimeModel addWorkTimeModel (model: WorkStatisticListModel) =
+        { model with AddWorkTime = addWorkTimeModel }
     
 
     let overallTotalTime (model: WorkStatisticListModel) =
@@ -180,20 +182,42 @@ module WorkStatisticListModel =
 
 
     [<Literal>]
-    let private workHoursMax = 25.0 * 4.0 * 3.0 + 25.0 + 25.0 + 15.0
+    let private overallMinutesPerDayMax = 8 * 60
 
-    let overallTotalTimeRemains (model: WorkStatisticListModel) =
+    [<Literal>]
+    let private workMinutesPerDayMax = 25 * 4 * 3 + 25 + 25 + 15
+
+    [<Literal>]
+    let private breakMinutesPerDayMax = overallMinutesPerDayMax - workMinutesPerDayMax
+
+    let dayCount (model: WorkStatisticListModel) =
+        (model.EndDate.DayNumber - model.StartDate.DayNumber) + 1
+
+    let overallTimeRemains (model: WorkStatisticListModel) =
+        let dayCount = model |> dayCount
         overallTotalTime model
-        |> Option.map (fun ts -> ts - TimeSpan.FromHours(8))
+        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(float (overallMinutesPerDayMax * dayCount)))
 
-    let workTotalTimeRemains (model: WorkStatisticListModel) =
+    let workTimeRemains (model: WorkStatisticListModel) =
+        let dayCount = model |> dayCount
         workTotalTime model
-        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(workHoursMax))
+        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(float (workMinutesPerDayMax * dayCount)))
 
-    let breakTotalTimeRemains (model: WorkStatisticListModel) =
+    let breakTimeRemains (model: WorkStatisticListModel) =
+        let dayCount = model |> dayCount
         breakTotalTime model
-        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(8.0 * 60.0 - workHoursMax))
+        |> Option.map (fun ts -> ts - TimeSpan.FromMinutes(float (breakMinutesPerDayMax * dayCount)))
 
-    let withAddWorkTimeModel addWorkTimeModel (model: WorkStatisticListModel) =
-        { model with AddWorkTime = addWorkTimeModel }
+    let overallAtParTime (model: WorkStatisticListModel) =
+        let dayCount = model |> dayCount
+        TimeSpan.FromMinutes(float (overallMinutesPerDayMax * dayCount))
+
+    let workAtParTime (model: WorkStatisticListModel) =
+        let dayCount = model |> dayCount
+        TimeSpan.FromMinutes(float (workMinutesPerDayMax * dayCount))
+
+    let breakAtParTime (model: WorkStatisticListModel) =
+        let dayCount = model |> dayCount
+        TimeSpan.FromMinutes(float (breakMinutesPerDayMax * dayCount))
+
 

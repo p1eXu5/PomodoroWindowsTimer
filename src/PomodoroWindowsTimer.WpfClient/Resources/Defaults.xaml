@@ -21,6 +21,9 @@
     <converters:InverseBooleanConverter x:Key="conv_InverseBoolean" />
     <converters:TimeSpanToMinutesConverter x:Key="conv_TimeSpanToMinutes" />
     <converters:TimeSpanToDateTimeConverter x:Key="conv_TimeSpanToDateTime" />
+    <converters:TimeSpanToMnemonicStringConverter x:Key="conv_TimeSpanToMnemonicString" />
+    <converters:TimeSpanToMnemonicStringConverterS x:Key="conv_TimeSpanToMnemonicStringS" />
+    <converters:DiffTimeToBrushConverter x:Key="conv_DiffTimeToBrush" />
 
     <Style x:Key="st_IconBase" TargetType="materialDesign:PackIcon">
         <Setter Property="Width" Value="18" />

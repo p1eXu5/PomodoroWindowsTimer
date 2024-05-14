@@ -4,6 +4,7 @@ open System
 
 type [<Measure>] ms
 type [<Measure>] sec
+type [<Measure>] min
 
 type Name = string
 

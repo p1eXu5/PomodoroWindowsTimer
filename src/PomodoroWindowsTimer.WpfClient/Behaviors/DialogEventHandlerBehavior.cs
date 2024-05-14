@@ -114,8 +114,6 @@ internal sealed class DialogEventHandlerBehavior : Behavior<Button>
     }
 
 
-
-
     public static object? GetLoadDialogModelCommandParameter(DependencyObject obj)
     {
         return (object?)obj.GetValue(LoadDialogModelCommandParameterProperty);
