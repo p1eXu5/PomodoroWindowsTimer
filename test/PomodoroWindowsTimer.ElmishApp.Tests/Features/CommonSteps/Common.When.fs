@@ -108,14 +108,14 @@ let rec ``Next msg has been dispatched with 2.5 ticks timeout`` (times: int<time
     }
     |> Scenario.log $"When.``{nameof ``Next msg has been dispatched with 2.5 ticks timeout``}``"
 
-let rec ``Replay msg has been dispatched`` () =
+let rec ``Replay msg has been dispatched with 2.5 ticks timeout`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let msg = MainModel.ControllerMsg.Replay |> MainModel.Msg.ControllerMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "Replay" ((=) msg)
     }
-    |> Scenario.log $"When.``{nameof ``Replay msg has been dispatched``}``"
+    |> Scenario.log $"When.``{nameof ``Replay msg has been dispatched with 2.5 ticks timeout``}``"
 
 
 let rec ``PreChangeActiveTimeSpan msg has been dispatched`` times =

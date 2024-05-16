@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=mainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="100"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -57,11 +59,11 @@
                                                 />
 
                                         <ContentPresenter x:Name="MyContentPresenter"
+                                                          Content="{TemplateBinding Content}"
                                                           Height="{TemplateBinding Height}"
                                                           Margin="{TemplateBinding Padding}"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"
-                                                          Content="{TemplateBinding Content}"
                                                           />
                                     </Grid>
                                 </Grid>
@@ -101,19 +103,19 @@
                 </Style.Triggers>
             </Style>
         </StackPanel.Resources>
-        <Button Command="{Binding ReplayCommand}"
-                Content="Replay"
+        <Button Content="Replay"
+                Command="{Binding ReplayCommand}"
                 Visibility="{Binding LooperIsRunning,
                                      Converter={StaticResource conv_BooleanToVisibility}}"
                 />
-        <Button Command="{Binding PlayStopCommand}"
-                Margin="20,0,0,0"
-                Content="{Binding PlayPauseButtonText,
+        <Button Content="{Binding PlayPauseButtonText,
                                   FallbackValue=Resume}"
-                />
-        <Button Command="{Binding NextCommand}"
+                Command="{Binding PlayStopCommand}"
                 Margin="20,0,0,0"
-                Content="Next"
+                />
+        <Button Content="Next"
+                Command="{Binding NextCommand}"
+                Margin="20,0,0,0"
                 Visibility="{Binding LooperIsRunning,
                                      Converter={StaticResource conv_BooleanToVisibility}}"
                 />

@@ -169,18 +169,20 @@ module StopResumeFeature =
     [<Category("UC0: Work TimePoint Scenarios")>]
     let ``UC0-8 - Start-Replay Work TimePoint Scenario`` () =
         scenario {
-            let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
+            let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
-            do! When.``Replay msg has been dispatched`` ()
+            do! When.``Replay msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.Spent 1.0<sec>
 
             do! Then.``Active Point is set on`` timePoints.Head
-            do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
+            do! Then.``Active Point remaining time is less then`` timePoints.Head
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should not be minimized`` ()
+            do! Then.``MainModel.IsMinimized should be`` false
+            do! Then.``WindowsMinimizer.MinimizeOtherAsync is called`` 0
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Work 2<times>
         }
@@ -378,7 +380,7 @@ module StopResumeFeature =
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
-            do! When.``Replay msg has been dispatched`` ()
+            do! When.``Replay msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None

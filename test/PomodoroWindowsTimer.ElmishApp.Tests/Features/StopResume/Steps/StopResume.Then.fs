@@ -194,6 +194,18 @@ let rec ``Active Point remaining time is equal to or less then`` (timePoint: Tim
     }
     |> Scenario.log $"Then.``{nameof ``Active Point remaining time is equal to or less then``} {timePoint.TimeSpan}``"
 
+let rec ``Active Point remaining time is less then`` (timePoint: TimePoint) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        match sut.MainModel.ActiveTimePoint with
+        | Some atp ->
+            atp.TimeSpan |> shouldL be (lessThan timePoint.TimeSpan) $"Active TimePoint is %A{atp}"
+        | None ->
+            assertionExn "Active TimePoint is not set."
+    }
+    |> Scenario.log $"Then.``{nameof ``Active Point remaining time is less then``} {timePoint.TimeSpan}``"
+
 let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState

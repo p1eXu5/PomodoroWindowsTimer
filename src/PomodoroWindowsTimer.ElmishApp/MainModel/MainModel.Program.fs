@@ -157,7 +157,13 @@ let updateOnPlayerMsg
 
     | ControllerMsg.Replay when model.ActiveTimePoint |> Option.isSome ->
         let cmd =
-            Cmd.batch [Cmd.ofMsg (ControllerMsg.PreChangeActiveTimeSpan |> Msg.ControllerMsg); Cmd.ofMsg (ControllerMsg.ChangeActiveTimeSpan 0.0 |> Msg.ControllerMsg); Cmd.ofMsg (ControllerMsg.Resume |> Msg.ControllerMsg)]
+            Cmd.batch [
+                Cmd.ofMsg (ControllerMsg.PreChangeActiveTimeSpan |> Msg.ControllerMsg);
+                Cmd.ofMsg (ControllerMsg.ChangeActiveTimeSpan 0.0 |> Msg.ControllerMsg);
+                Cmd.ofMsg (ControllerMsg.PostChangeActiveTimeSpan |> Msg.ControllerMsg);
+                if model.LooperState = LooperState.Stopped then
+                    Cmd.ofMsg (ControllerMsg.Resume |> Msg.ControllerMsg);
+            ]
         model, cmd
 
     | ControllerMsg.LooperMsg evt ->
