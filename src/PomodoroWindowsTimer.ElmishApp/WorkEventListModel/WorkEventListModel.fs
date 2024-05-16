@@ -17,6 +17,8 @@ module WorkEventListModel =
 
     module MsgWith =
 
+        open System
+
         let (|``Start of LoadEventList``|_|) model msg =
             match msg with
             | Msg.LoadEventList (AsyncOperation.Start (workId, period)) ->
@@ -35,35 +37,72 @@ module WorkEventListModel =
                         | head :: tail ->
                             let sm =
                                 WorkEventModel.init head.WorkEvent head.OffsetTime false None
+                                |> WorkEventModel.addRunningTime TimeSpan.Zero
 
-                            let isPrevWork =
+                            let (isPrevWork, workTime, breakTime) =
                                 match sm with
                                 | WorkEventModel.Work wm ->
                                     match wm.TimePoitName with
-                                    | Some _ -> true
-                                    | _ -> false
-                                | _ -> false
+                                    | Some _ -> true, wm.OffsetTime |> Option.defaultValue TimeSpan.Zero, TimeSpan.Zero
+                                    | _ -> false, wm.OffsetTime |> Option.defaultValue TimeSpan.Zero, TimeSpan.Zero
+                                | WorkEventModel.Break bm -> false, TimeSpan.Zero, bm.OffsetTime |> Option.defaultValue TimeSpan.Zero
 
                             tail
-                            |> List.fold (fun (acc, isPrevWork, lastTimePointName) offsetTime ->
-                                let sm = 
-                                    WorkEventModel.init offsetTime.WorkEvent offsetTime.OffsetTime isPrevWork lastTimePointName
+                            |> List.fold (
+                                fun
+                                    (state: {|
+                                        Acc: WorkEventModel list;
+                                        IsPrevWork: bool;
+                                        LastTimePointName: string option;
+                                        WorkTime: TimeSpan;
+                                        BreakTime: TimeSpan
+                                    |})
+                                    offsetTime
+                                    ->
+                                let (sm, state) =
+                                    match
+                                        WorkEventModel.init offsetTime.WorkEvent offsetTime.OffsetTime state.IsPrevWork state.LastTimePointName,
+                                        offsetTime.OffsetTime
+                                    with
+                                    | WorkEventModel.Work wm, Some offsetTime ->
+                                        let workTime = state.WorkTime + offsetTime
+                                        (wm |> WorkEventDetailsModel.addRunningTime workTime |> WorkEventModel.Work), {| state with WorkTime = workTime |}
+                                    | WorkEventModel.Break bm, Some offsetTime ->
+                                        let breakTime = state.BreakTime + offsetTime
+                                        (bm |> WorkEventDetailsModel.addRunningTime breakTime |> WorkEventModel.Break), {| state with BreakTime = breakTime |}
+                                    | sm, _ -> sm, state
+
                                 match sm with
                                 | WorkEventModel.Work wm ->
                                     match wm.TimePoitName with
                                     | Some _ ->
-                                        (sm :: acc, true, wm.TimePoitName)
+                                        {| state with
+                                            Acc = sm :: state.Acc
+                                            IsPrevWork = true
+                                            LastTimePointName = wm.TimePoitName
+                                        |}
                                     | None ->
-                                        (sm :: acc, isPrevWork, lastTimePointName)
+                                        {| state with Acc = sm :: state.Acc |}
                                 | WorkEventModel.Break wm ->
                                     match wm.TimePoitName with
                                     | Some _ ->
-                                        (sm :: acc, false, wm.TimePoitName)
+                                        {|
+                                            state with
+                                                Acc = sm :: state.Acc
+                                                IsPrevWork = false
+                                                LastTimePointName = wm.TimePoitName
+                                        |}
                                     | None ->
-                                        (sm :: acc, isPrevWork, lastTimePointName)
+                                        {| state with Acc = sm :: state.Acc |}
 
-                            ) ([sm], isPrevWork, sm |> WorkEventModel.timePointName )
-                            |> fun (acc, _, _) -> acc |> List.rev
+                            ) ({|
+                                Acc = [sm]
+                                IsPrevWork = isPrevWork
+                                LastTimePointName = sm |> WorkEventModel.timePointName
+                                WorkTime = workTime
+                                BreakTime = breakTime
+                            |})
+                            |> fun state -> state.Acc |> List.rev
                         |> AsyncDeferred.Retrieved
                     )
                 )

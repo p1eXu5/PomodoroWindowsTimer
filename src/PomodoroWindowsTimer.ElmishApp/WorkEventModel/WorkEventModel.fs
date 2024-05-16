@@ -55,6 +55,9 @@ module WorkEventModel =
         | WorkEventModel.Break m
         | WorkEventModel.Work m -> m.TimePoitName
 
+    let addRunningTime t = function
+        | WorkEventModel.Break m -> m |> WorkEventDetailsModel.addRunningTime t |> WorkEventModel.Break
+        | WorkEventModel.Work m -> m |> WorkEventDetailsModel.addRunningTime t |> WorkEventModel.Work
 
 namespace PomodoroWindowsTimer.ElmishApp.WorkEventModel
 

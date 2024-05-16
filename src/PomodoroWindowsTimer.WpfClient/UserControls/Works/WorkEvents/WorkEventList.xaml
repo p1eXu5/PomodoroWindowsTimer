@@ -6,7 +6,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:workEventListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkEventListModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             Width="850"
+             Width="950"
              Height="330"
              Padding="20,20,20,10"
              d:DataContext="{d:DesignInstance Type=workEventListModel:Bindings, IsDesignTimeCreatable=False}"
@@ -33,9 +33,9 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="250" SharedSizeGroup="gr_EventName" />
                     <ColumnDefinition Width="150" SharedSizeGroup="gr_WorkTime" />
-                    <ColumnDefinition Width="100" SharedSizeGroup="gr_WorkOffset" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_WorkOffset" />
                     <ColumnDefinition Width="150" SharedSizeGroup="gr_BreakTime" />
-                    <ColumnDefinition Width="100" SharedSizeGroup="gr_BreakOffset" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_BreakOffset" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="EventName" />
                 <TextBlock Grid.Column="1"

@@ -11,6 +11,7 @@ type WorkEventDetailsModel =
         TimePoitName: string option
         CreatedAt: DateTimeOffset
         OffsetTime: TimeSpan option
+        RunningTime: TimeSpan option
     }
 
 
@@ -24,12 +25,18 @@ module WorkEventDetailsModel =
             TimePoitName = timePointName
             CreatedAt = createdAt
             OffsetTime = offsetTime
+            RunningTime = None
         }
 
     let eventName (model: WorkEventDetailsModel) =
         match model.TimePoitName with
         | None -> model.EventName
         | Some n -> $"{model.EventName}: \"{n}\""
+
+    let addRunningTime (addingTime: TimeSpan) (model: WorkEventDetailsModel) =
+        match model.RunningTime with
+        | Some t -> { model with RunningTime = (t + addingTime) |> Some }
+        | None -> { model with RunningTime = addingTime |> Some }
 
 
 namespace PomodoroWindowsTimer.ElmishApp.WorkEventDetailsModel
@@ -69,4 +76,10 @@ type Bindings() =
 
     member val OffsetTime : Binding =
         nameof __.OffsetTime |> Binding.oneWayOpt _.OffsetTime
+
+    member val HasOffsetTime : Binding =
+        nameof __.HasOffsetTime |> Binding.oneWay (_.OffsetTime >> Option.isSome)
+
+    member val RunningTime : Binding =
+        nameof __.RunningTime |> Binding.oneWayOpt _.RunningTime
 

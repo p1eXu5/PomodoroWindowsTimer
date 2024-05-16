@@ -24,6 +24,11 @@
                    TextWrapping="Wrap"
                    />
         <TextBlock Grid.Column="1" Text="{Binding CreatedAt, Converter={StaticResource conv_DateTimeOffsetToShortLocalDateTime}}" />
-        <TextBlock Grid.Column="2" Text="{Binding OffsetTime, Converter={StaticResource conv_TimeSpanToMnemonicStringS}}" />
+        <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <TextBlock Text="{Binding OffsetTime, Converter={StaticResource conv_TimeSpanToMnemonicStringS}}" />
+            <TextBlock Visibility="{Binding HasOffsetTime, Converter={StaticResource conv_BooleanToVisibility}}">
+                <Run Text=" (" /><Run Text="{Binding RunningTime, Converter={StaticResource conv_TimeSpanToMnemonicStringS}}" /><Run Text=")" />
+            </TextBlock>
+        </StackPanel>
     </Grid>
 </UserControl>
