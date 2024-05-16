@@ -24,6 +24,7 @@
     <converters:TimeSpanToMnemonicStringConverter x:Key="conv_TimeSpanToMnemonicString" />
     <converters:TimeSpanToMnemonicStringConverterS x:Key="conv_TimeSpanToMnemonicStringS" />
     <converters:DiffTimeToBrushConverter x:Key="conv_DiffTimeToBrush" />
+    <converters:DateTimeOffsetToShortLocalDateTimeConverter x:Key="conv_DateTimeOffsetToShortLocalDateTime" />
 
     <Style x:Key="st_IconBase" TargetType="materialDesign:PackIcon">
         <Setter Property="Width" Value="18" />

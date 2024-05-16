@@ -100,6 +100,12 @@ type WorkStatistic =
         Statistic: Statistic option
     }
 
+type WorkEventOffsetTime =
+    {
+        WorkEvent: WorkEvent
+        OffsetTime: TimeSpan option
+    }
+
 // ------------------------------- modules
 
 module WorkEvent =

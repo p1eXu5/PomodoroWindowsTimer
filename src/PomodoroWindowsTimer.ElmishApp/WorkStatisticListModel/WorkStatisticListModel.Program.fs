@@ -59,13 +59,98 @@ let storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workI
     }
 
 
-let update (userSettings: IUserSettings) (workEventRepo: IWorkEventRepository) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<WorkStatisticListModel>) msg (model: WorkStatisticListModel) =
+let (|WorkEventListDialogMsg|_|) updateWorkEventListModel (model: WorkStatisticListModel) msg =
+    match msg with
+    | MsgWith.LoadWorkEventListModel model work ->
+        let (workEventListModel, cmd) = WorkEventListModel.init work.Work.Id (model |> WorkStatisticListModel.dateOnlyPeriod)
+        (
+            model |> withWorkEventListModel (workEventListModel |> Some)
+            , Cmd.map (WorkEventListDialogMsg.WorkEventListModelMsg >> Msg.WorkEventListDialogMsg) cmd
+            , Intent.None
+        )
+        |> Some
+
+    | MsgWith.UnloadWorkEventListModel model _ ->
+        model |> withWorkEventListModel None |> withCmdNone |> withNoIntent |> Some
+
+    | MsgWith.WorkEventListModelMsg model (amsg, am) ->
+        let (workEventListModel, cmd) = updateWorkEventListModel amsg am
+        (
+            model |> withWorkEventListModel (workEventListModel |> Some)
+            , Cmd.map (WorkEventListDialogMsg.WorkEventListModelMsg >> Msg.WorkEventListDialogMsg) cmd
+            , Intent.None
+        )
+        |> Some
+    | _ -> None
+
+
+let (|AddWorkTimeDialogMsg|_|) (workEventRepo: IWorkEventRepository) (model: WorkStatisticListModel) msg =
     let storeWorkIncreasedEventTask =
         storeWorkIncreasedEventTask workEventRepo
 
     let storeWorkReducedEventTask =
         storeWorkReducedEventTask workEventRepo
 
+    match msg with
+    | MsgWith.LoadAddWorkTimeModel model work ->
+        let addWorkTimeModel = AddWorkTimeModel.init work.Work model.EndDate
+        model |> withAddWorkTimeModel (addWorkTimeModel |> Some) |> withCmdNone |> withNoIntent |> Some
+
+    | MsgWith.UnloadAddWorkTimeModel model _ ->
+        model |> withAddWorkTimeModel None |> withCmdNone |> withNoIntent |> Some
+
+    | MsgWith.AddWorkTimeModelMsg model (amsg, am) ->
+        let addWorkTimeModel = AddWorkTimeModel.Program.update amsg am
+        model |> withAddWorkTimeModel (addWorkTimeModel |> Some) |> withCmdNone |> withNoIntent |> Some
+
+    | MsgWith.AddWorkTimeOffset model am ->
+        if am.TimeOffset <> TimeSpan.Zero then
+            if am.IsReduce then
+                let model =
+                    match model.WorkStatistics with
+                    | AsyncDeferred.Retrieved statistic when model.StartDate <= am.Date && am.Date <= model.EndDate ->
+                        statistic
+                        |> List.mapFirst (fun sm -> sm.WorkId = am.Work.Id) (fun sm -> { sm with Statistic = sm.Statistic |> Option.map (fun s -> { s with WorkTime = s.WorkTime - am.TimeOffset }) })
+                        |> AsyncDeferred.Retrieved
+                        |> fun s -> { model with WorkStatistics = s }
+                    | _ -> model
+
+                (
+                    model |> withAddWorkTimeModel None
+                    , Cmd.OfTask.attempt (storeWorkReducedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
+                    , Intent.None
+                )
+                |> Some
+            else
+                let model =
+                    match model.WorkStatistics with
+                    | AsyncDeferred.Retrieved statistic when model.StartDate <= am.Date && am.Date <= model.EndDate ->
+                        statistic
+                        |> List.mapFirst (fun sm -> sm.WorkId = am.Work.Id) (fun sm -> { sm with Statistic = sm.Statistic |> Option.map (fun s -> { s with WorkTime = s.WorkTime + am.TimeOffset }) })
+                        |> AsyncDeferred.Retrieved
+                        |> fun s -> { model with WorkStatistics = s }
+                    | _ -> model
+
+                (
+                    model |> withAddWorkTimeModel None
+                    , Cmd.OfTask.attempt (storeWorkIncreasedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
+                    , Intent.None
+                )
+                |> Some
+        else
+            model |> withAddWorkTimeModel None |> withCmdNone |> withNoIntent |> Some
+    | _ -> None
+
+
+
+let update
+    (userSettings: IUserSettings)
+    (workEventRepo: IWorkEventRepository)
+    (errorMessageQueue: IErrorMessageQueue)
+    (logger: ILogger<WorkStatisticListModel>)
+    updateWorkEventListModel
+    msg
+    (model: WorkStatisticListModel) =
     match msg with
     | Msg.SetStartDate startDate when model.StartDate <> startDate ->
         model |> withStartDate userSettings startDate
@@ -114,47 +199,11 @@ let update (userSettings: IUserSettings) (workEventRepo: IWorkEventRepository) (
         | _ -> ()
         model |> withCmdNone |> withCloseIntent
 
-    | MsgWith.LoadAddWorkTimeModel model work ->
-        let addWorkTimeModel = AddWorkTimeModel.init work.Work model.EndDate
-        model |> withAddWorkTimeModel (addWorkTimeModel |> Some) |> withCmdNone |> withNoIntent
+    | AddWorkTimeDialogMsg workEventRepo model (m, cmd, intent) ->
+        (m, cmd, intent)
 
-    | Msg.UnloadAddWorkTimeModel ->
-        model |> withAddWorkTimeModel None |> withCmdNone |> withNoIntent
-
-    | MsgWith.AddWorkTimeModelMsg model (amsg, am) ->
-        let addWorkTimeModel = AddWorkTimeModel.Program.update amsg am
-        model |> withAddWorkTimeModel (addWorkTimeModel |> Some) |> withCmdNone |> withNoIntent
-
-    | MsgWith.AddWorkTimeOffset model am ->
-        if am.TimeOffset <> TimeSpan.Zero then
-            if am.IsReduce then
-                let model =
-                    match model.WorkStatistics with
-                    | AsyncDeferred.Retrieved statistic when model.StartDate <= am.Date && am.Date <= model.EndDate ->
-                        statistic
-                        |> List.mapFirst (fun sm -> sm.WorkId = am.Work.Id) (fun sm -> { sm with Statistic = sm.Statistic |> Option.map (fun s -> { s with WorkTime = s.WorkTime - am.TimeOffset }) })
-                        |> AsyncDeferred.Retrieved
-                        |> fun s -> { model with WorkStatistics = s }
-                    | _ -> model
-
-                model |> withAddWorkTimeModel None
-                , Cmd.OfTask.attempt (storeWorkReducedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
-                , Intent.None
-            else
-                let model =
-                    match model.WorkStatistics with
-                    | AsyncDeferred.Retrieved statistic when model.StartDate <= am.Date && am.Date <= model.EndDate ->
-                        statistic
-                        |> List.mapFirst (fun sm -> sm.WorkId = am.Work.Id) (fun sm -> { sm with Statistic = sm.Statistic |> Option.map (fun s -> { s with WorkTime = s.WorkTime + am.TimeOffset }) })
-                        |> AsyncDeferred.Retrieved
-                        |> fun s -> { model with WorkStatistics = s }
-                    | _ -> model
-
-                model |> withAddWorkTimeModel None
-                , Cmd.OfTask.attempt (storeWorkIncreasedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
-                , Intent.None
-        else
-            model |> withAddWorkTimeModel None |> withCmdNone |> withNoIntent
+    | WorkEventListDialogMsg updateWorkEventListModel model (m, cmd, intent) ->
+        (m, cmd, intent)
 
     | Msg.EnqueueExn ex ->
         errorMessageQueue.EnqueueError(ex.Message)

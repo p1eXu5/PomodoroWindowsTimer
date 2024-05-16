@@ -12,10 +12,12 @@ type WorkStatisticListModel =
         EndDate: DateOnly
         IsByDay: bool
         AddWorkTime: AddWorkTimeModel option
+        WorkEvents: WorkEventListModel option
     }
 
 module WorkStatisticListModel =
 
+    [<RequireQualifiedAccess>]
     type Msg =
         | SetStartDate of DateOnly
         | SetEndDate of DateOnly
@@ -23,11 +25,21 @@ module WorkStatisticListModel =
         | LoadStatistics of AsyncOperation<unit, Result<WorkStatistic list, string>>
         | WorkStatisticMsg of workId: uint64 * WorkStatisticModel.Msg
         | Close
-        | LoadAddWorkTimeModel of workId: uint64
-        | UnloadAddWorkTimeModel
-        | AddWorkTimeModelMsg of AddWorkTimeModel.Msg
-        | AddWorkTimeOffset
+        | AddWorkTimeDialogMsg of AddWorkTimeDialogMsg
+        | WorkEventListDialogMsg of WorkEventListDialogMsg
         | EnqueueExn of exn
+    and
+        [<RequireQualifiedAccess>]
+        AddWorkTimeDialogMsg =
+            | LoadAddWorkTimeModel of workId: uint64
+            | UnloadAddWorkTimeModel
+            | AddWorkTimeModelMsg of AddWorkTimeModel.Msg
+            | AddWorkTimeOffset
+    and
+        WorkEventListDialogMsg =
+            | LoadWorkEventListModel of workId: uint64
+            | UnloadWorkEventListModel
+            | WorkEventListModelMsg of WorkEventListModel.Msg
 
     [<RequireQualifiedAccess>]
     type Intent =
@@ -66,7 +78,7 @@ module WorkStatisticListModel =
 
         let (|LoadAddWorkTimeModel|_|) (model: WorkStatisticListModel) (msg: Msg) =
             match msg, model.WorkStatistics with
-            | Msg.LoadAddWorkTimeModel workId, AsyncDeferred.Retrieved statistic ->
+            | Msg.AddWorkTimeDialogMsg (AddWorkTimeDialogMsg.LoadAddWorkTimeModel workId), AsyncDeferred.Retrieved statistic ->
                 statistic
                 |> List.tryFind (fun sm -> sm.WorkId = workId)
                 |> Option.map (fun sm -> sm.Work)
@@ -74,14 +86,40 @@ module WorkStatisticListModel =
 
         let (|AddWorkTimeModelMsg|_|) (model: WorkStatisticListModel) (msg: Msg) =
             match msg, model.AddWorkTime with
-            | Msg.AddWorkTimeModelMsg amsg, Some am ->
+            | Msg.AddWorkTimeDialogMsg (AddWorkTimeDialogMsg.AddWorkTimeModelMsg amsg), Some am ->
                 (amsg, am) |> Some
+            | _ -> None
+
+        let (|UnloadAddWorkTimeModel|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.AddWorkTime with
+            | Msg.AddWorkTimeDialogMsg AddWorkTimeDialogMsg.UnloadAddWorkTimeModel, Some am ->
+                am |> Some
             | _ -> None
 
         let (|AddWorkTimeOffset|_|) (model: WorkStatisticListModel) (msg: Msg) =
             match msg, model.AddWorkTime with
-            | Msg.AddWorkTimeOffset, Some am ->
+            | Msg.AddWorkTimeDialogMsg AddWorkTimeDialogMsg.AddWorkTimeOffset, Some am ->
                 am |> Some
+            | _ -> None
+
+        let (|LoadWorkEventListModel|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.WorkStatistics with
+            | Msg.WorkEventListDialogMsg (WorkEventListDialogMsg.LoadWorkEventListModel workId), AsyncDeferred.Retrieved statistic ->
+                statistic
+                |> List.tryFind (fun sm -> sm.WorkId = workId)
+                |> Option.map (fun sm -> sm.Work)
+            | _ -> None
+
+        let (|UnloadWorkEventListModel|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.WorkEvents with
+            | Msg.WorkEventListDialogMsg WorkEventListDialogMsg.UnloadWorkEventListModel, Some am ->
+                am |> Some
+            | _ -> None
+
+        let (|WorkEventListModelMsg|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg, model.WorkEvents with
+            | Msg.WorkEventListDialogMsg (WorkEventListDialogMsg.WorkEventListModelMsg emsg), Some em ->
+                (emsg, em) |> Some
             | _ -> None
 
 
@@ -102,6 +140,7 @@ module WorkStatisticListModel =
             EndDate = endDate
             IsByDay = (startDate = endDate)
             AddWorkTime = None
+            WorkEvents = None
         }
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadStatistics)
 
@@ -158,6 +197,8 @@ module WorkStatisticListModel =
     let withAddWorkTimeModel addWorkTimeModel (model: WorkStatisticListModel) =
         { model with AddWorkTime = addWorkTimeModel }
     
+    let withWorkEventListModel workEventListModel (model: WorkStatisticListModel) =
+        { model with WorkEvents = workEventListModel }
 
     let overallTotalTime (model: WorkStatisticListModel) =
         model.WorkStatistics
@@ -220,4 +261,9 @@ module WorkStatisticListModel =
         let dayCount = model |> dayCount
         TimeSpan.FromMinutes(float (breakMinutesPerDayMax * dayCount))
 
+    let dateOnlyPeriod (model: WorkStatisticListModel) : DateOnlyPeriod =
+        {
+            Start = model.StartDate
+            EndInclusive = model.EndDate
+        }
 

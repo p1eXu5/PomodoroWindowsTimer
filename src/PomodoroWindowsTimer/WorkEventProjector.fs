@@ -8,10 +8,13 @@ type private StatisticBuilder =
     | Initialized
     | Calculating of Statistic * lastWorkEvent: WorkEvent
 
+
 let internal project (workEvents: WorkEvent list) =
     workEvents
     |> List.fold (fun builder ev ->
         match builder with
+        // we suppose that first stopped event is not preceeded to started
+        // TODO: add this case processing into store
         | Initialized ->
             let evDate = ev |> WorkEvent.localDateTime
             let tpName = ev |> WorkEvent.tpName
@@ -117,30 +120,13 @@ let internal project (workEvents: WorkEvent list) =
                         BreakTime = stat.BreakTime + v
                     }, lastWorkEvent = lastEvent)
 
+            | _ -> raise (ArgumentException($"Unpredictable event order. Current: {ev}, previous: {lastEvent}"))
     ) StatisticBuilder.Initialized
     |> function
         | Initialized -> None
         | Calculating (stat, _) ->
             { stat with TimePointNameStack = stat.TimePointNameStack |> List.distinct |> List.rev }
             |> Some
-
-let projectByWorkIdDaily (workEventRepo: IWorkEventRepository) (workId: uint64) (date: DateOnly) ct =
-    task {
-        let! res = workEventRepo.FindByWorkIdByDateAsync workId date ct
-        return res |> Result.map project
-    }
-
-let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: DateOnlyPeriod) ct =
-    task {
-        let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
-        return res |> Result.map project
-    }
-
-let projectByWorkId (workEventRepo: IWorkEventRepository) (workId: uint64) ct =
-    task {
-        let! res = workEventRepo.FindByWorkIdAsync workId ct
-        return res |> Result.map project
-    }
 
 
 let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =

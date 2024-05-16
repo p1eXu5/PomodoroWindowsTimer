@@ -90,22 +90,42 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val BreakAtParTime : Binding =
         nameof __.BreakAtParTime |> Binding.oneWay breakAtParTime
 
+    // ---------------- add work time dialog
+
     member val LoadAddWorkTimeModelCommand : Binding =
         nameof __.LoadAddWorkTimeModelCommand
             |> Binding.cmdParam (fun p ->
-                Msg.LoadAddWorkTimeModel (p :?> uint64)
+                Msg.AddWorkTimeDialogMsg (AddWorkTimeDialogMsg.LoadAddWorkTimeModel (p :?> uint64))
             )
 
     member val AddWorkTimeDialog : Binding =
         nameof __.AddWorkTimeDialog
             |> Binding.SubModel.opt (AddWorkTimeModel.Bindings.ToList)
             |> Binding.mapModel _.AddWorkTime
-            |> Binding.mapMsg Msg.AddWorkTimeModelMsg
+            |> Binding.mapMsg (AddWorkTimeDialogMsg.AddWorkTimeModelMsg >> Msg.AddWorkTimeDialogMsg)
 
     member val UnloadAddWorkTimeModelCommand : Binding =
         nameof __.UnloadAddWorkTimeModelCommand
-            |> Binding.cmdIf (_.AddWorkTime >> Option.map (fun _ -> Msg.UnloadAddWorkTimeModel))
+            |> Binding.cmdIf (_.AddWorkTime >> Option.map (fun _ -> AddWorkTimeDialogMsg.UnloadAddWorkTimeModel |> Msg.AddWorkTimeDialogMsg))
 
     member val AddWorkTimeOffsetCommand : Binding =
-        nameof __.AddWorkTimeOffsetCommand |> Binding.cmdIf (_.AddWorkTime >> Option.map (fun _ -> Msg.AddWorkTimeOffset))
+        nameof __.AddWorkTimeOffsetCommand |> Binding.cmdIf (_.AddWorkTime >> Option.map (fun _ -> AddWorkTimeDialogMsg.AddWorkTimeOffset |> Msg.AddWorkTimeDialogMsg))
+
+    // ---------------- work event list dialog
+
+    member val LoadWorkEventListModelCommand : Binding =
+        nameof __.LoadWorkEventListModelCommand
+            |> Binding.cmdParam (fun p ->
+                Msg.WorkEventListDialogMsg (WorkEventListDialogMsg.LoadWorkEventListModel (p :?> uint64))
+            )
+
+    member val WorkEventListDialog : Binding =
+        nameof __.WorkEventListDialog
+            |> Binding.SubModel.opt (WorkEventListModel.Bindings.ToList)
+            |> Binding.mapModel _.WorkEvents
+            |> Binding.mapMsg (WorkEventListDialogMsg.WorkEventListModelMsg >> Msg.WorkEventListDialogMsg)
+
+    member val UnloadWorkEventListModelCommand : Binding =
+        nameof __.UnloadWorkEventListModelCommand
+            |> Binding.cmd (WorkEventListDialogMsg.UnloadWorkEventListModel |> Msg.WorkEventListDialogMsg)
 

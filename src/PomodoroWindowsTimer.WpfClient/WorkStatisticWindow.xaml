@@ -9,7 +9,7 @@
         xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
         x:Name="m_WorkStatisticWindowRoot"
         Title="WorkStatisticWindow"
-        Width="1340"
+        Width="1600"
         Height="450"
         d:DataContext="{d:DesignInstance Type=workStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
         Style="{StaticResource MaterialDesignWindow}"

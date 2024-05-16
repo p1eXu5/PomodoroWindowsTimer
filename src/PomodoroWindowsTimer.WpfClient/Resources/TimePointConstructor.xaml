@@ -16,9 +16,7 @@
                        VerticalAlignment="Center"
                        Text="{Binding TimeSpan}"
                        />
-            <TextBlock VerticalAlignment="Center"
-                       Text="{Binding Kind}"
-                       />
+            <TextBlock VerticalAlignment="Center" Text="{Binding Kind}" />
         </StackPanel>
     </ControlTemplate>
 

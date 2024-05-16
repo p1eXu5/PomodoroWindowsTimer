@@ -74,11 +74,19 @@ let compose
         let updateTimePointGeneratorModel =
             TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore dialogErrorMessageQueue
 
+        let updateWorkEventListModel =
+            WorkEventListModel.Program.update workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkEventListModel>())
+
         let initWorkStatisticListModel =
             fun () -> WorkStatisticListModel.init userSettings timeProvider
 
         let updateWorkStatisticListModel =
-            WorkStatisticListModel.Program.update userSettings workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkStatisticListModel>())
+            WorkStatisticListModel.Program.update
+                userSettings
+                workEventRepository
+                dialogErrorMessageQueue
+                (loggerFactory.CreateLogger<WorkStatisticListModel>())
+                updateWorkEventListModel
 
         let updateRollbackWorkModel =
             RollbackWorkModel.Program.update userSettings
