@@ -1,173 +1,191 @@
 ﻿<Window x:Class="PomodoroWindowsTimer.WpfClient.MainWindow"
+        x:Name="m_Root"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
-        xmlns:vm="clr-namespace:PomodoroWindowsTimer.ElmishApp;assembly=PomodoroWindowsTimer.ElmishApp"
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+        xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
         xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
-        mc:Ignorable="d"
-        Title="MainWindow"
-        Height="420" Width="800"
-        WindowStartupLocation="CenterScreen"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        TextElement.FontWeight="Regular"
-        TextElement.FontSize="13"
-        TextOptions.TextFormattingMode="Ideal"
-        TextOptions.TextRenderingMode="Auto"
-        Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}"
-        FontFamily="{DynamicResource MaterialDesignFont}"
+        xmlns:mainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+        xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
+        xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
+        d:DataContext="{d:DesignInstance Type=mainModel:Bindings, IsDesignTimeCreatable=False}"
+        Title="{Binding Title}"
+        Style="{StaticResource MaterialDesignWindow}"
+        Width="800"
+        Height="520"
+        MinWidth="800"
+        MinHeight="595"
         Icon="pomodoro-technique.ico"
+        TextElement.FontSize="13"
+        TextElement.FontWeight="Regular"
+        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource br_Base}"
+        mc:Ignorable="d"
         >
     <Window.Resources>
-        <DataTemplate x:Key="dt_BotSettingsDialog">
-            <usercontrols:BotSettingsDialog DataContext="{Binding}" />
-        </DataTemplate>
+        <conv:ActualWidthToTopRightPointConverter x:Key="conv_ActualWidthToTopRightPoint" />
+        <conv:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
+        <sel:MainDialogContentTemplateSelector x:Key="set_MainDialogContentTemplate" />
     </Window.Resources>
-    
-    <materialDesign:DialogHost DialogTheme="Inherit"
+
+    <materialDesign:DialogHost x:Name="m_RootDialogHost"
+                               DataContext="{Binding AppDialog}"
+                               DialogContent="{Binding AppDialogId}"
+                               DialogContentTemplateSelector="{StaticResource set_MainDialogContentTemplate}"
+                               IsOpen="{Binding IsDialogOpened}"
+                               DialogTheme="Inherit"
                                Identifier="RootDialog"
-                               SnackbarMessageQueue="{Binding ElementName=ErrorMessageQueue, Path=MessageQueue}"
-                               DialogContentTemplate="{StaticResource dt_BotSettingsDialog}"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
+                                                              Path=MessageQueue}"
+                               CloseOnClickAway="False"
                                >
-        
-        <materialDesign:DrawerHost x:Name="DrawerHost"
-                                       HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Stretch"
-                                       BorderBrush="{DynamicResource MaterialDesignDivider}"
-                                       BorderThickness="2"
-                                       BottomDrawerBackground="{DynamicResource SecondaryHueLightBrush}"
-                                       BottomDrawerCornerRadius="20 20 0 0">
-            <materialDesign:DrawerHost.LeftDrawerContent>
-                <usercontrols:DrawerUserControl DataContext="{Binding}" />
-            </materialDesign:DrawerHost.LeftDrawerContent>
 
-            <DockPanel LastChildFill="True" Margin="10,0,10,0">
-                <DockPanel DockPanel.Dock="Top" LastChildFill="True">
-                    <TextBlock DockPanel.Dock="Right" 
-                           Text="{Binding AssemblyVersion}" 
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"
-                           Foreground="{StaticResource MaterialDesignDarkForeground}"
-                           Margin="5,5,10,5"/>
-                    <Button Style="{StaticResource MaterialDesignIconButton}"
-                            ToolTip="MaterialDesignFloatingActionMiniDarkButton"
-                            Content="{materialDesign:PackIcon ClockOutline}"
-                            Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}"
-                            />
-                    <Border></Border>
-                </DockPanel>
+        <Grid d:DataContext="{d:DesignInstance Type=mainModel:Bindings}"
+              DataContext="{Binding ElementName=m_Root,
+                                    Path=DataContext}"
+              >
+            <!--  gloss rect  -->
+            <Rectangle Width="{Binding ElementName=m_Root,
+                                       Path=ActualWidth}"
+                       Height="{Binding ElementName=m_Root,
+                                        Path=ActualHeight}"
+                       Opacity="0.7"
+                       >
+                <Rectangle.OpacityMask>
+                    <RadialGradientBrush Center="{Binding ElementName=m_Root,
+                                                          Path=ActualWidth,
+                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
+                                         GradientOrigin="{Binding ElementName=m_Root,
+                                                                  Path=ActualWidth,
+                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
+                                         MappingMode="Absolute"
+                                         RadiusX="500"
+                                         RadiusY="500"
+                                         SpreadMethod="Pad"
+                                         >
+                        <RadialGradientBrush.GradientStops>
+                            <GradientStop Offset="0" Color="#FF000000" />
+                            <GradientStop Offset="1" Color="#00000000" />
+                        </RadialGradientBrush.GradientStops>
+                    </RadialGradientBrush>
+                </Rectangle.OpacityMask>
+                <Rectangle.Fill>
+                    <ImageBrush TileMode="FlipXY"
+                                Viewport="0,0,256,256"
+                                ViewportUnits="Absolute"
+                                >
+                        <ImageBrush.ImageSource>
+                            <DrawingImage>
+                                <DrawingImage.Drawing>
+                                    <DrawingGroup>
+                                        <ImageDrawing ImageSource="{StaticResource img_Gloss}"
+                                                      Rect="0,0,256,256"
+                                                      />
+                                    </DrawingGroup>
+                                </DrawingImage.Drawing>
+                            </DrawingImage>
+                        </ImageBrush.ImageSource>
+                    </ImageBrush>
+                </Rectangle.Fill>
+            </Rectangle>
 
-                <materialDesign:Snackbar DockPanel.Dock="Bottom" 
+            <DockPanel>
+                <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                                         x:Name="m_ErrorMessageQueueSnackbar"
                                          HorizontalAlignment="Stretch"
-                                         MessageQueue="{Binding ErrorMessageQueue}"
                                          ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                                         MessageQueue="{Binding ErrorMessageQueue}"
                                          />
 
-                <materialDesign:ColorZone VerticalAlignment="Stretch" Background="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}">
-                    <!-- Content -->
-                    <DockPanel LastChildFill="True" Margin="0,0,0,20">
-                        <DockPanel.Resources>
-                            <DataTemplate  x:Key="gp_Green">
-                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding DataContext.ActiveTimePointName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                               Foreground="#00FF00"
-                                               HorizontalAlignment="Left"
-                                               Margin="0,0,0,20"
-                                               />
-                                    <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                                           VerticalAlignment="Center"
-                                                           Foreground="#00FF00"
-                                                           DigitBackground="#004000"
-                                                           Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
-                                                           Format="mm':'ss"
-                                                           />
-                                    <Slider DockPanel.Dock="Top"
-                                            Minimum="0"
-                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            Orientation="Horizontal"
-                                            Margin="0,40,0,0"
-                                            Foreground="#00FF00"
-                                            PreviewMouseDown="Slider_MouseDown"
-                                            PreviewMouseUp="Slider_MouseUp"
-                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            />
-                                </StackPanel>
-                            </DataTemplate>
 
-                            <DataTemplate x:Key="gp_Red">
-                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding DataContext.ActiveTimePointName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                               Foreground="#FF0000"
-                                               HorizontalAlignment="Left"
-                                               Margin="0,0,0,20"
-                                               />
-                                    <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                                                       VerticalAlignment="Center"
-                                                       Foreground="#FF0000"
-                                                       DigitBackground="#400000"
-                                                       Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}, FallbackValue=00:00:00.00}"
-                                                       Format="mm':'ss"
-                                                       />
-                                    <Slider DockPanel.Dock="Top"
-                                            Minimum="0"
-                                            Maximum="{Binding DataContext.ActiveTimeDuration, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            Value="{Binding DataContext.ActiveTimeSeconds, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            Orientation="Horizontal"
-                                            Margin="0,40,0,0"
-                                            Foreground="#FF0000"
-                                            PreviewMouseDown="Slider_MouseDown"
-                                            PreviewMouseUp="Slider_MouseUp"
-                                            IsEnabled="{Binding DataContext.IsActiveTimePointSet, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Control}}"
-                                            />
-                                </StackPanel>
-                            </DataTemplate>
+                <!--  LCD  -->
+                <Grid DockPanel.Dock="Top"
+                      Width="700"
+                      Height="420"
+                      Margin="0,30,0,0"
+                      >
+                    <Border x:Name="m_BlackPane"
+                            BorderThickness="0"
+                            CornerRadius="4"
+                            Background="Black"
+                            >
+                        <Grid>
 
-                            <local:DigitPanelTemplateSelector x:Key="dts_DigitPanel" />
-                        </DockPanel.Resources>
-                    
-                        <!-- Digit Panel -->
-                        <ContentControl x:Name="m_DigitPanel"
-                                        DockPanel.Dock="Top"
-                                        ContentTemplateSelector="{StaticResource dts_DigitPanel}"
-                                        Content="{Binding IsBreak}"
-                                        DataContext="{Binding}"
-                                        HorizontalAlignment="Center"
+                            <Grid Margin="1">
+                                <usercontrols:Lcd DataContext="{Binding}" />
+                                <Border BorderBrush="#0A0A0A"
+                                        BorderThickness="0,1,1,0"
+                                        CornerRadius="4"
                                         />
+                                <Border BorderBrush="#000000"
+                                        BorderThickness="1,0,0,1"
+                                        CornerRadius="4"
+                                        />
+                            </Grid>
 
-                        <!-- Buttons -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Height="120">
-                            <StackPanel.Resources>
-                                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatSecondaryDarkBgButton}">
-                                    <Setter Property="Background">
-                                        <Setter.Value>
-                                            <LinearGradientBrush >
-                                                <GradientStop Color="#A1B1A1" Offset="0"/>
-                                                <GradientStop Color="#637363" Offset="1"/>
-                                            </LinearGradientBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Setter Property="Foreground" Value="{DynamicResource {x:Static digitPanel:DigitPanelColors.DigitPanelBackgroundKey}}" />
-                                    <Setter Property="Width" Value="90" />
-                                </Style>
-                            </StackPanel.Resources>
-                            <Button Content="Replay" Command="{Binding ReplayCommand}"
-                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                            <Border x:Name="m_OuterBottomLeftShadowBorder"
+                                    BorderBrush="#101010"
+                                    BorderThickness="1,0,0,1"
+                                    CornerRadius="4"
                                     />
-                            <Button Content="{Binding PlayPauseButtonText, FallbackValue=Resume}" Command="{Binding PlayStopCommand}" Margin="20,0,0,0" />
-                            <Button Content="Next" Command="{Binding NextCommand}" Margin="20,0,0,0"
-                                    Visibility="{Binding LooperIsRunning, Converter={StaticResource BooleanToVisibilityConverter}}"
+
+                            <Rectangle x:Name="m_GlossRect"
+                                       IsHitTestVisible="False"
+                                       Opacity="0.13"
+                                       RadiusX="4"
+                                       RadiusY="4"
+                                       >
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1.3">
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Offset="0.38" Color="#00FFFFFF" />
+                                            <GradientStop Offset="0.4" Color="#FFFFFFFF" />
+                                            <GradientStop Offset="0.7" Color="#FFFFFFFF" />
+                                            <GradientStop Offset="0.72" Color="#00FFFFFF" />
+                                        </LinearGradientBrush.GradientStops>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                                <Rectangle.OpacityMask>
+                                    <RadialGradientBrush Center="{Binding ElementName=m_Root,
+                                                                          Path=ActualWidth,
+                                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
+                                                         GradientOrigin="{Binding ElementName=m_Root,
+                                                                                  Path=ActualWidth,
+                                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
+                                                         MappingMode="Absolute"
+                                                         RadiusX="500"
+                                                         RadiusY="500"
+                                                         SpreadMethod="Pad"
+                                                         >
+                                        <RadialGradientBrush.GradientStops>
+                                            <GradientStop Offset="0" Color="#FF000000" />
+                                            <GradientStop Offset="1" Color="#00000000" />
+                                        </RadialGradientBrush.GradientStops>
+                                    </RadialGradientBrush>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+
+                            <Border x:Name="m_OuterTopRightShadowBorder"
+                                    BorderBrush="#0A0A0A"
+                                    BorderThickness="0,1,1,0"
+                                    CornerRadius="4"
                                     />
-                            <!--<Button Content="Minimize" Margin="10,0" Command="{Binding MinimizeCommand}" />-->
-                            <!--<Button Content="Send Test Msg" Margin="10,0" Command="{Binding SendToChatBotCommand}" />-->
-                        </StackPanel>
-                    
-                    </DockPanel>
-                </materialDesign:ColorZone>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <usercontrols:ControlButtons DockPanel.Dock="Top"
+                                             DataContext="{Binding}"
+                                             VerticalAlignment="Top"
+                                             />
             </DockPanel>
-        </materialDesign:DrawerHost>
+        </Grid>
     </materialDesign:DialogHost>
 </Window>

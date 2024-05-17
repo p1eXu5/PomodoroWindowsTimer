@@ -1,16 +1,16 @@
-﻿namespace PomodoroWindowsTimer.ElmishApp.Types
+﻿namespace PomodoroWindowsTimer.ElmishApp
 
-open System.Threading.Tasks
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-
-
-type WindowsMinimizer =
-    {
-        Minimize: unit -> Async<unit>
-        Restore: unit -> Async<unit>
-        RestoreMainWindow: unit -> Async<unit>
-    }
+/// Used in theme switcher on WPF side
+type TimePointKind =
+    | Undefined = 0
+    | Work = 1
+    | Break = 2
 
 type Message = string
 
-type BotSender = IBotConfiguration -> Message -> Task<unit>
+[<Struct>]
+type RollbackWorkStrategy = 
+    | UserChoiceIsRequired
+    | SubstractWorkAddBreak
+    | Default
+

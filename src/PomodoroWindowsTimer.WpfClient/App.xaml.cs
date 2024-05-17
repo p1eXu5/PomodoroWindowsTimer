@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using Microsoft.Extensions.Configuration;
+using PomodoroWindowsTimer.ElmishApp.Models;
+using Microsoft.FSharp.Core;
+using PomodoroWindowsTimer.Types;
 
 namespace PomodoroWindowsTimer.WpfClient
 {
@@ -14,19 +17,9 @@ namespace PomodoroWindowsTimer.WpfClient
     /// </summary>
     public partial class App : Application
     {
-        private readonly IErrorMessageQueue _errorMessageQueue;
-
-        static App()
-        {
-            Configuration =
-                new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", true)
-#if RELEASE
-#else
-                    .AddJsonFile($"appsettings.Personal.json", true)
-#endif
-                    .Build();
-        }
+        private IErrorMessageQueue _errorMessageQueue = default!;
+        private Bootstrap _bootstrap = default!;
+        private MainWindow _mainWindow = default!;
 
         public App()
         {
@@ -34,46 +27,68 @@ namespace PomodoroWindowsTimer.WpfClient
             ci.DateTimeFormat.ShortDatePattern = "dd.MM.yyyy";
             Thread.CurrentThread.CurrentCulture = ci;
 
-            _errorMessageQueue = new ErrorMessageQueue();
-
             AppDomain.CurrentDomain.UnhandledException += OnDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
-
-            this.Activated += StartElmish;
         }
 
-        public static IConfiguration Configuration { get; }
-
-        private void StartElmish(object? sender, EventArgs e)
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
-            this.Activated -= StartElmish;
-            ElmishApp.Program.main(
-                MainWindow,
-                _errorMessageQueue,
-                SettingsManager.Instance,
-                new BotConfiguration(SettingsManager.Instance),
-                new ThemeSwitcher()
-            );
+            _bootstrap = Bootstrap.Build<Bootstrap>(e.Args);
+            _bootstrap.StartHost();
+
+            _errorMessageQueue = _bootstrap.GetMainWindowErrorMessageQueue();
+            var themeSwitcher = _bootstrap.GetThemeSwitcher();
+            themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);
+
+            _mainWindow = new MainWindow();
+            _bootstrap.ShowMainWindow(_mainWindow, () => new WorkStatisticWindow());
+        }
+
+        private async void Application_Exit(object sender, ExitEventArgs e)
+        {
+            if (_bootstrap is not null)
+            {
+                using (_bootstrap)
+                {
+                    var looper = _bootstrap.GetLooper();
+                    looper.Stop();
+
+                    bool isPlaying = ((dynamic)_mainWindow.DataContext).IsPlaying;
+                    object currentWork = ((dynamic)_mainWindow.DataContext).CurrentWork;
+
+                    if (isPlaying && currentWork is not null)
+                    {
+                        UInt64 workId = ((dynamic)currentWork).Id;
+                        var timeProvider = _bootstrap.GetTimerProvider();
+                        var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
+
+                        var workEventRepository = _bootstrap.GetWorkEventRepository();
+                        await workEventRepository.CreateAsync(workId, workEvent, default);
+                    }
+
+                    await _bootstrap.StopHostAsync();
+                }
+            }
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            _errorMessageQueue.EnqueuError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+            _errorMessageQueue.EnqueueError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
             e.Handled = false;
         }
 
         private void OnDispatcherUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             string errorMessage = e.ExceptionObject.ToString() + Environment.NewLine;
-            _errorMessageQueue.EnqueuError(errorMessage);
+            _errorMessageQueue.EnqueueError(errorMessage);
         }
 
         private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
             string errorMessage = e.Exception.InnerExceptions.First().Message + Environment.NewLine + e.Exception.GetType();
-            _errorMessageQueue.EnqueuError(errorMessage);
+            _errorMessageQueue.EnqueueError(errorMessage);
         }
     }
 }

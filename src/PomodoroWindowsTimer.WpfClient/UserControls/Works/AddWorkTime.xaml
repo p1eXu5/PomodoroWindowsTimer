@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.AddWorkTime"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="m_AddWorkTimeRoot"
+             Width="300"
+             Height="330"
+             Loaded="m_AddWorkTimeRoot_Loaded"
+             mc:Ignorable="d"
+             Background="{DynamicResource PrimaryHueDarkBrush}"
+             Foreground="{DynamicResource MaterialDesignBody}"
+             >
+    <StackPanel xmlns:addWorkTimeModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AddWorkTimeModel;assembly=PomodoroWindowsTimer.ElmishApp"
+                Margin="20,20,20,0"
+                d:DataContext="{d:DesignInstance Type=addWorkTimeModel:Bindings, IsDesignTimeCreatable=False}"
+                Orientation="Vertical"
+                >
+        <TextBlock Text="{Binding Number, FallbackValue='PWT-10'}" />
+        <TextBlock MinHeight="70"
+                   Margin="0,10,0,10"
+                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                   Text="{Binding Title, FallbackValue='Task title'}"
+                   TextWrapping="Wrap"
+                   />
+
+        <DatePicker Width="150"
+                    Margin="0,10"
+                    VerticalContentAlignment="Center"
+                    materialDesign:HintAssist.Hint="Date"
+                    SelectedDate="{Binding Date, Converter={StaticResource conv_DateOnlyToDateTime}}"
+                    />
+
+        <materialDesign:TimePicker Width="150"
+                                   materialDesign:HintAssist.Hint="Time"
+                                   Is24Hours="True"
+                                   IsInvalidTextAllowed="False"
+                                   SelectedTime="{Binding TimeOffset, Converter={StaticResource conv_TimeSpanToDateTime}}"
+                                   />
+        <StackPanel Margin="0,20"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
+            <RadioButton Content="Increase"
+                         IsChecked="{Binding IsIncrease}"
+                         Style="{StaticResource MaterialDesignLightRadioButton}"
+                         />
+            <RadioButton Margin="20,0,0,0"
+                         Content="Reduce"
+                         IsChecked="{Binding IsReduce}"
+                         Style="{StaticResource MaterialDesignLightRadioButton}"
+                         />
+        </StackPanel>
+        <StackPanel Margin="0,0,0,10"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
+            <Button Content="OK" Style="{StaticResource PomodoroOkDialogButton}" />
+            <Button Content="CANCEL" Style="{StaticResource PomodoroCancelDialogButton}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

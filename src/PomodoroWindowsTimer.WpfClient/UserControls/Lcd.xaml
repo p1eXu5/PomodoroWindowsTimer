@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Lcd"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:MainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
+             xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+             d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             mc:Ignorable="d"
+             >
+    <UserControl.Resources>
+        <sel:WorkSubModelTemplateSelector x:Key="sel_WorkSubModelTemplate" />
+    </UserControl.Resources>
+    <materialDesign:DrawerHost x:Name="DrawerHost"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               BorderThickness="0"
+                               BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
+                               BottomDrawerCornerRadius="20 20 0 0"
+                               IsLeftDrawerOpen="{Binding IsTimePointsShown}"
+                               IsRightDrawerOpen="{Binding IsWorkSelectorLoaded}"
+                               LeftDrawerBackground="Transparent"
+                               LeftDrawerCloseOnClickAway="True"
+                               OpenMode="Standard"
+                               RightDrawerBackground="Transparent"
+                               RightDrawerCloseOnClickAway="True"
+                               >
+        <materialDesign:DrawerHost.LeftDrawerContent>
+            <local:RunningTimePoints DataContext="{Binding}" Width="350" />
+        </materialDesign:DrawerHost.LeftDrawerContent>
+
+        <!--  time points generator  -->
+
+        <materialDesign:DrawerHost.RightDrawerContent>
+            <works:WorkSelector DataContext="{Binding WorkSelector}" />
+        </materialDesign:DrawerHost.RightDrawerContent>
+
+        <DockPanel Margin="10,0,10,0" LastChildFill="True">
+            <local:MainMenu DockPanel.Dock="Top" DataContext="{Binding}" />
+
+            <materialDesign:ColorZone VerticalAlignment="Center"
+                                      materialDesign:ThemeAssist.Theme="Inherit"
+                                      Background="Transparent"
+                                      >
+                <!--  Content  -->
+                <Grid Margin="0,0,0,20">
+                    <!--  Digit Panel  -->
+                    <local:Timer x:Name="m_DigitPanel"
+                                 DockPanel.Dock="Top"
+                                 DataContext="{Binding}"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
+                                 Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                 />
+
+                </Grid>
+            </materialDesign:ColorZone>
+        </DockPanel>
+    </materialDesign:DrawerHost>
+</UserControl>

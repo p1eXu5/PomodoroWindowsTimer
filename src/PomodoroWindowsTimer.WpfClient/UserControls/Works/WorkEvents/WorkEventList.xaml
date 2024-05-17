@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkEvents.WorkEventList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkEvents"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:workEventListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkEventListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             Width="950"
+             Height="330"
+             Padding="20,20,20,10"
+             d:DataContext="{d:DesignInstance Type=workEventListModel:Bindings, IsDesignTimeCreatable=False}"
+             d:Foreground="#AAAAAA"
+             Loaded="UserControl_Loaded"
+             mc:Ignorable="d"
+             >
+    <UserControl.Resources>
+        <local:WorkListItemTemplateSelector x:Key="sel_WorkListItemTemplate" />
+        <DataTemplate x:Key="dt_WorkEventRow">
+            <local:WorkEventRow />
+        </DataTemplate>
+        <DataTemplate x:Key="dt_BreakEventRow">
+            <local:BreakEventRow />
+        </DataTemplate>
+    </UserControl.Resources>
+    <DockPanel Grid.IsSharedSizeScope="True" HorizontalAlignment="Center">
+        <Button DockPanel.Dock="Bottom"
+                Content="CANCEL"
+                Style="{StaticResource PomodoroCancelDialogButton}"
+                />
+        <Border BorderThickness="0,1,0,1" DockPanel.Dock="Top" BorderBrush="#5E5E5E">
+            <Grid Margin="0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" SharedSizeGroup="gr_EventName" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_WorkTime" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_WorkOffset" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_BreakTime" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_BreakOffset" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="EventName" />
+                <TextBlock Grid.Column="1"
+                           Grid.ColumnSpan="2"
+                           HorizontalAlignment="Center"
+                           Text="Work"
+                           />
+                <TextBlock Grid.Column="3"
+                           Grid.ColumnSpan="2"
+                           HorizontalAlignment="Center"
+                           Text="Break"
+                           />
+            </Grid>
+        </Border>
+        <ListBox VerticalAlignment="Top"
+                 ItemsSource="{Binding WorkEvents}"
+                 ItemTemplateSelector="{StaticResource sel_WorkListItemTemplate}"
+                 />
+    </DockPanel>
+</UserControl>

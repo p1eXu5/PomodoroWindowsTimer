@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
 
@@ -10,8 +10,8 @@
     
     <Title>Pomodoro Windows Timer</Title>
 
-    <AssemblyVersion>1.0.3</AssemblyVersion>
-    <FileVersion>1.0.3.0</FileVersion>
+    <AssemblyVersion>3.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
     <Version>$(VersionPrefix)</Version>
     
     <Copyright>2023 Vladimir Likhatskiy</Copyright>
@@ -22,13 +22,27 @@
     <Configurations>Debug;Release;Personal</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Personal|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
   <ItemGroup>
+    <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
-    <None Remove="appsettings.Personal.json" />
+    <None Remove="appsettings.Production.json" />
+    <None Remove="Resources\base_texture.png" />
+    <None Remove="Resources\gloss_texture.png" />
+    <None Remove="Resources\metalArtboard-50.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.Production.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="pomodoro-technique.ico">
@@ -37,20 +51,37 @@
   </ItemGroup>
   
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
-    <Content Include="appsettings.Personal.json">
+    <Content Include="appsettings.Production.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="4.7.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.0.1-ci629" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
     <PackageReference Include="p1eXu5.Wpf.DigitPanel" Version="1.0.1" />
+    
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+    <PackageReference Include="Serilog.Expressions" Version="4.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\base_texture.png" />
+    <Resource Include="Resources\gloss_texture.png" />
+    <Resource Include="Resources\metalArtboard-50.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -66,6 +97,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="PomodoroWindowsTimer.ElmishApp.Tests" />
   </ItemGroup>
 
 </Project>

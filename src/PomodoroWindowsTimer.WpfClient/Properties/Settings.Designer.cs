@@ -12,7 +12,7 @@ namespace PomodoroWindowsTimer.WpfClient.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -44,6 +44,89 @@ namespace PomodoroWindowsTimer.WpfClient.Properties {
             }
             set {
                 this["MyChatId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection Patterns {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["Patterns"]));
+            }
+            set {
+                this["Patterns"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TimePointPrototypes {
+            get {
+                return ((string)(this["TimePointPrototypes"]));
+            }
+            set {
+                this["TimePointPrototypes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TimePoints {
+            get {
+                return ((string)(this["TimePoints"]));
+            }
+            set {
+                this["TimePoints"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DisableSkipBreak {
+            get {
+                return ((bool)(this["DisableSkipBreak"]));
+            }
+            set {
+                this["DisableSkipBreak"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CurrentWork {
+            get {
+                return ((string)(this["CurrentWork"]));
+            }
+            set {
+                this["CurrentWork"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastStatisticPeriod {
+            get {
+                return ((string)(this["LastStatisticPeriod"]));
+            }
+            set {
+                this["LastStatisticPeriod"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string RollbackWorkStrategy {
+            get {
+                return ((string)(this["RollbackWorkStrategy"]));
+            }
+            set {
+                this["RollbackWorkStrategy"] = value;
             }
         }
     }

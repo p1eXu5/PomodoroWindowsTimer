@@ -1,92 +1,56 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.Program
 
-open System
-open Serilog
-open Serilog.Extensions.Logging
-open Telegram.Bot
+open Microsoft.Extensions.Logging
 open Elmish.WPF
 open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstrractions
-open PomodoroWindowsTimer.TimePointQueue
-open PomodoroWindowsTimer.Looper
 open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Abstractions
 
-let [<Literal>] tickMilliseconds = 200
+[<Literal>]
+let internal tickMilliseconds = 200<ms>
 
+[<Literal>]
+let internal title = "Pomodoro Windows Timer"
 
-let internal main (window, errorQueue, settingsManager, botConfiguration: IBotConfiguration, themeSwitcher: IThemeSwitcher) =
-    let logger =
-        LoggerConfiguration()
-#if DEBUG
-            .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Verbose)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Verbose)
-            .MinimumLevel.Override("Elmish.WPF.Performance", Events.LogEventLevel.Debug)
-            .MinimumLevel.Override(nameof (PomodoroWindowsTimer.ElmishApp), Events.LogEventLevel.Debug)
-#else
-            .MinimumLevel.Override("Elmish.WPF.Update", Events.LogEventLevel.Information)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Events.LogEventLevel.Information)
-            .MinimumLevel.Override("Elmish.WPF.Performance", Events.LogEventLevel.Information)
-            .MinimumLevel.Override(nameof (PomodoroWindowsTimer.ElmishApp), Events.LogEventLevel.Information)
-#endif
-            //.WriteTo.Console(outputTemplate="[{Timestamp:HH:mm:ss:fff} {Level:u3}] [{SourceContext:l}] {Message:lj}{NewLine}{Exception}")
-            .WriteTo.Console(outputTemplate="[{Timestamp:HH:mm:ss:fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-            .WriteTo.Debug(outputTemplate="[{Timestamp:HH:mm:ss:fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-            //.WriteTo.Seq("http://localhost:5341")
-            .CreateLogger()
+let internal main
+    (window: System.Windows.Window)
+    (workStatisticWindowFactory: System.Func<#System.Windows.Window>)
+    (looper: ILooper)
+    (timePointQueue: ITimePointQueue)
+    (workRepository: IWorkRepository)
+    (workEventRepository: IWorkEventRepository)
+    (telegramBot: ITelegramBot)
+    (windowsMinimizer: IWindowsMinimizer)
+    (themeSwitcher: IThemeSwitcher)
+    (userSettings: IUserSettings)
+    (mainErrorMessageQueue: IErrorMessageQueue)
+    (dialogErrorMessageQueue: IErrorMessageQueue)
+    (timeProvider: System.TimeProvider)
+    (loggerFactory: ILoggerFactory)
+    =
+    let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
+        CompositionRoot.compose
+            title
+            workStatisticWindowFactory
+            looper
+            timePointQueue
+            workRepository
+            workEventRepository
+            telegramBot
+            windowsMinimizer
+            themeSwitcher
+            userSettings
+            mainErrorMessageQueue
+            dialogErrorMessageQueue
+            timeProvider
+            loggerFactory
 
-    let loggerFactory = new SerilogLoggerFactory(logger)
-
-    // let mainModelLogger : ILogger = loggerFactory.CreateLogger(nameof (PomodoroWindowsTimer.ElmishApp.Models.MainModel))
-
-    let timePoints =
-        [
-            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 3"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 3"; TimeSpan = TimeSpan.FromMinutes(5); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 4"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Long Break"; TimeSpan = TimeSpan.FromMinutes(20); Kind = Break }
-        ]
-
-    let testTimePoints =
-        [
-            { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 1"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
-            { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Work }
-            { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Break }
-        ]
-
-    let timePointQueue = new TimePointQueue(timePoints)
-    let looper = new Looper((timePointQueue :> ITimePointQueue), tickMilliseconds)
-
-    let subscribe _ =
-        let effect dispatch =
-            let onLooperEvt =
-                fun evt ->
-                    async {
-                        do dispatch (MainModel.Msg.LooperMsg evt)
-                    }
-            looper.AddSubscriber(onLooperEvt)
-        [ effect ]
-
-    looper.Start()
-
-    let sendToBot (botConfiguration: IBotConfiguration) =
-        let botClient = TelegramBotClient(botConfiguration.BotToken)
-        Infrastructure.sendToBot botClient (Types.ChatId(botConfiguration.MyChatId))
-
-    WpfProgram.mkProgram 
-        (fun () -> MainModel.init settingsManager botConfiguration errorQueue timePoints)
-#if DEBUG
-        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.simWindowsMinimizer themeSwitcher)
-#else
-        (MainModel.Program.update botConfiguration sendToBot looper Infrastructure.prodWindowsMinimizer themeSwitcher)
-#endif
-        MainModel.Bindings.bindings
+    WpfProgram.mkProgram
+        initMainModel
+        updateMainModel
+        mainModelBindings
     |> WpfProgram.withLogger loggerFactory
     |> WpfProgram.withSubscription subscribe
     |> WpfProgram.startElmishLoop window
+

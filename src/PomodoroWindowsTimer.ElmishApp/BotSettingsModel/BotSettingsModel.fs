@@ -14,17 +14,16 @@ module BotSettingsModel =
     type Msg =
         | SetBotToken of string option
         | SetChatId of string option
+        | Apply
+        | Cancel
 
+    [<RequireQualifiedAccess>]
+    type Intent =
+        | None
+        | CloseDialogRequested
 
-    let init (botConfiguration: IBotConfiguration) =
+    let init (botConfiguration: IBotSettings) =
         {
-            BotToken = 
-                match botConfiguration.BotToken with
-                | null -> None
-                | s -> s |> Some
-
-            ChatId =
-                match botConfiguration.MyChatId with
-                | null -> None
-                | s -> s |> Some
+            BotToken = botConfiguration.BotToken
+            ChatId = botConfiguration.MyChatId
         }

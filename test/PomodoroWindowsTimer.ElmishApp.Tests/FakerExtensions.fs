@@ -1,7 +1,12 @@
-﻿namespace FakerExtensions
+﻿namespace PomodoroWindowsTimer.ElmishApp.Tests
 
 open System.Runtime.CompilerServices
 open Bogus
+
+[<AutoOpen>]
+module FakerInstance =
+    let faker = new Faker("en")
+
 
 [<Extension>]
 type FakerExtensions =
