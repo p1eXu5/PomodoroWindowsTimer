@@ -16,6 +16,7 @@ module WorkListModel =
         | SetSelectedWorkId of uint64 option
         | WorkModelMsg of uint64 * WorkModel.Msg
         | CreateWork
+        | UnselectWork
 
     module MsgWith =
 

@@ -14,9 +14,7 @@
              d:DesignWidth="300"
              mc:Ignorable="d"
              >
-    <UserControl.Resources />
     <DockPanel Grid.IsSharedSizeScope="True">
-
         <!--  `SELECTED WORK` title. It's not shown if there is no any selected work  -->
         <materialDesign:ColorZone DockPanel.Dock="Top"
                                   Padding="0"
@@ -37,27 +35,40 @@
                                       SharedSizeGroup="PopupGroup"
                                       />
                 </Grid.ColumnDefinitions>
+
+                <!--  title: SELECTED WORK  -->
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
-                           Margin="0,21.5,0,10"
+                           Margin="0,16,0,10"
                            Text="SELECTED WORK"
                            TextAlignment="Center"
-                           Foreground="#AAAAAA"
+                           Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
                            />
+                <!--  selected work popup menu  -->
                 <materialDesign:PopupBox Grid.Row="0"
                                          Grid.Column="1"
+                                         Margin="0,0,3,0"
+                                         Padding="0"
                                          PlacementMode="BottomAndAlignRightEdges"
                                          StaysOpen="False"
                                          Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                          >
-                    <Button Command="{Binding CreateWorkCommand}"
-                            Content="Create New"
-                            />
+                    <StackPanel Orientation="Vertical">
+                        <Button Content="Create New"
+                                Command="{Binding CreateWorkCommand}"
+                                />
+                        <Button Content="Unselect"
+                                Command="{Binding UnselectWorkCommand}"
+                                />
+                    </StackPanel>
                 </materialDesign:PopupBox>
+
+                <!--  selected work  -->
                 <local:SelectedWork Grid.Row="1"
                                     Grid.ColumnSpan="2"
                                     DataContext="{Binding SelectedWorkModel}"
                                     Margin="0,10,0,0"
+                                    Padding="0,0,18,0"
                                     VerticalAlignment="Center"
                                     IsSelected="True"
                                     />
@@ -66,7 +77,7 @@
 
         <!--  `SELECT WORK` title. It's not shown if any work is selected  -->
         <materialDesign:ColorZone DockPanel.Dock="Top"
-                                  Margin="0,11.5,0,0"
+                                  Margin="0,2,0,0"
                                   Padding="0,10,0,10"
                                   materialDesign:ElevationAssist.Elevation="Dp0"
                                   Mode="Custom"
@@ -81,6 +92,8 @@
                                       SharedSizeGroup="PopupGroup"
                                       />
                 </Grid.ColumnDefinitions>
+
+                <!--  title: SELECT WORK  -->
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
                            VerticalAlignment="Center"
@@ -89,28 +102,26 @@
                            Visibility="{Binding ElementName=m_Root,
                                                 Path=DataContext.HasSelectedWork,
                                                 Converter={StaticResource conv_InverseBooleanToVisibility}}"
-                           Foreground="#AAAAAA"
+                           Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
                            />
                 <materialDesign:PopupBox Grid.Row="0"
                                          Grid.Column="1"
+                                         Margin="0,0,3,0"
+                                         Padding="0"
                                          PlacementMode="BottomAndAlignRightEdges"
                                          StaysOpen="False"
                                          Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                          >
-                    <Button Command="{Binding CreateWorkCommand}"
-                            Content="Create New"
+                    <Button Content="Create New"
+                            Command="{Binding CreateWorkCommand}"
                             />
                 </materialDesign:PopupBox>
             </Grid>
         </materialDesign:ColorZone>
-        <!--<TextBlock DockPanel.Dock="Top"
-                   Margin="0,40,0,10"
-                   Text="WORK LIST"
-                   TextAlignment="Center"
-                   Foreground="#AAAAAA"
-                   />-->
+
+        <!--  Search TextBox  -->
         <Grid DockPanel.Dock="Top"
-              Margin="20,10"
+              Margin="0,10,18,10"
               VerticalAlignment="Top"
               >
             <materialDesign:PackIcon VerticalAlignment="Center"
@@ -122,18 +133,21 @@
                      Padding="25,0,0,5"
                      HorizontalAlignment="Stretch"
                      VerticalAlignment="Bottom"
+                     TextChanged="TextBox_TextChanged"
                      />
         </Grid>
 
+        <!--  Work List  -->
         <Border Margin="0,0,0,1"
                 BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
                 BorderThickness="0"
                 >
-            <ItemsControl Margin="0"
+            <ItemsControl x:Name="m_WorkList"
+                          Margin="0"
                           HorizontalContentAlignment="Stretch"
                           VerticalContentAlignment="Center"
                           ItemsSource="{Binding WorkModelList}"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible"
                           >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

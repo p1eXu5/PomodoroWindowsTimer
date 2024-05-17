@@ -48,4 +48,7 @@ type Bindings() =
     member val CreateWorkCommand : Binding =
         nameof __.CreateWorkCommand |> Binding.cmd Msg.CreateWork
 
+    member val UnselectWorkCommand : Binding =
+        nameof __.UnselectWorkCommand |> Binding.cmd Msg.UnselectWork
+
 

@@ -90,6 +90,9 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
     | Msg.CreateWork ->
         model |> withCmdNone |> withSwitchToCreateWorkIntent
 
+    | Msg.UnselectWork ->
+        model |> withSelectedWorkId None |> withCmdNone |> withSelectIntent
+
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
         model |> withCmdNone |> withNoIntent

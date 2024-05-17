@@ -56,7 +56,7 @@
                    VerticalAlignment="Center"
                    Text="{Binding AssemblyVersion,
                                   FallbackValue=v 1.0.1.0}"
-                   Foreground="#4E6876"
+                   Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
                    />
         <!--  running time points  -->
         <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"
@@ -74,9 +74,9 @@
         <!--  telegram bot settings open dialog button  -->
         <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
-                Command="{Binding OpenBotSettingsDialogCommand}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 ToolTip="Telegram bot settings"
+                Command="{Binding OpenBotSettingsDialogCommand}"
                 Style="{StaticResource st_MenuButton}"
                 >
             <Button.RenderTransform>

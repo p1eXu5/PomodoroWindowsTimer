@@ -23,4 +23,32 @@ public partial class WorkList : UserControl
     {
         InitializeComponent();
     }
+
+    private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        if (e.Source is TextBox tb)
+        {
+            e.Handled = true;
+            var collView = (CollectionView)CollectionViewSource.GetDefaultView(m_WorkList.ItemsSource);
+
+            if (!collView.CanFilter)
+            {
+                return;
+            }
+
+            string text = tb.Text;
+            if (String.IsNullOrEmpty(text))
+            {
+                collView.Filter = null;
+            }
+            else
+            {
+                collView.Filter = new Predicate<object>(o => {
+                    string number = ((dynamic)o).Number;
+                    string title = ((dynamic)o).Title;
+                    return number.Contains(text, StringComparison.OrdinalIgnoreCase) || title.Contains(text, StringComparison.OrdinalIgnoreCase);
+                });
+            }
+        }
+    }
 }
