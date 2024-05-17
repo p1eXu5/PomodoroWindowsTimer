@@ -37,7 +37,7 @@
 
             <Button DockPanel.Dock="Bottom"
                     Command="{Binding CloseCommand}"
-                    Content="SKIP"
+                    Content="AS WORK"
                     Style="{StaticResource PomodoroCancelDialogButton}"
                     />
         </StackPanel>
