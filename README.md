@@ -1,5 +1,5 @@
-PomodoroWindowsTimer
-====================
+Pomodoro Windows Timer
+======================
 
 *Version: 3.0.0*
 
