@@ -54,11 +54,11 @@
                                          Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                          >
                     <StackPanel Orientation="Vertical">
-                        <Button Content="Create New"
-                                Command="{Binding CreateWorkCommand}"
+                        <Button Command="{Binding CreateWorkCommand}"
+                                Content="Create New"
                                 />
-                        <Button Content="Unselect"
-                                Command="{Binding UnselectWorkCommand}"
+                        <Button Command="{Binding UnselectWorkCommand}"
+                                Content="Unselect"
                                 />
                     </StackPanel>
                 </materialDesign:PopupBox>
@@ -112,8 +112,8 @@
                                          StaysOpen="False"
                                          Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                                          >
-                    <Button Content="Create New"
-                            Command="{Binding CreateWorkCommand}"
+                    <Button Command="{Binding CreateWorkCommand}"
+                            Content="Create New"
                             />
                 </materialDesign:PopupBox>
             </Grid>

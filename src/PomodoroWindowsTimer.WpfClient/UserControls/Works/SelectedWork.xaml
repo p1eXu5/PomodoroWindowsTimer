@@ -48,17 +48,37 @@
                         VerticalAlignment="Center"
                         Orientation="Vertical"
                         >
-                <TextBlock Grid.Row="0"
-                           Grid.Column="0"
-                           Margin="10,6,0,0"
-                           VerticalAlignment="Bottom"
-                           materialDesign:HintAssist.Hint="Number"
-                           FontSize="11"
-                           FontWeight="Normal"
-                           Text="{Binding Number,
-                                          Converter={StaticResource conv_NoNumberConverter},
-                                          FallbackValue='NO NUMBER'}"
-                           />
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Margin="10,6,0,0"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Bottom"
+                               materialDesign:HintAssist.Hint="Number"
+                               Text="{Binding Number,
+                                              Converter={StaticResource conv_NoNumberConverter},
+                                              FallbackValue='NO NUMBER'}"
+                               FontWeight="Normal"
+                               FontSize="11"
+                               />
+
+                    <TextBlock Grid.Column="1"
+                               Margin="0,6,5,0"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Bottom"
+                               materialDesign:HintAssist.Hint="Number"
+                               Text="{Binding UpdatedAt,
+                                              Converter={StaticResource conv_DateTimeOffsetToShortDate},
+                                              FallbackValue='12.02.2024'}"
+                               FontWeight="Normal"
+                               FontSize="11"
+                               />
+                </Grid>
+
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            ToolTip="{Binding Title}"

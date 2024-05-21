@@ -62,21 +62,42 @@
                         Background="Transparent"
                         BorderThickness="0"
                         >
-                    <StackPanel VerticalAlignment="Center"
+                    <StackPanel Width="{Binding ElementName=m_Stack,
+                                                Path=ActualWidth}"
+                                VerticalAlignment="Center"
                                 Orientation="Vertical"
                                 TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
                                 >
-                        <TextBlock Grid.Row="0"
-                                   Grid.Column="0"
-                                   Margin="10,6,0,0"
-                                   VerticalAlignment="Bottom"
-                                   materialDesign:HintAssist.Hint="Number"
-                                   Text="{Binding Number,
-                                                  Converter={StaticResource conv_NoNumberConverter},
-                                                  FallbackValue='NO NUMBER'}"
-                                   FontWeight="Normal"
-                                   FontSize="11"
-                                   />
+                        <Grid HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Margin="10,6,0,0"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Bottom"
+                                       materialDesign:HintAssist.Hint="Number"
+                                       Text="{Binding Number,
+                                                      Converter={StaticResource conv_NoNumberConverter},
+                                                      FallbackValue='NO NUMBER'}"
+                                       FontWeight="Normal"
+                                       FontSize="11"
+                                       />
+
+                            <TextBlock Grid.Column="1"
+                                       Margin="0,6,5,0"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Bottom"
+                                       materialDesign:HintAssist.Hint="Number"
+                                       Text="{Binding UpdatedAt,
+                                                      Converter={StaticResource conv_DateTimeOffsetToShortDate},
+                                                      FallbackValue='12.02.2024'}"
+                                       FontWeight="Normal"
+                                       FontSize="11"
+                                       />
+                        </Grid>
                         <TextBlock Grid.Row="1"
                                    Grid.Column="0"
                                    ToolTip="{Binding Title}"
@@ -95,9 +116,9 @@
                 <Button Grid.RowSpan="2"
                         Grid.Column="1"
                         x:Name="m_Button"
+                        Command="{Binding EditCommand}"
                         Content="{materialDesign:PackIcon Pencil}"
                         ToolTip="Edit"
-                        Command="{Binding EditCommand}"
                         Height="{Binding ElementName=m_Stack,
                                          Path=ActualHeight,
                                          Mode=OneWay}"

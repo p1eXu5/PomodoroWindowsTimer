@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +24,8 @@ public partial class WorkList : UserControl
     public WorkList()
     {
         InitializeComponent();
+
+        ((INotifyCollectionChanged)m_WorkList.Items).CollectionChanged += mListBox_CollectionChanged;
     }
 
     private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -50,5 +54,15 @@ public partial class WorkList : UserControl
                 });
             }
         }
+    }
+
+    private void mListBox_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Clear any existing sorting first
+        m_WorkList.Items.SortDescriptions.Clear();
+
+        // Sort by the Content property
+        m_WorkList.Items.SortDescriptions.Add(
+            new SortDescription("UpdatedAt", ListSortDirection.Descending));
     }
 }

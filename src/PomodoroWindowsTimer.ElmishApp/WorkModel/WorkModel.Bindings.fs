@@ -38,6 +38,9 @@ type Bindings() =
     member val EditTitle : Binding =
         nameof __.EditTitle |> Binding.twoWay (_.Title, Msg.SetTitle)
 
+    member val UpdatedAt : Binding =
+        nameof __.UpdatedAt |> Binding.oneWay (_.Work >> _.UpdatedAt)
+
     member val UpdateCommand : Binding =
         nameof __.UpdateCommand
             |> Binding.cmdIf (fun m ->
