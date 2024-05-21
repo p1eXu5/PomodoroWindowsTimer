@@ -129,3 +129,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
         nameof __.UnloadWorkEventListModelCommand
             |> Binding.cmd (WorkEventListDialogMsg.UnloadWorkEventListModel |> Msg.WorkEventListDialogMsg)
 
+    // ------------------
+
+    member val RefreshStatisticCommand : Binding =
+        nameof __.RefreshStatisticCommand |> Binding.cmd (AsyncOperation.startUnit Msg.LoadStatistics)
