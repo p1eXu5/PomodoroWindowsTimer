@@ -8,7 +8,7 @@ open FsToolkit.ErrorHandling
 open System
 open System
 
-let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEventList list) : Result<ExcelRow list, string> =
+let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEventList list) =
 
     let events =
         workEventOffsetTimes
@@ -201,16 +201,58 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
             let init = ([initWorkExcelRow], head)
 
             traverseRes startDt (folder startDt init) tail
+            |> Result.map (fun rows -> (startDt, rows))
 
         | _ -> Error $"First event is {head}"
 
-    | [] -> Ok []
+    | [] -> Error "Have no events"
 
 let export (excelBook: IExcelBook) (gluingThreshold: TimeSpan) (fileName: string) (workEventOffsetTimes: WorkEventList list) =
-    cancellableTaskResult {
-        let! sheet = excelBook.CreateAsync fileName
-        let! rows = workEventOffsetTimes |> excelRows gluingThreshold
-        do! sheet.AddRowsAsync rows
-        do! excelBook.SaveAsync
+    result {
+        let! sheet = excelBook.Create fileName
+        let! dailyRows =
+            workEventOffsetTimes
+            |> List.map (fun wel ->
+                wel.Events
+                |> List.groupBy (WorkEvent.dateOnly)
+                |> List.map (fun (day, events) ->
+                    (
+                        day,
+                        {
+                            Work = wel.Work
+                            Events = events
+                        }
+                    )
+                )
+            )
+            |> List.concat
+            |> List.groupBy fst
+            |> List.map (fun (day, wel) ->
+                wel
+                |> List.map snd
+                |> excelRows gluingThreshold
+                |> Result.map (fun (startTime, rows) -> (day, startTime, rows))
+            )
+            |> List.sequenceResultM
+
+        let! startRow = sheet.AddHeaders ()
+
+        let addRows startRow t =
+            let (day, startTime, rows) = t
+            sheet.AddRows day startTime rows startRow
+
+        let rec running f list =
+            match list with
+            | [] -> Ok ()
+            | head :: tail ->
+                head
+                |> f
+                |> Result.bind (fun nextRow ->
+                    running (addRows nextRow) tail
+                )
+
+        do! running (addRows startRow) dailyRows
+
+        do! excelBook.Save sheet
         return ()
     }

@@ -1,6 +1,10 @@
 ﻿[<AutoOpen>]
 module PomodoroWindowsTimer.Helpers
 
+module Unit =
+    [<CompiledName("Value")>]
+    let value = ()
+
 module String =
 
     open System

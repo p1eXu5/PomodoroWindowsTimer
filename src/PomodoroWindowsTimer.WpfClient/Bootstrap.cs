@@ -139,6 +139,7 @@ internal class Bootstrap : IDisposable
         services.AddThemeSwitcher();
         services.AddUserSettings(hostBuilderCtx.Configuration);
         services.AddDb(hostBuilderCtx.Configuration);
+        services.AddExcelBook();
 
         if (!hostBuilderCtx.Configuration.GetValue<bool>("InTest"))
         {

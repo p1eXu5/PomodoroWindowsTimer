@@ -15,6 +15,7 @@ using PomodoroWindowsTimer.WpfClient.Configuration;
 using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.TimePointQueue;
 using System.Windows.Interop;
+using PomodoroWindowsTimer.Exporter.Excel;
 
 namespace DrugRoom.WpfClient;
 
@@ -120,6 +121,9 @@ internal static class DependencyInjectionExtensions
         services.TryAddKeyedSingleton<IErrorMessageQueue>("main", errorMessageQueueFactory);
         services.TryAddKeyedSingleton<IErrorMessageQueue>("dialog", errorMessageQueueFactory);
     }
+
+    public static void AddExcelBook(this IServiceCollection services)
+        => services.TryAddSingleton<IExcelBook, ExcelBook>();
 
     public static void AddElmishProgramFactory(this IServiceCollection services)
         => services.TryAddTransient<ElmishProgramFactory>();

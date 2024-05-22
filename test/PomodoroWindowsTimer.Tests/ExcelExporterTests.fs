@@ -51,7 +51,7 @@ module ExcelExporterTests =
                     ExcelRow.createWorkExcelRow 3 work (dt.AddMinutes 70)
                 ]
 
-            let! rows = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
+            let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
             do %rows.Should().SequenceEqual(expectedRows)
         }
         |> Result.runTest
@@ -98,7 +98,7 @@ module ExcelExporterTests =
                     ExcelRow.createWorkExcelRow 3 work2 (dt.AddMinutes 70)
                 ]
 
-            let! rows = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
+            let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
             do %rows.Should().SequenceEqual(expectedRows)
         }
         |> Result.runTest
@@ -134,7 +134,7 @@ module ExcelExporterTests =
                     ExcelRow.createWorkExcelRow 1 work (dt.AddMinutes(23))
                 ]
 
-            let! rows = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
+            let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
             do %rows.Should().SequenceEqual(expectedRows)
         }
         |> Result.runTest

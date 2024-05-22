@@ -30,6 +30,7 @@ let compose
     (mainErrorMessageQueue: IErrorMessageQueue)
     (dialogErrorMessageQueue: IErrorMessageQueue)
     (timeProvider: System.TimeProvider)
+    (excelBook: IExcelBook)
     (loggerFactory: ILoggerFactory)
     =
     let patternStore = PatternStore.init userSettings
@@ -84,6 +85,7 @@ let compose
             WorkStatisticListModel.Program.update
                 userSettings
                 workEventRepository
+                excelBook
                 dialogErrorMessageQueue
                 (loggerFactory.CreateLogger<WorkStatisticListModel>())
                 updateWorkEventListModel

@@ -15,8 +15,9 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkStatisticListModel
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open Microsoft.Win32
 
-let storeWorkIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
+let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
     task {
         let! lastEvent = workEventRepository.FindLastByWorkIdByDateAsync workId date CancellationToken.None
 
@@ -37,7 +38,7 @@ let storeWorkIncreasedEventTask (workEventRepository: IWorkEventRepository) (wor
             raise (InvalidOperationException(err))
     }
 
-let storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
+let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
     task {
         let! lastEvent = workEventRepository.FindLastByWorkIdByDateAsync workId date CancellationToken.None
 
@@ -59,7 +60,7 @@ let storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workI
     }
 
 
-let (|WorkEventListDialogMsg|_|) updateWorkEventListModel (model: WorkStatisticListModel) msg =
+let private (|WorkEventListDialogMsg|_|) updateWorkEventListModel (model: WorkStatisticListModel) msg =
     match msg with
     | MsgWith.LoadWorkEventListModel model work ->
         let (workEventListModel, cmd) = WorkEventListModel.init work.Work.Id (model |> WorkStatisticListModel.dateOnlyPeriod)
@@ -84,7 +85,7 @@ let (|WorkEventListDialogMsg|_|) updateWorkEventListModel (model: WorkStatisticL
     | _ -> None
 
 
-let (|AddWorkTimeDialogMsg|_|) (workEventRepo: IWorkEventRepository) (model: WorkStatisticListModel) msg =
+let private (|AddWorkTimeDialogMsg|_|) (workEventRepo: IWorkEventRepository) (model: WorkStatisticListModel) msg =
     let storeWorkIncreasedEventTask =
         storeWorkIncreasedEventTask workEventRepo
 
@@ -142,10 +143,30 @@ let (|AddWorkTimeDialogMsg|_|) (workEventRepo: IWorkEventRepository) (model: Wor
     | _ -> None
 
 
+let private exportToExcelTask (workEventRepo: IWorkEventRepository) (excelBook: IExcelBook) =
+    let fd = SaveFileDialog()
+    fd.Filter <- "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*"
+    let result = fd.ShowDialog()
+    if result.HasValue && result.Value then
+        fun period ct ->
+            task {
+                let! events = workEventRepo.FindAllByPeriodAsync period ct
+                return
+                    events
+                    |> Result.bind (ExcelExporter.export excelBook (TimeSpan.FromMinutes(5)) fd.FileName)
+            }
+    else
+        fun _ _ ->
+            task {
+                return Ok ()
+            }
+
+
 
 let update
     (userSettings: IUserSettings)
     (workEventRepo: IWorkEventRepository)
+    (excelBook: IExcelBook)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<WorkStatisticListModel>)
     updateWorkEventListModel
@@ -191,6 +212,28 @@ let update
             model |> withStatistics AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
         | Ok (deff, _) ->
             model |> withStatistics deff |> withCmdNone |> withNoIntent
+
+    | MsgWith.``Start of ExportToExcel`` model (deff, cts) ->
+        let period =
+            {
+                Start = model.StartDate
+                EndInclusive = model.EndDate
+            }
+            : DateOnlyPeriod
+
+        let exportTask = exportToExcelTask workEventRepo excelBook
+        model |> withExportToExcelState deff
+        , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportToExcel cts)
+        , Intent.None
+
+    | MsgWith.``Finish of ExportToExcel`` model res ->
+        match res with
+        | Error err ->
+            do errorMessageQueue.EnqueueError err
+            logger.LogError(err)
+            model |> withExportToExcelState AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
+        | Ok deff ->
+            model |> withExportToExcelState deff |> withCmdNone |> withNoIntent
 
     | Msg.Close ->
         match model.WorkStatistics with

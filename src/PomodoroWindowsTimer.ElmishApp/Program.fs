@@ -27,6 +27,7 @@ let internal main
     (mainErrorMessageQueue: IErrorMessageQueue)
     (dialogErrorMessageQueue: IErrorMessageQueue)
     (timeProvider: System.TimeProvider)
+    (excelBook: IExcelBook)
     (loggerFactory: ILoggerFactory)
     =
     let (initMainModel, updateMainModel, mainModelBindings, subscribe) =
@@ -44,6 +45,7 @@ let internal main
             mainErrorMessageQueue
             dialogErrorMessageQueue
             timeProvider
+            excelBook
             loggerFactory
 
     WpfProgram.mkProgram

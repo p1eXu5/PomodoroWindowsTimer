@@ -52,14 +52,17 @@ type IWorkEventRepository =
         abstract FindLastByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent option, string>>
     end
 
+type StartRow = int
+
 type IExcelSheet =
     interface
-        abstract AddRowsAsync: ExcelRow seq -> CancellationToken -> Task<Result<unit, string>>
+        abstract AddHeaders: unit -> Result<StartRow, string>
+        abstract AddRows: date: DateOnly -> startTime: TimeOnly -> rows: ExcelRow seq -> StartRow -> Result<StartRow, string>
     end
 
 type IExcelBook =
     interface
-        abstract CreateAsync: string -> CancellationToken -> Task<Result<IExcelSheet, string>>
-        abstract SaveAsync: CancellationToken -> Task<Result<unit, string>>
+        abstract Create: filePath: string -> Result<IExcelSheet, string>
+        abstract Save: excelSheet: IExcelSheet -> Result<unit, string>
     end
 

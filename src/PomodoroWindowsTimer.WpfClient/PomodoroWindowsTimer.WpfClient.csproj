@@ -75,6 +75,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Exporter.Excel\PomodoroWindowsTimer.Exporter.Excel.csproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj" />
   </ItemGroup>
 
