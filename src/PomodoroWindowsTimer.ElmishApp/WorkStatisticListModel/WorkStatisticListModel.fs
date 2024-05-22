@@ -8,6 +8,7 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 type WorkStatisticListModel =
     {
         WorkStatistics: AsyncDeferred<WorkStatisticModel list>
+        ExportToExcelState: AsyncDeferred<unit>
         StartDate: DateOnly
         EndDate: DateOnly
         IsByDay: bool
@@ -23,6 +24,7 @@ module WorkStatisticListModel =
         | SetEndDate of DateOnly
         | SetIsByDay of bool
         | LoadStatistics of AsyncOperation<unit, Result<WorkStatistic list, string>>
+        | ExportToExcel of AsyncOperation<unit, Result<unit, string>>
         | WorkStatisticMsg of workId: uint64 * WorkStatisticModel.Msg
         | Close
         | AddWorkTimeDialogMsg of AddWorkTimeDialogMsg
@@ -74,6 +76,20 @@ module WorkStatisticListModel =
                         , res
                     )
                 )
+            | _ -> None
+
+        let (|``Start of ExportToExcel``|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg with
+            | Msg.ExportToExcel (AsyncOperation.Start _) ->
+                model.ExportToExcelState |> AsyncDeferred.forceInProgressWithCancellation |> Some
+            | _ -> None
+
+        let (|``Finish of ExportToExcel``|_|) (model: WorkStatisticListModel) (msg: Msg) =
+            match msg with
+            | Msg.ExportToExcel (AsyncOperation.Finish (res, cts)) ->
+                model.ExportToExcelState
+                |> AsyncDeferred.chooseRetrievedResultWithin res cts
+                |> Option.map (Result.map fst)
             | _ -> None
 
         let (|LoadAddWorkTimeModel|_|) (model: WorkStatisticListModel) (msg: Msg) =
@@ -136,6 +152,7 @@ module WorkStatisticListModel =
 
         {
             WorkStatistics = AsyncDeferred.NotRequested
+            ExportToExcelState = AsyncDeferred.NotRequested
             StartDate = startDate
             EndDate = endDate
             IsByDay = (startDate = endDate)
@@ -188,6 +205,9 @@ module WorkStatisticListModel =
 
     let withStatistics deff (model: WorkStatisticListModel) =
         { model with WorkStatistics = deff }
+
+    let withExportToExcelState deff (model: WorkStatisticListModel) =
+        { model with ExportToExcelState = deff }
 
     let workStatisticModels (model: WorkStatisticListModel) : WorkStatisticModel list =
         match model.WorkStatistics with

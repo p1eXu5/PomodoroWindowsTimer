@@ -5,6 +5,7 @@ open System.Threading
 open System.Threading.Tasks
 open FSharp.Control
 open PomodoroWindowsTimer.Types
+open System.Threading
 
 type ITimePointQueue =
     inherit IDisposable
@@ -44,7 +45,21 @@ type IWorkEventRepository =
         abstract FindByWorkId: workId: uint64 -> Result<WorkEvent list, string>
         abstract FindByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent list, string>>
         abstract FindByWorkIdByPeriodAsync: workId: uint64 -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        
+        /// Returns work event list ordered by work id then by created at time.
         abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
+        
         abstract FindLastByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent option, string>>
+    end
+
+type IExcelSheet =
+    interface
+        abstract AddRowsAsync: ExcelRow seq -> CancellationToken -> Task<Result<unit, string>>
+    end
+
+type IExcelBook =
+    interface
+        abstract CreateAsync: string -> CancellationToken -> Task<Result<IExcelSheet, string>>
+        abstract SaveAsync: CancellationToken -> Task<Result<unit, string>>
     end
 

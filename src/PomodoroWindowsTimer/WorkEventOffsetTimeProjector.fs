@@ -76,3 +76,18 @@ let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint6
         let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
         return res |> Result.map project
     }
+
+let projectByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
+    task {
+        let! res = workEventRepo.FindAllByPeriodAsync period ct
+        return
+            res
+            |> Result.map (
+                List.map (fun wel ->
+                    {
+                        Work = wel.Work
+                        OffsetTimes = wel.Events |> project
+                    }
+                )
+            )
+    }

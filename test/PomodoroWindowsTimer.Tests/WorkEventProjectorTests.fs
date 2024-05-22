@@ -4,12 +4,11 @@ open System
 open System.Collections
 
 open NUnit.Framework
-open FsUnit
-open PomodoroWindowsTimer.Testing.Fakers
+open Faqt
+open Faqt.Operators
 
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.WorkEventProjector
 
 [<Category("Projector")>]
 module WorkEventProjectorTests =
@@ -161,5 +160,5 @@ module WorkEventProjectorTests =
     [<TestCaseSource(nameof testCases)>]
     let ``project WorkStarted event test`` (events: WorkEvent list, expectedStat: Statistic option) =
         let stat = WorkEventProjector.project events
-        stat |> should equal expectedStat
+        %stat.Should().Be(expectedStat)
 

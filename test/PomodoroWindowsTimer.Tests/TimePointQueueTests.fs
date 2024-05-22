@@ -4,7 +4,7 @@ open System
 
 open NUnit.Framework
 open FsUnit
-open ShouldExtensions
+open p1eXu5.FSharp.Testing.ShouldExtensions
 
 open System.Threading
 open Microsoft.Extensions.Logging

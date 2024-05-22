@@ -148,7 +148,7 @@ let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: Cance
             )
     }
 
-
+/// Returns work event list ordered by work id then by created at time.
 let findAllByPeriodTask
     (timeProvider: System.TimeProvider)
     (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow * WorkRepository.ReadRow>, string>>)

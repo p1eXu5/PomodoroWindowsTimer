@@ -129,7 +129,30 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-6: Moving time slider when Initialized -> does not add events Scenario`` () =
+    let ``UC5-6: Start Work -> Next Work -> adds 3 events`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP 10.0<sec>; workTP 10.0<sec> ]
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent`` 1.0<sec>
+            do! When.``StartTimePoint msg has been dispatched with 2.5 ticks timeout`` timePoints[2].Id
+            do! When.``Spent`` 1.0<sec>
+
+            do! Then.``Current Work has been set to`` currentWork
+            do! Then.``Work events in db exist`` currentWork.Id [
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+            ]
+            do! Then.``Work time is between`` currentWork.Id 1.0<sec> 2.9<sec>
+            do! Then.``Break time is zero`` currentWork.Id
+        }
+        |> Scenario.runTestAsync
+
+    [<Test>]
+    let ``UC5-10: Moving time slider when Initialized -> does not add events Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             let! currentWork =
@@ -146,7 +169,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-7: Moving time slider when Playing -> adds events Scenario`` () =
+    let ``UC5-11: Moving time slider when Playing -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! currentWork =
@@ -170,7 +193,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-8: Moving time slider forward and backward when Playing and RollbackWorkStrategy is Default -> adds events Scenario`` () =
+    let ``UC5-12: Moving time slider forward and backward when Playing and RollbackWorkStrategy is Default -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! currentWork =
@@ -201,7 +224,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-8: Moving time slider forward and backward when Playing and RollbackWorkStrategy is SubstractWorkAddBreak -> adds events Scenario`` () =
+    let ``UC5-13: Moving time slider forward and backward when Playing and RollbackWorkStrategy is SubstractWorkAddBreak -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             do! Given.``RollbackWorkStrategy is SubstractWorkAddBreak`` ()
@@ -238,7 +261,7 @@ module WorkEventFeature =
     // change work scenarios
     // ---------------------
     [<Test>]
-    let ``UC5-9: Current Work set -> new Work is created and selected -> does not add events`` () =
+    let ``UC5-14: Current Work set -> new Work is created and selected -> does not add events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! _ =
@@ -264,7 +287,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-10: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
+    let ``UC5-15: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! _ =

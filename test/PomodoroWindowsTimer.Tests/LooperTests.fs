@@ -6,7 +6,7 @@ open System.Collections.Generic
 
 open NUnit.Framework
 open FsUnit
-open ShouldExtensions
+open p1eXu5.FSharp.Testing.ShouldExtensions
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.TimePointQueue

@@ -39,7 +39,6 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.5.1" />
-    <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="4.15.1" />
     <PackageReference Include="FsUnit" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NSubstitute" Version="5.1.0" />

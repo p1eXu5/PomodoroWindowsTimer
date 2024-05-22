@@ -133,3 +133,11 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val RefreshStatisticCommand : Binding =
         nameof __.RefreshStatisticCommand |> Binding.cmd (AsyncOperation.startUnit Msg.LoadStatistics)
+
+    member val ExportToExcelCommand : Binding =
+        nameof __.ExportToExcelCommand
+            |> Binding.cmdIf (fun m ->
+                match m.ExportToExcelState with
+                | AsyncDeferred.InProgress _ -> None
+                | _ -> AsyncOperation.startUnit Msg.ExportToExcel |> Some
+            )

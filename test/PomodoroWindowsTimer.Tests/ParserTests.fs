@@ -2,7 +2,7 @@
 
 open NUnit.Framework
 open FsToolkit.ErrorHandling
-open ShouldExtensions
+open p1eXu5.FSharp.Testing.ShouldExtensions
 open PomodoroWindowsTimer.Parser
 open FsUnit
 open PomodoroWindowsTimer.Types

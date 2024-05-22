@@ -8,6 +8,7 @@ open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features
+open Elmish.Extensions
 
 let rec ``Spent 2.5 ticks`` () =
     scenario {
@@ -116,6 +117,17 @@ let rec ``Replay msg has been dispatched with 2.5 ticks timeout`` () =
         do! Scenario.msgDispatchedWithin2Sec "Replay" ((=) msg)
     }
     |> Scenario.log $"When.``{nameof ``Replay msg has been dispatched with 2.5 ticks timeout``}``"
+
+/// Dispatches StartTimePoint Start msg and waits StartTimePoint Finish msg.
+let rec ``StartTimePoint msg has been dispatched with 2.5 ticks timeout`` (timePointId: Guid) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let msg = MainModel.Msg.StartTimePoint (Operation.Start timePointId)
+        do sut.Dispatcher.DispatchWithTimeout(msg)
+        do! Scenario.msgDispatchedWithin2Sec $"Start StartTimePoint {timePointId}" ((=) msg)
+        do! Scenario.msgDispatchedWithin2Sec $"Finish StartTimePoint {timePointId}" ((=) (MainModel.Msg.StartTimePoint (Operation.Finish ())))
+    }
+    |> Scenario.log $"When.``{nameof ``Play msg has been dispatched with 2.5 ticks timeout``}``"
 
 
 let rec ``PreChangeActiveTimeSpan msg has been dispatched`` times =
