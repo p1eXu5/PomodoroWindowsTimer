@@ -33,23 +33,23 @@ type IWorkRepository =
     interface
         abstract CreateAsync: number: string -> title: string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
         abstract ReadAllAsync: CancellationToken -> Task<Result<Work list, string>>
-        abstract FindByIdAsync: workId: uint64 -> CancellationToken -> Task<Result<Work option, string>>
+        abstract FindByIdAsync: workId: WorkId -> CancellationToken -> Task<Result<Work option, string>>
         abstract FindByIdOrCreateAsync: Work -> CancellationToken -> Task<Result<Work, string>>
         abstract UpdateAsync: Work -> CancellationToken -> Task<Result<DateTimeOffset, string>>
     end
 
 type IWorkEventRepository =
     interface
-        abstract CreateAsync: workId: uint64 -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract FindByWorkIdAsync: workId: uint64 -> CancellationToken -> Task<Result<WorkEvent list, string>>
-        abstract FindByWorkId: workId: uint64 -> Result<WorkEvent list, string>
-        abstract FindByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent list, string>>
-        abstract FindByWorkIdByPeriodAsync: workId: uint64 -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract CreateAsync: workId: WorkId -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract FindByWorkIdAsync: workId: WorkId -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkId: workId: WorkId -> Result<WorkEvent list, string>
+        abstract FindByWorkIdByDateAsync: workId: WorkId -> DateOnly -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkIdByPeriodAsync: workId: WorkId -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent list, string>>
         
         /// Returns work event list ordered by work id then by created at time.
         abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
         
-        abstract FindLastByWorkIdByDateAsync: workId: uint64 -> DateOnly -> CancellationToken -> Task<Result<WorkEvent option, string>>
+        abstract FindLastByWorkIdByDateAsync: workId: WorkId -> DateOnly -> CancellationToken -> Task<Result<WorkEvent option, string>>
     end
 
 type StartRow = int

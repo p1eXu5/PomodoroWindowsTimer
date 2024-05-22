@@ -1,15 +1,14 @@
 ﻿module PomodoroWindowsTimer.ExcelExporter
 
+open System
+open FsToolkit.ErrorHandling
+
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open System
-open FsToolkit.ErrorHandling
-open System
-open System
 
+/// Returns start time with rows
 let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEventList list) =
-
     let events =
         workEventOffsetTimes
         |> List.map (fun it -> it.Events |> List.map (fun t -> (it.Work, t)))
@@ -84,7 +83,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
 
             // ---------------- increaseTime
 
-            let increaseTime work (startTime: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
+            let increaseTime work (_: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
                 let rec running (value: TimeSpan) (rows: ExcelRow list) res =
                     match rows with
                     | [] ->
@@ -137,12 +136,28 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                 | WorkEvent.BreakStarted (currCt, _), WorkEvent.Stopped (lastCt) ->
                     let diff = currCt - lastCt
                     if diff <= gluingThreshold then
-                        let (head, tail) = rows |> List.head, rows |> List.tail
-                        (
-                            (head |> ExcelRow.addTime diff) :: tail
-                            , curr
-                        )
-                        |> Ok
+                        if currWork.Id = lastWork.Id then
+                            let (head, tail) = rows |> List.head, rows |> List.tail
+                            (
+                                (head |> ExcelRow.addTime diff) :: tail
+                                , curr
+                            )
+                            |> Ok
+                        else
+                            let head = rows |> List.head
+                            let lastNum = head |> ExcelRow.num
+                            let lastEnd = head |> ExcelRow.endAddTime diff
+                            let w =
+                                ExcelRow.createWorkExcelRow
+                                    (lastNum + 1)
+                                    currWork
+                                    lastEnd
+
+                            (
+                                (w :: rows)
+                                , curr
+                            )
+                            |> Ok
                     else
                         let head = rows |> List.head
                         let lastNum = head |> ExcelRow.num
@@ -158,19 +173,27 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                                 currWork
                                 iddleEnd
 
-                        ((w :: idle :: rows), curr) |> Ok
+                        (
+                            (w :: idle :: rows)
+                            , curr
+                        )
+                        |> Ok
 
                 | WorkEvent.WorkIncreased (_, v), _
                 | WorkEvent.BreakIncreased (_, v), _ ->
                     rows
                     |> increaseTime currWork startDt v
-                    |> Result.map (fun rs -> (rs, last))
+                    |> Result.map (fun rs ->
+                        (rs, last)
+                    )
 
                 | WorkEvent.WorkReduced (_, v), _
                 | WorkEvent.BreakReduced (_, v), _ ->
-                    rows
+                   rows
                     |> reduceTime currWork startDt v
-                    |> Result.map (fun rs -> (rs, last))
+                    |> Result.map (fun rs ->
+                       (rs, last)
+                    )
 
                 | _ -> Error "Not implemented"
 
@@ -207,26 +230,14 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
 
     | [] -> Error "Have no events"
 
-let export (excelBook: IExcelBook) (gluingThreshold: TimeSpan) (fileName: string) (workEventOffsetTimes: WorkEventList list) =
+
+
+let export (excelBook: IExcelBook) (gluingThreshold: TimeSpan) (fileName: string) (workEvents: WorkEventList list) =
     result {
         let! sheet = excelBook.Create fileName
         let! dailyRows =
-            workEventOffsetTimes
-            |> List.map (fun wel ->
-                wel.Events
-                |> List.groupBy (WorkEvent.dateOnly)
-                |> List.map (fun (day, events) ->
-                    (
-                        day,
-                        {
-                            Work = wel.Work
-                            Events = events
-                        }
-                    )
-                )
-            )
-            |> List.concat
-            |> List.groupBy fst
+            workEvents
+            |> WorkEventList.List.groupByDay
             |> List.map (fun (day, wel) ->
                 wel
                 |> List.map snd

@@ -12,9 +12,9 @@
     <Compile Include="Types.fs" />
     <Compile Include="Abstractions.fs" />
     <Compile Include="JsonHelper.fs" />
+    <Compile Include="ExcelExporter.fs" />
     <Compile Include="WorkEventProjector.fs" />
     <Compile Include="WorkEventOffsetTimeProjector.fs" />
-    <Compile Include="ExcelExporter.fs" />
     <Compile Include="TimePointQueue.fs" />
     <Compile Include="Looper.fs" />
     <Compile Include="Parser.fs" />

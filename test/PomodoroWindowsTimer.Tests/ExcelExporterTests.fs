@@ -105,7 +105,7 @@ module ExcelExporterTests =
 
 
     [<Test>]
-    let ``03: single work events with shifting time in the middle`` () =
+    let ``03: single work events with reduce-increase time in the middle`` () =
         result {
             let work = Fakers.generateWork ()
 
@@ -132,6 +132,81 @@ module ExcelExporterTests =
             let expectedRows =
                 [
                     ExcelRow.createWorkExcelRow 1 work (dt.AddMinutes(23))
+                ]
+
+            let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
+            do %rows.Should().SequenceEqual(expectedRows)
+        }
+        |> Result.runTest
+
+    [<Test>]
+    let ``04: single work events with increase time in the middle`` () =
+        result {
+            let work = Fakers.generateWork ()
+
+            let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
+
+            let events =
+                [
+                    WorkEvent.WorkStarted    (startDt, "W1")
+                    WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60)
+                    WorkEvent.Stopped        (startDt.AddMinutes 20)
+                    WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1")
+                    WorkEvent.Stopped        (startDt.AddMinutes 30)
+                ]
+
+            let workEventOffsetTimes =
+                {
+                    Work = work
+                    Events = events
+                }
+                |> List.singleton
+
+            let dt = TimeOnly.FromDateTime(startDt.LocalDateTime)
+
+            let expectedRows =
+                [
+                    ExcelRow.createWorkExcelRow 1 work (dt.AddMinutes(90))
+                ]
+
+            let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
+            do %rows.Should().SequenceEqual(expectedRows)
+        }
+        |> Result.runTest
+
+    [<Test>]
+    let ``05: multiple work events with increase time in the middle`` () =
+        result {
+            let work1 = Fakers.generateWork ()
+            let work2 = Fakers.generateWork ()
+
+            let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
+
+            let events1 =
+                [
+                    WorkEvent.WorkStarted    (startDt, "W1")
+                    WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60)
+                    WorkEvent.Stopped        (startDt.AddMinutes 20)
+                ]
+
+            let events2 =
+                [
+                    WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1")
+                    WorkEvent.Stopped        (startDt.AddMinutes 30)
+                ]
+
+            let workEventOffsetTimes =
+                [
+                    { Work = work1; Events = events1 }
+                    { Work = work2; Events = events2 }
+                ]
+
+            let dt = TimeOnly.FromDateTime(startDt.LocalDateTime)
+
+            let expectedRows =
+                [
+                    ExcelRow.createWorkExcelRow 1 work1 (dt.AddMinutes(80))
+                    ExcelRow.createWorkExcelRow 2 work2 (dt.AddMinutes(90))
                 ]
 
             let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``

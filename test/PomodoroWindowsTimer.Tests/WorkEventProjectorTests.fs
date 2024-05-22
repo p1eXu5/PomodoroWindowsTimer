@@ -28,6 +28,7 @@ module WorkEventProjectorTests =
     let ``00:20:00`` = DateTimeOffset(Date.``January, 2st``, TimeOnly(00, 20, 0), TimeSpan.Zero)
     let ``00:30:00`` = DateTimeOffset(Date.``January, 2st``, TimeOnly(00, 30, 0), TimeSpan.Zero)
 
+    let start23 = ``23:00:00``
 
     let testCases : IEnumerable =
         seq {
@@ -138,7 +139,7 @@ module WorkEventProjectorTests =
             TestCaseData(
                 [
                     (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
-                    (``23:10:00``) |> WorkEvent.Stopped
+                    (``23:10:00``)           |> WorkEvent.Stopped
                     (``23:20:00``, "Work 1") |> WorkEvent.WorkStarted
                     (``23:30:00``, "Break 1") |> WorkEvent.BreakStarted
                     (``23:40:00``) |> WorkEvent.Stopped
@@ -154,6 +155,27 @@ module WorkEventProjectorTests =
                     TimePointNameStack = ["Work 1"; "Break 1"]
                 } |> Some
             ).SetName("07: Work Started -> Stopped -> Work Started -> Break Started -> Stopped")
+
+            TestCaseData(
+                [
+                    WorkEvent.WorkStarted   (start23,               "W1")
+                    WorkEvent.WorkIncreased (start23.AddMinutes  5, TimeSpan.FromMinutes 60)
+                    WorkEvent.Stopped       (start23.AddMinutes 10)        
+                    WorkEvent.WorkStarted   (start23.AddMinutes 20, "W1")
+                    WorkEvent.BreakStarted  (start23.AddMinutes 30, "B1")
+                    WorkEvent.Stopped       (start23.AddMinutes 40)
+                ],
+                {
+                    Period =
+                        {
+                            Start = start23.LocalDateTime
+                            EndInclusive = start23.AddMinutes(40.0 + 60.0).LocalDateTime
+                        }
+                    WorkTime = TimeSpan.FromMinutes(20. + 60.)
+                    BreakTime = TimeSpan.FromMinutes(10)
+                    TimePointNameStack = ["W1"; "B1"]
+                } |> Some
+            ).SetName("08: Work Started -> WorkIncreased -> Stopped -> Work Started -> Break Started -> Stopped")
         }
 
 

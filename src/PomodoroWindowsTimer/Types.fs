@@ -62,9 +62,11 @@ type TimePointPrototype =
 
 type Pattern = string
 
+type WorkId = uint64
+
 type Work =
     {
-        Id: uint64
+        Id: WorkId
         Number: string
         Title: string
         CreatedAt: DateTimeOffset
@@ -225,6 +227,26 @@ module WorkEvent =
         | WorkEvent.WorkIncreased _ 
         | WorkEvent.BreakReduced _
         | WorkEvent.BreakIncreased _ -> None
+
+module WorkEventList =
+    module List =
+        let groupByDay (workEvents: WorkEventList list) =
+            workEvents
+            |> List.map (fun wel ->
+                wel.Events
+                |> List.groupBy (WorkEvent.dateOnly)
+                |> List.map (fun (day, events) ->
+                    (
+                        day,
+                        {
+                            Work = wel.Work
+                            Events = events
+                        }
+                    )
+                )
+            )
+            |> List.concat
+            |> List.groupBy fst
 
 
 module Alias =
