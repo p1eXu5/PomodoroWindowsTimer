@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using PomodoroWindowsTimer.ElmishApp.Models;
 using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.Types;
+using PomodoroWindowsTimer.WpfClient.Properties;
 
 namespace PomodoroWindowsTimer.WpfClient
 {
@@ -67,6 +68,9 @@ namespace PomodoroWindowsTimer.WpfClient
                         var workEventRepository = _bootstrap.GetWorkEventRepository();
                         await workEventRepository.CreateAsync(workId, workEvent, default);
                     }
+
+                    var userSettings = _bootstrap.GetUserSettings();
+                    userSettings.LastStatisticPeriod = null;
 
                     await _bootstrap.StopHostAsync();
                 }

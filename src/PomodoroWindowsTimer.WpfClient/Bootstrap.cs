@@ -168,6 +168,9 @@ internal class Bootstrap : IDisposable
     internal System.TimeProvider GetTimerProvider()
         => Host.Services.GetRequiredService<System.TimeProvider>();
 
+    internal IUserSettings GetUserSettings()
+        => Host.Services.GetRequiredService<IUserSettings>();
+
     protected virtual void PreConfigureServices(HostBuilderContext hostBuilder, IServiceCollection services)
     { }
 
