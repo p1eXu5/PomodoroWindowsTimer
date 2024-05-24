@@ -15,6 +15,7 @@
         Height="450"
         ResizeMode="CanResize"
         TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        Background="#1E1E1E"
         mc:Ignorable="d"
         >
     <Behaviors:Interaction.Triggers>

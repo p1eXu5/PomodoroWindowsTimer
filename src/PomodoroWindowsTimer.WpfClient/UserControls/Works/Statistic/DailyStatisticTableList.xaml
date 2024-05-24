@@ -125,7 +125,7 @@
                         >
                         <ScrollViewer
                             Padding="{TemplateBinding Padding}"
-                            CanContentScroll="True"
+                            CanContentScroll="False"
                             Focusable="False"
                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                             >

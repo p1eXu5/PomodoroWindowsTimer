@@ -1,6 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.Types
 
 open System
+open System.Diagnostics
 
 type [<Measure>] ms
 type [<Measure>] sec
@@ -120,12 +121,14 @@ type WorkEventOffsetTimeList =
         OffsetTimes: WorkEventOffsetTime list
     }
 
+[<DebuggerDisplay("Num = {Num}, End = {End}")>]
 type IdleExcelRow =
     {
         Num: int
         End: TimeOnly
     }
 
+[<DebuggerDisplay("Num = {Num}, End = {End}, WorkId = {Work.Id}")>]
 type WorkExcelRow =
     {
         Num: int
@@ -244,6 +247,10 @@ module WorkEvent =
         | WorkEvent.WorkIncreased _ 
         | WorkEvent.BreakReduced _
         | WorkEvent.BreakIncreased _ -> None
+
+    let isStopped = function
+        | WorkEvent.Stopped _ -> true
+        | _ -> false
 
 module WorkEventList =
     module List =

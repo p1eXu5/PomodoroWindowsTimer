@@ -112,7 +112,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val RedoAllocateBreakTimeCommand : Binding =
         nameof __.RedoAllocateBreakTimeCommand
             |> Binding.cmdIf (fun m ->
-                if m |> canAllocateBreakTime then None else Msg.RedoAllocateBreakTime |> Some
+                if m |> canRedoAllocateBreakTime then Msg.RedoAllocateBreakTime |> Some else None
             )
 
     member val CanAllocateBreakTime : Binding =

@@ -17,8 +17,9 @@
     d:DataContext="{d:DesignInstance Type=dailyStatisticModel:Bindings,
                                      IsDesignTimeCreatable=False}"
     d:Foreground="#DDDDDD"
-    mc:Ignorable="d">
-    <materialDesign:Card>
+    mc:Ignorable="d"
+    >
+    <materialDesign:Card Margin="0,10">
         <Expander IsExpanded="True">
             <Expander.Header>
                 <DockPanel DataContext="{Binding}">
@@ -28,33 +29,38 @@
                             Command="{Binding RefreshStatisticCommand}"
                             Content="{materialDesign:PackIcon Kind=Refresh}"
                             ToolBar.OverflowMode="AsNeeded"
-                            ToolTip="Refresh statistic" />
+                            ToolTip="Refresh statistic"
+                            />
                         <Button
                             Margin="5,0"
                             Command="{Binding ExportToExcelCommand}"
                             Content="{materialDesign:PackIcon Kind=Export}"
                             ToolBar.OverflowMode="AsNeeded"
-                            ToolTip="Export statistic" />
+                            ToolTip="Export statistic"
+                            />
                         <Button
                             Margin="5,0,24,0"
                             Command="{Binding AllocateBreakTimeCommand}"
                             Content="{materialDesign:PackIcon Kind=TimerCheckOutline}"
                             ToolBar.OverflowMode="AsNeeded"
                             ToolTip="Allocate break time between works"
-                            Visibility="{Binding CanAllocateBreakTime, Converter={StaticResource conv_BooleanToVisibility}}" />
+                            Visibility="{Binding CanAllocateBreakTime, Converter={StaticResource conv_BooleanToVisibility}}"
+                            />
                         <Button
                             Margin="5,0,24,0"
                             Command="{Binding RedoAllocateBreakTimeCommand}"
                             Content="{materialDesign:PackIcon Kind=TimerRefreshOutline}"
                             ToolBar.OverflowMode="AsNeeded"
                             ToolTip="Allocate break time between works"
-                            Visibility="{Binding CanRedoAllocateBreakTime, Converter={StaticResource conv_BooleanToVisibility}}" />
+                            Visibility="{Binding CanRedoAllocateBreakTime, Converter={StaticResource conv_BooleanToVisibility}}"
+                            />
                     </StackPanel>
                     <Border>
                         <TextBlock
                             VerticalAlignment="Center"
                             Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                            Text="{Binding Day, Converter={StaticResource conv_DateOnlyToShortDateString}, FallbackValue='12.02.2024'}" />
+                            Text="{Binding Day, Converter={StaticResource conv_DateOnlyToShortDateString}, FallbackValue='12.02.2024'}"
+                            />
                     </Border>
                 </DockPanel>
             </Expander.Header>
@@ -62,7 +68,8 @@
                 <Grid
                     Margin="10"
                     HorizontalAlignment="Right"
-                    DockPanel.Dock="Bottom">
+                    DockPanel.Dock="Bottom"
+                    >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition Width="100" />
@@ -80,153 +87,186 @@
                         Grid.Column="1"
                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                         Text="Overall"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="2"
                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                         Text="Work"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="0"
                         Grid.Column="3"
                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                         Text="Break"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="0"
                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                         Text="Total:"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="1"
                         Foreground="{Binding OverallTimeRemains, Converter={StaticResource conv_DiffTimeToBrush}}"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding OverallTotalTime, Converter={StaticResource conv_TimeSpanToMnemonicString}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="2"
                         Foreground="{Binding WorkTimeRemains, Converter={StaticResource conv_DiffTimeToBrush}}"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding WorkTotalTime, Converter={StaticResource conv_TimeSpanToMnemonicString}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="1"
                         Grid.Column="3"
                         Foreground="{Binding BreakTimeRemains, Converter={StaticResource conv_DiffTimeToBrush}}"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding BreakTotalTime, Converter={StaticResource conv_TimeSpanToMnemonicString}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="0"
                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                         Text="At par:"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="1"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding OverallAtParTime, Converter={StaticResource conv_TimeSpanToMnemonicString}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="2"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding WorkAtParTime, Converter={StaticResource conv_TimeSpanToMnemonicString}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="2"
                         Grid.Column="3"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding BreakAtParTime, Converter={StaticResource conv_TimeSpanToMnemonicString}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="0"
                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                         Text="Diff:"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="1"
                         Foreground="{Binding OverallTimeRemains, Converter={StaticResource conv_DiffTimeToBrush}}"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding OverallTimeRemains, Converter={StaticResource conv_TimeSpanToMnemonicStringS}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="2"
                         Foreground="{Binding WorkTimeRemains, Converter={StaticResource conv_DiffTimeToBrush}}"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding WorkTimeRemains, Converter={StaticResource conv_TimeSpanToMnemonicStringS}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                     <TextBlock
                         Grid.Row="3"
                         Grid.Column="3"
                         Foreground="{Binding BreakTimeRemains, Converter={StaticResource conv_DiffTimeToBrush}}"
                         Style="{StaticResource MaterialDesignBody1TextBlock}"
                         Text="{Binding BreakTimeRemains, Converter={StaticResource conv_TimeSpanToMnemonicStringS}, FallbackValue='0h 00m'}"
-                        TextAlignment="Right" />
+                        TextAlignment="Right"
+                        />
                 </Grid>
 
                 <Grid HorizontalAlignment="Stretch">
                     <DataGrid
                         x:Name="m_StatisticTable"
+                        HorizontalAlignment="Left"
                         AutoGenerateColumns="False"
                         CanUserAddRows="False"
                         HeadersVisibility="All"
                         IsReadOnly="False"
                         ItemsSource="{Binding WorkStatistics}"
                         SelectionMode="Extended"
-                        SelectionUnit="CellOrRowHeader">
+                        SelectionUnit="CellOrRowHeader"
+                        >
                         <DataGrid.Columns>
                             <DataGridTextColumn
                                 Binding="{Binding WorkId}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="ID" />
+                                Header="ID"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTextColumn
                                 Binding="{Binding WorkNumber}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Number" />
+                                Header="Number"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTextColumn
                                 Binding="{Binding WorkTitle}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Title" />
+                                Header="Title"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTextColumn
                                 Binding="{Binding StartPeriod}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
                                 Header="Start"
-                                SortDirection="Descending" />
+                                IsReadOnly="True"
+                                SortDirection="Descending"
+                                />
 
                             <DataGridTextColumn
                                 Binding="{Binding EndPeriod}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="End" />
+                                Header="End"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTextColumn
                                 x:Name="m_OverallTimeColumn"
                                 Binding="{Binding OverallTime, Converter={StaticResource conv_TimeSpanToMnemonicString}}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Overall Time" />
+                                Header="Overall Time"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTextColumn
                                 x:Name="m_WorkTimeColumn"
                                 Binding="{Binding WorkTime, Converter={StaticResource conv_TimeSpanToMnemonicString}}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Work Time" />
+                                Header="Work Time"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTextColumn
                                 x:Name="m_BreakTimeColumn"
                                 Binding="{Binding BreakTime, Converter={StaticResource conv_TimeSpanToMnemonicString}}"
                                 ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
-                                Header="Break Time" />
+                                Header="Break Time"
+                                IsReadOnly="True"
+                                />
 
                             <DataGridTemplateColumn>
                                 <DataGridTemplateColumn.CellStyle>
@@ -241,7 +281,8 @@
                                             materialDesign:ButtonAssist.CornerRadius="0"
                                             Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
                                             Content="Log Time"
-                                            Style="{StaticResource MaterialDesignFlatLightButton}">
+                                            Style="{StaticResource MaterialDesignFlatLightButton}"
+                                            >
                                             <Button.CommandParameter>
                                                 <local:AddWorkTime />
                                             </Button.CommandParameter>
@@ -250,7 +291,8 @@
                                                     CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.UnloadAddWorkTimeModelCommand}"
                                                     LoadDialogModelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.LoadAddWorkTimeModelCommand}"
                                                     LoadDialogModelCommandParameter="{Binding WorkId}"
-                                                    OkCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AddWorkTimeOffsetCommand}" />
+                                                    OkCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AddWorkTimeOffsetCommand}"
+                                                    />
                                             </Behaviors:Interaction.Behaviors>
                                         </Button>
                                     </DataTemplate>
@@ -270,7 +312,8 @@
                                             materialDesign:ButtonAssist.CornerRadius="0"
                                             Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
                                             Content="Show Events"
-                                            Style="{StaticResource MaterialDesignFlatLightButton}">
+                                            Style="{StaticResource MaterialDesignFlatLightButton}"
+                                            >
                                             <Button.CommandParameter>
                                                 <workEvents:WorkEventList />
                                             </Button.CommandParameter>
@@ -278,7 +321,8 @@
                                                 <behaviors:DialogEventHandlerBehavior
                                                     CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.UnloadWorkEventListModelCommand}"
                                                     LoadDialogModelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext.LoadWorkEventListModelCommand}"
-                                                    LoadDialogModelCommandParameter="{Binding WorkId}" />
+                                                    LoadDialogModelCommandParameter="{Binding WorkId}"
+                                                    />
                                             </Behaviors:Interaction.Behaviors>
                                         </Button>
                                     </DataTemplate>

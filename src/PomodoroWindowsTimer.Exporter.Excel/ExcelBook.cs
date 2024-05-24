@@ -238,22 +238,22 @@ public sealed class ExcelBook : IExcelBook
 
             cell = row.CreateCell(2);
             cell.SetCellValue("");
-            cell.CellStyle = (styles["cell_normal_left"]);
+            cell.CellStyle = (styles["cell_normal_left_i"]);
 
             cell = row.CreateCell(3);
             cell.SetCellValue("idle");
-            cell.CellStyle = (styles["cell_normal_left"]);
+            cell.CellStyle = (styles["cell_normal_left_i"]);
 
             cell = row.CreateCell(4);
             // var idleDur = idleRow.Item.End - prevTime;
             // cell.SetCellValue(new DateTime(date, TimeOnly.FromTimeSpan(idleDur)));
             cell.SetCellType(CellType.Formula);
             cell.SetCellFormula($"F{row.RowNum + 1}-F{row.RowNum}");
-            cell.CellStyle = (styles["cell_normal_time"]);
+            cell.CellStyle = (styles["cell_normal_time_i"]);
 
             cell = row.CreateCell(5);
             cell.SetCellValue(new DateTime(date, idleRow.Item.End));
-            cell.CellStyle = (styles["cell_normal_time"]);
+            cell.CellStyle = (styles["cell_normal_time_i"]);
 
             return idleRow.Item.End;
         }
@@ -351,6 +351,17 @@ public sealed class ExcelBook : IExcelBook
             style.WrapText = (true);
             styles.Add("cell_normal_left", style);
 
+            IFont font4 = wb.CreateFont();
+            font4.FontHeightInPoints = ((short)11);
+            font4.Color = (IndexedColors.Grey25Percent.Index);
+            font4.IsBold = false;
+
+            style = CreateBorderedStyle(wb);
+            style.Alignment = HorizontalAlignment.Left;
+            style.WrapText = (true);
+            style.SetFont(font4);
+            styles.Add("cell_normal_left_i", style);
+
             style = CreateBorderedStyle(wb);
             style.Alignment = HorizontalAlignment.Right;
             style.WrapText = (true);
@@ -372,6 +383,13 @@ public sealed class ExcelBook : IExcelBook
             style.WrapText = (true);
             style.DataFormat = (df.GetFormat("h:mm"));
             styles.Add("cell_normal_time", style);
+
+            style = CreateBorderedStyle(wb);
+            style.Alignment = HorizontalAlignment.Right;
+            style.WrapText = (true);
+            style.DataFormat = (df.GetFormat("h:mm"));
+            style.SetFont(font4);
+            styles.Add("cell_normal_time_i", style);
 
             style = CreateBorderedStyle(wb);
             style.Alignment = HorizontalAlignment.Center;

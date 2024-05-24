@@ -14,6 +14,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
         |> List.map (fun it -> it.Events |> List.map (fun t -> (it.Work, t)))
         |> List.concat
         |> List.sortBy (snd >> WorkEvent.createdAt)
+        |> List.skipWhile (snd >> WorkEvent.isStopped)
 
     match events with
     | head :: tail ->
@@ -206,7 +207,6 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                     f head
                     |> Result.bind (fun h -> 
                         traverseRes startDt (folder startDt h) tail
-                        |> Result.map List.rev
                     )
 
             let work = head |> fst
@@ -224,7 +224,9 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
             let init = ([initWorkExcelRow], head)
 
             traverseRes startDt (folder startDt init) tail
-            |> Result.map (fun rows -> (startDt, rows))
+            |> Result.map (fun rows ->
+                (startDt, rows |> List.rev)
+            )
 
         | _ -> Error $"First event is {head}"
 
