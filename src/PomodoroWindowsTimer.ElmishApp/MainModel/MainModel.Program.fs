@@ -386,10 +386,15 @@ let update
 
     | Msg.SetCurrentWorkIfNone res ->
         match res with
-        | Ok work when model.CurrentWork |> Option.isNone ->
+        | Ok work ->
+            cfg.CurrentWorkItemSettings.CurrentWork <- work |> Some
+            if model.CurrentWork |> Option.isNone then
             { model with CurrentWork = work |> WorkModel.init |> Some}, Cmd.none
-        | Error err -> model, Cmd.ofMsg (Msg.OnError err)
-        | _ -> model, Cmd.none
+            else
+                model, Cmd.none
+        | Error err ->
+            cfg.CurrentWorkItemSettings.CurrentWork <- None
+            model, Cmd.ofMsg (Msg.OnError err)
 
     | Msg.WorkModelMsg wmsg ->
         match model.CurrentWork with
