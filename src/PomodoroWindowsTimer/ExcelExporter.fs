@@ -195,7 +195,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                        (rs, last)
                     )
 
-                | _ -> Error "Not implemented"
+                | _ -> Error $"Not implemented. Current: {curr}, Last: {last}"
 
 
             let rec traverseRes startDt f list =
