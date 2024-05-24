@@ -225,7 +225,29 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
 
             traverseRes startDt (folder startDt init) tail
             |> Result.map (fun rows ->
-                (startDt, rows |> List.rev)
+                let round (row: ExcelRow) =
+                    let minute = (row |> ExcelRow.endTimeOnly).Minute % 5
+                    if minute = 0 then row
+                    elif minute < 3 then row |> ExcelRow.subTime (TimeSpan.FromMinutes(minute))
+                    else row |> ExcelRow.addTime (TimeSpan.FromMinutes(float (5 - minute)))
+
+                let fakeStartRow = ExcelRow.createIdleExcelRow 0 startDt |> round
+                let rows =
+                    match rows with
+                    | [] -> []
+                    | _ ->
+                        List.scanBack (fun (curr: ExcelRow) (prev: ExcelRow) ->
+                            let mutable curr = (curr |> round)
+                            while (curr |> ExcelRow.endTimeOnly) < (prev |> ExcelRow.endTimeOnly) do
+                                curr <- curr |> ExcelRow.addTime (TimeSpan.FromMinutes(5))
+                            curr
+                        ) rows fakeStartRow
+                        |> List.rev
+                        |> List.tail
+                (
+                    fakeStartRow |> ExcelRow.endTimeOnly,
+                    rows
+                )
             )
 
         | _ -> Error $"First event is {head}"
