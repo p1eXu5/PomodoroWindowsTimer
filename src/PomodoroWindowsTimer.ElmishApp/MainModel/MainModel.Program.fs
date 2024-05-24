@@ -315,7 +315,7 @@ let update
     updateAppDialogModel
     updateWorkSelectorModel
     initWorkStatisticListModel
-    updateWorkStatisticListModel
+    updateDailyStatisticListModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     (msg: Msg)
@@ -389,12 +389,13 @@ let update
         | Ok work ->
             cfg.CurrentWorkItemSettings.CurrentWork <- work |> Some
             if model.CurrentWork |> Option.isNone then
-            { model with CurrentWork = work |> WorkModel.init |> Some}, Cmd.none
+                { model with CurrentWork = work |> WorkModel.init |> Some}, Cmd.none
             else
                 model, Cmd.none
         | Error err ->
             cfg.CurrentWorkItemSettings.CurrentWork <- None
             model, Cmd.ofMsg (Msg.OnError err)
+   
 
     | Msg.WorkModelMsg wmsg ->
         match model.CurrentWork with
@@ -481,21 +482,21 @@ let update
     | Msg.SetIsWorkStatisticShown v ->
         if v then
             let (m, cmd) = initWorkStatisticListModel ()
-            model |> MainModel.withWorkStatistic (m |> Some)
-            , Cmd.map Msg.WorkStatisticListModelMsg cmd
+            model |> MainModel.withDailyStatisticList (m |> Some)
+            , Cmd.map Msg.DailyStatisticListModelMsg cmd
         else
-            model |> MainModel.withWorkStatistic None
+            model |> MainModel.withDailyStatisticList None
             , Cmd.none
 
 
     | MsgWith.WorkStatisticListModelMsg model (smsg, sm) ->
-        let (m, cmd, intent) = updateWorkStatisticListModel smsg sm
+        let (m, cmd, intent) = updateDailyStatisticListModel smsg sm
         match intent with
-        | WorkStatisticListModel.Intent.None ->
-            model |> MainModel.withWorkStatistic (m |> Some)
-            , Cmd.map Msg.WorkStatisticListModelMsg cmd
-        | WorkStatisticListModel.Intent.CloseDialogRequested ->
-            model |> MainModel.withWorkStatistic None
+        | DailyStatisticListModel.Intent.None ->
+            model |> MainModel.withDailyStatisticList (m |> Some)
+            , Cmd.map Msg.DailyStatisticListModelMsg cmd
+        | DailyStatisticListModel.Intent.CloseDialogRequested ->
+            model |> MainModel.withDailyStatisticList None
             , Cmd.none
 
     // --------------------

@@ -78,16 +78,28 @@ let compose
         let updateWorkEventListModel =
             WorkEventListModel.Program.update workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkEventListModel>())
 
-        let initWorkStatisticListModel =
-            fun () -> WorkStatisticListModel.init userSettings timeProvider
+        let updateDailyStatisticModel =
+            DailyStatisticModel.Program.update
+                timeProvider
+                workEventRepository
+                excelBook
+                dialogErrorMessageQueue
+                (loggerFactory.CreateLogger<DailyStatisticModel>())
 
-        let updateWorkStatisticListModel =
-            WorkStatisticListModel.Program.update
+        let initDailyStatisticListModel =
+            fun () ->
+                DailyStatisticListModel.init
+                    userSettings
+                    timeProvider
+
+        let updateDailyStatisticListModel =
+            DailyStatisticListModel.Program.update
                 userSettings
                 workEventRepository
                 excelBook
                 dialogErrorMessageQueue
-                (loggerFactory.CreateLogger<WorkStatisticListModel>())
+                (loggerFactory.CreateLogger<DailyStatisticListModel>())
+                updateDailyStatisticModel
                 updateWorkEventListModel
 
         let updateRollbackWorkModel =
@@ -117,8 +129,8 @@ let compose
             updateWorkModel
             updateAppDialogModel
             updateWorkSelectorModel
-            initWorkStatisticListModel
-            updateWorkStatisticListModel
+            initDailyStatisticListModel
+            updateDailyStatisticListModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
 

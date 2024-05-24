@@ -21,3 +21,13 @@ module WorkStatisticModel =
             Statistic = workStatistic.Statistic
         }
 
+    module List =
+        let sumBreakTime (models: WorkStatisticModel list) =
+            models
+            |> List.choose _.Statistic
+            |> List.map _.BreakTime
+            |> List.reduce (+)
+
+        let dailyBreakTimeRemains (models: WorkStatisticModel list) =
+            Statistic.breakMinutesPerDayMax - (models |> sumBreakTime)
+

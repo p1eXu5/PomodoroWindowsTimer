@@ -7,6 +7,7 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer
 
 
+
 type TimePointPrototypeStore =
     {
         Read: unit -> TimePointPrototype list
@@ -193,3 +194,30 @@ module TelegramBot =
                 | _ ->
                     task { return () }
         }
+
+
+module ExcelReport =
+
+    open Microsoft.Win32
+
+    open PomodoroWindowsTimer
+    open PomodoroWindowsTimer.Types
+    open PomodoroWindowsTimer.Abstractions
+
+    let exportToExcelTask (workEventRepo: IWorkEventRepository) (excelBook: IExcelBook) =
+        let fd = SaveFileDialog()
+        fd.Filter <- "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*"
+        let result = fd.ShowDialog()
+        if result.HasValue && result.Value then
+            fun period ct ->
+                task {
+                    let! events = workEventRepo.FindAllByPeriodAsync period ct
+                    return
+                        events
+                        |> Result.bind (ExcelExporter.export excelBook (TimeSpan.FromMinutes(5)) fd.FileName)
+                }
+        else
+            fun _ _ ->
+                task {
+                    return Ok ()
+                }

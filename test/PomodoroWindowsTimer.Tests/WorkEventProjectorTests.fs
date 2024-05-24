@@ -169,7 +169,7 @@ module WorkEventProjectorTests =
                     Period =
                         {
                             Start = start23.LocalDateTime
-                            EndInclusive = start23.AddMinutes(40.0 + 60.0).LocalDateTime
+                            EndInclusive = start23.AddMinutes(40.0).LocalDateTime // by start/stop event created time (not increase/reduce)
                         }
                     WorkTime = TimeSpan.FromMinutes(20. + 60.)
                     BreakTime = TimeSpan.FromMinutes(10)

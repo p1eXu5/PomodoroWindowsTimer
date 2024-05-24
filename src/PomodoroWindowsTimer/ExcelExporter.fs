@@ -240,7 +240,6 @@ let export (excelBook: IExcelBook) (gluingThreshold: TimeSpan) (fileName: string
             |> WorkEventList.List.groupByDay
             |> List.map (fun (day, wel) ->
                 wel
-                |> List.map snd
                 |> excelRows gluingThreshold
                 |> Result.map (fun (startTime, rows) -> (day, startTime, rows))
             )

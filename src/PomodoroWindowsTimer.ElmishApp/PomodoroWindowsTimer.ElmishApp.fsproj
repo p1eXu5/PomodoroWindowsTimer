@@ -22,9 +22,12 @@
     <Compile Include="WorkStatisticModel\WorkStatisticModel.fs" />
     <Compile Include="WorkStatisticModel\WorkStatisticModel.Program.fs" />
     <Compile Include="WorkStatisticModel\WorkStatisticModel.Bindings.fs" />
-    <Compile Include="WorkStatisticListModel\WorkStatisticListModel.fs" />
-    <Compile Include="WorkStatisticListModel\WorkStatisticListModel.Program.fs" />
-    <Compile Include="WorkStatisticListModel\WorkStatisticListModel.Bindings.fs" />
+    <Compile Include="DailyStatisticModel\DailyStatisticModel.fs" />
+    <Compile Include="DailyStatisticModel\DailyStatisticModel.Program.fs" />
+    <Compile Include="DailyStatisticModel\DailyStatisticModel.Bindings.fs" />
+    <Compile Include="DailyStatisticListModel\DailyStatisticListModel.fs" />
+    <Compile Include="DailyStatisticListModel\DailyStatisticListModel.Program.fs" />
+    <Compile Include="DailyStatisticListModel\DailyStatisticListModel.Bindings.fs" />
     <Compile Include="CreatingWorkModel\CreatingWorkModel.fs" />
     <Compile Include="CreatingWorkModel\CreatingWorkModel.Program.fs" />
     <Compile Include="CreatingWorkModel\CreatingWorkModel.Bindings.fs" />

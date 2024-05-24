@@ -145,3 +145,27 @@ let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPe
             )
     }
 
+let projectDailyByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
+    task {
+        let! res = workEventRepo.FindAllByPeriodAsync period ct
+        return
+            res
+            |> Result.map (fun workEvents ->
+                workEvents
+                |> WorkEventList.List.groupByDay
+                |> List.map (fun (day, wel) ->
+                    {
+                        Date = day
+                        WorkStatistic =
+                            wel
+                            |> List.map (fun wel ->
+                                {
+                                    Work = wel.Work
+                                    Statistic = wel.Events |> project
+                                }
+                            )
+                    }
+                )
+            )
+    }
+

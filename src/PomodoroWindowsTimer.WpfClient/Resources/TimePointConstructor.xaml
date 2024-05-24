@@ -1,46 +1,48 @@
-﻿<ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared">
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+                    >
     <!--  Constructor  -->
     <ControlTemplate x:Key="ct_GeneratedTimePoint">
         <StackPanel Orientation="Horizontal">
-            <TextBox
-                Width="100"
-                Margin="18,0,0,0"
-                VerticalAlignment="Center"
-                Text="{Binding Name}" />
-            <TextBlock
-                Margin="20,0"
-                VerticalAlignment="Center"
-                Text="{Binding TimeSpan}" />
-            <TextBlock VerticalAlignment="Center" Text="{Binding Kind}" />
+            <TextBox Width="100"
+                     Margin="18,0,0,0"
+                     VerticalAlignment="Center"
+                     Text="{Binding Name}"
+                     />
+            <TextBlock Margin="20,0"
+                       VerticalAlignment="Center"
+                       Text="{Binding TimeSpan}"
+                       />
+            <TextBlock VerticalAlignment="Center"
+                       Text="{Binding Kind}"
+                       />
         </StackPanel>
     </ControlTemplate>
 
     <DataTemplate x:Key="dt_SettingsTimepPointTemplate">
-        <Control
-            x:Name="theControl"
-            Focusable="False"
-            Template="{StaticResource ct_GeneratedTimePoint}" />
+        <Control x:Name="theControl"
+                 Focusable="False"
+                 Template="{StaticResource ct_GeneratedTimePoint}"
+                 />
     </DataTemplate>
 
     <DataTemplate x:Key="dt_TimePointPrototype">
-        <shared:TimePointPrototypeV2
-            shared:TimePointAssistant.TimePointKind="{Binding Kind}"
-            shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
-            shared:TimePointAssistant.TimePointName="{Binding Name}"
-            shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}" />
+        <shared:TimePointPrototypeV2 shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                                     shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                                     shared:TimePointAssistant.TimePointName="{Binding Name}"
+                                     shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                                     />
     </DataTemplate>
 
     <DataTemplate x:Key="dt_EditableTimePoint">
-        <shared:EditableTimePoint
-            shared:TimePointAssistant.TimePointKind="{Binding Kind}"
-            shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
-            shared:TimePointAssistant.TimePointName="{Binding Name}"
-            shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}" />
+        <shared:EditableTimePoint shared:TimePointAssistant.TimePointKind="{Binding Kind}"
+                                  shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
+                                  shared:TimePointAssistant.TimePointName="{Binding Name}"
+                                  shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                                  />
     </DataTemplate>
 
 </ResourceDictionary>

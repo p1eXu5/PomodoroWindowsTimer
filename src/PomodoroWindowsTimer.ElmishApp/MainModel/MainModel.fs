@@ -32,7 +32,7 @@ type MainModel =
         WorkSelector: WorkSelectorModel option
         CurrentWork: WorkModel option
 
-        WorkStatistic: WorkStatisticListModel option
+        DailyStatisticList: DailyStatisticListModel option
 
         AppDialog: AppDialogModel
 
@@ -96,7 +96,7 @@ module MainModel =
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
 
         | SetIsWorkStatisticShown of bool
-        | WorkStatisticListModelMsg of WorkStatisticListModel.Msg
+        | DailyStatisticListModelMsg of DailyStatisticListModel.Msg
         
         | OnError of string
         | OnExn of exn
@@ -143,8 +143,8 @@ module MainModel =
             | _ -> None
 
         let (|WorkStatisticListModelMsg|_|) (model: MainModel) (msg: Msg) =
-            match msg, model.WorkStatistic with
-            | Msg.WorkStatisticListModelMsg msg, Some m ->
+            match msg, model.DailyStatisticList with
+            | Msg.DailyStatisticListModelMsg msg, Some m ->
                 (msg, m) |> Some
             | _ -> None
 
@@ -184,7 +184,7 @@ module MainModel =
             //BotSettingsModel = None
             //TimePointsGeneratorModel = None
 
-            WorkStatistic = None
+            DailyStatisticList = None
 
             AppDialog = AppDialogModel.NoDialog
 
@@ -328,5 +328,5 @@ module MainModel =
     let withPreShiftActiveTimePointTimeSpan (model: MainModel) =
         { model with PreShiftActiveTimeSpan = model.ActiveTimePoint.Value.TimeSpan.TotalSeconds * 1.0<sec> }
 
-    let withWorkStatistic workStatisticListModel (model: MainModel) =
-        { model with WorkStatistic = workStatisticListModel }
+    let withDailyStatisticList workStatisticListModel (model: MainModel) =
+        { model with DailyStatisticList = workStatisticListModel }

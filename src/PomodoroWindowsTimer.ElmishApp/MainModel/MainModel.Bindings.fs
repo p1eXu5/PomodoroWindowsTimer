@@ -182,20 +182,19 @@ type Bindings(title: string, assemblyVersion: string, workStatisticWindowFactory
         nameof __.IsWorkSelectorLoaded |> Binding.twoWay (_.WorkSelector >> Option.isSome, Msg.SetIsWorkSelectorLoaded)
 
     member val IsWorkStatisticShown : Binding =
-        nameof __.IsWorkStatisticShown |> Binding.twoWay (_.WorkStatistic >> Option.isSome, Msg.SetIsWorkStatisticShown)
+        nameof __.IsWorkStatisticShown |> Binding.twoWay (_.DailyStatisticList >> Option.isSome, Msg.SetIsWorkStatisticShown)
 
     member val WorkStatisticWindow : Binding =
         nameof __.WorkStatisticWindow
             |> Binding.subModelWin (
-                (_.WorkStatistic >> WindowState.ofOption),
+                (_.DailyStatisticList >> WindowState.ofOption),
                 snd,
-                Msg.WorkStatisticListModelMsg,
-                (fun () -> WorkStatisticListModel.Bindings.ToList(dialogErrorMessageQueue)),
+                Msg.DailyStatisticListModelMsg,
+                (fun () -> DailyStatisticListModel.Bindings.ToList(dialogErrorMessageQueue)),
                 (fun _ _ -> workStatisticWindowFactory.Invoke()),
                 isModal = false
             )
-            //|> Binding.mapModel _.WorkSelector
-            //|> Binding.mapMsg Msg.WorkSelectorModelMsg
+
 
 (*
 let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> list =

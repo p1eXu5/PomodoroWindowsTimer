@@ -102,6 +102,12 @@ type WorkStatistic =
         Statistic: Statistic option
     }
 
+type DailyStatistic =
+    {
+        Date: DateOnly
+        WorkStatistic: WorkStatistic list
+    }
+
 type WorkEventOffsetTime =
     {
         WorkEvent: WorkEvent
@@ -132,6 +138,17 @@ type ExcelRow =
     | IdleExcelRow of IdleExcelRow
 
 // ------------------------------- modules
+
+module DateOnlyPeriod =
+
+    let create start endInclusive : DateOnlyPeriod =
+        {
+            Start = start
+            EndInclusive = endInclusive
+        }
+
+    let isOneDay (period: DateOnlyPeriod) =
+        period.Start = period.EndInclusive
 
 module ExcelRow =
 
@@ -247,6 +264,35 @@ module WorkEventList =
             )
             |> List.concat
             |> List.groupBy fst
+            |> List.map (fun (day, wel) ->
+                (day, wel |> List.map snd)
+            )
+
+module Statistic =
+    [<Literal>]
+    let OVERALL_MINUTES_PER_DAY_MAX = 8.0 * 60.0
+
+    let overallMinutesPerDayMax = TimeSpan.FromMinutes(OVERALL_MINUTES_PER_DAY_MAX)
+
+    [<Literal>]
+    let WORK_MINUTES_PER_DAY_MAX = 25. * 4. * 3. + 25. + 25. + 15.
+
+    [<Literal>]
+    let BREAK_MINUTES_PER_DAY_MAX =
+        OVERALL_MINUTES_PER_DAY_MAX - WORK_MINUTES_PER_DAY_MAX
+
+    let breakMinutesPerDayMax = TimeSpan.FromMinutes(BREAK_MINUTES_PER_DAY_MAX)
+
+    let total (statistic: Statistic) =
+        statistic.BreakTime + statistic.WorkTime
+
+    /// Returns difference
+    let chooseNotCompleted (statistic: Statistic) =
+        let total = statistic.BreakTime + statistic.WorkTime
+        if total < overallMinutesPerDayMax then
+            overallMinutesPerDayMax - total |> Some
+        else
+            None
 
 
 module Alias =

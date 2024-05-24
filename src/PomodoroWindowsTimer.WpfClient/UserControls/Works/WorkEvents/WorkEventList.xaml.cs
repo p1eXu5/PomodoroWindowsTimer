@@ -33,7 +33,7 @@ public partial class WorkEventList : UserControl
         }
     }
 
-    private FrameworkElement? FindParentFrameworkElement(DependencyObject child)
+    private static FrameworkElement? FindParentFrameworkElement(DependencyObject child)
     {
         // Get the parent item
         DependencyObject parentObject = VisualTreeHelper.GetParent(child);

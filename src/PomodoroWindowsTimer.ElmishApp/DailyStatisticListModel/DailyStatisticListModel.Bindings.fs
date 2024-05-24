@@ -1,20 +1,16 @@
-﻿namespace PomodoroWindowsTimer.ElmishApp.WorkStatisticListModel
+﻿namespace PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel
 
 open System
 
 open Elmish.WPF
 open Elmish.Extensions
 
-open PomodoroWindowsTimer
-open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Logging
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.WorkStatisticListModel
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.DailyStatisticListModel
 
-type private Binding = Binding<WorkStatisticListModel, WorkStatisticListModel.Msg>
+type private Binding = Binding<DailyStatisticListModel, DailyStatisticListModel.Msg>
 
 [<Sealed>]
 type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
@@ -34,6 +30,23 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val ErrorMessageQueue : Binding =
         nameof __.ErrorMessageQueue |> Binding.oneWay (fun _ -> dialogErrorMessageQueue)
 
+    member val CloseCommand : Binding =
+        nameof __.CloseCommand |> Binding.cmd Msg.Close
+
+    // ----------------------- statistics
+    member val LoadDailyStatisticsCommand : Binding =
+        nameof __.LoadDailyStatisticsCommand |> Binding.cmd (AsyncOperation.startUnit Msg.LoadDailyStatistics)
+
+    member val DailyStatisticsDeff : Binding =
+        nameof __.DailyStatisticsDeff |> Binding.oneWay _.DailyStatistics
+
+    member val DailyStatistics : Binding =
+        nameof __.DailyStatistics
+            |> Binding.subModelSeq ((fun () -> DailyStatisticModel.Bindings.ToList(dialogErrorMessageQueue)), _.Day)
+            |> Binding.mapModel (dailyStatistics >> List.toSeq)
+            |> Binding.mapMsg Msg.DailyStatisticModelMsg
+
+    // ----------------------- period
     member val StartDate : Binding =
         nameof __.StartDate |> Binding.twoWay (_.StartDate, Msg.SetStartDate)
 
@@ -51,52 +64,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val IsByDay : Binding =
         nameof __.IsByDay |> Binding.twoWay (_.IsByDay, Msg.SetIsByDay)
 
-    member val WorkStatisticsDeff : Binding =
-        nameof __.WorkStatisticsDeff |> Binding.oneWay _.WorkStatistics
-
-    member val WorkStatistics : Binding =
-        nameof __.WorkStatistics
-            |> Binding.subModelSeq (WorkStatisticModel.Bindings.ToList, _.WorkId)
-            |> Binding.mapModel (workStatisticModels >> List.toSeq)
-            |> Binding.mapMsg Msg.WorkStatisticMsg
-
-    member val CloseCommand : Binding =
-        nameof __.CloseCommand |> Binding.cmd Msg.Close
-
-    member val OverallTotalTime : Binding =
-        nameof __.OverallTotalTime |> Binding.oneWayOpt overallTotalTime
-
-    member val WorkTotalTime : Binding =
-        nameof __.WorkTotalTime |> Binding.oneWayOpt workTotalTime
-
-    member val BreakTotalTime : Binding =
-        nameof __.BreakTotalTime |> Binding.oneWayOpt breakTotalTime
-
-    member val OverallTimeRemains : Binding =
-        nameof __.OverallTimeRemains |> Binding.oneWayOpt overallTimeRemains
-
-    member val WorkTimeRemains : Binding =
-        nameof __.WorkTimeRemains |> Binding.oneWayOpt workTimeRemains
-
-    member val BreakTimeRemains : Binding =
-        nameof __.BreakTimeRemains |> Binding.oneWayOpt breakTimeRemains
-
-    member val OverallAtParTime : Binding =
-        nameof __.OverallAtParTime |> Binding.oneWay overallAtParTime
-
-    member val WorkAtParTime : Binding =
-        nameof __.WorkAtParTime |> Binding.oneWay workAtParTime
-
-    member val BreakAtParTime : Binding =
-        nameof __.BreakAtParTime |> Binding.oneWay breakAtParTime
-
     // ---------------- add work time dialog
-
-    member val LoadAddWorkTimeModelCommand : Binding =
-        nameof __.LoadAddWorkTimeModelCommand
-            |> Binding.cmdParam (fun p ->
-                Msg.AddWorkTimeDialogMsg (AddWorkTimeDialogMsg.LoadAddWorkTimeModel (p :?> uint64))
-            )
 
     member val AddWorkTimeDialog : Binding =
         nameof __.AddWorkTimeDialog
@@ -113,12 +81,6 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     // ---------------- work event list dialog
 
-    member val LoadWorkEventListModelCommand : Binding =
-        nameof __.LoadWorkEventListModelCommand
-            |> Binding.cmdParam (fun p ->
-                Msg.WorkEventListDialogMsg (WorkEventListDialogMsg.LoadWorkEventListModel (p :?> uint64))
-            )
-
     member val WorkEventListDialog : Binding =
         nameof __.WorkEventListDialog
             |> Binding.SubModel.opt (WorkEventListModel.Bindings.ToList)
@@ -129,10 +91,8 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
         nameof __.UnloadWorkEventListModelCommand
             |> Binding.cmd (WorkEventListDialogMsg.UnloadWorkEventListModel |> Msg.WorkEventListDialogMsg)
 
-    // ------------------
 
-    member val RefreshStatisticCommand : Binding =
-        nameof __.RefreshStatisticCommand |> Binding.cmd (AsyncOperation.startUnit Msg.LoadStatistics)
+    // ----------------------------
 
     member val ExportToExcelCommand : Binding =
         nameof __.ExportToExcelCommand
@@ -141,3 +101,23 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
                 | AsyncDeferred.InProgress _ -> None
                 | _ -> AsyncOperation.startUnit Msg.ExportToExcel |> Some
             )
+
+
+    member val AllocateBreakTimeCommand : Binding =
+        nameof __.AllocateBreakTimeCommand
+            |> Binding.cmdIf (fun m ->
+                if m |> canAllocateBreakTime then Msg.AllocateBreakTime |> Some else None
+            )
+
+    member val RedoAllocateBreakTimeCommand : Binding =
+        nameof __.RedoAllocateBreakTimeCommand
+            |> Binding.cmdIf (fun m ->
+                if m |> canAllocateBreakTime then None else Msg.RedoAllocateBreakTime |> Some
+            )
+
+    member val CanAllocateBreakTime : Binding =
+        nameof __.CanAllocateBreakTime |> Binding.oneWay canAllocateBreakTime
+
+    member val CanRedoAllocateBreakTime : Binding =
+        nameof __.CanRedoAllocateBreakTime |> Binding.oneWay canRedoAllocateBreakTime
+
