@@ -432,7 +432,7 @@ let update
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (storeStoppedWorkEventTask currWork.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt (storeStoppedWorkEventTask currWork.Id (time.AddMilliseconds(-1))) model.ActiveTimePoint.Value Msg.OnExn
                         Cmd.OfTask.attempt (storeStartedWorkEventTask workModel.Id time) model.ActiveTimePoint.Value Msg.OnExn
                     ]
                 | Some _ ->
