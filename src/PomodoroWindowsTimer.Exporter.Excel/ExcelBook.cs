@@ -123,7 +123,7 @@ public sealed class ExcelBook : IExcelBook
 
                 cell = row.CreateCell(5);
                 cell.SetCellValue(new DateTime(date, startTime));
-                cell.CellStyle = (styles["cell_normal_time"]);
+                cell.CellStyle = (styles["cell_normal_time_t"]);
 
                 var prevTime = startTime;
                 int i = 0;
@@ -154,18 +154,7 @@ public sealed class ExcelBook : IExcelBook
 
                 if (workRowNumQueue.Count > 0)
                 {
-                    StringBuilder formula = new();
-
-                    while (workRowNumQueue.TryDequeue(out rowNum))
-                    {
-                        formula.AppendFormat("E").Append(rowNum + 1).Append("+");
-                    }
-
-                    formula.Remove(formula.Length - 1, 1);
-                    cell = row.CreateCell(4);
-                    cell.SetCellType(CellType.Formula);
-                    cell.SetCellFormula(formula.ToString());
-                    cell.CellStyle = (styles["cell_normal_time"]);
+                    AddSummaryCell(row, workRowNumQueue);
                 }
 
                 //set column widths, the width is measured in units of 1/256th of a character width
@@ -182,6 +171,23 @@ public sealed class ExcelBook : IExcelBook
             {
                 return FSharpResult<int, string>.NewError(ex.Message);
             }
+        }
+
+        private void AddSummaryCell(IRow row, Queue<int> workRowNumQueue)
+        {
+            var styles = GetStyles(this);
+            StringBuilder formula = new();
+
+            while (workRowNumQueue.TryDequeue(out int rowNum))
+            {
+                formula.AppendFormat("E").Append(rowNum + 1).Append("+");
+            }
+
+            formula.Remove(formula.Length - 1, 1);
+            var cell = row.CreateCell(4);
+            cell.SetCellType(CellType.Formula);
+            cell.SetCellFormula(formula.ToString());
+            cell.CellStyle = (styles["cell_normal_time_h"]);
         }
 
         private TimeOnly AddWorkRow(IRow row, DateOnly date, TimeOnly prevTime, ExcelRow excelRow)
@@ -390,6 +396,26 @@ public sealed class ExcelBook : IExcelBook
             style.DataFormat = (df.GetFormat("h:mm"));
             style.SetFont(font4);
             styles.Add("cell_normal_time_i", style);
+
+            IFont fontBold11 = wb.CreateFont();
+            fontBold11.FontHeightInPoints = ((short)11);
+            fontBold11.IsBold = true;
+
+            style = CreateBorderedStyle(wb);
+            style.Alignment = HorizontalAlignment.Right;
+            style.WrapText = (true);
+            style.DataFormat = (df.GetFormat("h:mm"));
+            style.SetFont(fontBold11);
+            style.FillForegroundColor = (IndexedColors.LightYellow.Index);
+            style.FillPattern = FillPattern.SolidForeground;
+            styles.Add("cell_normal_time_h", style);
+
+            style = CreateBorderedStyle(wb);
+            style.Alignment = HorizontalAlignment.Right;
+            style.WrapText = (true);
+            style.DataFormat = (df.GetFormat("h:mm"));
+            style.SetFont(fontBold11);
+            styles.Add("cell_normal_time_t", style);
 
             style = CreateBorderedStyle(wb);
             style.Alignment = HorizontalAlignment.Center;
