@@ -122,7 +122,7 @@ public sealed class ExcelBook : IExcelBook
                 _sheet.AddMergedRegion(cellRangeAddress);
 
                 cell = row.CreateCell(5);
-                cell.SetCellValue(new DateTime(date, startTime));
+                cell.SetCellValue($"{startTime.Hour:#0}:{startTime.Minute:00}");
                 cell.CellStyle = (styles["cell_normal_time_t"]);
 
                 var prevTime = startTime;
@@ -221,7 +221,7 @@ public sealed class ExcelBook : IExcelBook
             cell.CellStyle = (styles["cell_normal_time"]);
 
             cell = row.CreateCell(5);
-            cell.SetCellValue(new DateTime(date, workRow.Item.End));
+            cell.SetCellValue($"{workRow.Item.End.Hour:#0}:{workRow.Item.End.Minute:00}");
             cell.CellStyle = (styles["cell_normal_time"]);
 
             return workRow.Item.End;
@@ -258,7 +258,7 @@ public sealed class ExcelBook : IExcelBook
             cell.CellStyle = (styles["cell_normal_time_i"]);
 
             cell = row.CreateCell(5);
-            cell.SetCellValue(new DateTime(date, idleRow.Item.End));
+            cell.SetCellValue($"{idleRow.Item.End.Hour:#0}:{idleRow.Item.End.Minute:00}");
             cell.CellStyle = (styles["cell_normal_time_i"]);
 
             return idleRow.Item.End;

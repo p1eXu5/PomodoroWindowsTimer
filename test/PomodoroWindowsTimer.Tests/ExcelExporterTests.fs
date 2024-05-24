@@ -214,3 +214,38 @@ module ExcelExporterTests =
         }
         |> Result.runTest
 
+
+    [<Test>]
+    let ``06: threshold test`` () =
+        result {
+            let work = Fakers.generateWork ()
+
+            let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
+
+            let events =
+                [
+                    WorkEvent.WorkStarted  (startDt, "W1")
+                    WorkEvent.Stopped      (startDt.AddMinutes 20)
+                    WorkEvent.WorkStarted  (startDt.AddMinutes 24, "W2")
+                    WorkEvent.Stopped      (startDt.AddMinutes 30)
+                ]
+
+            let workEventOffsetTimes =
+                {
+                    Work = work
+                    Events = events
+                }
+                |> List.singleton
+
+            let dt = TimeOnly.FromDateTime(startDt.LocalDateTime)
+
+            let expectedRows =
+                [
+                    ExcelRow.createWorkExcelRow 1 work (dt.AddMinutes 30)
+                ]
+
+            let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``
+            do %rows.Should().SequenceEqual(expectedRows)
+        }
+        |> Result.runTest
+
