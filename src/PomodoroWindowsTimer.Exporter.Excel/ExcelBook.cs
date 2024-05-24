@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text;
 using Microsoft.FSharp.Core;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
@@ -107,27 +108,64 @@ public sealed class ExcelBook : IExcelBook
             try
             {
                 IRow row = _sheet.CreateRow(startRow);
-                ICell cell = row.CreateCell(5);
+                ICell cell = row.CreateCell(0);
+                cell.CellStyle = (styles["cell_filled"]);
+                cell = row.CreateCell(1);
+                cell.CellStyle = (styles["cell_filled"]);
+                cell = row.CreateCell(2);
+                cell.CellStyle = (styles["cell_filled"]);
+                cell = row.CreateCell(3);
+                cell.CellStyle = (styles["cell_filled"]);
+                cell = row.CreateCell(4);
+                cell.CellStyle = (styles["cell_filled"]);
+                CellRangeAddress cellRangeAddress = new CellRangeAddress(startRow, startRow, 0, 4);
+                _sheet.AddMergedRegion(cellRangeAddress);
+
+                cell = row.CreateCell(5);
                 cell.SetCellValue(new DateTime(date, startTime));
                 cell.CellStyle = (styles["cell_normal_time"]);
 
                 var prevTime = startTime;
                 int i = 0;
 
+                int rowNum;
+                Queue<int> workRowNumQueue = new ();
+
                 for (; i < excelRows.Count; i++)
                 {
-                    row = _sheet.CreateRow(startRow + 1 + i);
+                    rowNum = startRow + 1 + i;
+                    row = _sheet.CreateRow(rowNum);
 
                     switch (excelRows[i].Tag)
                     {
                         case ExcelRow.Tags.WorkExcelRow:
                             prevTime = AddWorkRow(row, date, prevTime, excelRows[i]);
+                            workRowNumQueue.Enqueue(rowNum);
                             break;
 
                         case ExcelRow.Tags.IdleExcelRow:
                             prevTime = AddIdleRow(row, date, prevTime, excelRows[i]);
                             break;
                     }
+                }
+
+                rowNum = startRow + 1 + i;
+                row = _sheet.CreateRow(rowNum);
+
+                if (workRowNumQueue.Count > 0)
+                {
+                    StringBuilder formula = new();
+
+                    while (workRowNumQueue.TryDequeue(out rowNum))
+                    {
+                        formula.AppendFormat("E").Append(rowNum + 1).Append("+");
+                    }
+
+                    formula.Remove(formula.Length - 1, 1);
+                    cell = row.CreateCell(4);
+                    cell.SetCellType(CellType.Formula);
+                    cell.SetCellFormula(formula.ToString());
+                    cell.CellStyle = (styles["cell_normal_time"]);
                 }
 
                 //set column widths, the width is measured in units of 1/256th of a character width
@@ -138,7 +176,7 @@ public sealed class ExcelBook : IExcelBook
                 _sheet.SetColumnWidth(4, 256 * 17);
                 _sheet.SetColumnWidth(5, 256 * 17);
 
-                return FSharpResult<int, string>.NewOk(startRow + 1 + i);
+                return FSharpResult<int, string>.NewOk(startRow + 2 + i);
             }
             catch (Exception ex)
             {
@@ -170,8 +208,10 @@ public sealed class ExcelBook : IExcelBook
             cell.CellStyle = (styles["cell_normal_left"]);
 
             cell = row.CreateCell(4);
-            var workDur = workRow.Item.End - prevTime;
-            cell.SetCellValue(new DateTime(date, TimeOnly.FromTimeSpan(workDur)));
+            //var workDur = workRow.Item.End - prevTime;
+            //cell.SetCellValue(new DateTime(date, TimeOnly.FromTimeSpan(workDur)));
+            cell.SetCellType(CellType.Formula);
+            cell.SetCellFormula($"F{row.RowNum + 1}-F{row.RowNum}");
             cell.CellStyle = (styles["cell_normal_time"]);
 
             cell = row.CreateCell(5);
@@ -205,8 +245,10 @@ public sealed class ExcelBook : IExcelBook
             cell.CellStyle = (styles["cell_normal_left"]);
 
             cell = row.CreateCell(4);
-            var idleDur = idleRow.Item.End - prevTime;
-            cell.SetCellValue(new DateTime(date, TimeOnly.FromTimeSpan(idleDur)));
+            // var idleDur = idleRow.Item.End - prevTime;
+            // cell.SetCellValue(new DateTime(date, TimeOnly.FromTimeSpan(idleDur)));
+            cell.SetCellType(CellType.Formula);
+            cell.SetCellFormula($"F{row.RowNum + 1}-F{row.RowNum}");
             cell.CellStyle = (styles["cell_normal_time"]);
 
             cell = row.CreateCell(5);
@@ -243,6 +285,14 @@ public sealed class ExcelBook : IExcelBook
             style.SetFont(headerFont);
             style.DataFormat = (df.GetFormat("d-mmm"));
             styles.Add("header_date", style);
+
+            style = CreateBorderedStyle(wb);
+            style.Alignment = HorizontalAlignment.Center;
+            style.VerticalAlignment = VerticalAlignment.Center;
+            style.FillForegroundColor = (IndexedColors.Grey25Percent.Index);
+            style.FillPattern = FillPattern.SolidForeground;
+            style.SetFont(headerFont);
+            styles.Add("cell_filled", style);
 
             IFont font1 = wb.CreateFont();
             font1.IsBold = true;
