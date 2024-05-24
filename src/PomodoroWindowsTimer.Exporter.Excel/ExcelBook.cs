@@ -359,7 +359,7 @@ public sealed class ExcelBook : IExcelBook
 
             IFont font4 = wb.CreateFont();
             font4.FontHeightInPoints = ((short)11);
-            font4.Color = (IndexedColors.Grey25Percent.Index);
+            font4.Color = (IndexedColors.Grey40Percent.Index);
             font4.IsBold = false;
 
             style = CreateBorderedStyle(wb);
