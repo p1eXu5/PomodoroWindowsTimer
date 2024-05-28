@@ -276,6 +276,7 @@ module WorkEventList =
             )
 
 module Statistic =
+    /// 14 * 25 min pomodoro + 1 * 15 min pomodoro + 11 * 5 min break + 3 * 20 min long break
     [<Literal>]
     let OVERALL_MINUTES_PER_DAY_MAX = 8.0 * 60.0
 
