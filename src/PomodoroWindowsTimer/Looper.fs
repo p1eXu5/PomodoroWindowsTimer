@@ -15,15 +15,6 @@ type private State =
         Subscribers: (LooperEvent -> Async<unit>) list
         IsStopped: bool
     }
-    with
-        static member Default() =
-            {
-                ActiveTimePoint = None
-                StartTime = DateTime.Now
-                Subscribers = []
-                IsStopped = false
-            }
-
 
 type private Msg =
     | PreloadTimePoint
@@ -39,9 +30,25 @@ type private Msg =
 
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
-type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: ILogger<Looper>, ?cancellationToken: System.Threading.CancellationToken) =
+type Looper(
+    timePointQueue: ITimePointQueue,
+    timeProvider: System.TimeProvider,
+    tickMilliseconds: int<ms>,
+    logger: ILogger<Looper>, 
+    ?cancellationToken: System.Threading.CancellationToken
+) =
     let mutable timer : Timer = Unchecked.defaultof<_>
     let mutable _isDisposed = false
+
+    let now () = timeProvider.GetLocalNow().DateTime
+
+    let defaultState () =
+        {
+            ActiveTimePoint = None
+            StartTime = now ()
+            Subscribers = []
+            IsStopped = false
+        }
 
     let startHandleMessage =
         LoggerMessage.Define<string>(
@@ -114,7 +121,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                 nextTp |> Some
             | None, _ -> None
 
-        let dt = DateTime.Now
+        let dt = now ()
 
         match nextTpOpt with
         | Some nextTp ->
@@ -163,13 +170,13 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                         return! loop { state with ActiveTimePoint = tpOpt }
 
                     | Resume when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
-                        let dt = DateTime.Now
+                        let dt = now ()
                         timer.Change(int tickMilliseconds, 0) |> ignore
                         return! loop { state with StartTime = dt; IsStopped = false }
 
                     | Next ->
                         use scope = beginScope (nameof Next)
-                        let newState = initialize { state with IsStopped = false; StartTime = DateTime.Now }
+                        let newState = initialize { state with IsStopped = false; StartTime = now () }
                         scope.Dispose()
                         return! loop newState
 
@@ -178,7 +185,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
 
                     | Tick when not (state.IsStopped) ->
                         let atp = state.ActiveTimePoint |> Option.get
-                        let dt = DateTime.Now
+                        let dt = now ()
                         let atp = { atp with TimeSpan = atp.TimeSpan - (dt - state.StartTime) }
 
                         if MathF.Floor(float32 atp.TimeSpan.TotalSeconds) <= 0f then
@@ -207,7 +214,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                         return! loop { state with Subscribers = subscribers @ state.Subscribers }
 
                     | Stop when not state.IsStopped ->
-                        return! loop { state with IsStopped = true; StartTime = DateTime.Now }
+                        return! loop { state with IsStopped = true; StartTime = timeProvider.GetLocalNow().DateTime }
 
                     | Shift seconds when state.IsStopped ->
                         use scope = beginScope (nameof Next)
@@ -225,7 +232,7 @@ type Looper(timePointQueue: ITimePointQueue, tickMilliseconds: int<ms>, logger: 
                     | _ -> return! loop state
                 }
 
-            loop (State.Default())
+            loop (defaultState ())
         )
         , defaultArg cancellationToken CancellationToken.None
     )

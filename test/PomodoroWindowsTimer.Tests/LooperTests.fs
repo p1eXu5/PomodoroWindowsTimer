@@ -29,11 +29,14 @@ let private timePointQueue () =
     tpQueue.AddMany(testTimePoints)
     tpQueue
 
+let timeProvider () =
+    System.TimeProvider.System
+
 [<Test>]
 let ``Next test``() =
     task {
         use tpQueue = timePointQueue ()
-        use looper = new Looper(tpQueue, 200<ms>, TestLogger<Looper>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<Looper>, CancellationToken.None)
+        use looper = new Looper(tpQueue, timeProvider (), 200<ms>, TestLogger<Looper>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<Looper>, CancellationToken.None)
         use semaphore = new SemaphoreSlim(0, 1)
 
         let mutable startedTPStack = Queue<TimePoint>()

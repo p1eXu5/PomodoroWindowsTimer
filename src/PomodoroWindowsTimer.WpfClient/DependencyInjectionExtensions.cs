@@ -66,9 +66,10 @@ internal static class DependencyInjectionExtensions
         => services.TryAddSingleton<ILooper>(sp =>
         {
             var timePointQueue = sp.GetRequiredService<ITimePointQueue>();
+            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
             var logger = sp.GetRequiredService<ILogger<Looper.Looper>>();
             return
-                new Looper.Looper(timePointQueue, PomodoroWindowsTimer.ElmishApp.Program.tickMilliseconds, logger, default);
+                new Looper.Looper(timePointQueue, timeProvider, PomodoroWindowsTimer.ElmishApp.Program.tickMilliseconds, logger, default);
         });
 
     public static void AddTelegramBot(this IServiceCollection services)
