@@ -31,10 +31,10 @@ type private Msg =
     | Reset
 
 
-type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, ?timeout: int, ?cancellationToken: System.Threading.CancellationToken) =
+type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, ?timeout: int<ms>, ?cancellationToken: System.Threading.CancellationToken) =
     let mutable _isDisposed = false
     let isStarted = ref 0
-    let replyTimeout = defaultArg timeout 1000
+    let replyTimeout = defaultArg timeout 1000<ms>
     
     let startHandleMessage =
         LoggerMessage.Define<string>(
@@ -262,7 +262,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
         , defaultArg cancellationToken CancellationToken.None
     )
 
-    new(logger: ILogger<TimePointQueue>, timeout: int, cancellationToken: System.Threading.CancellationToken) = new TimePointQueue(Seq.empty, logger, timeout, cancellationToken)
+    new(logger: ILogger<TimePointQueue>, timeout: int<ms>, cancellationToken: System.Threading.CancellationToken) = new TimePointQueue(Seq.empty, logger, timeout, cancellationToken)
     new(logger: ILogger<TimePointQueue>) = new TimePointQueue(Seq.empty, logger)
 
     member this.Start() =
@@ -282,16 +282,16 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
     member _.TryPick() =
 
-        _agent.PostAndReply(Pick, replyTimeout)
+        _agent.PostAndReply(Pick, int replyTimeout)
 
     member _.ScrollTo(id: Guid) =
         _agent.PostAndReply(fun reply -> ScrollTo (id, reply))
 
     member _.TryGetNext() =
-        _agent.PostAndReply(GetNext, replyTimeout)
+        _agent.PostAndReply(GetNext, int replyTimeout)
 
     member internal _.GetAllWithPriority() =
-        _agent.PostAndReply(GetAllWithPriority, replyTimeout)
+        _agent.PostAndReply(GetAllWithPriority, int replyTimeout)
 
     member private _.Dispose(isDisposing: bool) =
         if _isDisposed then ()
