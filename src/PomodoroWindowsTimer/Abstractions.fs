@@ -27,8 +27,6 @@ type ILooper =
     abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
     abstract PreloadTimePoint : unit -> unit
 
-
-
 type IWorkRepository =
     interface
         abstract CreateAsync: number: string -> title: string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
