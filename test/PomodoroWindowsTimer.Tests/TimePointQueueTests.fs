@@ -26,7 +26,7 @@ let private testTimePoints =
 
 let private timePointQueue () =
     let cts = new CancellationTokenSource(TimeSpan.FromSeconds(60))
-    let tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<TimePointQueue>, 100_000, cts.Token)
+    let tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<TimePointQueue>, -1<ms>, cts.Token)
     tpQueue.Start()
     tpQueue
 
