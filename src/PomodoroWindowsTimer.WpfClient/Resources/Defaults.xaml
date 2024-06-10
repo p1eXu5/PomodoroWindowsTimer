@@ -28,6 +28,7 @@
     <converters:DateTimeOffsetToShortLocalDateTimeConverter x:Key="conv_DateTimeOffsetToShortLocalDateTime" />
     <converters:DateTimeOffsetToShortDateConverter x:Key="conv_DateTimeOffsetToShortDate" />
     <converters:DateOnlyToShortDateStringConverter x:Key="conv_DateOnlyToShortDateString" />
+    <converters:DateOnlyToLongDateStringConverter x:Key="conv_DateOnlyToLongDateString" />
 
     <Style x:Key="st_IconBase"
            TargetType="materialDesign:PackIcon"

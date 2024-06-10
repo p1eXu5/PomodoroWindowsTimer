@@ -17,10 +17,10 @@ internal sealed class BooleansToDigitWidthConverter : IMultiValueConverter
         {
             if (!flag1 && !flag2)
             {
-                return 100;
+                return 100.0;
             }
 
-            return 75;
+            return 75.0;
         }
 
         return DependencyProperty.UnsetValue;

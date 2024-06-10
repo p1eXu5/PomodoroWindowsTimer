@@ -14,4 +14,8 @@
     <PackageReference Include="p1eXu5.CliBootstrap" Version="1.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="8.0.300" />
+  </ItemGroup>
+
 </Project>

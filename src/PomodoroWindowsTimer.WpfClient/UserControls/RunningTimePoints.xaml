@@ -83,8 +83,7 @@
                 <TextBlock Style="{StaticResource MaterialDesignButtonTextBlock}"
                            Margin="10,16,0,16"
                            HorizontalAlignment="Center"
-                           Text="{Binding Path=Header,
-                                          FallbackValue=TIME POINTS}"
+                           Text="TIME POINTS"
                            />
             </Grid>
 
