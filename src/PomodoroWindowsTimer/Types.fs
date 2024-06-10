@@ -274,13 +274,12 @@ module WorkEventList =
             |> List.map (fun (day, wel) ->
                 (day, wel |> List.map snd)
             )
+            |> List.sortBy fst
 
 module Statistic =
     /// 14 * 25 min pomodoro + 1 * 15 min pomodoro + 11 * 5 min break + 3 * 20 min long break
     [<Literal>]
     let OVERALL_MINUTES_PER_DAY_MAX = 8.0 * 60.0
-
-    let overallMinutesPerDayMax = TimeSpan.FromMinutes(OVERALL_MINUTES_PER_DAY_MAX)
 
     [<Literal>]
     let WORK_MINUTES_PER_DAY_MAX = 25. * 4. * 3. + 25. + 25. + 15.
@@ -290,6 +289,8 @@ module Statistic =
         OVERALL_MINUTES_PER_DAY_MAX - WORK_MINUTES_PER_DAY_MAX
 
     let breakMinutesPerDayMax = TimeSpan.FromMinutes(BREAK_MINUTES_PER_DAY_MAX)
+    let workMinutesPerDayMax = TimeSpan.FromMinutes(WORK_MINUTES_PER_DAY_MAX)
+    let overallMinutesPerDayMax = TimeSpan.FromMinutes(OVERALL_MINUTES_PER_DAY_MAX)
 
     let total (statistic: Statistic) =
         statistic.BreakTime + statistic.WorkTime
