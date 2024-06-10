@@ -40,7 +40,10 @@ type Looper(
     let mutable timer : Timer = Unchecked.defaultof<_>
     let mutable _isDisposed = false
 
-    let now () = timeProvider.GetLocalNow().DateTime
+    let started = ref 0
+
+    let now () =
+        timeProvider.GetLocalNow().DateTime
 
     let defaultState () =
         {
@@ -247,17 +250,18 @@ type Looper(
 
     /// Starts Looper in Stop state
     member _.Start(subscribers: (LooperEvent -> Async<unit>) list) =
-        if timer = null then
-            timer <-
-                new Timer(fun _ ->
-                    agent.Post(Tick)
-                )
+        if Interlocked.CompareExchange(started, 1 ,0) = 0 then
+            if timer = null then
+                timer <-
+                    new Timer(fun _ ->
+                        agent.Post(Tick)
+                    )
 
-        timePointQueue.Start()
-        invoker.Start()
-        agent.Start()
-        do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
-        agent.Post(Stop)
+            timePointQueue.Start()
+            invoker.Start()
+            agent.Start()
+            do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
+            agent.Post(Stop)
 
     member _.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) =
         agent.Post(Subscribe subscriber)
