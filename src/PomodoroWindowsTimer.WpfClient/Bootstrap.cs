@@ -171,6 +171,9 @@ internal class Bootstrap : IDisposable
     internal IUserSettings GetUserSettings()
         => Host.Services.GetRequiredService<IUserSettings>();
 
+    internal ILogger<T> GetLogger<T>()
+        => Host.Services.GetRequiredService<ILogger<T>>();
+
     protected virtual void PreConfigureServices(HostBuilderContext hostBuilder, IServiceCollection services)
     { }
 
