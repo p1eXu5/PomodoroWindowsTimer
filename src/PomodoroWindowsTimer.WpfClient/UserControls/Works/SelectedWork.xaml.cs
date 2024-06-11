@@ -40,5 +40,17 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
                 typeof(bool),
                 typeof(SelectedWork),
                 new PropertyMetadata(false));
+
+        private void m_Root_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (m_TitleTextBlock.TextWrapping == TextWrapping.Wrap)
+            {
+                m_TitleTextBlock.TextWrapping = TextWrapping.NoWrap;
+            }
+            else
+            {
+                m_TitleTextBlock.TextWrapping = TextWrapping.Wrap;
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@
              d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignWidth="300"
              d:DesignHeight="70"
+             MouseRightButtonDown="m_Root_MouseDown"
              mc:Ignorable="d"
              >
     <UserControl.Resources>
@@ -49,7 +50,7 @@
                     <ColumnDefinition Width="50" />
                 </Grid.ColumnDefinitions>
                 <!--  with Auto height button is not appearing correctly  -->
-                <Button x:Name="m_Stack"
+                <Button x:Name="m_SelectButton"
                         Command="{Binding SelectCommand}"
                         Style="{StaticResource MaterialDesignRaisedButton}"
                         Height="Auto"
@@ -62,7 +63,7 @@
                         Background="Transparent"
                         BorderThickness="0"
                         >
-                    <StackPanel Width="{Binding ElementName=m_Stack,
+                    <StackPanel Width="{Binding ElementName=m_SelectButton,
                                                 Path=ActualWidth}"
                                 VerticalAlignment="Center"
                                 Orientation="Vertical"
@@ -98,8 +99,10 @@
                                        FontSize="11"
                                        />
                         </Grid>
+                        <!--  Title  -->
                         <TextBlock Grid.Row="1"
                                    Grid.Column="0"
+                                   x:Name="m_TitleTextBlock"
                                    ToolTip="{Binding Title}"
                                    Margin="10,5,5,5"
                                    VerticalAlignment="Top"
@@ -119,7 +122,7 @@
                         Command="{Binding EditCommand}"
                         Content="{materialDesign:PackIcon Pencil}"
                         ToolTip="Edit"
-                        Height="{Binding ElementName=m_Stack,
+                        Height="{Binding ElementName=m_SelectButton,
                                          Path=ActualHeight,
                                          Mode=OneWay}"
                         VerticalAlignment="Stretch"
