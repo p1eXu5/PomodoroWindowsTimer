@@ -36,7 +36,7 @@ let update (patternStore: PatternStore) (timePointPrototypeStore: TimePointProto
 
     match msg with
     | SetPatterns patternList ->
-        { model with Patterns = patternList }, Cmd.none, Intent.none
+        { model with Patterns = patternList }, Cmd.none, Intent.None
 
     | SetSelectedPattern (Some p) ->
         model |> setSelectedPattern p
@@ -55,26 +55,26 @@ let update (patternStore: PatternStore) (timePointPrototypeStore: TimePointProto
 
     | Msg.SetGeneratedTimePoints tpList ->
         model |> setTimePoints tpList
-        , Cmd.none, Intent.none
+        , Cmd.none, Intent.None
 
     | SetSelectedPattern None ->
-        model |> unsetSelectedPattern |> unsetIsPatternWrong |> clearTimePoints, Cmd.none, Intent.none
+        model |> unsetSelectedPattern |> unsetIsPatternWrong |> clearTimePoints, Cmd.none, Intent.None
 
     | SetSelectedPatternIndex ind ->
-        model |> setSelectedPatternIndex ind, Cmd.none, Intent.none
+        model |> setSelectedPatternIndex ind, Cmd.none, Intent.None
 
     | TimePointPrototypeMsg (kind, ptMsg) ->
         ptMsg |> TimePointPrototypeModel.Program.update |> flip (mapPrototype kind) model
         , Cmd.ofMsg (SetSelectedPattern model.SelectedPattern)
-        , Intent.none
+        , Intent.None
 
     | TimePointMsg (id, tpMsg) ->
         tpMsg |> TimePointModel.Program.update |> flip (mapTimePoint id) model
         , Cmd.none
-        , Intent.none
+        , Intent.None
 
     | ApplyTimePoints ->
         let patterns = model.SelectedPattern |> Option.get |> (fun p -> p :: model.Patterns) |> List.distinct
         patternStore.Write(patterns)
         timePointPrototypeStore.Write(model.TimePointPrototypes |> List.map _.Prototype)
-        (model, Cmd.none, Request.ApplyGeneratedTimePoints |> Intent.Request )
+        (model, Cmd.none, Intent.ApplyGeneratedTimePoints )

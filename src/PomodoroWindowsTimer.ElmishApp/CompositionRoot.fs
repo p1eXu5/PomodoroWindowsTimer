@@ -39,7 +39,7 @@ let compose
     let mainModelCfg =
         {
             UserSettings = userSettings
-            SendToBot = telegramBot
+            TelegramBot = telegramBot
             Looper = looper
             TimePointQueue = timePointQueue
             WindowsMinimizer = windowsMinimizer
@@ -57,9 +57,11 @@ let compose
             MainErrorMessageQueue = mainErrorMessageQueue
         }
 
+    let workEventStore = WorkEventStore.init workEventRepository
+
     // init
     let initMainModel () =
-        MainModel.init mainModelCfg
+        MainModel.init userSettings
 
     // update
     let updateMainModel =
@@ -124,13 +126,28 @@ let compose
         let updateWorkSelectorModel =
             WorkSelectorModel.Program.update updateWorkListModel updateCreatingWorkModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
 
+        let updatePlayerModel =
+            PlayerModel.Program.update
+                looper
+                windowsMinimizer
+                timeProvider
+                workEventStore 
+                themeSwitcher 
+                telegramBot 
+                userSettings 
+                timePointQueue 
+                mainErrorMessageQueue 
+                (loggerFactory.CreateLogger<PlayerModel>())
+
         MainModel.Program.update
             mainModelCfg
+            workEventStore
             updateWorkModel
             updateAppDialogModel
             updateWorkSelectorModel
             initDailyStatisticListModel
             updateDailyStatisticListModel
+            updatePlayerModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
 
@@ -141,7 +158,7 @@ let compose
 
     let mainModelBindings =
         fun () ->
-            MainModel.Bindings.ToList title assemblyVer workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue
+            MainModel.Bindings.ToList title assemblyVer workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue timePointQueue looper
 
     // subscriptions
     let subscribe _ : (SubId * Subscribe<_>) list =
@@ -149,7 +166,12 @@ let compose
             let onLooperEvt =
                 fun evt ->
                     async {
-                        do dispatch (MainModel.ControllerMsg.LooperMsg evt |> MainModel.Msg.ControllerMsg)
+                        match evt with
+                        | LooperEvent.TimePointTimeReduced tp ->
+                            do dispatch (MainModel.LooperMsg.TimePointTimeReduced tp |> MainModel.Msg.LooperMsg)
+
+                        | LooperEvent.TimePointStarted args ->
+                            do dispatch (MainModel.LooperMsg.TimePointStarted args |> MainModel.Msg.LooperMsg)
                     }
             looper.AddSubscriber(onLooperEvt)
             { new IDisposable with 

@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Shared.TimePointV2"
+             x:Name="m_Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -7,7 +8,6 @@
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
-             x:Name="m_Root"
              Height="36"
              Padding="0"
              d:DesignWidth="280"
@@ -51,7 +51,8 @@
                         BorderThickness="0,0,1,0"
                         BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                         >
-                    <TextBlock HorizontalAlignment="Center"
+                    <TextBlock Style="{StaticResource MaterialDesignButtonTextBlock}"
+                               HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias),
                                               ElementName=m_Root,
@@ -60,17 +61,16 @@
                                Foreground="{Binding ElementName=m_Root,
                                                     Path=ButtonForeground,
                                                     FallbackValue='Gray'}"
-                               Style="{StaticResource MaterialDesignButtonTextBlock}"
                                FontSize="10"
                                />
                 </Border>
 
                 <TextBlock Grid.Column="2"
+                           Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                            Margin="8,0"
                            VerticalAlignment="Center"
                            FontSize="16"
                            TextTrimming="CharacterEllipsis"
-                           Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                            Text="{Binding Path=(local:TimePointAssistant.TimePointName),
                                           ElementName=m_Root}"
                            Foreground="{Binding ElementName=m_Root,
@@ -83,14 +83,14 @@
                                           Path=PlayStopCommand}"
                         CommandParameter="{Binding ElementName=m_Root,
                                                    Path=PlayStopCommandParameter}"
+                        Style="{StaticResource MaterialDesignPaperDarkButton}"
+                        Height="36"
                         materialDesign:ButtonAssist.CornerRadius="0"
                         materialDesign:ElevationAssist.Elevation="Dp0"
                         BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                         BorderThickness="1,0,0,0"
                         Foreground="{Binding Path=ButtonForeground,
                                              ElementName=m_Root}"
-                        Style="{StaticResource MaterialDesignPaperDarkButton}"
-                        Height="36"
                         >
                     <Button.Background>
                         <ImageBrush ImageSource="{StaticResource img_Metal}"
@@ -101,9 +101,9 @@
                                     />
                     </Button.Background>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock HorizontalAlignment="Center"
+                        <TextBlock Style="{StaticResource MaterialDesignButtonTextBlock}"
+                                   HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   Style="{StaticResource MaterialDesignButtonTextBlock}"
                                    Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
                                                   ElementName=m_Root}"
                                    />

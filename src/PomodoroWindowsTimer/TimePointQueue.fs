@@ -27,8 +27,9 @@ type private Msg =
     | GetAllWithPriority of AsyncReplyChannel<(TimePoint * float32) seq>
     | GetNext of AsyncReplyChannel<TimePoint option>
     | Pick of AsyncReplyChannel<TimePoint option>
-    | ScrollTo of Guid * AsyncReplyChannel<unit>
+    | ScrollTo of TimePointId * AsyncReplyChannel<unit>
     | Reset
+    | TryFind of TimePointId * AsyncReplyChannel<TimePoint option>
 
 
 type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, ?timeout: int<ms>, ?cancellationToken: System.Threading.CancellationToken) =
@@ -254,6 +255,10 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
                         closeScope scope (nameof Pick)
                         return! loop state
+
+                    | TryFind (id, reply) ->
+                        reply.Reply(state.Queue |> Seq.tryFind (fun tp -> tp.Id = id))
+                        return! loop state
                 }
 
             loop State.Default
@@ -290,6 +295,9 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
     member _.TryGetNext() =
         _agent.PostAndReply(GetNext, int replyTimeout)
 
+    member _.TryFind(id: TimePointId) =
+        _agent.PostAndReply((fun reply -> TryFind (id, reply)), int replyTimeout)
+
     member internal _.GetAllWithPriority() =
         _agent.PostAndReply(GetAllWithPriority, int replyTimeout)
 
@@ -301,6 +309,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
             _isDisposed <- true
 
+
     interface ITimePointQueue with
         member this.AddMany(timePointSeq) = this.AddMany(timePointSeq)
         member this.Start() = this.Start()
@@ -308,6 +317,7 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
         member this.TryPick() = this.TryPick()
         member this.ScrollTo(id: Guid) = this.ScrollTo(id)
         member this.Reload timePoints = this.Reload(timePoints)
+        member this.TryFind(id: Guid) = this.TryFind(id) 
 
     interface IDisposable with
         member this.Dispose() =

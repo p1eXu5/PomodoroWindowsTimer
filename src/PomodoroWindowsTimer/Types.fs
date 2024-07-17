@@ -41,10 +41,11 @@ type Kind =
 /// Kind alias, used in patterns.
 type Alias = private Alias of string
 
+type TimePointId = Guid
 
 type TimePoint =
     {
-        Id: Guid
+        Id: TimePointId
         Name: Name
         TimeSpan: TimeSpan
         Kind: Kind
@@ -59,6 +60,18 @@ type TimePointPrototype =
         KindAlias: Alias
         TimeSpan: TimeSpan
     }
+
+
+type LooperEvent =
+    | TimePointStarted of TimePointStartedEventArgs
+    | TimePointTimeReduced of TimePoint
+and
+    TimePointStartedEventArgs =
+        {
+            NewOriginTimePoint: TimePoint
+            NewActiveTimePoint: TimePoint
+            OldActiveTimePoint: TimePoint option
+        }
 
 
 type Pattern = string
@@ -152,6 +165,14 @@ module DateOnlyPeriod =
 
     let isOneDay (period: DateOnlyPeriod) =
         period.Start = period.EndInclusive
+
+module TimePointStartedEventArgs =
+    let init newOriginTimePoint newActiveTimePoint oldActiveTimePoint : TimePointStartedEventArgs =
+        {
+            NewOriginTimePoint = newOriginTimePoint
+            NewActiveTimePoint = newActiveTimePoint
+            OldActiveTimePoint = oldActiveTimePoint
+        }
 
 module ExcelRow =
 
@@ -347,11 +368,6 @@ module Kind =
         | LongBreak -> "LB"
 
 
-type LooperEvent =
-    | TimePointStarted of ``new``: TimePoint * old: TimePoint option 
-    | TimePointTimeReduced of TimePoint
-
-
 module TimePointPrototype =
 
     let defaults =
@@ -392,8 +408,6 @@ module TimePoint =
             { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
             { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
         ]
-
-
 
 module Pattern =
 

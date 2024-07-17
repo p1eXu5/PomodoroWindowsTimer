@@ -15,17 +15,23 @@ type ITimePointQueue =
     abstract Reload : TimePoint list -> unit
     abstract TryPick : unit -> TimePoint option
     abstract ScrollTo : Guid -> unit
+    abstract TryFind : TimePointId -> TimePoint option
 
 type ILooper =
-    inherit IDisposable
-    abstract Start : unit -> unit
-    abstract Stop : unit -> unit
-    abstract Next : unit -> unit
-    abstract Shift : float<sec> -> unit
-    abstract ShiftAck : float<sec> -> unit
-    abstract Resume : unit -> unit
-    abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
-    abstract PreloadTimePoint : unit -> unit
+    interface
+        inherit IDisposable
+        abstract Start : unit -> unit
+        abstract Stop : unit -> unit
+        abstract Next : unit -> unit
+        abstract Shift : float<sec> -> unit
+        abstract ShiftAck : float<sec> -> unit
+        abstract Resume : unit -> unit
+        abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
+        /// Tryes to pick TimePoint from queue, if it present
+        /// emits TimePointStarted event and sets ActiveTimePoint.
+        abstract PreloadTimePoint : unit -> unit
+        abstract GetActiveTimePoint : unit -> TimePoint option
+    end
 
 type IWorkRepository =
     interface

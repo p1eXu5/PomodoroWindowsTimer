@@ -60,7 +60,8 @@ namespace PomodoroWindowsTimer.WpfClient
                     var looper = _bootstrap.GetLooper();
                     looper.Stop();
 
-                    bool isPlaying = ((dynamic)_mainWindow.DataContext).IsPlaying;
+                    object player = ((dynamic)_mainWindow.DataContext).Player;
+                    bool isPlaying = ((dynamic)player).IsPlaying;
                     object currentWork = ((dynamic)_mainWindow.DataContext).CurrentWork;
 
                     if (isPlaying && currentWork is not null)

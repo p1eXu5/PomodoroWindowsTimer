@@ -9,6 +9,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
              xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+             xmlns:mainScreen="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.MainScreen"
+             xmlns:tpDrawer="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer"
              d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="450"
              d:DesignWidth="800"
@@ -32,7 +34,9 @@
                                RightDrawerCloseOnClickAway="True"
                                >
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <local:RunningTimePoints DataContext="{Binding}" Width="350" />
+            <tpDrawer:TimePointsDrawer DataContext="{Binding}"
+                                       Width="350"
+                                       />
         </materialDesign:DrawerHost.LeftDrawerContent>
 
         <!--  time points generator  -->
@@ -41,8 +45,12 @@
             <works:WorkSelector DataContext="{Binding WorkSelector}" />
         </materialDesign:DrawerHost.RightDrawerContent>
 
-        <DockPanel Margin="10,0,10,0" LastChildFill="True">
-            <local:MainMenu DockPanel.Dock="Top" DataContext="{Binding}" />
+        <DockPanel Margin="10,0,10,0"
+                   LastChildFill="True"
+                   >
+            <local:MainMenu DockPanel.Dock="Top"
+                            DataContext="{Binding}"
+                            />
 
             <materialDesign:ColorZone VerticalAlignment="Center"
                                       materialDesign:ThemeAssist.Theme="Inherit"
@@ -51,14 +59,14 @@
                 <!--  Content  -->
                 <Grid Margin="0,0,0,20">
                     <!--  Digit Panel  -->
-                    <local:Timer x:Name="m_DigitPanel"
-                                 DockPanel.Dock="Top"
-                                 DataContext="{Binding}"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
-                                 Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
-                                 />
+                    <mainScreen:MainScreen DockPanel.Dock="Top"
+                                           x:Name="m_DigitPanel"
+                                           DataContext="{Binding}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
+                                           Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                           />
 
                 </Grid>
             </materialDesign:ColorZone>

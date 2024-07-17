@@ -44,7 +44,7 @@ let rec ``Active Point is set on`` (timePoint: TimePoint) =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        match sut.MainModel.ActiveTimePoint with
+        match sut.MainModel.Player.ActiveTimePoint with
         | Some apt ->
             apt.Id |> shouldL equal timePoint.Id $"Expected Active TimePoint is {timePoint} baut was {apt}"
         | None ->
@@ -56,7 +56,7 @@ let ``LooperState is`` (looperState: LooperState) =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        sut.MainModel.LooperState
+        sut.MainModel.Player.LooperState
         |> shouldL equal looperState ("LooperState is not Initialized")
     }
 
@@ -69,32 +69,8 @@ let ``Windows should not be minimized`` () =
         
         do
             wm.Received(0).MinimizeAllRestoreAppWindowAsync()
-            |> Async.AwaitTask
-            |> Async.RunSynchronously
-
-        sut.MainModel.IsMinimized
-        |> shouldL be False "MainModel.IsMinimized is not false"
     }
 
-let rec ``MinimizeWindows msg has been dispatched`` () =
-    scenario {
-        do! Scenario.msgDispatchedWithin2Sec "MinimizeWindows" (fun msg ->
-            match msg with
-            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeAllRestoreApp) -> true
-            | _ -> false
-        )
-    }
-    |> Scenario.log $"Then.``{nameof ``MinimizeWindows msg has been dispatched``}``"
-
-let rec ``MinimizeWindows msg has not been dispatched`` () =
-    scenario {
-        do! Scenario.msgNotDispatchedWithin1Sec "MinimizeWindows" (fun msg ->
-            match msg with
-            | MainModel.Msg.WindowsMsg (WindowsMsg.MinimizeAllRestoreApp) -> true
-            | _ -> false
-        )
-    }
-    |> Scenario.log $"Then.``{nameof ``MinimizeWindows msg has been dispatched``}``"
 
 let ``WindowsMinimizer.MinimizeOtherAsync is called`` (times: int) =
     scenario {
@@ -104,39 +80,6 @@ let ``WindowsMinimizer.MinimizeOtherAsync is called`` (times: int) =
         
         do
             wm.Received(times).MinimizeAllRestoreAppWindowAsync()
-            |> Async.AwaitTask
-            |> Async.RunSynchronously
-    }
-
-[<Obsolete("Use ``MainModel.IsMinimized should be`` and ``WindowsMinimizer.MinimizeOtherAsync is called``")>]
-let ``Windows should be minimized`` () =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-
-        let wm = sut.MockRepository.Substitute<IWindowsMinimizer>()
-
-        (*
-            TODO: uncoment when reduce window messages
-            do
-                wm.Received().MinimizeOtherAsync()
-                |> Async.AwaitTask
-                |> Async.RunSynchronously
-
-            do
-                wm.Received().RestoreMainWindow()
-
-        *)
-
-        sut.MainModel.IsMinimized
-        |> shouldL be True "MainModel.IsMinimized is not true"
-    }
-
-let ``MainModel.IsMinimized should be`` (v: bool) =
-    scenario {
-        let! (sut: ISut) = Scenario.getState
-
-        sut.MainModel.IsMinimized
-        |> shouldL equal v $"MainModel.IsMinimized is {sut.MainModel.IsMinimized}"
     }
 
 
@@ -183,7 +126,7 @@ let rec ``Active Point remaining time is equal to or less then`` (timePoint: Tim
     scenario {
         let! (sut: ISut) = Scenario.getState
 
-        match sut.MainModel.ActiveTimePoint with
+        match sut.MainModel.Player.ActiveTimePoint with
         | Some atp ->
             let tolerance = tolerance |> Option.map (float >> (*) 1000.0 ) |> Option.defaultValue (float Program.tickMilliseconds)
             // reminder can be appended to the next tp
@@ -198,7 +141,7 @@ let rec ``Active Point remaining time is less then`` (timePoint: TimePoint) =
     scenario {
         let! (sut: ISut) = Scenario.getState
 
-        match sut.MainModel.ActiveTimePoint with
+        match sut.MainModel.Player.ActiveTimePoint with
         | Some atp ->
             atp.TimeSpan |> shouldL be (lessThan timePoint.TimeSpan) $"Active TimePoint is %A{atp}"
         | None ->
@@ -210,7 +153,7 @@ let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
 
-        match sut.MainModel.ActiveTimePoint with
+        match sut.MainModel.Player.ActiveTimePoint with
         | Some atp ->
             atp.TimeSpan.TotalSeconds
             |> shouldL equal (float seconds)

@@ -12,10 +12,8 @@ let ``Looper TimePointStarted event has been despatched with`` newTimePoint oldT
     scenario {
         do! Scenario.msgDispatchedWithin2Sec "Finish of LoadRecipeCards" (fun msg ->
             match msg with
-            | MainModel.Msg.ControllerMsg (
-                ControllerMsg.LooperMsg (
-                    LooperEvent.TimePointStarted (newTp, oldTp)
-                )) when newTp = newTimePoint && oldTp = oldTimePoint -> true
+            | MainModel.Msg.LooperMsg (LooperMsg.TimePointStarted ({ NewActiveTimePoint = newTp; OldActiveTimePoint = oldTp}))
+                when newTp = newTimePoint && oldTp = oldTimePoint -> true
             | _ -> false
         )
     }

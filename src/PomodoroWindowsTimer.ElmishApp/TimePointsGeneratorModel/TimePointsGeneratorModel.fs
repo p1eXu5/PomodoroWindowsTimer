@@ -30,9 +30,14 @@ module TimePointsGeneratorModel =
         TimePointMsg =
             | SetName of string
 
-    type Request =
+    [<RequireQualifiedAccess>]
+    type Intent =
+        | None
         | ApplyGeneratedTimePoints
 
+    [<AutoOpen>]
+    module Helpers =
+        let withNoIntent (model, cmd) = (model, cmd, Intent.None)
 
     open Elmish
     open Elmish.Extensions

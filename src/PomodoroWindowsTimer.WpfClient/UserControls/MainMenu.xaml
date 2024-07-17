@@ -74,9 +74,9 @@
         <!--  telegram bot settings open dialog button  -->
         <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
                 DataContext="{Binding AppDialog}"
+                Command="{Binding OpenBotSettingsDialogCommand}"
                 Content="{materialDesign:PackIcon CommentAccountOutline}"
                 ToolTip="Telegram bot settings"
-                Command="{Binding OpenBotSettingsDialogCommand}"
                 Style="{StaticResource st_MenuButton}"
                 >
             <Button.RenderTransform>

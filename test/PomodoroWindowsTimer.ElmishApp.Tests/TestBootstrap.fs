@@ -75,7 +75,7 @@ type TestBootstrap () =
 
         services
             .AddSingleton<IWindowsMinimizer>(fun _ ->
-                WindowsMinimizer.initStub ()
+                new StabWindowsMinimizer() :> IWindowsMinimizer
             )
             |> ignore
 

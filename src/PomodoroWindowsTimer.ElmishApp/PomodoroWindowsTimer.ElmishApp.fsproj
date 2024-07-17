@@ -12,6 +12,8 @@
     <Compile Include="Abstractions.fs" />
     <Compile Include="Infrastructure.fs" />
     <Compile Include="LoggerExtensions.fs" />
+    <Compile Include="WorkEventStore.fs" />
+    <Compile Include="WindowMinimizer.fs" />
     <Compile Include="WorkEventDetailsModel\WorkEventDetailsModel.fs" />
     <Compile Include="WorkEventModel\WorkEventModel.fs" />
     <Compile Include="WorkEventListModel\WorkEventListModel.fs" />
@@ -49,6 +51,12 @@
     <Compile Include="AppDialogModel\AppDialogModel.fs" />
     <Compile Include="AppDialogModel\AppDialogModel.Program.fs" />
     <Compile Include="AppDialogModel\AppDialogModel.Bindings.fs" />
+    <Compile Include="TimePointListModel\TimePointListModel.fs" />
+    <Compile Include="TimePointListModel\TimePointListModel.Program.fs" />
+    <Compile Include="TimePointListModel\TimePointListModel.Bindings.fs" />
+    <Compile Include="PlayerModel\PlayerModel.fs" />
+    <Compile Include="PlayerModel\PlayerModel.Program.fs" />
+    <Compile Include="PlayerModel\PlayerModel.Bindings.fs" />
     <Compile Include="MainModel\MainModel.fs" />
     <Compile Include="MainModel\MainModel.Program.fs" />
     <Compile Include="MainModel\MainModel.Bindings.fs" />

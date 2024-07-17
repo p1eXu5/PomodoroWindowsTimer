@@ -10,7 +10,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
-        xmlns:usercontrols="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+        xmlns:userControls="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
         xmlns:mainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
         xmlns:appDialogModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AppDialogModel;assembly=PomodoroWindowsTimer.ElmishApp"
         xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
@@ -119,7 +119,7 @@
                         <Grid>
 
                             <Grid Margin="1">
-                                <usercontrols:Lcd DataContext="{Binding}" />
+                                <userControls:Lcd DataContext="{Binding}" />
                                 <Border BorderBrush="#0A0A0A"
                                         BorderThickness="0,1,1,0"
                                         CornerRadius="4"
@@ -181,8 +181,8 @@
                     </Border>
                 </Grid>
 
-                <usercontrols:ControlButtons DockPanel.Dock="Top"
-                                             DataContext="{Binding}"
+                <userControls:ControlButtons DockPanel.Dock="Top"
+                                             DataContext="{Binding Player}"
                                              VerticalAlignment="Top"
                                              />
             </DockPanel>

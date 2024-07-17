@@ -13,13 +13,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PomodoroWindowsTimer.WpfClient.UserControls;
+namespace PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer;
 /// <summary>
 /// Interaction logic for DrawerUserControl.xaml
 /// </summary>
-public partial class RunningTimePoints : UserControl
+public partial class TimePointsDrawer : UserControl
 {
-    public RunningTimePoints()
+    public TimePointsDrawer()
     {
         InitializeComponent();
     }

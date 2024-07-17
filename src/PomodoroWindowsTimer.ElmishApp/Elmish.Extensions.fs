@@ -60,11 +60,6 @@ type AsyncDeferred<'Retrieved> =
     | InProgress of Cts
     | Retrieved of 'Retrieved
 
-[<RequireQualifiedAccess>]
-type Intent<'TIntent> =
-    | None
-    | Request of 'TIntent
-
 // ----------------------- modules
 [<AutoOpen>]
 module Helpers =
@@ -170,11 +165,6 @@ module Cts =
         {
             CancellationTokenSource = new CancellationTokenSource()
         }
-
-
-[<RequireQualifiedAccess>]
-module Intent =
-    let none = Intent.None
 
 
 [<RequireQualifiedAccess>]

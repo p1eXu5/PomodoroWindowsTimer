@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.TimePointQueue;
 using System.Windows.Interop;
 using PomodoroWindowsTimer.Exporter.Excel;
+using PomodoroWindowsTimer.ElmishApp;
 
 namespace DrugRoom.WpfClient;
 
@@ -82,10 +83,11 @@ internal static class DependencyInjectionExtensions
     public static void AddWindowsMinimizer(this IServiceCollection services)
         => services.TryAddSingleton<IWindowsMinimizer>(sp =>
         {
+            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
 #if DEBUG
-            return WindowsMinimizer.initStub();
+            return new StabWindowsMinimizer();
 #else
-            return new WindowsMinimizer.WindowsMinimizer();
+            return new WindowsMinimizer(timeProvider);
 #endif
         });
 

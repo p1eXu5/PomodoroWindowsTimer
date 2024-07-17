@@ -75,7 +75,7 @@ let ``PreloadTimePoint -> raises TimePointStarted event with None nextTp`` () =
     do looper.PreloadTimePoint()
     do eventQueue |> waitEventCount 1
 
-    %eventQueue.Should().Contain(LooperEvent.TimePointStarted (testTimePoints[0], None))
+    %eventQueue.Should().Contain(LooperEvent.TimePointStarted (TimePointStartedEventArgs.init testTimePoints[0] testTimePoints[0] None))
 
 
 //[<Test>]

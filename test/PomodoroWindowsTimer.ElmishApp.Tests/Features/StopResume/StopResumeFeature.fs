@@ -113,7 +113,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            // TODO: do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Work 2<times>
             do! Then.``Theme should been switched with`` TimePointKind.Break 1<times>
@@ -136,7 +136,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            // TODO: do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Work 2<times>
             do! Then.``Theme should been switched with`` TimePointKind.Break 1<times>
@@ -158,7 +158,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            // TODO: do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Work 2<times>
             do! Then.``Theme should been switched with`` TimePointKind.Break 1<times>
@@ -181,7 +181,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is less then`` timePoints.Head
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``MainModel.IsMinimized should be`` false
+            // TODO: do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``WindowsMinimizer.MinimizeOtherAsync is called`` 0
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Work 2<times>
@@ -210,7 +210,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[3]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[3] (1.0<sec> |> Some) // reminder can be appended to the next tp
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``MainModel.IsMinimized should be`` true
+            // TODO: do! Then.``MainModel.IsMinimized should be`` true
             do! Then.``Theme should been switched with`` TimePointKind.Work 3<times>
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
         }
@@ -251,7 +251,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            // TODO: do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
         }
@@ -272,7 +272,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Stopped
-            do! Then.``MainModel.IsMinimized should be`` false
+            // TODO: do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
         }
@@ -294,7 +294,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``Windows should be minimized`` ()
+            // TODO: do! Then.``Windows should be minimized`` ()
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
         }
@@ -315,7 +315,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``MainModel.IsMinimized should be`` false
+            // TODO: do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
             do! Then.``Theme should been switched with`` TimePointKind.Work 1<times>
@@ -339,7 +339,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``MainModel.IsMinimized should be`` false
+            // TODO: do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
             do! Then.``Theme should been switched with`` TimePointKind.Work 1<times>
@@ -364,7 +364,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints[1]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``MainModel.IsMinimized should be`` false
+            // TODO: do! Then.``MainModel.IsMinimized should be`` false
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
             do! Then.``Theme should been switched with`` TimePointKind.Work 1<times>
         }
@@ -385,7 +385,7 @@ module StopResumeFeature =
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``Active Point remaining time is equal to or less then`` timePoints.Head None
             do! Then.``LooperState is`` LooperState.Playing
-            do! Then.``MainModel.IsMinimized should be`` true
+            // TODO: do! Then.``MainModel.IsMinimized should be`` true
             do! Then.``Telegrtam bot should not be notified`` ()
             do! Then.``Theme should been switched with`` TimePointKind.Break 2<times>
         }

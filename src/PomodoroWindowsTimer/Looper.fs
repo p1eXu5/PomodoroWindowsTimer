@@ -6,6 +6,7 @@ open PomodoroWindowsTimer.Abstractions
 open System
 open System.Threading
 open Microsoft.Extensions.Logging
+open System.Runtime.CompilerServices
 
 
 type private State = 
@@ -26,6 +27,68 @@ type private Msg =
     | Next
     | Shift of float<sec>
     | ShiftAck of float<sec> * AsyncReplyChannel<unit>
+    | GetActiveTimePoint of AsyncReplyChannel<TimePoint option>
+
+
+module private State =
+    let init (timeProvider: System.TimeProvider) =
+        {
+            ActiveTimePoint = None
+            StartTime = timeProvider.GetLocalNow().DateTime
+            Subscribers = []
+            IsStopped = false
+        }
+
+[<AutoOpen>]
+module private BeginMessageScope =
+    let private messageScope =
+        LoggerMessage.DefineScope<string>(
+            "Scope of Looper message: {LooperMsgName}"
+        )
+
+    type LoggerExtensions () =
+        [<Extension>]
+        static member BeginMessageScope(logger: ILogger, looperMsgName: string) =
+            messageScope.Invoke(logger, looperMsgName)
+
+[<AutoOpen>]
+module private StartHandleMessage =
+    let private loggerMessage = LoggerMessage.Define<string>(
+        LogLevel.Debug,
+        new EventId(0b0_0010_0001, "Start Handle Looper Message"),
+        "Start handle Looper message: {LooperMsgName}"
+    )
+
+    type LoggerExtensions () =
+        [<Extension>]
+        static member LogStartHandleMessage(logger: ILogger, looperMsgName: string) =
+            loggerMessage.Invoke(logger, looperMsgName, null)
+
+[<AutoOpen>]
+module private LooperStateUpdated =
+    let private loggerMessageTrace = LoggerMessage.Define<string>(
+        LogLevel.Trace,
+        new EventId(0b0_0001_0010, "Looper State Updated"),
+        "Looper state updated: {NewLooperState}"
+    )
+
+    let private loggerMessage = LoggerMessage.Define(
+        LogLevel.Trace,
+        new EventId(0b0_0001_0010, "Looper State Updated"),
+        "Looper state updated"
+    )
+
+    type LoggerExtensions () =
+        [<Extension>]
+        static member LogLooperStateUpdated(logger: ILogger, state: State) =
+            if logger.IsEnabled(LogLevel.Trace) then
+                loggerMessageTrace.Invoke(
+                    logger,
+                    (JsonHelpers.Serialize state),
+                    null
+                )
+            else
+                loggerMessage.Invoke(logger, null)
 
 
 /// 1. Start looper
@@ -45,47 +108,12 @@ type Looper(
     let now () =
         timeProvider.GetLocalNow().DateTime
 
-    let defaultState () =
-        {
-            ActiveTimePoint = None
-            StartTime = now ()
-            Subscribers = []
-            IsStopped = false
-        }
-
-    let startHandleMessage =
-        LoggerMessage.Define<string>(
-            LogLevel.Debug,
-            new EventId(0b0_0010_0001, "Start Handle Looper Message"),
-            "Start handle Looper message: {LooperMsgName}"
-        )
-
-    let logStartHandle (scopeName: string) =
-        startHandleMessage.Invoke(logger, scopeName, null)
-
-    let messageScope =
-        LoggerMessage.DefineScope<string>(
-            "Scope of Looper message: {LooperMsgName}"
-        )
-
-    let beginScope (scopeName: string) =
-        let scope = messageScope.Invoke(logger, scopeName)
-        logStartHandle scopeName
+    let beginScope (looperMsgName: string) =
+        let scope = logger.BeginMessageScope(looperMsgName)
+        logger.LogStartHandleMessage(looperMsgName)
         scope
 
-    let newStateMessage =
-        LoggerMessage.Define<string>(
-            LogLevel.Trace,
-            new EventId(0b0_0001_0010, "New Looper State"),
-            "New Looper State: {NewLooperState}"
-        )
-
-    let logNewState (state: State) =
-        if logger.IsEnabled(LogLevel.Trace) then
-            let stateJson = JsonHelpers.Serialize(state)
-            newStateMessage.Invoke(logger, stateJson, null)
-
-    let invoker = new MailboxProcessor<Choice<Async<unit> list, unit>>(
+    let notifierAgent = new MailboxProcessor<Choice<Async<unit> list, unit>>(
         (fun inbox ->
             let rec loop () =
                 async {
@@ -109,7 +137,7 @@ type Looper(
 
     let tryPostEvent (state: State) event =
         if state.Subscribers |> (not << List.isEmpty) then
-            invoker.Post(Choice1Of2 (state.Subscribers |> List.map (fun f -> f event)))
+            notifierAgent.Post(Choice1Of2 (state.Subscribers |> List.map (fun f -> f event)))
 
     let initialize (state: State) =
         let nextTpOpt =
@@ -120,9 +148,7 @@ type Looper(
                     timePointQueue.TryGetNext()
                 else
                     nextTp |> Some
-            | Some nextTp, None ->
-                nextTp |> Some
-            | None, _ -> None
+            | nextTp, _ -> nextTp
 
         let dt = now ()
 
@@ -134,7 +160,7 @@ type Looper(
                 |> Option.map (fun t -> (t, None))
                 |> Option.defaultValue (nextTp, state.ActiveTimePoint)
 
-            tryPostEvent state (LooperEvent.TimePointStarted (newAtp, oldAtp))
+            tryPostEvent state (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init newAtp newAtp oldAtp))
             timer.Change(int tickMilliseconds, 0) |> ignore
             { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
 
@@ -167,7 +193,7 @@ type Looper(
 
                         let tpOpt = timePointQueue.TryPick()
                         tpOpt
-                        |> Option.iter (fun atp -> LooperEvent.TimePointStarted (atp, None) |> tryPostEvent)
+                        |> Option.iter (fun atp -> LooperEvent.TimePointStarted (TimePointStartedEventArgs.init atp atp None) |> tryPostEvent)
 
                         scope.Dispose()
                         return! loop { state with ActiveTimePoint = tpOpt }
@@ -201,7 +227,7 @@ type Looper(
 
                             | Some tp ->
                                 let newAtp = { tp with TimeSpan = tp.TimeSpan + atp.TimeSpan }
-                                tryPostEvent (LooperEvent.TimePointStarted (newAtp, atp |> Some))
+                                tryPostEvent (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init tp newAtp (atp |> Some)))
                                 timer.Change(int tickMilliseconds, 0) |> ignore
                                 return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
                         else
@@ -232,10 +258,14 @@ type Looper(
                         scope.Dispose()
                         return! loop newState
 
+                    | GetActiveTimePoint reply ->
+                        reply.Reply(state.ActiveTimePoint)
+                        return! loop state
+
                     | _ -> return! loop state
                 }
 
-            loop (defaultState ())
+            loop (State.init timeProvider)
         )
         , defaultArg cancellationToken CancellationToken.None
     )
@@ -258,7 +288,7 @@ type Looper(
                     )
 
             timePointQueue.Start()
-            invoker.Start()
+            notifierAgent.Start()
             agent.Start()
             do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
             agent.Post(Stop)
@@ -292,15 +322,18 @@ type Looper(
     member _.Stop() =
         agent.Post(Stop)
 
+    member _.GetActiveTimePoint() =
+        agent.PostAndReply(Msg.GetActiveTimePoint)
+
     member private _.Dispose(isDisposing: bool) =
         if _isDisposed then ()
         else
             if isDisposing then
                 timer.Dispose()
                 agent.Post(Stop)
-                invoker.Post(() |> Choice2Of2)
+                notifierAgent.Post(() |> Choice2Of2)
                 (agent :> IDisposable).Dispose()
-                (invoker :> IDisposable).Dispose()
+                (notifierAgent :> IDisposable).Dispose()
                 timePointQueue.Dispose()
 
             _isDisposed <- true
@@ -314,7 +347,10 @@ type Looper(
         member this.ShiftAck(seconds: float<sec>) = this.ShiftAck(seconds)
         member this.Resume() = this.Resume()
         member this.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) = this.AddSubscriber(subscriber)
+        /// Tryes to pick TimePoint from queue, if it present
+        /// emits TimePointStarted event and sets ActiveTimePoint.
         member this.PreloadTimePoint() = this.PreloadTimePoint()
+        member this.GetActiveTimePoint() = this.GetActiveTimePoint()
 
     interface IDisposable with
         member this.Dispose() = this.Dispose(true)

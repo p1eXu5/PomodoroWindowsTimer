@@ -37,7 +37,14 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Testin
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.fsproj", "{AB7600E3-341C-4E01-B483-F46FBE8BD480}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.Exporter.Excel", "src\PomodoroWindowsTimer.Exporter.Excel\PomodoroWindowsTimer.Exporter.Excel.csproj", "{21A6B3B7-FCD1-4D6E-882F-F892A08A336F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PomodoroWindowsTimer.Exporter.Excel", "src\PomodoroWindowsTimer.Exporter.Excel\PomodoroWindowsTimer.Exporter.Excel.csproj", "{21A6B3B7-FCD1-4D6E-882F-F892A08A336F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A27FA8E1-2727-4FF9-8698-01526ADDD01C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{AD2A9CDD-A5BE-4D9B-BCD3-5EF538CF2EE0}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,6 +113,8 @@ Global
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31} = {1896E5C8-A5DF-4A76-905B-E4ADB313ADEF}
 		{AB7600E3-341C-4E01-B483-F46FBE8BD480} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 		{21A6B3B7-FCD1-4D6E-882F-F892A08A336F} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
+		{A27FA8E1-2727-4FF9-8698-01526ADDD01C} = {E3B48FA2-00B4-4035-BBA2-D89F6E3F505D}
+		{AD2A9CDD-A5BE-4D9B-BCD3-5EF538CF2EE0} = {A27FA8E1-2727-4FF9-8698-01526ADDD01C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FEFD379F-4D9B-4063-82CF-15AF19AF2B11}

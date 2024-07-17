@@ -37,7 +37,7 @@ let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: 
 let rec ``Play msg has been dispatched with 2.5 ticks timeout`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Play |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Play |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "Play" ((=) msg)
     }
@@ -46,7 +46,7 @@ let rec ``Play msg has been dispatched with 2.5 ticks timeout`` () =
 let rec ``Play msg has been dispatched`` (times: int<times>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Play |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Play |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.Dispatch(msg)
         do! Scenario.msgDispatchedWithin2SecT "Play" times ((=) msg)
     }
@@ -56,7 +56,7 @@ let rec ``Play msg has been dispatched`` (times: int<times>) =
 let rec ``Stop msg has been dispatched with 2.5 ticks timeout`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Stop |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Stop |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "Stop" ((=) msg)
     }
@@ -65,7 +65,7 @@ let rec ``Stop msg has been dispatched with 2.5 ticks timeout`` () =
 let rec ``Stop msg has been dispatched`` (times: int<times>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Stop |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Stop |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.Dispatch(msg)
         do! Scenario.msgDispatchedWithin2SecT "Stop" times ((=) msg)
     }
@@ -75,7 +75,7 @@ let rec ``Stop msg has been dispatched`` (times: int<times>) =
 let rec ``Resume msg has been dispatched with 2.5 ticks timeout`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Resume |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Resume |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "Resume" ((=) msg)
     }
@@ -84,7 +84,7 @@ let rec ``Resume msg has been dispatched with 2.5 ticks timeout`` () =
 let rec ``Resume msg has been dispatched`` (times: int<times>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Resume |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Resume |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.Dispatch(msg)
         do! Scenario.msgDispatchedWithin2SecT "Resume" times ((=) msg)
     }
@@ -94,7 +94,7 @@ let rec ``Resume msg has been dispatched`` (times: int<times>) =
 let rec ``Next msg has been dispatched`` (times: int<times>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Next |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Next |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.Dispatch(msg)
         do! Scenario.msgDispatchedWithin2SecT "Next" times ((=) msg)
     }
@@ -103,7 +103,7 @@ let rec ``Next msg has been dispatched`` (times: int<times>) =
 let rec ``Next msg has been dispatched with 2.5 ticks timeout`` (times: int<times>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Next |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Next |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2SecT "Next" times ((=) msg)
     }
@@ -112,7 +112,7 @@ let rec ``Next msg has been dispatched with 2.5 ticks timeout`` (times: int<time
 let rec ``Replay msg has been dispatched with 2.5 ticks timeout`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.Replay |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.Replay |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "Replay" ((=) msg)
     }
@@ -122,10 +122,13 @@ let rec ``Replay msg has been dispatched with 2.5 ticks timeout`` () =
 let rec ``StartTimePoint msg has been dispatched with 2.5 ticks timeout`` (timePointId: Guid) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.Msg.StartTimePoint (Operation.Start timePointId)
+        let msg = MainModel.Msg.StartTimePoint timePointId
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec $"Start StartTimePoint {timePointId}" ((=) msg)
-        do! Scenario.msgDispatchedWithin2Sec $"Finish StartTimePoint {timePointId}" ((=) (MainModel.Msg.StartTimePoint (Operation.Finish ())))
+        do!
+            Scenario.msgDispatchedWithin2Sec
+                $"Finish StartTimePoint {timePointId}"
+                ((=) (MainModel.Msg.PlayerModelMsg (PlayerModel.Msg.StartTimePoint (Operation.Finish ()))))
     }
     |> Scenario.log $"When.``{nameof ``Play msg has been dispatched with 2.5 ticks timeout``}``"
 
@@ -133,7 +136,7 @@ let rec ``StartTimePoint msg has been dispatched with 2.5 ticks timeout`` (timeP
 let rec ``PreChangeActiveTimeSpan msg has been dispatched`` times =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.PreChangeActiveTimeSpan |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.PreChangeActiveTimeSpan |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2SecT "PreChangeActiveTimeSpan" times ((=) msg)
     }
@@ -142,7 +145,7 @@ let rec ``PreChangeActiveTimeSpan msg has been dispatched`` times =
 let rec ``PostChangeActiveTimeSpan msg has been dispatched`` times =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.PostChangeActiveTimeSpan |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.PostChangeActiveTimeSpan |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2SecT "PostChangeActiveTimeSpan" times ((=) msg)
     }
@@ -151,7 +154,7 @@ let rec ``PostChangeActiveTimeSpan msg has been dispatched`` times =
 let rec ``ActiveTimeSeconds changed to`` (seconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = MainModel.ControllerMsg.ChangeActiveTimeSpan (float seconds) |> MainModel.Msg.ControllerMsg
+        let msg = PlayerModel.Msg.ChangeActiveTimeSpan (float seconds) |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
     }

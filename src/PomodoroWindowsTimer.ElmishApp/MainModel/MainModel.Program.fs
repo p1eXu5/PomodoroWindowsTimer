@@ -2,345 +2,60 @@
 
 open System.Threading
 open Microsoft.Extensions.Logging
+
 open Elmish
 open Elmish.Extensions
+
 open PomodoroWindowsTimer.Types
+
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open PomodoroWindowsTimer.ElmishApp.Logging
+
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
-open PomodoroWindowsTimer.ElmishApp.Logging
-open PomodoroWindowsTimer.Abstractions
-open System
+let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
+    let (playerModel, playerCmd, playerIntent) =
+        model.Player
+        |> updatef (model.CurrentWork |> Option.map _.Work) pmsg
 
-
-let storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (timePoint: TimePoint) =
-    task {
-        let workEvent =
-            match timePoint.Kind with
-            | Kind.Break
-            | Kind.LongBreak ->
-                (time, timePoint.Name) |> WorkEvent.BreakStarted
-            | Kind.Work ->
-                (time, timePoint.Name) |> WorkEvent.WorkStarted
-
-        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
-
-        match res with
-        | Ok _ -> ()
-        | Error err -> raise (InvalidOperationException(err))
-    }
-
-let storeStoppedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (_: TimePoint) =
-    task {
-        let workEvent =
-            time |> WorkEvent.Stopped
-
-        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
-
-        match res with
-        | Ok _ -> ()
-        | Error err -> raise (InvalidOperationException(err))
-    }
-
-let storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (offset: TimeSpan) =
-    task {
-        let workEvent =
-            WorkEvent.WorkReduced (time, offset)
-
-        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
-
-        match res with
-        | Ok _ -> ()
-        | Error err -> raise (InvalidOperationException(err))
-    }
-
-let storeBreakIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (offset: TimeSpan) =
-    task {
-        let workEvent =
-            WorkEvent.BreakIncreased (time, offset)
-
-        let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
-
-        match res with
-        | Ok _ -> ()
-        | Error err -> raise (InvalidOperationException(err))
-    }
-
-let updateOnWindowsMsg (cfg: MainModeConfig) (logger: ILogger<MainModel>) (msg: WindowsMsg) (model: MainModel) =
-    match msg with
-    | WindowsMsg.MinimizeAllRestoreApp when not model.IsMinimized ->
-        { model with IsMinimized = true }
-        , Cmd.OfTask.either cfg.WindowsMinimizer.MinimizeAllRestoreAppWindowAsync () (fun _ -> WindowsMsg.SetIsMinimized true |> Msg.WindowsMsg) Msg.OnExn
-
-    | WindowsMsg.RestoreAllMinimized when model.IsMinimized ->
-        { model with IsMinimized = false }
-        , Cmd.OfFunc.either cfg.WindowsMinimizer.RestoreAllMinimized () (fun _ -> WindowsMsg.SetIsMinimized false |> Msg.WindowsMsg) Msg.OnExn
-
-    | WindowsMsg.RestoreAppWindow ->
-        model, Cmd.OfFunc.attempt cfg.WindowsMinimizer.RestoreAppWindow () Msg.OnExn
-
-    | WindowsMsg.SetIsMinimized v ->
-        { model with IsMinimized = v }, Cmd.none
-
-    | _ ->
-        logger.LogUnprocessedMessage(msg, model)
-        model, Cmd.none
-
-
-let updateOnPlayerMsg
-    (cfg: MainModeConfig)
-    (logger: ILogger<MainModel>)
-    (msg: ControllerMsg)
-    (model: MainModel)
-    =
-    let storeStartedWorkEventTask =
-        storeStartedWorkEventTask cfg.WorkEventRepository
-
-    let storeStoppedWorkEventTask =
-        storeStoppedWorkEventTask cfg.WorkEventRepository
-
-    let storeWorkReducedEventTask =
-        storeWorkReducedEventTask cfg.WorkEventRepository
-
-    let storeBreakIncreasedEventTask =
-        storeBreakIncreasedEventTask cfg.WorkEventRepository
-
-    match msg with
-    | ControllerMsg.Next ->
-        cfg.Looper.Next()
-        model |> withLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
-
-    | ControllerMsg.Play ->
-        cfg.Looper.Next()
-        model |> withLooperState Playing |> setLastAtpWhenLooperNextWasCalled, Cmd.none
-
-    | ControllerMsg.Resume when model.ActiveTimePoint |> Option.isSome && model.LooperState = LooperState.Stopped ->
-        let time = cfg.TimeProvider.GetUtcNow()
-        cfg.Looper.Resume() // next looper event is TimePointReduced
-
-        let model = model |> withLooperState Playing
-
-        model
+    match playerIntent with
+    | PlayerModel.Intent.None ->
+        model |> withPlayerModel playerModel
+        , Cmd.map Msg.PlayerModelMsg playerCmd
+    | PlayerModel.Intent.ShowRollbackDialog (workId, time, diff) ->
+        model |> withPlayerModel playerModel
         , Cmd.batch [
-            match model.CurrentWork with
-            | Some work ->
-                Cmd.OfTask.attempt (storeStartedWorkEventTask work.Work.Id time) model.ActiveTimePoint.Value Msg.OnExn
-            | _ ->
-                Cmd.none
-
-            match model.ActiveTimePoint.Value with
-            | { Kind = Kind.Break } when not model.IsMinimized ->
-                Cmd.ofMsg (WindowsMsg.MinimizeAllRestoreApp |> Msg.WindowsMsg)
-            | { Kind = Kind.Work } when model.IsMinimized ->
-                Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
-            | _ ->
-                Cmd.none
+            Cmd.map Msg.PlayerModelMsg playerCmd
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workId, time, diff)))
         ]
 
-    | ControllerMsg.Stop when model.LooperState = LooperState.Playing ->
-        cfg.Looper.Stop()
-        let time = cfg.TimeProvider.GetUtcNow()
-        model |> withLooperState Stopped
-        , Cmd.batch [
-            Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
-            Cmd.ofMsg (WindowsMsg.RestoreAppWindow |> Msg.WindowsMsg)
+let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =
+    let (tplModel) = model.TimePointList |> TimePointListModel.Program.update tplMsg
+    model |> withTimePointListModel tplModel |> withCmdNone
 
-            match model.CurrentWork, model.ActiveTimePoint with
-            | Some work, Some tp ->
-                Cmd.OfTask.attempt (storeStoppedWorkEventTask work.Work.Id time) tp Msg.OnExn
-            | _ ->
-                Cmd.none
-        ]
-
-    | ControllerMsg.Replay when model.ActiveTimePoint |> Option.isSome ->
-        let cmd =
-            Cmd.batch [
-                Cmd.ofMsg (ControllerMsg.PreChangeActiveTimeSpan |> Msg.ControllerMsg);
-                Cmd.ofMsg (ControllerMsg.ChangeActiveTimeSpan 0.0 |> Msg.ControllerMsg);
-                Cmd.ofMsg (ControllerMsg.PostChangeActiveTimeSpan |> Msg.ControllerMsg);
-                if model.LooperState = LooperState.Stopped then
-                    Cmd.ofMsg (ControllerMsg.Resume |> Msg.ControllerMsg);
-            ]
-        model, cmd
-
-    | ControllerMsg.LooperMsg evt ->
-        match evt with
-        | LooperEvent.TimePointTimeReduced tp ->
-            model
-            |> withActiveTimePoint (tp |> Some)
-            |> withNoneLastAtpWhenLooperNextIsCalled
-            , Cmd.none
-
-        | LooperEvent.TimePointStarted (nextTp, oldTp) ->
-            let time = cfg.TimeProvider.GetUtcNow()
-            let model =
-                model
-                |> withActiveTimePoint (nextTp |> Some)
-                |> withNoneLastAtpWhenLooperNextIsCalled
-
-            let switchThemeCmd = Cmd.OfFunc.attempt cfg.ThemeSwitcher.SwitchTheme (model |> timePointKindEnum) Msg.OnExn
-
-            let storeStartedWorkEventCmd =
-                match model.CurrentWork, model.LooperState with
-                | Some work, LooperState.Playing ->
-                    Cmd.OfTask.attempt (storeStartedWorkEventTask work.Work.Id time) nextTp Msg.OnExn
-                | _ ->
-                    Cmd.none
-
-            match nextTp.Kind with
-            | LongBreak
-            | Break when model.LooperState <> LooperState.Playing ->
-                model, switchThemeCmd
-
-            | LongBreak
-            | Break when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Break || oldTp.Value.Kind = Kind.LongBreak) ->
-                model
-                , Cmd.batch [
-                    storeStartedWorkEventCmd
-                ]
-
-            | LongBreak
-            | Break ->
-                model
-                , Cmd.batch [
-                    switchThemeCmd;
-                    storeStartedWorkEventCmd
-                    Cmd.ofMsg (WindowsMsg.MinimizeAllRestoreApp |> Msg.WindowsMsg)
-                ]
-
-            // initialized
-            | Work when model.LooperState <> LooperState.Playing ->
-                model, switchThemeCmd
-
-            // do not send a notification if the user manually presses the Next button or the Play button
-            | Work when isLastAtpWhenLooperNextWasCalled oldTp model || oldTp |> Option.isNone ->
-                model
-                , Cmd.batch [
-                    switchThemeCmd;
-                    storeStartedWorkEventCmd
-                    Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg)
-                ]
-
-            | Work when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Work) ->
-                model
-                , Cmd.batch [
-                    storeStartedWorkEventCmd
-                    Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
-                ]
-
-            | Work ->
-                model
-                , Cmd.batch [
-                    switchThemeCmd;
-                    storeStartedWorkEventCmd
-                    Cmd.ofMsg (WindowsMsg.RestoreAllMinimized |> Msg.WindowsMsg);
-                    Cmd.ofMsg (Msg.SendToChatBot $"It's time to {nextTp.Name}!!")
-                ]
-
-    // --------------------
-    // Active time changing
-    // --------------------
-    | ControllerMsg.PreChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
-
-        match model.LooperState with
-        | Playing ->
-            cfg.Looper.Stop()
-            let time = cfg.TimeProvider.GetUtcNow()
-            model |> withPreShiftActiveTimePointTimeSpan
-            , Cmd.batch [
-                if model.CurrentWork |> Option.isSome then
-                    Cmd.OfTask.attempt (storeStoppedWorkEventTask model.CurrentWork.Value.Id time) model.ActiveTimePoint.Value Msg.OnExn
-            ]
-        | _ ->
-            { model with LooperState = TimeShiftingAfterNotPlaying model.LooperState }, Cmd.none
-
-    | ControllerMsg.ChangeActiveTimeSpan v when model.ActiveTimePoint |> Option.isSome ->
-        let duration = model |> getActiveTimeDuration
-        let shiftTime = (duration - v) * 1.0<sec>
-        cfg.Looper.Shift(shiftTime)
-
-        model |> withShiftTime shiftTime |> withCmdNone
-
-    | ControllerMsg.PostChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
-        // TODO: check model.ShiftTime and ActiveTimePoint
-        match model.LooperState with
-        | TimeShiftingAfterNotPlaying s ->
-            model |> withLooperState s |> withoutShiftAndPreShiftTimes |> withCmdNone
-        | _ ->
-            let time = cfg.TimeProvider.GetUtcNow()
-            cfg.Looper.Resume()
-
-            let atp = model.ActiveTimePoint.Value
-            let rollbackWorkStrategy = cfg.UserSettings.RollbackWorkStrategy
-
-            let cmds = [
-                if model.CurrentWork |> Option.isSome then
-                    Cmd.OfTask.attempt (storeStartedWorkEventTask model.CurrentWork.Value.Id time) atp Msg.OnExn
-            ]
-
-            if atp.Kind = Kind.Work && model.NewActiveTimeSpan > model.PreShiftActiveTimeSpan && model.CurrentWork |> Option.isSome then
-                let diff = TimeSpan.FromSeconds(float (model.NewActiveTimeSpan - model.PreShiftActiveTimeSpan))
-                match rollbackWorkStrategy with
-                | RollbackWorkStrategy.SubstractWorkAddBreak ->
-                    model |> withoutShiftAndPreShiftTimes
-                    , Cmd.batch [
-                        Cmd.OfTask.attempt (storeWorkReducedEventTask model.CurrentWork.Value.Id (time.AddMilliseconds(-2))) diff Msg.OnExn
-                        Cmd.OfTask.attempt (storeBreakIncreasedEventTask model.CurrentWork.Value.Id (time.AddMilliseconds(-1))) diff Msg.OnExn
-                        yield! cmds
-                    ]
-                | RollbackWorkStrategy.UserChoiceIsRequired ->
-                    model |> withoutShiftAndPreShiftTimes
-                    , Cmd.batch [
-                        Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (model.CurrentWork.Value.Id, time, diff)))
-                        yield! cmds
-                    ]
-                | RollbackWorkStrategy.Default ->
-                    model |> withoutShiftAndPreShiftTimes
-                    , Cmd.batch cmds
-
-            else
-                model |> withoutShiftAndPreShiftTimes
-                , Cmd.batch cmds
-    | _ ->
-        logger.LogUnprocessedMessage(msg, model)
-        model, Cmd.none
-
+let private chain f (model, cmd) =
+    let (model', cmd') = f model
+    model', Cmd.batch [ cmd; cmd' ]
 
 let update
     (cfg: MainModeConfig)
+    (workEventStore: WorkEventStore)
     updateWorkModel
     updateAppDialogModel
     updateWorkSelectorModel
     initWorkStatisticListModel
     updateDailyStatisticListModel
+    updatePlayerModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     (msg: Msg)
     (model: MainModel)
     =
-    let updateOnPlayerMsg = updateOnPlayerMsg cfg
-    let updateOnWindowsMsg = updateOnWindowsMsg cfg
-
-    let storeStartedWorkEventTask =
-        storeStartedWorkEventTask cfg.WorkEventRepository
-
-    let storeStoppedWorkEventTask =
-        storeStoppedWorkEventTask cfg.WorkEventRepository
 
     match msg with
-    // --------------------
-    // Flags
-    // --------------------
-    | Msg.SetDisableSkipBreak v ->
-        cfg.DisableSkipBreakSettings.DisableSkipBreak <- v
-        { model with DisableSkipBreak = v }, Cmd.none
-
-    | Msg.SetDisableMinimizeMaximizeWindows v ->
-        { model with DisableMinimizeMaximizeWindows = v }, Cmd.none
-
     // --------------------
     // Time Points
     // --------------------
@@ -354,7 +69,8 @@ let update
         let timePoints = cfg.TimePointStore.Read()
         cfg.TimePointQueue.Reload(timePoints)
         cfg.Looper.PreloadTimePoint()
-        { model with TimePoints = timePoints }, Cmd.none
+        
+        model |> withInitTimePointListModel timePoints |> withCmdNone
 
     | Msg.LoadTimePoints timePoints ->
         cfg.Looper.Stop()
@@ -362,18 +78,35 @@ let update
         cfg.TimePointStore.Write(timePoints)
         cfg.Looper.PreloadTimePoint()
 
-        { model with TimePoints = timePoints }
-        , Cmd.none
+        model |> withInitTimePointListModel timePoints |> withCmdNone
 
-    | Msg.StartTimePoint (Operation.Start id) ->
-        model
-        , Cmd.batch [
-            Cmd.ofMsg (ControllerMsg.Stop |> Msg.ControllerMsg);
-            Cmd.OfFunc.either cfg.TimePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn
-        ]
+    | Msg.TimePointListModelMsg smsg ->
+        model |> withUpdatedTimePointListModel TimePointListModel.Program.update smsg
 
-    | Msg.StartTimePoint (Operation.Finish _) ->
-        model, Cmd.ofMsg (ControllerMsg.Play |> Msg.ControllerMsg)
+    | Msg.StartTimePoint tpId ->
+        model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
+
+    | Msg.PlayStopCommand _ ->
+        model, Cmd.ofMsg (model.Player |> PlayerModel.Msg.playStopResume |> Msg.PlayerModelMsg)
+
+    | Msg.LooperMsg lmsg ->
+        match lmsg with
+        | LooperMsg.TimePointTimeReduced tp ->
+            model
+            |> withUpdatedPlayerModel
+                updatePlayerModel
+                (PlayerModel.LooperMsg.TimePointTimeReduced tp |> PlayerModel.Msg.LooperMsg)
+
+        | LooperMsg.TimePointStarted args ->
+            model
+            |> withUpdatedPlayerModel
+                updatePlayerModel
+                (PlayerModel.LooperMsg.TimePointStarted args |> PlayerModel.Msg.LooperMsg)
+            |> chain (
+                withUpdatedTimePointListModel
+                    TimePointListModel.Program.update
+                    (TimePointListModel.Msg.SetActiveTimePointId (args.NewActiveTimePoint.Id |> Some))
+            )
 
     // --------------------
     // Work
@@ -425,15 +158,15 @@ let update
         | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
             cfg.CurrentWorkItemSettings.CurrentWork <- workModel.Work |> Some
 
-            if model.LooperState = LooperState.Playing then
+            if model.Player.LooperState = LooperState.Playing then
                 let time = cfg.TimeProvider.GetUtcNow()
                 match model.CurrentWork with
                 | Some currWork when currWork.Id <> workModel.Id ->
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (storeStoppedWorkEventTask currWork.Id (time.AddMilliseconds(-1))) model.ActiveTimePoint.Value Msg.OnExn
-                        Cmd.OfTask.attempt (storeStartedWorkEventTask workModel.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currWork.Id (time.AddMilliseconds(-1))) model.Player.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask workModel.Id time) model.Player.ActiveTimePoint.Value Msg.OnExn
                     ]
                 | Some _ ->
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
@@ -442,24 +175,23 @@ let update
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (storeStartedWorkEventTask workModel.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask workModel.Id time) model.Player.ActiveTimePoint.Value Msg.OnExn
                     ]
             else
                 model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
                 , cmd
 
-
         | WorkSelectorModel.Intent.UnselectCurrentWork ->
             cfg.CurrentWorkItemSettings.CurrentWork <- None
 
-            if model.LooperState = LooperState.Playing then
+            if model.Player.LooperState = LooperState.Playing then
                 match model.CurrentWork with
                 | Some currWork ->
                     let time = cfg.TimeProvider.GetUtcNow()
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (storeStoppedWorkEventTask currWork.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currWork.Id time) model.Player.ActiveTimePoint.Value Msg.OnExn
                     ]
                 | None ->
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
@@ -475,9 +207,8 @@ let update
     // Player, Windows
     // --------------------
 
-    | Msg.ControllerMsg pmsg -> updateOnPlayerMsg logger pmsg model
-
-    | Msg.WindowsMsg wmsg when not model.DisableMinimizeMaximizeWindows -> updateOnWindowsMsg logger wmsg model
+    | Msg.PlayerModelMsg pmsg ->
+        model |> withUpdatedPlayerModel updatePlayerModel pmsg
 
     | Msg.SetIsWorkStatisticShown v ->
         if v then
@@ -502,7 +233,7 @@ let update
     // --------------------
     
     | Msg.SendToChatBot message ->
-        model, Cmd.OfTask.attempt cfg.SendToBot.SendMessage message Msg.OnExn
+        model, Cmd.OfTask.attempt cfg.TelegramBot.SendMessage message Msg.OnExn
 
     | Msg.AppDialogModelMsg smsg ->
         let (m, cmd) = updateAppDialogModel smsg model.AppDialog

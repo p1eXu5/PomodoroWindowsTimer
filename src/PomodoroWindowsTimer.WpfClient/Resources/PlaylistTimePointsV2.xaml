@@ -38,6 +38,7 @@
         <Setter Property="ButtonForeground" Value="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}" />
         <Setter Property="NameForeground" Value="White" />
         <Setter Property="PlayStopCommand" Value="{Binding DataContext.PlayStopCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+        <Setter Property="PlayStopCommandParameter" Value="{Binding Id}" />
     </Style>
 
     <!--  unselected time point  -->

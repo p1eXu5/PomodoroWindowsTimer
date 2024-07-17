@@ -1,32 +1,48 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.MainModel
 
 open Elmish.WPF
-open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.MainModel
-open System
 open Elmish.Extensions
 
-open Elmish.WPF
-open Elmish.Extensions
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
+
+open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Models.MainModel
+
 
 type private Binding = Binding<MainModel, MainModel.Msg>
 
 [<Sealed>]
-type Bindings(title: string, assemblyVersion: string, workStatisticWindowFactory: System.Func<System.Windows.Window>, mainErrorMessageQueue: IErrorMessageQueue, dialogErrorMessageQueue: IErrorMessageQueue) =
+type Bindings(
+    title: string,
+    assemblyVersion: string,
+    workStatisticWindowFactory: System.Func<System.Windows.Window>,
+    mainErrorMessageQueue: IErrorMessageQueue,
+    dialogErrorMessageQueue: IErrorMessageQueue,
+    timePointQueue: ITimePointQueue,
+    looper: ILooper
+) =
     static let props = Utils.bindingProperties typeof<Bindings>
     static let mutable __ = Unchecked.defaultof<Bindings>
-    static member Instance title assemblyVersion (workStatisticWindowFactory: System.Func<System.Windows.Window>) mainErrorMessageQueue dialogErrorMessageQueue =
+    static member Instance
+        title
+        assemblyVersion
+        (workStatisticWindowFactory: System.Func<System.Windows.Window>)
+        mainErrorMessageQueue
+        dialogErrorMessageQueue
+        timePointQueue
+        looper
+        =
         if System.Object.ReferenceEquals(__, null) then
-            __ <- Bindings(title, assemblyVersion, workStatisticWindowFactory, mainErrorMessageQueue, dialogErrorMessageQueue)
+            __ <- Bindings(title, assemblyVersion, workStatisticWindowFactory, mainErrorMessageQueue, dialogErrorMessageQueue, timePointQueue, looper)
             __
         else __
 
-    static member ToList title assemblyVersion (workStatisticWindowFactory: System.Func<System.Windows.Window>) mainErrorMessageQueue dialogErrorMessageQueue =
+    static member ToList title assemblyVersion (workStatisticWindowFactory: System.Func<System.Windows.Window>) mainErrorMessageQueue dialogErrorMessageQueue timePointQueue looper =
         Utils.bindings<Binding>
-            (Bindings.Instance title assemblyVersion workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue)
+            (Bindings.Instance title assemblyVersion workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue timePointQueue looper)
             props
 
     member val Title : Binding =
@@ -39,117 +55,42 @@ type Bindings(title: string, assemblyVersion: string, workStatisticWindowFactory
         nameof __.ErrorMessageQueue |> Binding.oneWay (fun _ -> mainErrorMessageQueue)
 
     // -------------------------------------------------------------
-    member val LooperIsRunning : Binding =
-        nameof __.LooperIsRunning |> Binding.oneWay isLooperStateIsNotInitialized
-
-    member val IsPlaying : Binding =
-        nameof __.IsPlaying |> Binding.oneWay isPlaying
-
-    member val PlayPauseButtonText : Binding =
-        nameof __.PlayPauseButtonText
-            |> Binding.oneWay (fun m ->
-                match m.LooperState with
-                | TimeShiftingAfterNotPlaying _
-                | Initialized -> "Play"
-                | Playing -> "Stop"
-                | Stopped -> "Resume"
-            )
-
-    member val PlayStopCommand : Binding =
-        nameof __.PlayStopCommand
-            |> Binding.cmd (fun m ->
-                match m.LooperState with
-                | TimeShiftingAfterNotPlaying _
-                | Initialized -> ControllerMsg.Play |> Msg.ControllerMsg
-                | Playing -> ControllerMsg.Stop |> Msg.ControllerMsg
-                | Stopped -> ControllerMsg.Resume |> Msg.ControllerMsg
-            )
-
-    member val NextCommand : Binding =
-        nameof __.NextCommand |> Binding.cmdIf Msg.tryNext
-
-    member val ReplayCommand : Binding =
-        nameof __.ReplayCommand
-            |> Binding.cmdIf (fun m ->
-                match m.LooperState with
-                | Playing
-                | Stopped ->
-                    m.ActiveTimePoint
-                    |> Option.map (fun _ -> ControllerMsg.Replay |> Msg.ControllerMsg)
-                | _ -> None
-            )
-
-    // ----------------------------------------------------- ActiveTimePoint
-    member val ActiveTimePointName : Binding =
-        nameof __.ActiveTimePointName |> Binding.oneWayOpt (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Name))
-
-    member val ActiveTime : Binding =
-        nameof __.ActiveTime |> Binding.oneWay getActiveTimeSpan
-
-    member val ActiveTimeDuration : Binding =
-        nameof __.ActiveTimeDuration |> Binding.oneWay getActiveTimeDuration
-
-    member val ActiveTimeKind : Binding =
-        nameof __.ActiveTimeKind |> Binding.oneWay getActiveTimeKind
-
-    member val IsActiveTimePointSet : Binding =
-        nameof __.IsActiveTimePointSet |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.isSome)
-
-    member val ActiveTimeSeconds : Binding =
-        nameof __.ActiveTimeSeconds |> Binding.twoWay (getActiveSpentTime, (ControllerMsg.ChangeActiveTimeSpan >> Msg.ControllerMsg))
-
-    member val PreChangeActiveTimeSpanCommand : Binding =
-        nameof __.PreChangeActiveTimeSpanCommand |> Binding.cmd (ControllerMsg.PreChangeActiveTimeSpan |> Msg.ControllerMsg)
-
-    member val PostChangeActiveTimeSpanCommand : Binding =
-        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd (ControllerMsg.PostChangeActiveTimeSpan |> Msg.ControllerMsg)
-
-    member val IsBreak : Binding =
-        nameof __.IsBreak
-            |> Binding.oneWay (fun m ->
-                m.ActiveTimePoint
-                |> Option.map (fun tp -> tp.Kind |> function Kind.Break | Kind.LongBreak -> true | _ -> false)
-                |> Option.defaultValue false
-            )
-
-    // ----------------------------------------------------
-    member val TimePoints : Binding =
-        nameof __.TimePoints
-            |> Binding.subModelSeq (
-                (fun m -> m.TimePoints),
-                (fun tp -> tp.Id),
-                (fun () -> [
-                    "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
-                    "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
-                    "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
-                    "KindAlias" |> Binding.oneWay (fun (_, e) -> e.KindAlias |> Alias.value)
-                    "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
-                    "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePoint |> Option.map (fun atp -> atp.Id = e.Id) |> Option.defaultValue false)
-                ])
-            )
+    
+    member val TimePointList : Binding =
+        nameof __.TimePointList
+            |> Binding.SubModel.required (fun () -> TimePointListModel.Bindings.ToList())
+            |> Binding.mapModel _.TimePointList
+            |> Binding.mapMsg Msg.TimePointListModelMsg
 
     member val StartTimePointCommand : Binding =
-        nameof __.StartTimePointCommand |> Binding.cmdParam (fun id -> (id :?> Guid) |> Operation.Start |> Msg.StartTimePoint)
+        nameof __.StartTimePointCommand |> Binding.cmdParam (fun id -> (id :?> System.Guid) |> Msg.StartTimePoint)
 
-    member val MinimizeCommand : Binding =
-        nameof __.MinimizeCommand |> Binding.cmd (WindowsMsg.MinimizeAllRestoreApp |> Msg.WindowsMsg)
+    member val PlayStopCommand : Binding =
+        nameof __.PlayStopCommand |> Binding.cmdParam (fun id -> (id :?> System.Guid) |> Msg.PlayStopCommand)
+
+    member val IsPlaying : Binding =
+        nameof __.IsPlaying |> Binding.oneWay (fun m -> m.Player |> PlayerModel.isPlaying)
+
+    member val ActiveTime : Binding =
+        nameof __.ActiveTime |> Binding.oneWay (fun m -> m.Player |> PlayerModel.getActiveTimeSpan)
+
+    // ----------------------------------------------------
+    /// For the test purpose
+    //member val MinimizeCommand : Binding =
+    //    nameof __.MinimizeCommand |> Binding.cmd (Msg.MinimizeAllRestoreApp)
 
     /// For the test purpose
     member val SendToChatBotCommand : Binding =
         nameof __.SendToChatBotCommand
         |> Binding.cmd (fun m ->
-            match m.ActiveTimePoint with
+            match m.Player.ActiveTimePoint with
             | Some tp ->
                 Msg.SendToChatBot $"It's time to {tp.Name}!!"
             | None ->
                 Msg.SendToChatBot $"It's time!!"
         )
 
-    member val DisableSkipBreak : Binding =
-        nameof __.DisableSkipBreak |> Binding.twoWay (_.DisableSkipBreak, Msg.SetDisableSkipBreak)
-
-    member val DisableMinimizeMaximizeWindows : Binding =
-        nameof __.DisableMinimizeMaximizeWindows |> Binding.twoWay (_.DisableMinimizeMaximizeWindows, Msg.SetDisableMinimizeMaximizeWindows)
+    // ----------------------------------------------------
 
     member val IsTimePointsShown : Binding =
         nameof __.IsTimePointsShown |> Binding.twoWay (_.IsTimePointsShown, Msg.SetIsTimePointsShown)
@@ -195,6 +136,11 @@ type Bindings(title: string, assemblyVersion: string, workStatisticWindowFactory
                 isModal = false
             )
 
+    member val Player : Binding =
+        nameof __.Player
+            |> Binding.SubModel.required (PlayerModel.Bindings.ToList)
+            |> Binding.mapModel _.Player
+            |> Binding.mapMsg Msg.PlayerModelMsg
 
 (*
 let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> list =
