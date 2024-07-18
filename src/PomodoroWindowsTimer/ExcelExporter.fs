@@ -237,10 +237,10 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                     | [] -> []
                     | _ ->
                         List.scanBack (fun (curr: ExcelRow) (prev: ExcelRow) ->
-                            let mutable curr = (curr |> round)
-                            while (curr |> ExcelRow.endTimeOnly) < (prev |> ExcelRow.endTimeOnly) do
-                                curr <- curr |> ExcelRow.addTime (TimeSpan.FromMinutes(5))
-                            curr
+                            let mutable curr' = (curr |> round)
+                            while (curr' |> ExcelRow.endTimeOnly) < (prev |> ExcelRow.endTimeOnly) do
+                                curr' <- curr' |> ExcelRow.addTime (TimeSpan.FromMinutes(5))
+                            curr'
                         ) rows fakeStartRow
                         |> List.rev
                         |> List.tail

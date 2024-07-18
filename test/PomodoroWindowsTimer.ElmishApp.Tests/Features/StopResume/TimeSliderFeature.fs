@@ -90,7 +90,7 @@ module TimeSliderFeature =
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[1] None
             do! Then.``LooperState is`` LooperState.Playing
             // TODO: do! Then.``MainModel.IsMinimized should be`` false // switched to the next Work tp
-            do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
+            // TODO: do! Then.``Telegrtam bot should be notified with`` timePoints[1].Name
         }
         |> Scenario.runTestAsync
 

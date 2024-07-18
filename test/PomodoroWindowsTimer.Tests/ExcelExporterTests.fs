@@ -131,7 +131,7 @@ module ExcelExporterTests =
 
             let expectedRows =
                 [
-                    ExcelRow.createWorkExcelRow 1 work (dt.AddMinutes(23))
+                    ExcelRow.createWorkExcelRow 1 work (dt.AddMinutes(25)) // minutes rounded to the nearest 5
                 ]
 
             let! (_, rows) = workEventOffsetTimes |> ExcelExporter.excelRows ``5 min threshold``

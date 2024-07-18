@@ -107,6 +107,7 @@ let rec ``Theme should been switched with`` (timePointKind: TimePointKind) (time
         themeSwitcher.Received(int times).SwitchTheme(timePointKind)
     }
 
+// TODO: replace with mock check
 let ``Telegrtam bot should be notified with`` (timePointName: string) =
     scenario {
         let! (sut: ISut) = Scenario.getState
