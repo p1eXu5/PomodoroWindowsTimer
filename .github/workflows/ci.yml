@@ -1,37 +1,32 @@
-name: testing
+.windows_runners:
+  tags: [shared-windows, windows, windows-1809]
+  before_script:
+    - cd MyProject.MyProject
 
-on:
-  push:
-    branches:
-      - '**'
+stages:
+  - build
+  - test
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+workflow:
+  rules:
+    - when: always
+  
+build-job:
+  stage: build
+  extends:
+    - .windows_runners
+  script:
+    - dotnet restore
+    - dotnet build
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build solution
-      run: dotnet build --no-restore
-
-    - name: Setup output directory
-      run: mkdir -p ./test-output
-
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=./test-output/test-results.trx"
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: ./test-output
+test:
+  stage: test
+  extends:
+    - .windows_runners
+  script:
+    - 'dotnet test --logger "html;LogFileName=test-results.html;MethodFormat=Class;FailureBodyFormat=Verbose"'
+  artifacts:
+    when: always
+    paths:
+      - $CI_PROJECT_DIR\**\test-results.html
+    expire_in: 1 week
