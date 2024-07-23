@@ -182,19 +182,33 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
 
                 | WorkEvent.WorkIncreased (_, v), _
                 | WorkEvent.BreakIncreased (_, v), _ ->
-                    rows
-                    |> increaseTime currWork startDt v
-                    |> Result.map (fun rs ->
-                        (rs, last)
-                    )
+                    if v < TimeSpan.Zero then
+                        rows
+                        |> reduceTime currWork startDt -v
+                        |> Result.map (fun rs ->
+                           (rs, last)
+                        )
+                    else
+                        rows
+                        |> increaseTime currWork startDt v
+                        |> Result.map (fun rs ->
+                            (rs, last)
+                        )
 
                 | WorkEvent.WorkReduced (_, v), _
                 | WorkEvent.BreakReduced (_, v), _ ->
-                   rows
-                    |> reduceTime currWork startDt v
-                    |> Result.map (fun rs ->
-                       (rs, last)
-                    )
+                    if v < TimeSpan.Zero then
+                        rows
+                        |> increaseTime currWork startDt -v
+                        |> Result.map (fun rs ->
+                            (rs, last)
+                        )
+                    else
+                        rows
+                        |> reduceTime currWork startDt v
+                        |> Result.map (fun rs ->
+                           (rs, last)
+                        )
 
                 | _ -> Error $"Not implemented. Current: {curr}, Last: {last}"
 
