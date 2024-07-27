@@ -22,6 +22,11 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
+    - name: Generate appsettings.<env>.json
+      run: |
+        cp src/PomodoroWindowsTimer.WpfClient/appsettings.Development.template.json src/PomodoroWindowsTimer.WpfClient/appsettings.Development.json
+        cp src/PomodoroWindowsTimer.WpfClient/appsettings.Production.template.json src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
+
     - name: Build
       run: dotnet build --configuration Release
       env:
