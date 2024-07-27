@@ -85,6 +85,7 @@ type Work =
         Title: string
         CreatedAt: DateTimeOffset
         UpdatedAt: DateTimeOffset
+        LastEventCreatedAt: DateTimeOffset option
     }
 
 type WorkEvent =

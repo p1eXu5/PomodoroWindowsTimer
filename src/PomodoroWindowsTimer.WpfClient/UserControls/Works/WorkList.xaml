@@ -16,126 +16,31 @@
              >
     <DockPanel Grid.IsSharedSizeScope="True">
         <!--  `SELECTED WORK` title. It's not shown if there is no any selected work  -->
-        <materialDesign:ColorZone DockPanel.Dock="Top"
-                                  Padding="0"
-                                  materialDesign:ElevationAssist.Elevation="Dp0"
-                                  Mode="Custom"
-                                  Visibility="{Binding ElementName=m_Root,
-                                                       Path=DataContext.HasSelectedWork,
-                                                       Converter={StaticResource conv_BooleanToVisibility}}"
-                                  >
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto"
-                                      SharedSizeGroup="PopupGroup"
-                                      />
-                </Grid.ColumnDefinitions>
-
-                <!--  title: SELECTED WORK  -->
-                <TextBlock Grid.Row="0"
-                           Grid.Column="0"
-                           Margin="0,16,0,10"
-                           Text="SELECTED WORK"
-                           TextAlignment="Center"
-                           Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
-                           />
-                <!--  selected work popup menu  -->
-                <materialDesign:PopupBox Grid.Row="0"
-                                         Grid.Column="1"
-                                         Margin="0,0,3,0"
-                                         Padding="0"
-                                         PlacementMode="BottomAndAlignRightEdges"
-                                         StaysOpen="False"
-                                         Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
-                                         >
-                    <StackPanel Orientation="Vertical">
-                        <Button Command="{Binding CreateWorkCommand}"
-                                Content="Create New"
-                                />
-                        <Button Command="{Binding UnselectWorkCommand}"
-                                Content="Unselect"
-                                />
-                    </StackPanel>
-                </materialDesign:PopupBox>
-
-                <!--  selected work  -->
-                <local:SelectedWork Grid.Row="1"
-                                    Grid.ColumnSpan="2"
-                                    DataContext="{Binding SelectedWorkModel}"
-                                    Margin="0,10,0,0"
-                                    Padding="0,0,18,0"
-                                    VerticalAlignment="Center"
-                                    IsSelected="True"
-                                    />
-            </Grid>
-        </materialDesign:ColorZone>
+        <local:SelectedWorkTitle DockPanel.Dock="Top"
+                                 Padding="0"
+                                 Visibility="{Binding ElementName=m_Root,
+                                                      Path=DataContext.HasSelectedWork,
+                                                      Converter={StaticResource conv_BooleanToVisibility}}"
+                                 />
 
         <!--  `SELECT WORK` title. It's not shown if any work is selected  -->
-        <materialDesign:ColorZone DockPanel.Dock="Top"
-                                  Margin="0,2,0,0"
-                                  Padding="0,10,0,10"
-                                  materialDesign:ElevationAssist.Elevation="Dp0"
-                                  Mode="Custom"
-                                  Visibility="{Binding ElementName=m_Root,
-                                                       Path=DataContext.HasSelectedWork,
-                                                       Converter={StaticResource conv_InverseBooleanToVisibility}}"
-                                  >
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto"
-                                      SharedSizeGroup="PopupGroup"
-                                      />
-                </Grid.ColumnDefinitions>
-
-                <!--  title: SELECT WORK  -->
-                <TextBlock Grid.Row="0"
-                           Grid.Column="0"
-                           VerticalAlignment="Center"
-                           Text="SELECT WORK"
-                           TextAlignment="Center"
-                           Visibility="{Binding ElementName=m_Root,
-                                                Path=DataContext.HasSelectedWork,
-                                                Converter={StaticResource conv_InverseBooleanToVisibility}}"
-                           Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
-                           />
-                <materialDesign:PopupBox Grid.Row="0"
-                                         Grid.Column="1"
-                                         Margin="0,0,3,0"
-                                         Padding="0"
-                                         PlacementMode="BottomAndAlignRightEdges"
-                                         StaysOpen="False"
-                                         Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
-                                         >
-                    <Button Command="{Binding CreateWorkCommand}"
-                            Content="Create New"
-                            />
-                </materialDesign:PopupBox>
-            </Grid>
-        </materialDesign:ColorZone>
+        <local:NoSelectedWorkTitle DockPanel.Dock="Top"
+                                   Margin="0,2,0,0"
+                                   Padding="0,10,0,10"
+                                   Visibility="{Binding ElementName=m_Root,
+                                                        Path=DataContext.HasSelectedWork,
+                                                        Converter={StaticResource conv_InverseBooleanToVisibility}}"
+                                   />
 
         <!--  Search TextBox  -->
-        <Grid DockPanel.Dock="Top"
-              Margin="0,10,18,10"
-              VerticalAlignment="Top"
-              >
-            <materialDesign:PackIcon VerticalAlignment="Center"
-                                     Kind="Magnify"
-                                     Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
-                                     />
-            <TextBox MinWidth="200"
-                     Margin="0,5"
-                     Padding="25,0,0,5"
-                     HorizontalAlignment="Stretch"
-                     VerticalAlignment="Bottom"
-                     TextChanged="TextBox_TextChanged"
-                     />
-        </Grid>
+        <local:WorksSearchFilterPanel DockPanel.Dock="Top"
+                                      x:Name="m_WorksSearchFilterPanel"
+                                      DataContext="{Binding}"
+                                      Margin="0,10,18,10"
+                                      VerticalAlignment="Top"
+                                      SearchTextChanged="WorksSearchFilterPanel_TextChanged"
+                                      CountChanged="WorksSearchFilterPanel_CountChanged"
+                                      />
 
         <!--  Work List  -->
         <Border Margin="0,0,0,1"

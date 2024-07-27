@@ -28,7 +28,7 @@ module WorkEventStore =
                 | Kind.Work ->
                     (time, timePoint.Name) |> WorkEvent.WorkStarted
 
-            let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
             match res with
             | Ok _ -> ()
@@ -40,7 +40,7 @@ module WorkEventStore =
             let workEvent =
                 time |> WorkEvent.Stopped
 
-            let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
             match res with
             | Ok _ -> ()
@@ -52,7 +52,7 @@ module WorkEventStore =
             let workEvent =
                 WorkEvent.WorkReduced (time, offset)
 
-            let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
             match res with
             | Ok _ -> ()
@@ -64,7 +64,7 @@ module WorkEventStore =
             let workEvent =
                 WorkEvent.BreakIncreased (time, offset)
 
-            let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
             match res with
             | Ok _ -> ()

@@ -1,210 +1,304 @@
-﻿module PomodoroWindowsTimer.Storage.WorkEventRepository
+﻿namespace PomodoroWindowsTimer.Storage
 
 open System
-open System.Collections.Generic
-open System.Data
 open System.Threading
-open System.Threading.Tasks
+open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Options
 
-open Dapper.FSharp.SQLite
-
-open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.Storage.Configuration
 
-type CreateRow =
-    {
-        work_id: uint64
-        event_json: string
-        created_at: int64
-    }
+module internal WorkEventRepository =
 
-[<CLIMutable>]
-type ReadRow =
-    {
-        id: uint64
-        work_id: uint64
-        event_json: string
-        created_at: int64
-    }
+    open System.Data.Common
+    open Microsoft.FSharp.Collections
+    open Microsoft.FSharp.Core
+    
+    open Dapper
+    open IcedTasks
+    open FsToolkit.ErrorHandling
 
-let private readTable = table'<ReadRow> "work_event"
-let private writeTable = table'<CreateRow> "work_event"
+    module Table = PomodoroWindowsTimer.Storage.Tables.WorkEvent
+    module WorkTable = PomodoroWindowsTimer.Storage.Tables.Work
 
-let createTask
-    (timeProvider: System.TimeProvider)
-    (execute: string seq -> Map<string, obj> seq -> CancellationToken -> Task<Result<uint64, string>>)
-    (workId: uint64)
-    (workEvent: WorkEvent)
-    (ct: CancellationToken)
-    =
-    task {
-        let nowDate = timeProvider.GetUtcNow()
+    module Sql =
+        let CREATE_TABLE = $"""
+            CREATE TABLE IF NOT EXISTS {Table.NAME} (
+                  {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
+                , {Table.Columns.work_id} INTEGER NOT NULL
+                , {Table.Columns.event_json} TEXT NOT NULL
+                , {Table.Columns.created_at} INTEGER NOT NULL
 
-        let newWork =
-            {
-                work_id = workId
-                event_json = workEvent |> JsonHelpers.Serialize
-                created_at = (workEvent |> WorkEvent.createdAt).ToUnixTimeMilliseconds()
-            } : CreateRow
+                , FOREIGN KEY ({Table.Columns.work_id})
+                    REFERENCES {WorkTable.NAME} ({WorkTable.Columns.id})
+                    ON DELETE CASCADE 
+                    ON UPDATE NO ACTION
+                );
+            """
 
-        let (insertSql, insertSqlParams) =
-            insert {
-                into writeTable
-                value newWork
-            }
-            |> Deconstructor.insert
+        /// Parameters: WorkId, EventJson, CreatedAt.
+        let INSERT = $"""
+            INSERT INTO {Table.NAME} ({Table.Columns.work_id}, {Table.Columns.event_json}, {Table.Columns.created_at})
+            VALUES (@WorkId, @EventJson, @CreatedAt)
+            ;
 
-        let (selectLastSql, selectLastSqlParams) =
-            select {
-                for r in readTable do
-                orderByDescending r.id
-                skipTake 0 1
-            }
-            |> Deconstructor.select<ReadRow>
+            SELECT {Table.Columns.id}
+            FROM {Table.NAME}
+            ORDER BY {Table.Columns.id} DESC
+            LIMIT 1
+            ;
+            """
 
-        let! res =
-            execute (seq { insertSql; selectLastSql }) (seq { insertSqlParams; selectLastSqlParams }) ct
+        /// Parameters: WorkId.
+        let SELECT_BY_WORK_ID = $"""
+            SELECT *
+            FROM {Table.NAME}
+            WHERE {Table.Columns.work_id} = @WorkId
+            ORDER BY {Table.Columns.created_at} ASC
+            """
 
-        return res |> Result.map (fun id -> id, nowDate)
-    }
+        /// Parameters: WorkId, DateMin, DateMax.
+        let SELECT_BY_WORK_ID_BY_PERIOD = $"""
+            SELECT *
+            FROM {Table.NAME}
+            WHERE
+                {Table.Columns.work_id} = @WorkId
+                AND {Table.Columns.created_at} >= @DateMin
+                AND {Table.Columns.created_at} < @DateMax
+            ORDER BY {Table.Columns.created_at} ASC
+            ;
+            """
 
+        /// Parameters: DateMin, DateMax.
+        let SELECT_JOIN_WORK_BY_PERIOD = $"""
+            SELECT e.*, '' AS split, w.*
+            FROM {Table.NAME} e
+                INNER JOIN {WorkTable.NAME} w ON w.{WorkTable.Columns.id} = e.{Table.Columns.work_id} 
+            WHERE
+                e.{Table.Columns.created_at} >= @DateMin
+                AND e.{Table.Columns.created_at} < @DateMax
+            ORDER BY
+                  e.{Table.Columns.work_id}
+                , e.{Table.Columns.created_at} ASC
+            ;
+            """
 
-let findByWorkIdTask (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) ct =
-    task {
-        let! res =
-            select {
-                for r in readTable do
-                where (r.work_id = workId)
-                orderBy r.created_at
-            }
-            |> selectf ct
-
-        return
-            res
-            |> Result.map (
-                Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
-                >> Seq.toList
-            )
-    }
-
-let findByWorkId (selectf: SelectQuery -> Result<IEnumerable<ReadRow>, string>) (workId: uint64) =
-    let res =
-        select {
-            for r in readTable do
-            where (r.work_id = workId)
-            orderBy r.created_at
+    type Deps =
+        {
+            GetDbConnection: OpenDbConnection
+            TimeProvider: System.TimeProvider
+            Logger: ILogger
         }
-        |> selectf
 
-    res
-    |> Result.map (
-        Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
-        >> Seq.toList
-    )
+    let createTableAsync deps =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
 
+            let! ct = CancellableTask.getCancellationToken ()
 
-let findByWorkIdByPeriodQuery workId dateMin dateMax =
-    select {
-        for r in readTable do
-        where (r.work_id = workId)
-        andWhere (r.created_at >= dateMin)
-        andWhere (r.created_at < dateMax)
-        orderBy r.created_at
-    }
-
-let findByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =
-    task {
-
-        let dateMin = DateTimeOffset(date, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-        let dateMax = DateTimeOffset(date.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-
-        let! res =
-            findByWorkIdByPeriodQuery workId dateMin dateMax
-            |> selectf ct
-
-        return
-            res
-            |> Result.map (
-                Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
-                >> Seq.toList
-            )
-    }
-
-let findByWorkIdByPeriodTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (period: DateOnlyPeriod) ct =
-    task {
-
-        let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-        let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-
-        let! res =
-            findByWorkIdByPeriodQuery workId dateMin dateMax
-            |> selectf ct
-
-        return
-            res
-            |> Result.map (
-                Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
-                >> Seq.toList
-            )
-    }
-
-/// Returns work event list ordered by work id then by created at time.
-let findAllByPeriodTask
-    (timeProvider: System.TimeProvider)
-    (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow * WorkRepository.ReadRow>, string>>)
-    (period: DateOnlyPeriod)
-    ct
-    =
-    task {
-
-        let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-        let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-
-        let! res =
-            select {
-                for r in readTable do
-                innerJoin w in WorkRepository.readTable on (r.work_id = w.id)
-                andWhere (r.created_at >= dateMin)
-                andWhere (r.created_at < dateMax)
-                orderBy r.work_id
-                thenBy r.created_at
-            }
-            |> selectf ct
-
-        return
-            res
-            |> Result.map (fun l ->
-                l
-                |> Seq.map (fun (r, w) ->
-                    let work = w |> WorkRepository.ReadRow.toWork
-                    let ev = JsonHelpers.Deserialize<WorkEvent>(r.event_json)
-                    (work, ev)
+            let command =
+                CommandDefinition(
+                    Sql.CREATE_TABLE,
+                    cancellationToken = ct
                 )
-                |> Seq.groupBy fst
-                |> Seq.map (fun (w, evs) ->
-                    {
-                        Work = w
-                        Events = evs |> Seq.map snd |> Seq.toList
-                    }
+
+            try
+                let! _ = dbConnection.ExecuteAsync(command)
+                return ()
+            with ex ->
+                deps.Logger.FailedToCreateTable(Table.NAME, ex)
+                return! Error (ex.Format($"Failed to create table {Table.NAME}."))
+        }
+
+    let insertAsync deps workId workEvent =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let command =
+                CommandDefinition(
+                    Sql.INSERT,
+                    parameters = {|
+                        WorkId = workId
+                        EventJson = JsonHelpers.Serialize(workEvent)
+                        CreatedAt = WorkEvent.createdAt(workEvent).ToUnixTimeMilliseconds()
+                    |},
+                    cancellationToken = ct
                 )
-                |> Seq.toList
-            )
-    }
 
-let findLastByWorkIdByDateTask (timeProvider: System.TimeProvider) (selectf: CancellationToken -> SelectQuery -> Task<Result<IEnumerable<ReadRow>, string>>) (workId: uint64) (date: DateOnly) ct =
-    task {
+            try
+                return! dbConnection.ExecuteScalarAsync<uint64>(command)
+            with ex ->
+                deps.Logger.FailedToInsert(Table.NAME, ex)
+                return! Error (ex.Format($"Failed to insert {Table.NAME}."))
+        }
 
-        let dateMin = DateTimeOffset(date, TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
-        let dateMax = DateTimeOffset(date.AddDays(1), TimeOnly(0, 0, 0), timeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+    let findByWorkIdAsync deps workId =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
 
-        let! res =
-            findByWorkIdByPeriodQuery workId dateMin dateMax
-            |> selectf ct
+            let! ct = CancellableTask.getCancellationToken ()
 
-        return
-            res
-            |> Result.map (
-                Seq.tryLast
-                >> Option.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json))
-            )
-    }
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_BY_WORK_ID,
+                    parameters = {| WorkId = workId |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows = dbConnection.QueryAsync<Table.Row>(command)
+                return rows |> Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json)) |> Seq.toList
+            with ex ->
+                deps.Logger.FailedToFindWorkEventsByWorkId(workId, ex)
+                return! Error (ex.Format($"Failed to find work events by workId {workId}."))
+        }
+
+    let findByWorkIdByDateAsync deps (workId: WorkId) (date: DateOnly) =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let dateMin = new DateTimeOffset(date, new TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset)
+            let dateMax = new DateTimeOffset(date.AddDays(1), new TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset)
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_BY_WORK_ID_BY_PERIOD,
+                    parameters = {|
+                        WorkId = workId
+                        DateMin = dateMin.ToUnixTimeMilliseconds()
+                        DateMax = dateMax.ToUnixTimeMilliseconds()
+                    |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows = dbConnection.QueryAsync<Table.Row>(command)
+                return rows |> Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json)) |> Seq.toList
+            with ex ->
+                deps.Logger.FailedToFindWorkEventsByWorkIdByDate(workId, date, ex)
+                return! Error (ex.Format($"Failed to find work events by workId {workId} and date {date}."))
+        }
+
+    let findByWorkIdByPeriodAsync deps (workId: WorkId) (period: DateOnlyPeriod) =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+            let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_BY_WORK_ID_BY_PERIOD,
+                    parameters = {|
+                        WorkId = workId
+                        DateMin = dateMin
+                        DateMax = dateMax
+                    |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows = dbConnection.QueryAsync<Table.Row>(command)
+                return rows |> Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json)) |> Seq.toList
+            with ex ->
+                deps.Logger.FailedToFindWorkEventsByWorkIdByPeriod(workId, period, ex)
+                return! Error (ex.Format($"Failed to find work events by workId {WorkId} and by period [{period.Start} - {period.EndInclusive}]."))
+        }
+
+    let findAllByPeriodAsync deps (period: DateOnlyPeriod) =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+            let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_JOIN_WORK_BY_PERIOD,
+                    parameters = {|
+                        DateMin = dateMin
+                        DateMax = dateMax
+                    |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows =
+                    dbConnection.QueryAsync<Table.Row, WorkTable.Row, Table.Row * WorkTable.Row>(
+                        command,
+                        Func<Table.Row, WorkTable.Row, Table.Row * WorkTable.Row>(
+                            fun f s ->
+                                (f, s)
+                        ),
+                        "split"
+                    )
+                return
+                    rows
+                    |> Seq.map (fun (r, w) ->
+                        let work = w |> WorkTable.Row.ToWork
+                        let ev = JsonHelpers.Deserialize<WorkEvent>(r.event_json)
+                        (work, ev)
+                    )
+                    |> Seq.groupBy fst
+                    |> Seq.map (fun (w, evs) ->
+                        {
+                            Work = w
+                            Events = evs |> Seq.map snd |> Seq.toList
+                        }
+                    )
+                    |> Seq.toList
+            with ex ->
+                deps.Logger.FailedToFindWorkEventsByPeriod(period, ex)
+                return! Error (ex.Format($"Failed to find work events by period [{period.Start} - {period.EndInclusive}]."))
+        }
+
+
+
+type WorkEventRepository(options: WorkDbOptions, timeProvider: System.TimeProvider, logger: ILogger<WorkEventRepository>) =
+
+    let getDbConnection = RepositoryBase.openDbConnection options logger
+    let deps : WorkEventRepository.Deps =
+        {
+            GetDbConnection = getDbConnection
+            TimeProvider = timeProvider
+            Logger = logger
+        }
+
+    member _.CreateTableAsync(?cancellationToken) =
+        let ct = defaultArg cancellationToken CancellationToken.None
+        WorkEventRepository.createTableAsync deps ct
+
+    interface IWorkEventRepository with
+        member _.InsertAsync workId workEvent cancellationToken =
+            WorkEventRepository.insertAsync deps workId workEvent cancellationToken
+
+        member _.FindByWorkIdAsync workId cancellationToken =
+            WorkEventRepository.findByWorkIdAsync deps workId cancellationToken
+
+        member _.FindByWorkIdByDateAsync workId date cancellationToken =
+            WorkEventRepository.findByWorkIdByDateAsync deps workId date cancellationToken
+
+        member _.FindByWorkIdByPeriodAsync workId period cancellationToken =
+            WorkEventRepository.findByWorkIdByPeriodAsync deps workId period cancellationToken
+
+        member _.FindAllByPeriodAsync period cancellationToken =
+            WorkEventRepository.findAllByPeriodAsync deps period cancellationToken
+
+        member _.FindLastByWorkIdByDateAsync workId date cancellationToken =
+            raise (NotImplementedException())

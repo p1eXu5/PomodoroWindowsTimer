@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.Storage;
 using Serilog;
 
 namespace PomodoroWindowsTimer.WpfClient;
@@ -126,7 +127,7 @@ internal class Bootstrap : IDisposable
     protected void WaitDbSeeding()
     {
         var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
-        seederService!.SemaphoreSlim.Wait();
+        seederService!.Semaphore.Wait();
     }
 
     protected virtual void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
@@ -138,7 +139,7 @@ internal class Bootstrap : IDisposable
         services.AddWindowsMinimizer();
         services.AddThemeSwitcher();
         services.AddUserSettings(hostBuilderCtx.Configuration);
-        services.AddDb(hostBuilderCtx.Configuration);
+        services.AddWorkEventStorage(hostBuilderCtx.Configuration);
         services.AddExcelBook();
 
         if (!hostBuilderCtx.Configuration.GetValue<bool>("InTest"))

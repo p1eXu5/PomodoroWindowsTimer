@@ -16,7 +16,7 @@ open PomodoroWindowsTimer.ElmishApp.Models.CreatingWorkModel
 let update (workRepo: IWorkRepository) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<CreatingWorkModel>) msg model =
     let createWorkTask number title ct =
         task {
-            let! res = workRepo.CreateAsync number title ct
+            let! res = workRepo.InsertAsync number title ct
             return
                 res |> Result.map fst
         }

@@ -12,4 +12,3 @@ let internal dataSource dbFileName =
         Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
         dbFileName
     )
-

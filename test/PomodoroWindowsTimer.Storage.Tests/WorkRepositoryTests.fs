@@ -2,14 +2,20 @@ namespace PomodoroWindowsTimer.Storage.Tests
 
 open System
 open System.IO
-open Microsoft.Data.Sqlite
+open Microsoft.Extensions.Options
 
 open NUnit.Framework
+open FsUnit.TopLevelOperators
 open FsUnitTyped.TopLevelOperators
-open p1eXu5.FSharp.Testing.ShouldExtensions.Helpers
+open p1eXu5.AspNetCore.Testing.Logging
+open p1eXu5.FSharp.Testing.ShouldExtensions
+open FsToolkit.ErrorHandling
 
 open PomodoroWindowsTimer.Storage
+open PomodoroWindowsTimer.Storage.Configuration
 open PomodoroWindowsTimer.Testing.Fakers
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
 
 
 [<Category("DB. Work")>]
@@ -29,14 +35,43 @@ module WorkRepositoryTests =
         else
             connectionString
 
-    let getConnection () =
-        new SqliteConnection(getConnectionString())
+    let workDbOptionsSnapshot () =
+        { new IOptionsSnapshot<WorkDbOptions> with
+            member _.Get(name) : WorkDbOptions =
+                { ConnectionString=getConnectionString () }
+            member _.Value : WorkDbOptions = 
+                { ConnectionString=getConnectionString () }
+        }
+
+    let workRepository () =
+        new WorkRepository(
+            workDbOptionsSnapshot (),
+            System.TimeProvider.System,
+            TestLogger<WorkRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
+        )
+        :> IWorkRepository
+    
+    let workEventRepository () =
+        new WorkEventRepository(
+            workDbOptionsSnapshot (),
+            System.TimeProvider.System,
+            TestLogger<WorkEventRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
+        )
+        :> IWorkEventRepository
+
 
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            do!
-                Initializer.initdb (getConnectionString())
+            LastEventCreatedAtHandler.Register()
+
+            match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+
+            match! workEventRepository () :?> WorkEventRepository |> _.CreateTableAsync(ct) with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
         }
 
     [<OneTimeTearDown>]
@@ -48,14 +83,12 @@ module WorkRepositoryTests =
         }
 
     [<Test>]
-    let ``create test`` () =
+    let ``01: InsertAsync -> by default -> inserts work row`` () =
         task {
-            use conn = getConnection ()
-            let create =
-                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
+            let workRepo = workRepository ()
 
-            let! res1 = create (generateNumber ()) (generateTitle ()) ct
-            let! res2 = create (generateNumber ()) (generateTitle ()) ct
+            let! res1 = workRepo.InsertAsync (generateNumber ()) (generateTitle ()) ct
+            let! res2 = workRepo.InsertAsync (generateNumber ()) (generateTitle ()) ct
 
             match res1, res2 with
             | Error err, _ -> failAssert err
@@ -66,115 +99,117 @@ module WorkRepositoryTests =
         }
 
     [<Test>]
-    let ``readAll test`` () =
-        task {
-            use conn = getConnection ()
-            let create =
-                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
+    let ``02: ReadAllAsync - no events - returns with none latest event created_at`` () =
+        taskResult {
+            let workRepo = workRepository ()
 
-            let readAll =
-                WorkRepository.readAllTask (Helpers.selectTask conn)
+            let number1 = generateNumber ()
+            let title1 = generateTitle ()
+
+            let! _ = workRepo.InsertAsync number1 title1 ct
+
+            let! rows = workRepo.ReadAllAsync(ct)
+
+            rows |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number1, title1)
+        }
+        |> TaskResult.runTest
+
+    [<Test>]
+    let ``03: ReadAllAsync - events exists - returns with latest ecvent created_at`` () =
+        taskResult {
+            let workRepo = workRepository ()
+            let workEventRepo = workEventRepository ()
+
+            let number1 = generateNumber ()
+            let title1 = generateTitle ()
+
+            let! (workId1, _) = workRepo.InsertAsync number1 title1 ct
+
+            let workEvents =
+                [
+                    WorkEvent.generate ()
+                    WorkEvent.generate ()
+                    WorkEvent.generate ()
+                ]
+
+            let! _ = workEventRepo.InsertAsync workId1 workEvents[0] ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvents[1] ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvents[2] ct
+
+            let number2 = generateNumber ()
+            let title2 = generateTitle ()
+
+            let! _ = workRepo.InsertAsync number2 title2 ct
+
+            let! rows = workRepo.ReadAllAsync(ct)
+
+            rows
+            |> Seq.map (fun r -> r.Number, r.Title, (r.LastEventCreatedAt |> Option.map _.ToUnixTimeMilliseconds()))
+            |> shouldContain (number1, title1, (workEvents |> List.map WorkEvent.createdAt |> List.max).ToUnixTimeMilliseconds() |> Some)
+            
+            rows |> Seq.map (fun r -> r.Number, r.Title, r.LastEventCreatedAt) |> shouldContain (number2, title2, None)
+        }
+        |> TaskResult.runTest
+
+    [<Test>]
+    let ``04: SearchByNumberOrTitleAsync test`` () =
+        taskResult {
+            let workRepo = workRepository ()
 
             let number = generateNumber ()
             let title = generateTitle ()
 
-            let! _ = create number title ct
-            let! res = readAll ct
+            let! _ = workRepo.InsertAsync number title ct
+            let! rows = workRepo.SearchByNumberOrTitleAsync title[..3] ct
 
-            match res with
-            | Error err -> failAssert err
-            | Ok rows ->
-                rows |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number, title)
+            rows |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number, title)
         }
+        |> TaskResult.runTest
 
 
     [<Test>]
-    let ``find test`` () =
-        task {
-            let conn = getConnection ()
-            let create =
-                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
-
-            let find =
-                WorkRepository.findTask (Helpers.selectTask conn)
-
-            let number = generateNumber ()
-            let title = generateTitle ()
-
-            let! _ = create number title ct
-            let! res = find title[..3] ct
-
-            match res with
-            | Error err -> failAssert err
-            | Ok rows ->
-                rows |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number, title)
-        }
-
-
-    [<Test>]
-    let ``update test`` () =
-        task {
-            let conn = getConnection ()
-            let create =
-                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
-
-            let update =
-                WorkRepository.updateTask System.TimeProvider.System (Helpers.update conn)
-
-            let find =
-                WorkRepository.findTask (Helpers.selectTask conn)
-
-            let findById =
-                WorkRepository.findByIdTask (Helpers.selectTask conn)
+    let ``05: UpdateAsync -> work exists -> updates work`` () =
+        taskResult {
+            let workRepo = workRepository ()
         
-            match! create (generateNumber ()) (generateTitle ()) ct with
-            | Error err -> failAssert err
-            | Ok (id, _) ->
-                match! findById id ct with
-                | Error err -> failAssert err
-                | Ok work ->
-                    let number = generateNumber ()
-                    let title = generateTitle ()
+            let! (workId, _) = workRepo.InsertAsync (generateNumber ()) (generateTitle ()) ct
+            let! work = workRepo.FindByIdAsync workId ct
 
-                    let updatedWork =
-                        {
-                            work.Value with
-                                Number = number
-                                Title = title
-                        }
+            let number = generateNumber ()
+            let title = generateTitle ()
 
-                    match! update updatedWork ct with
-                    | Error err -> failAssert err
-                    | Ok _ ->
-                        match! find title ct with
-                        | Error err -> failAssert err
-                        | Ok rows ->
-                            rows |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number, title)
+            let updatedWork =
+                {
+                    work.Value with
+                        Number = number
+                        Title = title
+                }
+
+            // action
+            let! _ = workRepo.UpdateAsync updatedWork ct
+
+            // assert
+            let! foundWorks = workRepo.SearchByNumberOrTitleAsync title ct
+            foundWorks |> Seq.map (fun r -> r.Number, r.Title) |> shouldContain (number, title)
         }
-
+        |> TaskResult.runTest
 
     [<Test>]
-    let ``delete test`` () =
-        task {
-            let conn = getConnection ()
-            let create =
-                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
+    let ``06: DeleteAsync -> deletes db work`` () =
+        taskResult {
+            let workRepo = workRepository ()
 
-            let delete =
-                WorkRepository.deleteTask (Helpers.delete conn)
+            let work = Work.generate ()
 
-            let findById =
-                WorkRepository.findByIdTask (Helpers.selectTask conn)
+            let! (workId, createdAt) = workRepo.InsertAsync (generateNumber ()) (generateTitle ()) ct
+            
+            do!
+                workRepo.DeleteAsync
+                    { work with Id = workId; UpdatedAt = createdAt; }
+                    ct
 
-            match! create (generateNumber ()) (generateTitle ()) ct with
-            | Error err -> failAssert err
-            | Ok (id, _) ->
-                match! delete id ct with
-                | Error err -> failAssert err
-                | Ok () ->
-                    match! findById id ct with
-                    | Error err -> failAssert err
-                    | Ok None -> ()
-                    | Ok (Some _) -> failAssert "Work has not been deleted"
+            let! dbWork = workRepo.FindByIdAsync workId ct
+            dbWork |> should be (ofCase <@ Option<Work>.None @>)
         }
+        |> TaskResult.runTest
 

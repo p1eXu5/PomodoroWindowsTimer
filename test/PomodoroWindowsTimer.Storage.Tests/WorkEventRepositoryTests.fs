@@ -2,16 +2,22 @@
 
 open System
 open System.IO
-open Microsoft.Data.Sqlite
+open Microsoft.Extensions.Options
 
 open NUnit.Framework
 open FsUnit
-open FsUnitTyped.TopLevelOperators
-open p1eXu5.FSharp.Testing.ShouldExtensions.Helpers
+open p1eXu5.AspNetCore.Testing.Logging
+open p1eXu5.FSharp.Testing.ShouldExtensions
+open FsToolkit.ErrorHandling
 
 open PomodoroWindowsTimer.Storage
+open PomodoroWindowsTimer.Storage.Configuration
 open PomodoroWindowsTimer.Testing.Fakers
+open FsUnitTyped
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
+open p1eXu5.FSharp.Testing.ShouldExtensions
+
 
 
 [<Category("DB. WorkEvent")>]
@@ -33,29 +39,52 @@ module WorkEventRepositoryTests =
         else
             connectionString
 
-    let getConnection () =
-        new SqliteConnection(getConnectionString())
+    let workDbOptionsSnapshot () =
+        { new IOptionsSnapshot<WorkDbOptions> with
+            member _.Get(name) : WorkDbOptions =
+                { ConnectionString=getConnectionString () }
+            member _.Value : WorkDbOptions = 
+                { ConnectionString=getConnectionString () }
+        }
+
+    let workRepository () =
+        new WorkRepository(
+            workDbOptionsSnapshot (),
+            System.TimeProvider.System,
+            TestLogger<WorkRepository>(TestContextWriters.Default)
+        )
+        :> IWorkRepository
+    
+    let workEventRepository () =
+        new WorkEventRepository(
+            workDbOptionsSnapshot (),
+            System.TimeProvider.System,
+            TestLogger<WorkEventRepository>(TestContextWriters.Default)
+        )
+        :> IWorkEventRepository
 
     let private createWork () =
         task {
-            use conn = getConnection ()
-            let create =
-                WorkRepository.createTask System.TimeProvider.System (Helpers.execute conn)
-
-            return! create (generateNumber ()) (generateTitle ()) ct
+            let repo = workRepository ()
+            return! repo.InsertAsync (generateNumber ()) (generateTitle ()) ct
         }
 
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            do!
-                Initializer.initdb (getConnectionString())
+            match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+
+            match! workEventRepository () :?> WorkEventRepository |> _.CreateTableAsync(ct) with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+
             let! res = createWork ()
             match res with
             | Ok (id, _) ->
                 workId1 <- id
-            | Error err ->
-                assertionExn err
+            | Error err -> raise (InvalidOperationException(err))
 
             let! res = createWork ()
             match res with
@@ -73,54 +102,38 @@ module WorkEventRepositoryTests =
                 File.Delete(dataSource)
         }
 
+    
     [<Test>]
-    let ``create test`` () =
-        task {
-            use conn = getConnection ()
-            let create =
-                WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
+    let ``01: InsertAsync test`` () =
+        taskResult {
+            let workEventRepo = workEventRepository ()
 
-            let! res1 = create workId1 (generateWorkEvent ()) ct
-            let! res2 = create workId1 (generateWorkEvent ()) ct
+            let! id1 = workEventRepo.InsertAsync workId1 (generateWorkEvent ()) ct
+            let! id2 = workEventRepo.InsertAsync workId1 (generateWorkEvent ()) ct
 
-            match res1, res2 with
-            | Error err, _ -> failAssert err
-            | _, Error err -> failAssert err
-            | Ok (id1, _), Ok (id2, _) ->
-                id1 |> shouldBeGreaterThan 0UL
-                id2 |> shouldBeGreaterThan id1
+            id1 |> shouldBeGreaterThan 0UL
+            id2 |> shouldBeGreaterThan id1
         }
+        |> TaskResult.runTest
 
     [<Test>]
-    let ``findByWorkId test`` () =
-        task {
-            use conn = getConnection ()
-            let create =
-                WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
-
-            let findByWorkId =
-                WorkEventRepository.findByWorkIdTask (Helpers.selectTask conn)
+    let ``02: FindByWorkIdAsync test`` () =
+        taskResult {
+            let workEventRepo = workEventRepository ()
 
             let workEvent = generateWorkEvent ()
+            let! _ = workEventRepo.InsertAsync workId1 workEvent ct
 
-            let! _ = create workId1 workEvent ct
-            let! res = findByWorkId workId1 ct
+            let! rows = workEventRepo.FindByWorkIdAsync workId1 ct
 
-            match res with
-            | Error err -> failAssert err
-            | Ok rows ->
-                rows |> shouldContain workEvent
+            rows |> shouldContain workEvent
         }
+        |> TaskResult.runTest
 
     [<Test>]
-    let ``findByWorkIdByDate date with event test`` () =
-        task {
-            use conn = getConnection ()
-            let create =
-                WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
-
-            let findByWorkIdByDate =
-                WorkEventRepository.findByWorkIdByDateTask System.TimeProvider.System (Helpers.selectTask conn)
+    let ``03: FindByWorkIdByDateAsync test`` () =
+        taskResult {
+            let workEventRepo = workEventRepository ()
 
             let workEvent1 = generateWorkEvent ()
             let workEvent2 = generateWorkEvent ()
@@ -128,29 +141,22 @@ module WorkEventRepositoryTests =
             let workEvent4 = generateWorkEvent ()
             let workEvent5 = generateWorkEvent ()
 
-            let! _ = create workId1 workEvent1 ct
-            let! _ = create workId1 workEvent2 ct
-            let! _ = create workId1 workEvent3 ct
-            let! _ = create workId1 workEvent4 ct
-            let! _ = create workId1 workEvent5 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent1 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent2 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent3 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent4 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent5 ct
 
-            let! res = findByWorkIdByDate workId1 (workEvent3 |> WorkEvent.dateOnly) ct
+            let! rows = workEventRepo.FindByWorkIdByDateAsync workId1 (workEvent3 |> WorkEvent.dateOnly) ct
 
-            match res with
-            | Error err -> failAssert err
-            | Ok rows ->
-                rows |> shouldContain workEvent3
+            rows |> shouldContain workEvent3
         }
+        |> TaskResult.runTest
 
     [<Test>]
     let ``findByWorkIdByDate date without event test`` () =
-        task {
-            use conn = getConnection ()
-            let create =
-                WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
-
-            let findByWorkIdByDate =
-                WorkEventRepository.findByWorkIdByDateTask System.TimeProvider.System (Helpers.selectTask conn)
+        taskResult {
+            let workEventRepo = workEventRepository ()
 
             let workEvent1 = generateWorkEvent ()
             let workEvent2 = generateWorkEvent ()
@@ -158,28 +164,24 @@ module WorkEventRepositoryTests =
             let workEvent4 = generateWorkEvent ()
             let workEvent5 = generateWorkEvent ()
 
-            let! _ = create workId1 workEvent1 ct
-            let! _ = create workId1 workEvent2 ct
-            let! _ = create workId1 workEvent3 ct
-            let! _ = create workId1 workEvent4 ct
-            let! _ = create workId1 workEvent5 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent1 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent2 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent3 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent4 ct
+            let! _ = workEventRepo.InsertAsync workId1 workEvent5 ct
 
             let date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().DateTime.AddDays(1))
 
-            let! res = findByWorkIdByDate workId1 date ct
+            let! rows = workEventRepo.FindByWorkIdByDateAsync workId1 date ct
 
-            match res with
-            | Error err -> failAssert err
-            | Ok rows ->
-                rows |> should be Empty
+            rows |> should be Empty
         }
+        |> TaskResult.runTest
 
     [<Test>]
     let ``findAllByPeriod period with events test`` () =
-        task {
-            use conn = getConnection ()
-            let create =
-                WorkEventRepository.createTask System.TimeProvider.System (Helpers.execute conn)
+        taskResult {
+            let workEventRepo = workEventRepository ()
 
             let work1Events =
                 [
@@ -200,11 +202,11 @@ module WorkEventRepositoryTests =
                 ]
 
             for i in 0 .. 4 do
-                let! _ = create workId1 work1Events[i] ct
+                let! _ = workEventRepo.InsertAsync workId1 work1Events[i] ct
                 ()
 
             for i in 0 .. 4 do
-                let! _ = create workId2 work2Events[i] ct
+                let! _ = workEventRepo.InsertAsync workId2 work2Events[i] ct
                 ()
 
             let minDate =
@@ -223,16 +225,12 @@ module WorkEventRepositoryTests =
                     |> fun dt -> dt.DateTime
                 )
 
-            let findAllByPeriod =
-                WorkEventRepository.findAllByPeriodTask System.TimeProvider.System (Helpers.selectTask2 conn)
+            let! rows = workEventRepo.FindAllByPeriodAsync ({ Start = minDate; EndInclusive = maxDate }) ct
 
-            let! res = findAllByPeriod ({ Start = minDate; EndInclusive = maxDate }) ct
-
-            match res with
-            | Error err -> failAssert err
-            | Ok rows ->
-                let list = rows |> Seq.toList
-                list.Length |> should greaterThanOrEqualTo 2
-                list[0].Events.Length |> should greaterThanOrEqualTo 5
-                list[1].Events.Length |> should greaterThanOrEqualTo 5
+            let list = rows |> Seq.toList
+            list.Length |> should greaterThanOrEqualTo 2
+            list[0].Events.Length |> should greaterThanOrEqualTo 5
+            list[1].Events.Length |> should greaterThanOrEqualTo 5
         }
+        |> TaskResult.runTest
+

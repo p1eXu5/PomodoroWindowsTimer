@@ -71,7 +71,7 @@ namespace PomodoroWindowsTimer.WpfClient
                         var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
 
                         var workEventRepository = _bootstrap.GetWorkEventRepository();
-                        await workEventRepository.CreateAsync(workId, workEvent, default);
+                        await workEventRepository.InsertAsync(workId, workEvent, default);
                     }
 
                     var userSettings = _bootstrap.GetUserSettings();

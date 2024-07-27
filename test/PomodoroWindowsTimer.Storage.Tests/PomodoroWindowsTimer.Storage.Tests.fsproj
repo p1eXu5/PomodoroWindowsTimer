@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.5.1" />
-    <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="4.15.2" />
     <PackageReference Include="FsUnit" Version="6.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -30,6 +29,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="p1eXu5.AspNetCore.Testing.Logging" Version="1.0.15" />
   </ItemGroup>
 
   <ItemGroup>

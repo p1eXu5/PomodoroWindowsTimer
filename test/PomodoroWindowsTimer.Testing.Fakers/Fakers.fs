@@ -145,6 +145,7 @@ let generateWork () =
             Title = faker.Commerce.ProductName()
             CreatedAt = date
             UpdatedAt = date
+            LastEventCreatedAt = None
         }
     _workCounter <- _workCounter + 1UL
     work
@@ -172,3 +173,11 @@ let generateWorkEvent () : WorkEvent =
         |]
 
     (faker.Random.ArrayElement(eventFactory)) ()
+
+[<RequireQualifiedAccess>]
+module Work =
+    let generate = generateWork
+
+[<RequireQualifiedAccess>]
+module WorkEvent =
+    let generate = generateWorkEvent
