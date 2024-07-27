@@ -35,17 +35,15 @@ module WorkRepositoryTests =
         else
             connectionString
 
-    let workDbOptionsSnapshot () =
-        { new IOptionsSnapshot<WorkDbOptions> with
-            member _.Get(name) : WorkDbOptions =
-                { ConnectionString=getConnectionString () }
+    let workDbOptions () =
+        { new IOptions<WorkDbOptions> with
             member _.Value : WorkDbOptions = 
                 { ConnectionString=getConnectionString () }
         }
 
     let workRepository () =
         new WorkRepository(
-            workDbOptionsSnapshot (),
+            workDbOptions (),
             System.TimeProvider.System,
             TestLogger<WorkRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
         )
@@ -53,7 +51,7 @@ module WorkRepositoryTests =
     
     let workEventRepository () =
         new WorkEventRepository(
-            workDbOptionsSnapshot (),
+            workDbOptions (),
             System.TimeProvider.System,
             TestLogger<WorkEventRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
         )

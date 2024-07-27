@@ -305,7 +305,7 @@ module internal WorkRepository =
                 return! Error (ex.Format($"Failed to delete work {work.Id}."))
         }
 
-type WorkRepository(options: WorkDbOptions, timeProvider: System.TimeProvider, logger: ILogger<WorkRepository>) =
+type WorkRepository(options: IOptions<WorkDbOptions>, timeProvider: System.TimeProvider, logger: ILogger<WorkRepository>) =
 
     let getDbConnection = RepositoryBase.openDbConnection options logger
     let deps : WorkRepository.Deps =

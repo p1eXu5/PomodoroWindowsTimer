@@ -2,12 +2,10 @@
 
 open System
 open System.Threading
-open System.Threading.Tasks
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
-open Microsoft.Extensions.Options
+
 open PomodoroWindowsTimer.Storage
-open PomodoroWindowsTimer.Storage.Configuration
 
 type DbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHostApplicationLifetime) =
     inherit BackgroundService()
@@ -18,11 +16,8 @@ type DbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHost
 
     override _.ExecuteAsync(stoppingToken: CancellationToken) =
         task {
-            use scope = serviceProvider.CreateScope()
-            let workDbOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<WorkDbOptions>>();
-
-            let workRepository = ActivatorUtilities.CreateInstance<WorkRepository>(serviceProvider, [| workDbOptions.Value |])
-            let workEventRepository = ActivatorUtilities.CreateInstance<WorkRepository>(serviceProvider, [| workDbOptions.Value |])
+            let workRepository = serviceProvider.GetRequiredService<WorkRepository>()
+            let workEventRepository = serviceProvider.GetRequiredService<WorkEventRepository>()
 
             do LastEventCreatedAtHandler.Register()
 

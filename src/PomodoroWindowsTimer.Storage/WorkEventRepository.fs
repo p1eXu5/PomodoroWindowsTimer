@@ -270,7 +270,7 @@ module internal WorkEventRepository =
 
 
 
-type WorkEventRepository(options: WorkDbOptions, timeProvider: System.TimeProvider, logger: ILogger<WorkEventRepository>) =
+type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.TimeProvider, logger: ILogger<WorkEventRepository>) =
 
     let getDbConnection = RepositoryBase.openDbConnection options logger
     let deps : WorkEventRepository.Deps =
