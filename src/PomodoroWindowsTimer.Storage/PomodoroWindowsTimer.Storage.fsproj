@@ -4,17 +4,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <Compile Include="Helpers.fs" />
-    <Compile Include="Types.fs" />
-    <Compile Include="WorkRepository.fs" />
-    <Compile Include="WorkEventRepository.fs" />
-    <Compile Include="Initializer.fs" />
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="4.16.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper.FSharp.SQLite" Version="4.8.5" />
+    <PackageReference Update="FSharp.Core" Version="8.0.300" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Configuration\WorkDbOptions.fs" />
+    <Compile Include="LastEventCreatedAtHandler.fs" />
+    <Compile Include="Tables.fs" />
+    <Compile Include="LoggingExtensions.fs" />
+    <Compile Include="ExceptionExtensions.fs" />
+    <Compile Include="RepositoryBase.fs" />
+    <Compile Include="WorkRepository.fs" />
+    <Compile Include="WorkEventRepository.fs" />
+    <Compile Include="DbSeederHostedService.fs" />
+    <Compile Include="DependencyInjectionExtensions.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="8.0.300" />
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
   </ItemGroup>
-
 </Project>

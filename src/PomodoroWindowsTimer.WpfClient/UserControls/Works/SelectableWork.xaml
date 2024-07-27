@@ -46,8 +46,12 @@
                   VerticalAlignment="Center"
                   >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="*"
+                                      SharedSizeGroup="gr_WorkName"
+                                      />
+                    <ColumnDefinition Width="50"
+                                      SharedSizeGroup="gr_Button"
+                                      />
                 </Grid.ColumnDefinitions>
                 <!--  with Auto height button is not appearing correctly  -->
                 <Button x:Name="m_SelectButton"

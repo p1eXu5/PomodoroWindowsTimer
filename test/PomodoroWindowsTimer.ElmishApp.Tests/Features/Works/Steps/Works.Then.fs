@@ -22,6 +22,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 open NUnit.Framework
 open Elmish.Extensions
 open PomodoroWindowsTimer
+open System.Threading
 
 
 let ``Current Work has been set to`` (expectedCurrentWork: Work) =
@@ -57,7 +58,7 @@ let ``Have no work events in db within`` (workId: uint64) =
         let! (sut: ISut) = Scenario.getState
         let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
 
-        match workEventRepository.FindByWorkId workId with
+        match workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously with
         | Ok workEvents ->
             workEvents |> shouldL be Empty $"Work {workId} have db events"
         | Error err ->
@@ -71,7 +72,7 @@ let ``Work events in db exist`` (workId: uint64) (eventExpr: #Quotations.Expr se
         let! (sut: ISut) = Scenario.getState
         let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
 
-        match workEventRepository.FindByWorkId workId with
+        match workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously with
         | Ok workEvents ->
             workEvents |> List.length |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> List.length}. The events are {workEvents}"
             Seq.zip workEvents eventExpr
@@ -173,8 +174,8 @@ let ``MainModel WorkSelector becomes None`` () =
 let ``Work time is greater than`` (workId: uint64) (seconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
-        let eventsRes = workEventRepo.FindByWorkId workId
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with
         | Ok events ->
@@ -192,8 +193,8 @@ let ``Work time is greater than`` (workId: uint64) (seconds: float<sec>) =
 let ``Work time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
-        let eventsRes = workEventRepo.FindByWorkId workId
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with
         | Ok events ->
@@ -211,8 +212,8 @@ let ``Work time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSecon
 let ``Break time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
-        let eventsRes = workEventRepo.FindByWorkId workId
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with
         | Ok events ->
@@ -229,8 +230,8 @@ let ``Break time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeco
 let ``Break time is zero`` (workId: uint64) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepo = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
-        let eventsRes = workEventRepo.FindByWorkId workId
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with
         | Ok events ->

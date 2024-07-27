@@ -27,7 +27,7 @@ let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventReposito
             let workEvent =
                 WorkEvent.WorkIncreased (time, offset)
 
-            let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
             match res with
             | Ok _ -> ()
@@ -48,7 +48,7 @@ let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository
             let workEvent =
                 WorkEvent.WorkReduced (time, offset)
 
-            let! res = workEventRepository.CreateAsync workId workEvent CancellationToken.None
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
             match res with
             | Ok _ -> ()

@@ -35,18 +35,20 @@ type ILooper =
 
 type IWorkRepository =
     interface
-        abstract CreateAsync: number: string -> title: string -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
-        abstract ReadAllAsync: CancellationToken -> Task<Result<Work list, string>>
-        abstract FindByIdAsync: workId: WorkId -> CancellationToken -> Task<Result<Work option, string>>
-        abstract FindByIdOrCreateAsync: Work -> CancellationToken -> Task<Result<Work, string>>
-        abstract UpdateAsync: Work -> CancellationToken -> Task<Result<DateTimeOffset, string>>
+        abstract InsertAsync: number: string -> title: string -> cancellationToken: CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract ReadAllAsync: cancellationToken: CancellationToken -> Task<Result<Work list, string>>
+        abstract SearchByNumberOrTitleAsync: text: string -> cancellationToken: CancellationToken -> Task<Result<Work list, string>>
+        abstract FindByIdAsync: workId: WorkId -> cancellationToken: CancellationToken -> Task<Result<Work option, string>>
+        abstract FindByIdOrCreateAsync: work: Work -> cancellationToken: CancellationToken -> Task<Result<Work, string>>
+        abstract UpdateAsync: work: Work -> cancellationToken: CancellationToken -> Task<Result<DateTimeOffset, string>>
+        abstract DeleteAsync: work: Work -> cancellationToken: CancellationToken -> Task<Result<unit, string>>
     end
 
 type IWorkEventRepository =
     interface
-        abstract CreateAsync: workId: WorkId -> WorkEvent -> CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract InsertAsync: workId: WorkId -> WorkEvent -> CancellationToken -> Task<Result<uint64, string>>
+        // abstract FindByWorkId: workId: WorkId -> Result<WorkEvent list, string>
         abstract FindByWorkIdAsync: workId: WorkId -> CancellationToken -> Task<Result<WorkEvent list, string>>
-        abstract FindByWorkId: workId: WorkId -> Result<WorkEvent list, string>
         abstract FindByWorkIdByDateAsync: workId: WorkId -> DateOnly -> CancellationToken -> Task<Result<WorkEvent list, string>>
         abstract FindByWorkIdByPeriodAsync: workId: WorkId -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent list, string>>
         

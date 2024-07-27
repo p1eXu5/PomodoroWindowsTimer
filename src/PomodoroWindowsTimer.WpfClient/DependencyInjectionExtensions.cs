@@ -10,9 +10,6 @@ using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Infrastructure;
 using PomodoroWindowsTimer.WpfClient;
 using PomodoroWindowsTimer.WpfClient.Services;
-using PomodoroWindowsTimer.Storage;
-using PomodoroWindowsTimer.WpfClient.Configuration;
-using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.TimePointQueue;
 using System.Windows.Interop;
 using PomodoroWindowsTimer.Exporter.Excel;
@@ -22,37 +19,6 @@ namespace DrugRoom.WpfClient;
 
 internal static class DependencyInjectionExtensions
 {
-    public static void AddDb(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddOptions<WorkDbOptions>().Bind(configuration.GetSection("WorkDb")).ValidateDataAnnotations().ValidateOnStart();
-
-        services.TryAddSingleton<IWorkRepository>(sp =>
-        {
-            // var logger = sp.GetRequiredService<ILogger<IWorkRepository>>
-            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
-            
-            using var scope = sp.CreateScope();
-            var workDbOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<WorkDbOptions>>().Value;
-
-            return
-                Initializer.initWorkRepository(workDbOptions.ConnectionString, timeProvider);
-        });
-
-        services.TryAddSingleton<IWorkEventRepository>(sp =>
-        {
-            // var logger = sp.GetRequiredService<ILogger<IWorkRepository>>
-            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
-
-            using var scope = sp.CreateScope();
-            var workDbOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<WorkDbOptions>>().Value;
-
-            return
-                Initializer.initWorkEventRepository(workDbOptions.ConnectionString, timeProvider);
-        });
-
-        services.AddHostedService<DbSeederHostedService>();
-    }
-
     public static void AddTimeProvider(this IServiceCollection services)
         => services.TryAddSingleton(TimeProvider.System);
 

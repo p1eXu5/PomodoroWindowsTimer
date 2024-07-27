@@ -39,7 +39,7 @@ let private storeWorkEventsTask
 
                     let workEvent = eventCtor (time, offset)
                     
-                    match! workEventRepository.CreateAsync workId workEvent ct with
+                    match! workEventRepository.InsertAsync workId workEvent ct with
                     | Ok _ -> return! running tail
                     | Error err -> return err |> Error
                 | Error err -> return err |> Error
