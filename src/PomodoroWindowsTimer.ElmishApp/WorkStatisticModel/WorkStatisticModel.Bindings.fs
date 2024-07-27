@@ -33,10 +33,10 @@ type Bindings() =
         nameof __.WorkId |> Binding.oneWay _.WorkId
 
     member val WorkNumber : Binding =
-        nameof __.WorkNumber |> Binding.oneWay (_.Work >> _.Number)
+        nameof __.WorkNumber |> Binding.oneWay (_.Work >> _.EditableNumber)
 
     member val WorkTitle : Binding =
-        nameof __.WorkTitle |> Binding.oneWay (_.Work >> _.Title)
+        nameof __.WorkTitle |> Binding.oneWay (_.Work >> _.EditableTitle)
 
     member val StartPeriod : Binding =
         nameof __.StartPeriod |> Binding.oneWayOpt (_.Statistic >> Option.map (_.Period >> _.Start >> date))

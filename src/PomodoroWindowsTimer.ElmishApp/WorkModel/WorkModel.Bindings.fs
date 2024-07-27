@@ -32,11 +32,18 @@ type Bindings() =
     member val Title : Binding =
         nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
 
+    member val LastEventCreatedAt : Binding =
+        nameof __.LastEventCreatedAt |> Binding.oneWayOpt (_.Work >> _.LastEventCreatedAt)
+
+    member val LastEventCreatedAtOrUpdatedAt : Binding =
+        nameof __.LastEventCreatedAtOrUpdatedAt |> Binding.oneWay (fun m -> m.Work |> _.LastEventCreatedAt |> Option.defaultValue m.Work.UpdatedAt)
+
+
     member val EditNumber : Binding =
-        nameof __.EditNumber |> Binding.twoWay (_.Number, Msg.SetNumber)
+        nameof __.EditNumber |> Binding.twoWay (_.EditableNumber, Msg.SetNumber)
 
     member val EditTitle : Binding =
-        nameof __.EditTitle |> Binding.twoWay (_.Title, Msg.SetTitle)
+        nameof __.EditTitle |> Binding.twoWay (_.EditableTitle, Msg.SetTitle)
 
     member val UpdatedAt : Binding =
         nameof __.UpdatedAt |> Binding.oneWay (_.Work >> _.UpdatedAt)

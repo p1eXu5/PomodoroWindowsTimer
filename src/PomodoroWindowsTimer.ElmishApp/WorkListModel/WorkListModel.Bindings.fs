@@ -51,4 +51,7 @@ type Bindings() =
     member val UnselectWorkCommand : Binding =
         nameof __.UnselectWorkCommand |> Binding.cmd Msg.UnselectWork
 
+    member val LastDayCount : Binding =
+        nameof __.LastDayCount |> Binding.twoWay (lastDayCountText, Msg.SetLastDayCount)
+
 

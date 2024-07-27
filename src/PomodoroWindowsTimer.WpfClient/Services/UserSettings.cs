@@ -199,4 +199,14 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+
+    public int LastDayCount
+    {
+        get => Properties.Settings.Default.LastDayCount;
+        set
+        {
+            Properties.Settings.Default.LastDayCount = value;
+            Properties.Settings.Default.Save();
+        }
+    }
 }

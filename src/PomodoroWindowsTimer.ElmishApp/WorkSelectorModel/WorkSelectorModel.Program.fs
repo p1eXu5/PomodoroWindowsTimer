@@ -8,6 +8,7 @@ open Elmish.Extensions.Helpers
 open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkSelectorModel
+open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: ILogger<WorkSelectorModel>) msg model =
     match msg, model.SubModel with

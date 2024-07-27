@@ -131,8 +131,8 @@ let ``WorkList sub model work list contains`` (work: Work) =
             | WorkSelectorSubModel.WorkList workListModel ->
                 match workListModel.Works with
                 | AsyncDeferred.Retrieved workList ->
-                    workList |> List.map _.Title |> should contain work.Title
-                    workList |> List.map _.Number |> should contain work.Number
+                    workList |> List.map _.EditableTitle |> should contain work.Title
+                    workList |> List.map _.EditableNumber |> should contain work.Number
                 | _ -> assertionExn "WorkListModel Works are not retrieved."
             | _ -> assertionExn "Is not WorkList submodel."
         | _ -> assertionExn "WorkSelector is None."
@@ -149,8 +149,8 @@ let ``WorkList sub model work list does not contain`` (work: Work) =
             | WorkSelectorSubModel.WorkList workListModel ->
                 match workListModel.Works with
                 | AsyncDeferred.Retrieved workList ->
-                    workList |> List.map _.Title |> should not' (contain work.Title)
-                    workList |> List.map _.Number |> should not' (contain work.Number)
+                    workList |> List.map _.EditableTitle |> should not' (contain work.Title)
+                    workList |> List.map _.EditableNumber |> should not' (contain work.Number)
                 | _ -> assertionExn "WorkListModel Works are not retrieved."
             | _ -> assertionExn "Is not WorkList submodel."
         | _ -> assertionExn "WorkSelector is None."

@@ -7,8 +7,8 @@ open Elmish.Extensions
 type WorkModel =
     {
         Work: PomodoroWindowsTimer.Types.Work
-        Number: string
-        Title: string
+        EditableNumber: string
+        EditableTitle: string
         UpdateState: AsyncDeferred<DateTimeOffset>
         CreateNewState: AsyncDeferred<uint64 * DateTimeOffset>
     }
@@ -75,17 +75,17 @@ module WorkModel =
     let init work =
         {
             Work = work
-            Number = work.Number
-            Title = work.Title
+            EditableNumber = work.Number
+            EditableTitle = work.Title
             UpdateState = AsyncDeferred.NotRequested
             CreateNewState = AsyncDeferred.NotRequested
         }
 
     let withNumber number (model: WorkModel) =
-        { model with Number = number }
+        { model with EditableNumber = number }
 
     let withTitle title (model: WorkModel) =
-        { model with Title = title }
+        { model with EditableTitle = title }
 
     let withUpdateState deff (model: WorkModel) =
         { model with UpdateState = deff }
@@ -93,8 +93,8 @@ module WorkModel =
     let withUpdatedWork updatedAt (model: WorkModel) =
         {
             model with
-                Work.Number = model.Number
-                Work.Title = model.Title
+                Work.Number = model.EditableNumber
+                Work.Title = model.EditableTitle
                 Work.UpdatedAt = updatedAt
         }
 
@@ -105,16 +105,16 @@ module WorkModel =
         {
             model with
                 Work.Id = id
-                Work.Number = model.Number
-                Work.Title = model.Title
+                Work.Number = model.EditableNumber
+                Work.Title = model.EditableTitle
                 Work.CreatedAt = createdAt
                 Work.UpdatedAt = createdAt
         }
 
     let isModified (model: WorkModel) =
         not (
-            model.Work.Number |> String.equalOrigin model.Number
-            && model.Work.Title |> String.equalOrigin model.Title
+            model.Work.Number |> String.equalOrigin model.EditableNumber
+            && model.Work.Title |> String.equalOrigin model.EditableTitle
         )
 
     let ifModifiedThen v (model: WorkModel) =

@@ -1,5 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+
 type WorkSelectorModel =
     {
         SubModel: WorkSelectorSubModel
@@ -45,7 +47,7 @@ module WorkSelectorModel =
 
     open Elmish
 
-    let init selectedWorkId =
+    let init (userSettings: IUserSettings) selectedWorkId =
         let (m, cmd) = WorkListModel.init selectedWorkId
         {
             SubModel = m |> WorkSelectorSubModel.WorkList

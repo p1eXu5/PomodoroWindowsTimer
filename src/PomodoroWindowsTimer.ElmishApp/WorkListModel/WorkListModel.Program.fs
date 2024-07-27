@@ -11,7 +11,7 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkListModel
 
-let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMessageQueue: IErrorMessageQueue) updateWorkModel msg model =
+let update (userSettings: IUserSettings) (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMessageQueue: IErrorMessageQueue) updateWorkModel msg model =
     let loadWorksTask ct =
         task {
             let! works = workRepo.ReadAllAsync ct
@@ -45,16 +45,26 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
             match workModels with
             | [] ->
                 model |> withWorks deff
-                , Cmd.ofMsg (Msg.SetSelectedWorkId None)
+                , Cmd.batch [
+                    Cmd.ofMsg (Msg.SetSelectedWorkId None)
+                    Cmd.ofMsg (Msg.SetLastDayCount "")
+                ]
                 , Intent.SwitchToCreateWork
             | _ ->
                 match model.SelectedWorkId with
                 | Some selId ->
                     if workModels |> List.exists (_.Work >> _.Id >> (=) selId) then
-                        model |> withWorks deff |> withCmdNone |> withSelectIntent
+                        (
+                            model |> withWorks deff
+                            , Cmd.ofMsg Msg.LoadLastDayCount
+                        )
+                        |> withSelectIntent
                     else
                         model |> withWorks deff
-                        , Cmd.ofMsg (Msg.SetSelectedWorkId None)
+                        , Cmd.batch [
+                            Cmd.ofMsg (Msg.SetSelectedWorkId None)
+                            Cmd.ofMsg Msg.LoadLastDayCount
+                        ]
                         , Intent.Unselect
                 | None ->
                     model |> withWorks deff |> withCmdNone |> withNoIntent
@@ -92,6 +102,20 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMe
 
     | Msg.UnselectWork ->
         model |> withSelectedWorkId None |> withCmdNone |> withSelectIntent
+
+    | Msg.SetLastDayCount v ->
+        let model = model |> withParsingLastDayCount v
+
+        model
+        , Cmd.OfFunc.attempt (fun value -> userSettings.LastDayCount <- value) model.LastDayCount Msg.OnExn
+        , Intent.None
+
+    | Msg.LoadLastDayCount ->
+        model |> withLastDayCount userSettings.LastDayCount |> withCmdNone |> withNoIntent
+
+    | Msg.OnExn ex ->
+        errorMessageQueue.EnqueueError ex.Message
+        model |> withCmdNone |> withNoIntent
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)

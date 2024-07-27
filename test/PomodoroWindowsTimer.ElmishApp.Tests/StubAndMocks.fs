@@ -33,6 +33,7 @@ type UserSettingsStub () =
         member _.CurrentWork with get () = dict["CurrentWork"] :?> Work option and set v = dict["CurrentWork"] <- v
         member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
         member _.RollbackWorkStrategy with get () = dict["RollbackWorkStrategy"] :?> RollbackWorkStrategy and set v = dict["RollbackWorkStrategy"] <- v
+        member _.LastDayCount with get () = dict["LastDayCount"] :?> int and set v = dict["LastDayCount"] <- v
 
 
 [<RequireQualifiedAccess>]

@@ -25,8 +25,8 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
     | MsgWith.``Start of Update`` model (deff, cts) ->
         let updateWork =
             { model.Work with
-                Number = model.Number
-                Title = model.Title
+                Number = model.EditableNumber
+                Title = model.EditableTitle
             }
 
         (
@@ -46,7 +46,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
     | MsgWith.``Start of CreateNew`` model (deff, cts) ->
         (
             model |> withCreateNewState deff
-            , Cmd.OfTask.perform (workRepo.InsertAsync model.Number model.Title) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
+            , Cmd.OfTask.perform (workRepo.InsertAsync model.EditableNumber model.EditableTitle) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
         )
         |> withNoIntent
 

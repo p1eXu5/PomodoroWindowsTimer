@@ -52,6 +52,7 @@ type IUserSettings =
     inherit ICurrentWorkItemSettings
     abstract LastStatisticPeriod: DateOnlyPeriod option with get, set
     abstract RollbackWorkStrategy: RollbackWorkStrategy with get, set
+    abstract LastDayCount: int with get, set
 
 
 type IThemeSwitcher =

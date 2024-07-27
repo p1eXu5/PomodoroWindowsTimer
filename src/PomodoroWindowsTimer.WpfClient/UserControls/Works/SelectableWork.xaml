@@ -14,146 +14,146 @@
              MouseRightButtonDown="m_Root_MouseDown"
              mc:Ignorable="d"
              >
-    <UserControl.Resources>
-        <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
-    </UserControl.Resources>
-    <Border VerticalAlignment="Center"
-            BorderThickness="0,1,0,1"
-            BorderBrush="Black"
+  <UserControl.Resources>
+    <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
+  </UserControl.Resources>
+  <Border VerticalAlignment="Center"
+          BorderThickness="0,1,0,1"
+          BorderBrush="Black"
+          SnapsToDevicePixels="True"
+          >
+    <Border x:Name="m_Border"
+            VerticalAlignment="Center"
             SnapsToDevicePixels="True"
             >
-        <Border x:Name="m_Border"
+      <Border.Style>
+        <Style TargetType="Border">
+          <Setter Property="BorderThickness" Value="1,0,0,0" />
+          <Setter Property="Background" Value="#030C10" />
+          <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+          <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected,
+                                           ElementName=m_Root}"
+                         Value="True"
+                         >
+              <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </Border.Style>
+      <Grid Margin="0"
+            VerticalAlignment="Center"
+            >
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"
+                            SharedSizeGroup="gr_WorkName"
+                            />
+          <ColumnDefinition Width="50"
+                            SharedSizeGroup="gr_Button"
+                            />
+        </Grid.ColumnDefinitions>
+        <!--  with Auto height button is not appearing correctly  -->
+        <Button x:Name="m_SelectButton"
+                Command="{Binding SelectCommand}"
+                Style="{StaticResource MaterialDesignRaisedButton}"
+                Height="Auto"
+                Padding="0"
                 VerticalAlignment="Center"
-                SnapsToDevicePixels="True"
+                HorizontalContentAlignment="Left"
+                VerticalContentAlignment="Center"
+                materialDesign:ButtonAssist.CornerRadius="0"
+                d:Height="52"
+                Background="Transparent"
+                BorderThickness="0"
                 >
-            <Border.Style>
-                <Style TargetType="Border">
-                    <Setter Property="BorderThickness" Value="1,0,0,0" />
-                    <Setter Property="Background" Value="#030C10" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-                    <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsSelected,
-                                                       ElementName=m_Root}"
-                                     Value="True"
-                                     >
-                            <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <Grid Margin="0"
-                  VerticalAlignment="Center"
-                  >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"
-                                      SharedSizeGroup="gr_WorkName"
-                                      />
-                    <ColumnDefinition Width="50"
-                                      SharedSizeGroup="gr_Button"
-                                      />
-                </Grid.ColumnDefinitions>
-                <!--  with Auto height button is not appearing correctly  -->
-                <Button x:Name="m_SelectButton"
-                        Command="{Binding SelectCommand}"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
-                        Height="Auto"
-                        Padding="0"
-                        VerticalAlignment="Center"
-                        HorizontalContentAlignment="Left"
-                        VerticalContentAlignment="Center"
-                        materialDesign:ButtonAssist.CornerRadius="0"
-                        d:Height="52"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        >
-                    <StackPanel Width="{Binding ElementName=m_SelectButton,
-                                                Path=ActualWidth}"
-                                VerticalAlignment="Center"
-                                Orientation="Vertical"
-                                TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
-                                >
-                        <Grid HorizontalAlignment="Stretch">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
+          <StackPanel Width="{Binding ElementName=m_SelectButton,
+                                      Path=ActualWidth}"
+                      VerticalAlignment="Center"
+                      Orientation="Vertical"
+                      TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+                      >
+            <Grid HorizontalAlignment="Stretch">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+              </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0"
-                                       Margin="10,6,0,0"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Bottom"
-                                       materialDesign:HintAssist.Hint="Number"
-                                       Text="{Binding Number,
-                                                      Converter={StaticResource conv_NoNumberConverter},
-                                                      FallbackValue='NO NUMBER'}"
-                                       FontWeight="Normal"
-                                       FontSize="11"
-                                       />
+              <TextBlock Grid.Column="0"
+                         Margin="10,6,0,0"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Bottom"
+                         materialDesign:HintAssist.Hint="Number"
+                         Text="{Binding Number,
+                                        Converter={StaticResource conv_NoNumberConverter},
+                                        FallbackValue='NO NUMBER'}"
+                         FontWeight="Normal"
+                         FontSize="11"
+                         />
 
-                            <TextBlock Grid.Column="1"
-                                       Margin="0,6,5,0"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Bottom"
-                                       materialDesign:HintAssist.Hint="Number"
-                                       Text="{Binding UpdatedAt,
-                                                      Converter={StaticResource conv_DateTimeOffsetToShortDate},
-                                                      FallbackValue='12.02.2024'}"
-                                       FontWeight="Normal"
-                                       FontSize="11"
-                                       />
-                        </Grid>
-                        <!--  Title  -->
-                        <TextBlock Grid.Row="1"
-                                   Grid.Column="0"
-                                   x:Name="m_TitleTextBlock"
-                                   ToolTip="{Binding Title}"
-                                   Margin="10,5,5,5"
-                                   VerticalAlignment="Top"
-                                   materialDesign:HintAssist.Hint="Title"
-                                   Text="{Binding Title,
-                                                  FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
-                                   FontSize="16"
-                                   TextWrapping="NoWrap"
-                                   TextTrimming="CharacterEllipsis"
-                                   FontWeight="Light"
-                                   />
-                    </StackPanel>
-                </Button>
-                <Button Grid.RowSpan="2"
-                        Grid.Column="1"
-                        x:Name="m_Button"
-                        Command="{Binding EditCommand}"
-                        Content="{materialDesign:PackIcon Pencil}"
-                        ToolTip="Edit"
-                        Height="{Binding ElementName=m_SelectButton,
-                                         Path=ActualHeight,
-                                         Mode=OneWay}"
-                        VerticalAlignment="Stretch"
-                        materialDesign:ButtonAssist.CornerRadius="0"
-                        >
-                    <Button.Style>
-                        <Style TargetType="Button"
-                               BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
-                               >
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderThickness" Value="1,0,0,0" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected,
-                                                               ElementName=m_Root}"
-                                             Value="True"
-                                             >
-                                    <!--<Setter Property="Background" Value="#012A3C" />-->
-                                    <Setter Property="BorderThickness" Value="1,0,0,0" />
-                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+              <TextBlock Grid.Column="1"
+                         Margin="0,6,5,0"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Bottom"
+                         materialDesign:HintAssist.Hint="Number"
+                         Text="{Binding LastEventCreatedAtOrUpdatedAt,
+                                        Converter={StaticResource conv_DateTimeOffsetToShortDate},
+                                        FallbackValue='12.02.2024'}"
+                         FontWeight="Normal"
+                         FontSize="11"
+                         />
             </Grid>
-        </Border>
+            <!--  Title  -->
+            <TextBlock Grid.Row="1"
+                       Grid.Column="0"
+                       x:Name="m_TitleTextBlock"
+                       ToolTip="{Binding Title}"
+                       Margin="10,5,5,5"
+                       VerticalAlignment="Top"
+                       materialDesign:HintAssist.Hint="Title"
+                       Text="{Binding Title,
+                                      FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                       FontSize="16"
+                       TextWrapping="NoWrap"
+                       TextTrimming="CharacterEllipsis"
+                       FontWeight="Light"
+                       />
+          </StackPanel>
+        </Button>
+        <Button Grid.RowSpan="2"
+                Grid.Column="1"
+                x:Name="m_Button"
+                Command="{Binding EditCommand}"
+                Content="{materialDesign:PackIcon Pencil}"
+                ToolTip="Edit"
+                Height="{Binding ElementName=m_SelectButton,
+                                 Path=ActualHeight,
+                                 Mode=OneWay}"
+                VerticalAlignment="Stretch"
+                materialDesign:ButtonAssist.CornerRadius="0"
+                >
+          <Button.Style>
+            <Style TargetType="Button"
+                   BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
+                   >
+              <Setter Property="Background" Value="Transparent" />
+              <Setter Property="BorderThickness" Value="1,0,0,0" />
+              <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+              <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected,
+                                               ElementName=m_Root}"
+                             Value="True"
+                             >
+                  <!--<Setter Property="Background" Value="#012A3C" />-->
+                  <Setter Property="BorderThickness" Value="1,0,0,0" />
+                  <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </Button.Style>
+        </Button>
+      </Grid>
     </Border>
+  </Border>
 </UserControl>

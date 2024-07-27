@@ -1,11 +1,14 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
 open Elmish.Extensions
+open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 type WorkListModel =
     {
         Works: AsyncDeferred<WorkModel list>
         SelectedWorkId: uint64 option
+        /// Filters works by the number of days from the current day to the time of last event or last update.
+        LastDayCount: int
     }
 
 
@@ -17,6 +20,9 @@ module WorkListModel =
         | WorkModelMsg of uint64 * WorkModel.Msg
         | CreateWork
         | UnselectWork
+        | SetLastDayCount of string
+        | LoadLastDayCount
+        | OnExn of exn
 
     module MsgWith =
 
@@ -62,6 +68,7 @@ module WorkListModel =
         {
             Works = AsyncDeferred.NotRequested
             SelectedWorkId = selectedWorkId
+            LastDayCount = 0
         }
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadWorkList)
 
@@ -79,3 +86,20 @@ module WorkListModel =
             |> AsyncDeferred.chooseRetrieved
             |> Option.bind (List.tryFind (_.Work >> _.Id >> (=) id))
         )
+
+    let lastDayCountText (model: WorkListModel) =
+        if model.LastDayCount <= 0 then
+            ""
+        else
+            sprintf "%i"  model.LastDayCount
+
+    let withParsingLastDayCount (v: string) (model: WorkListModel) =
+        match System.Int32.TryParse(v) with
+        | true, intVal ->
+            { model with LastDayCount = intVal }
+        | false, _ ->
+            { model with LastDayCount = 0 }
+
+    let withLastDayCount (v: int) (model: WorkListModel) =
+        { model with LastDayCount = v }
+
