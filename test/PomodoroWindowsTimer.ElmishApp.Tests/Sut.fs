@@ -9,6 +9,7 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open p1eXu5.AspNetCore.Testing
 open p1eXu5.AspNetCore.Testing.MockRepository
+open System.Collections.Concurrent
 
 type ISut =
     inherit IScenarioContext
@@ -16,7 +17,7 @@ type ISut =
     abstract ServiceProvider: IServiceProvider
     abstract Dispatcher: TestDispatcher with get
     abstract MainModel: MainModel with get
-    abstract MsgStack: Stack<MainModel.Msg> with get
+    abstract MsgStack: ConcurrentStack<MainModel.Msg> with get
     abstract MockRepository: MockRepository with get
 
 
@@ -30,7 +31,7 @@ module Sut =
         let testDispatcher = new TestDispatcher()
         let dict = new Dictionary<string, obj>(5)
         let mainModel = ref Unchecked.defaultof<MainModel>
-        let msgStack = Stack<MainModel.Msg>()
+        let msgStack = ConcurrentStack<MainModel.Msg>()
 
         try
             bootstrap.StartHost()

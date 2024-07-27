@@ -19,6 +19,7 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 open PomodoroWindowsTimer.WpfClient
+open System.Collections.Concurrent
 
 type TestBootstrap () =
     inherit Bootstrap()
@@ -97,7 +98,7 @@ type TestBootstrap () =
         )
 
 
-    member this.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: Stack<MainModel.Msg>, testDispatcher: TestDispatcher) =
+    member this.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: ConcurrentStack<MainModel.Msg>, testDispatcher: TestDispatcher) =
         do this.WaitDbSeeding()
         
         let factory = base.GetElmishProgramFactory()

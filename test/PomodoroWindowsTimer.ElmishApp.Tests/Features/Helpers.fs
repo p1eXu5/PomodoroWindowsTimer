@@ -37,7 +37,7 @@ module Scenario =
         scenario {
             let! (state: ISut) = Scenario.getState
             let msgPresents = SpinWait.SpinUntil(
-                Func<bool>(fun () -> state.MsgStack |> Seq.exists msgPredicate),
+                Func<bool>(fun () -> state.MsgStack.ToArray() |> Seq.exists msgPredicate),
                 ``2sec``)
             msgPresents |> shouldL be True $"%s{msgDescription} has not been dispatched within 2 seconds."
         }
@@ -46,7 +46,7 @@ module Scenario =
         scenario {
             let! (state: ISut) = Scenario.getState
             let msgPresents = SpinWait.SpinUntil(
-                Func<bool>(fun () -> state.MsgStack |> Seq.filter msgPredicate |> Seq.length |> (=) (int times)),
+                Func<bool>(fun () -> state.MsgStack .ToArray()|> Seq.filter msgPredicate |> Seq.length |> (=) (int times)),
                 ``2sec``)
             msgPresents |> shouldL be True $"%s{msgDescription} has not been dispatched within 2 seconds."
         }
@@ -55,7 +55,7 @@ module Scenario =
         scenario {
             let! (state: ISut) = Scenario.getState
             let msgPresents = SpinWait.SpinUntil(
-                Func<bool>(fun () -> state.MsgStack |> Seq.exists msgPredicate),
+                Func<bool>(fun () -> state.MsgStack.ToArray() |> Seq.exists msgPredicate),
                 int (float delay * 1000.0))
             msgPresents |> shouldL be True $"%s{msgDescription} has not been dispatched within {delay} seconds."
         }
@@ -64,7 +64,7 @@ module Scenario =
         scenario {
             let! (state: ISut) = Scenario.getState
             let msgPresents = SpinWait.SpinUntil(
-                Func<bool>(fun () -> state.MsgStack |> Seq.exists msgPredicate),
+                Func<bool>(fun () -> state.MsgStack.ToArray() |> Seq.exists msgPredicate),
                 ``1sec``)
             msgPresents |> shouldL be False $"%s{msgDescription} has been dispatched within 2 seconds."
         }
