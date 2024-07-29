@@ -58,7 +58,7 @@ type ActiveTimePoint =
         OriginId: TimePointId
         Name: Name
         // TODO: rename to RemaininigTimeSpan
-        RunningTimeSpan: TimeSpan
+        RemainingTimeSpan: TimeSpan
         TimeSpan: TimeSpan
         Kind: Kind
         KindAlias: Alias
@@ -432,7 +432,7 @@ module TimePoint =
             Id = Guid.NewGuid()
             OriginId = timePoint.Id
             Name = timePoint.Name
-            RunningTimeSpan = runningTimeSpan
+            RemainingTimeSpan = runningTimeSpan
             TimeSpan = timePoint.TimeSpan
             Kind = timePoint.Kind
             KindAlias = timePoint.KindAlias

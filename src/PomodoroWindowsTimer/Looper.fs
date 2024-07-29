@@ -144,7 +144,7 @@ type Looper(
             // in first time next time point is equal to preloaded timepoint
             match timePointQueue.TryGetNext(), state.ActiveTimePoint with
             | Some nextTp, Some actTp ->
-                if nextTp.Id = actTp.OriginId && actTp.RunningTimeSpan = TimeSpan.Zero then
+                if nextTp.Id = actTp.OriginId && actTp.RemainingTimeSpan = TimeSpan.Zero then
                     timePointQueue.TryGetNext()
                 else
                     nextTp |> Some
@@ -171,7 +171,7 @@ type Looper(
     let withActiveTimePointTimeSpan (seconds: float<sec>) (state: State) =
         match state.ActiveTimePoint with
         | Some atp ->
-            let atp = { atp with RunningTimeSpan = TimeSpan.FromSeconds(float seconds) }
+            let atp = { atp with RemainingTimeSpan = TimeSpan.FromSeconds(float seconds) }
             tryPostEvent state (LooperEvent.TimePointTimeReduced atp)
             { state with ActiveTimePoint = atp |> Some }
         | None ->
@@ -215,9 +215,9 @@ type Looper(
                     | Tick when not (state.IsStopped) ->
                         let atp = state.ActiveTimePoint |> Option.get
                         let dt = now ()
-                        let atp = { atp with RunningTimeSpan = atp.RunningTimeSpan - (dt - state.StartTime) }
+                        let atp = { atp with RemainingTimeSpan = atp.RemainingTimeSpan - (dt - state.StartTime) }
 
-                        if MathF.Floor(float32 atp.RunningTimeSpan.TotalSeconds) <= 0f then
+                        if MathF.Floor(float32 atp.RemainingTimeSpan.TotalSeconds) <= 0f then
                             let tpOpt = timePointQueue.TryGetNext() |> Option.map TimePoint.toActiveTimePoint
                             match tpOpt with
                             | None ->
@@ -226,7 +226,7 @@ type Looper(
                                 return! loop { state with StartTime = dt; ActiveTimePoint = None }
 
                             | Some tp ->
-                                let newAtp = { tp with RunningTimeSpan = tp.RunningTimeSpan + atp.RunningTimeSpan }
+                                let newAtp = { tp with RemainingTimeSpan = tp.RemainingTimeSpan + atp.RemainingTimeSpan }
                                 tryPostEvent (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init newAtp (atp |> Some)))
                                 timer.Change(int tickMilliseconds, 0) |> ignore
                                 return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }

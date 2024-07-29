@@ -157,7 +157,7 @@ module PlayerModel =
 
     let getActiveSpentTime (model: PlayerModel) =
         match model.ActiveTimePoint with
-        | Some atp -> (atp.RunningTimeSpan).TotalSeconds
+        | Some atp -> (atp.RemainingTimeSpan).TotalSeconds
         | _ -> 0.0
 
     /// Returns model OriginTimePoint.TimeSpan.TotalSeconds.
@@ -195,7 +195,7 @@ module PlayerModel =
     let withPreShiftState (model: PlayerModel) =
         let atp = model.ActiveTimePoint.Value
         { model with
-            PreShiftActiveTimeSpan = atp.TimeSpan.TotalSeconds * 1.0<sec>
+            PreShiftActiveTimeSpan = atp.RemainingTimeSpan.TotalSeconds * 1.0<sec>
             LooperState = TimeShifting model.LooperState
         }
 
