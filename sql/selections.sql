@@ -77,3 +77,10 @@ LEFT JOIN work_last_event AS e ON e.work_id = w.id
 WHERE w.number LIKE 'Text'
     OR w.title LIKE 'Text'
 ;
+
+SELECT *
+FROM work_event
+WHERE event_json LIKE '%"Case":_"WorkStarted"%' OR event_json LIKE '%"Case":"WorkStarted"%'
+ORDER BY created_at ASC;
+
+SELECT COUNT(*) from work_event we; 
