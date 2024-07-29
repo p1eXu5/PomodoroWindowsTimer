@@ -7,46 +7,46 @@
              Exit="Application_Exit"
              Startup="Application_Startup"
              >
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
 
-                <!--  for IntelliSense, must be placed before BundledTheme  -->
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
+        <!--  for IntelliSense, must be placed before BundledTheme  -->
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
 
-                <materialDesign:CustomColorTheme BaseTheme="Dark"
-                                                 PrimaryColor="LightSteelBlue"
-                                                 SecondaryColor="Lime"
-                                                 >
-                    <materialDesign:CustomColorTheme.ColorAdjustment>
-                        <materialDesign:ColorAdjustment Colors="All"
-                                                        Contrast="Medium"
-                                                        DesiredContrastRatio="3.0"
-                                                        />
-                    </materialDesign:CustomColorTheme.ColorAdjustment>
-                </materialDesign:CustomColorTheme>
+        <materialDesign:CustomColorTheme BaseTheme="Dark"
+                                         PrimaryColor="LightSteelBlue"
+                                         SecondaryColor="Lime"
+                                         >
+          <materialDesign:CustomColorTheme.ColorAdjustment>
+            <materialDesign:ColorAdjustment Colors="All"
+                                            Contrast="Medium"
+                                            DesiredContrastRatio="3.0"
+                                            />
+          </materialDesign:CustomColorTheme.ColorAdjustment>
+        </materialDesign:CustomColorTheme>
 
 
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
 
-                <digitPanel:DigitPanelTheme />
+        <digitPanel:DigitPanelTheme />
 
-                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/Defaults.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePoints.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePointsV2.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/TimePointConstructor.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/DialogButtons.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/Defaults.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePoints.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePointsV2.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/TimePointConstructor.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/DialogButtons.xaml" />
 
-            </ResourceDictionary.MergedDictionaries>
+      </ResourceDictionary.MergedDictionaries>
 
-            <!--<SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />-->
+      <!--<SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />-->
 
-            <SolidColorBrush x:Key="WorkDigitForeground" Color="#00FF00" />
+      <SolidColorBrush x:Key="WorkDigitForeground" Color="#00FF00" />
 
-            <SolidColorBrush x:Key="BreakDigitForeground" Color="#FF0000" />
-        </ResourceDictionary>
-    </Application.Resources>
+      <SolidColorBrush x:Key="BreakDigitForeground" Color="#FF0000" />
+    </ResourceDictionary>
+  </Application.Resources>
 </Application>

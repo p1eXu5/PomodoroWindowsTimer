@@ -9,97 +9,98 @@
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              xmlns:PlayerModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.PlayerModel;assembly=PomodoroWindowsTimer.ElmishApp"
              d:DataContext="{d:DesignInstance Type=PlayerModel:Bindings, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450"
+             d:DesignHeight="250"
              d:DesignWidth="800"
+             d:Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
              mc:Ignorable="d"
              >
-    <UserControl.Resources>
-        <conv:BooleansToDigitWidthConverter x:Key="conv_BooleansToDigitWidth" />
-    </UserControl.Resources>
-    <StackPanel Orientation="Vertical">
-        <!--  current TimePoint name  -->
-        <TextBlock Margin="1,0,0,20"
-                   Foreground="{Binding ElementName=m_TimerRoot,
-                                        Path=Foreground}"
-                   Text="{Binding ActiveTimePointName,
-                                  FallbackValue='Time Point Name'}"
-                   />
+  <UserControl.Resources>
+    <conv:BooleansToDigitWidthConverter x:Key="conv_BooleansToDigitWidth" />
+  </UserControl.Resources>
+  <StackPanel Orientation="Vertical">
+    <!--  current TimePoint name  -->
+    <TextBlock Margin="1,0,0,20"
+               Foreground="{Binding ElementName=m_TimerRoot,
+                                    Path=Foreground}"
+               Text="{Binding ActiveTimePointName,
+                              FallbackValue='Time Point Name'}"
+               />
 
-        <!--  timer table  -->
-        <digitPanel:TimerTable HorizontalAlignment="Stretch"
-                               VerticalAlignment="Center"
-                               DigitBackground="{Binding ElementName=m_TimerRoot,
-                                                         Path=DigitBackground}"
-                               Foreground="{Binding ElementName=m_TimerRoot,
-                                                    Path=Foreground}"
-                               Background="{Binding ElementName=m_TimerRoot,
-                                                    Path=Background}"
-                               Format="mm':'ss"
-                               Value="{Binding ActiveTime,
-                                               FallbackValue=00:00:00.00}"
-                               >
-            <digitPanel:TimerTable.Style>
-                <Style TargetType="digitPanel:TimerTable">
-                    <Setter Property="DigitWidth">
-                        <Setter.Value>
-                            <MultiBinding Converter="{StaticResource conv_BooleansToDigitWidth}"
-                                          Mode="OneTime"
-                                          >
-                                <Binding Path="DataContext.IsTimePointsShown"
-                                         RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                         AncestorType=Window}"
-                                         />
-                                <Binding Path="DataContext.IsWorkSelectorLoaded"
-                                         RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                         AncestorType=Window}"
-                                         />
-                            </MultiBinding>
-                        </Setter.Value>
-                    </Setter>
-                    <Style.Triggers>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding DataContext.IsTimePointsShown, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False" />
-                                <Condition Binding="{Binding DataContext.IsWorkSelectorLoaded, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <MultiDataTrigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
-                                                         To="100"
-                                                         Duration="0:0:0.35"
-                                                         />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </MultiDataTrigger.EnterActions>
-                            <MultiDataTrigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
-                                                         To="75"
-                                                         Duration="0:0:0.35"
-                                                         />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </MultiDataTrigger.ExitActions>
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </digitPanel:TimerTable.Style>
-        </digitPanel:TimerTable>
+    <!--  timer table  -->
+    <digitPanel:TimerTable HorizontalAlignment="Stretch"
+                           VerticalAlignment="Center"
+                           DigitBackground="{Binding ElementName=m_TimerRoot,
+                                                     Path=DigitBackground}"
+                           Foreground="{Binding ElementName=m_TimerRoot,
+                                                Path=Foreground}"
+                           Background="{Binding ElementName=m_TimerRoot,
+                                                Path=Background}"
+                           Format="mm':'ss"
+                           Value="{Binding ActiveTime,
+                                           FallbackValue=00:00:00.00}"
+                           >
+      <digitPanel:TimerTable.Style>
+        <Style TargetType="digitPanel:TimerTable">
+          <Setter Property="DigitWidth">
+            <Setter.Value>
+              <MultiBinding Converter="{StaticResource conv_BooleansToDigitWidth}"
+                            Mode="OneTime"
+                            >
+                <Binding Path="DataContext.IsTimePointsShown"
+                         RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                         AncestorType=Window}"
+                         />
+                <Binding Path="DataContext.IsWorkSelectorLoaded"
+                         RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                         AncestorType=Window}"
+                         />
+              </MultiBinding>
+            </Setter.Value>
+          </Setter>
+          <Style.Triggers>
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding DataContext.IsTimePointsShown, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False" />
+                <Condition Binding="{Binding DataContext.IsWorkSelectorLoaded, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="False" />
+              </MultiDataTrigger.Conditions>
+              <MultiDataTrigger.EnterActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
+                                     To="100"
+                                     Duration="0:0:0.35"
+                                     />
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiDataTrigger.EnterActions>
+              <MultiDataTrigger.ExitActions>
+                <BeginStoryboard>
+                  <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="DigitWidth"
+                                     To="75"
+                                     Duration="0:0:0.35"
+                                     />
+                  </Storyboard>
+                </BeginStoryboard>
+              </MultiDataTrigger.ExitActions>
+            </MultiDataTrigger>
+          </Style.Triggers>
+        </Style>
+      </digitPanel:TimerTable.Style>
+    </digitPanel:TimerTable>
 
-        <!--  slider  -->
-        <Slider DockPanel.Dock="Top"
-                Margin="0,40,0,0"
-                Foreground="{Binding ElementName=m_TimerRoot,
-                                     Path=Foreground}"
-                IsEnabled="{Binding IsActiveTimePointSet}"
-                Maximum="{Binding ActiveTimeDuration}"
-                Minimum="0"
-                Orientation="Horizontal"
-                PreviewMouseDown="Slider_PreChangeActiveTimeSpanCommand"
-                PreviewMouseUp="Slider_PostChangeActiveTimeSpanCommand"
-                Value="{Binding ActiveTimeSeconds}"
-                />
-    </StackPanel>
+    <!--  slider  -->
+    <Slider DockPanel.Dock="Top"
+            Margin="0,40,0,0"
+            Foreground="{Binding ElementName=m_TimerRoot,
+                                 Path=Foreground}"
+            IsEnabled="{Binding IsActiveTimePointSet}"
+            Maximum="{Binding ActiveTimeDuration}"
+            Minimum="0"
+            Orientation="Horizontal"
+            PreviewMouseDown="Slider_PreChangeActiveTimeSpanCommand"
+            PreviewMouseUp="Slider_PostChangeActiveTimeSpanCommand"
+            Value="{Binding ActiveTimeSeconds}"
+            />
+  </StackPanel>
 </UserControl>
