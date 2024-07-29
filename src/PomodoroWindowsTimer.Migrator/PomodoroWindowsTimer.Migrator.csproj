@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="appsettings.json" />
+    <None Remove="sql\Script001_CreateActiveTimePointTable.sql" />
+    <None Remove="sql\Script002_CreateDummyActiveTimePoint.sql" />
+    <None Remove="sql\Script003_CreateActiveTimePointIdColumn.sql" />
+    <None Remove="sql\Script004_CreateActiveTimePointIdIndex.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="sql\Script001_CreateActiveTimePointTable.sql">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="sql\Script002_CreateDummyActiveTimePoint.sql" />
+    <EmbeddedResource Include="sql\Script003_CreateActiveTimePointIdColumn.sql" />
+    <EmbeddedResource Include="sql\Script004_CreateActiveTimePointIdIndex.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-sqlite" Version="5.0.40" />
+    <PackageReference Include="DbUp.Extensions.Microsoft.Logging" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.7" />
+    <PackageReference Include="p1eXu5.CliBootstrap" Version="1.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
+  </ItemGroup>
+
+</Project>

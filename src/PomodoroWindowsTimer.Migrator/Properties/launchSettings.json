@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "dev-db-pc-copy": {
+      "commandName": "Project",
+      "commandLineArgs": "--connection \"Data Source=E:\\db\\PomodoroWindowsTimer\\work - Copy.db;\"",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

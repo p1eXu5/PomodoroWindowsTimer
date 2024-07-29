@@ -33,8 +33,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AEF376B7-D
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Testing.Fakers", "test\PomodoroWindowsTimer.Testing.Fakers\PomodoroWindowsTimer.Testing.Fakers.fsproj", "{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.fsproj", "{AB7600E3-341C-4E01-B483-F46FBE8BD480}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PomodoroWindowsTimer.Exporter.Excel", "src\PomodoroWindowsTimer.Exporter.Excel\PomodoroWindowsTimer.Exporter.Excel.csproj", "{21A6B3B7-FCD1-4D6E-882F-F892A08A336F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{A27FA8E1-2727-4FF9-8698-01526ADDD01C}"
@@ -45,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Storage", "src\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj", "{C57EC492-3405-4E54-A210-F8B2A7377BC9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.csproj", "{99D0C7BE-CC16-424F-A928-A896088E76DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,10 +84,6 @@ Global
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB7600E3-341C-4E01-B483-F46FBE8BD480}.Release|Any CPU.Build.0 = Release|Any CPU
 		{21A6B3B7-FCD1-4D6E-882F-F892A08A336F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{21A6B3B7-FCD1-4D6E-882F-F892A08A336F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21A6B3B7-FCD1-4D6E-882F-F892A08A336F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -96,6 +92,10 @@ Global
 		{C57EC492-3405-4E54-A210-F8B2A7377BC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C57EC492-3405-4E54-A210-F8B2A7377BC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C57EC492-3405-4E54-A210-F8B2A7377BC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -110,11 +110,11 @@ Global
 		{DBB76192-0ABE-47FD-BCCA-397203E26FE9} = {1896E5C8-A5DF-4A76-905B-E4ADB313ADEF}
 		{AEF376B7-DCF6-418F-BFCA-840E40450343} = {E3B48FA2-00B4-4035-BBA2-D89F6E3F505D}
 		{73C67F31-8529-4D7D-BEAA-5F627CE0BA31} = {1896E5C8-A5DF-4A76-905B-E4ADB313ADEF}
-		{AB7600E3-341C-4E01-B483-F46FBE8BD480} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 		{21A6B3B7-FCD1-4D6E-882F-F892A08A336F} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 		{A27FA8E1-2727-4FF9-8698-01526ADDD01C} = {E3B48FA2-00B4-4035-BBA2-D89F6E3F505D}
 		{AD2A9CDD-A5BE-4D9B-BCD3-5EF538CF2EE0} = {A27FA8E1-2727-4FF9-8698-01526ADDD01C}
 		{C57EC492-3405-4E54-A210-F8B2A7377BC9} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
+		{99D0C7BE-CC16-424F-A928-A896088E76DD} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FEFD379F-4D9B-4063-82CF-15AF19AF2B11}
