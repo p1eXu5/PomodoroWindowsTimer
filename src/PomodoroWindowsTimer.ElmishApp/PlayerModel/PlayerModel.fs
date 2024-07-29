@@ -12,13 +12,11 @@ open PomodoroWindowsTimer.Abstractions
 
 type PlayerModel =
     {
-        OriginTimePoint: TimePoint option
-        ActiveTimePoint: TimePoint option
+        ActiveTimePoint: ActiveTimePoint option
 
         LooperState : LooperState
         LastAtpWhenPlayOrNextIsManuallyPressed: UIInitiator option
 
-        // to decide where to add time when Work time point shifting down:
         PreShiftActiveTimeSpan: float<sec>
         NewActiveTimeSpan: float<sec>
 
@@ -31,9 +29,9 @@ and
         | Playing
         | Stopped
         /// To restore LooperState when shifting end and previous state was not Playing.
-        | TimeShiftingAfterNotPlaying of previousState: LooperState
+        | TimeShifting of previousState: LooperState
 and
-    UIInitiator = UIInitiator of TimePoint
+    UIInitiator = UIInitiator of ActiveTimePoint
 
 module PlayerModel =
 
@@ -54,7 +52,7 @@ module PlayerModel =
         | OnExn of exn
     and
         LooperMsg =
-            | TimePointTimeReduced of TimePoint
+            | TimePointTimeReduced of ActiveTimePoint
             /// Includes SetActiveTimePoint and StoreStartedWorkEventTask 
             | TimePointStarted of TimePointStartedEventArgs
 
@@ -71,7 +69,7 @@ module PlayerModel =
 
         let playStopResume (model: PlayerModel) =
             match model.LooperState with
-            | TimeShiftingAfterNotPlaying _
+            | TimeShifting _
             | Initialized -> Msg.Play
             | Playing -> Msg.Stop
             | Stopped -> Msg.Resume
@@ -85,7 +83,6 @@ module PlayerModel =
 
     let init (usrSettings: IUserSettings) =
         {
-            OriginTimePoint = None
             ActiveTimePoint = None
             
             LooperState = Initialized
@@ -113,9 +110,6 @@ module PlayerModel =
         )
         |> Option.defaultValue TimePointKind.Undefined
 
-    let withOriginTimePoint tp (model: PlayerModel) =
-       { model with OriginTimePoint = tp; }
-
     let withActiveTimePoint atp (model: PlayerModel) =
        { model with ActiveTimePoint = atp; }
 
@@ -132,14 +126,14 @@ module PlayerModel =
         )
         |> Option.defaultValue model
 
-    let isLastAtpWhenPlayOrNextIsManuallyPressed (tpOpt: TimePoint option) (model: PlayerModel) =
+    let isLastAtpWhenPlayOrNextIsManuallyPressed (tpOpt: ActiveTimePoint option) (model: PlayerModel) =
         match model.LastAtpWhenPlayOrNextIsManuallyPressed, tpOpt with
         | Some (UIInitiator atp), Some tp -> atp.Id = tp.Id
         | _ -> false
 
     let isLooperStateIsNotInitialized (model: PlayerModel) =
         match model.LooperState with
-        | TimeShiftingAfterNotPlaying s ->
+        | TimeShifting s ->
             match s with
             | Initialized -> false
             | _ -> true
@@ -151,6 +145,10 @@ module PlayerModel =
         | Playing -> true
         | _ -> false
 
+    let activeTimePointIdValue (model: PlayerModel) =
+        model.ActiveTimePoint
+        |> Option.get
+        |> _.Id
 
     let getActiveTimeSpan (model: PlayerModel) =
         model.ActiveTimePoint
@@ -158,12 +156,13 @@ module PlayerModel =
         |> Option.defaultValue TimeSpan.Zero
 
     let getActiveSpentTime (model: PlayerModel) =
-        match model.OriginTimePoint, model.ActiveTimePoint with
-        | Some tp, Some atp -> (tp.TimeSpan - atp.TimeSpan).TotalSeconds
+        match model.ActiveTimePoint with
+        | Some atp -> (atp.RunningTimeSpan).TotalSeconds
         | _ -> 0.0
 
+    /// Returns model OriginTimePoint.TimeSpan.TotalSeconds.
     let getActiveTimeDuration (model: PlayerModel) =
-        model.OriginTimePoint
+        model.ActiveTimePoint
         |> Option.map (fun tp -> tp.TimeSpan.TotalSeconds)
         |> Option.defaultValue 0.0
 
@@ -187,14 +186,18 @@ module PlayerModel =
         | _ ->
             model
 
-    let withShiftTime seconds (model: PlayerModel) =
+    let withNewActiveTimeSpan seconds (model: PlayerModel) =
         { model with NewActiveTimeSpan = seconds }
 
     let withoutShiftAndPreShiftTimes (model: PlayerModel) =
         { model with NewActiveTimeSpan = -1.0<sec>; PreShiftActiveTimeSpan = -1.0<sec>; }
 
-    let withPreShiftActiveTimePointTimeSpan (model: PlayerModel) =
-        { model with PreShiftActiveTimeSpan = model.ActiveTimePoint.Value.TimeSpan.TotalSeconds * 1.0<sec> }
+    let withPreShiftState (model: PlayerModel) =
+        let atp = model.ActiveTimePoint.Value
+        { model with
+            PreShiftActiveTimeSpan = atp.TimeSpan.TotalSeconds * 1.0<sec>
+            LooperState = TimeShifting model.LooperState
+        }
 
     let withDisableSkipBreak v (model: PlayerModel) =
         { model with DisableSkipBreak = v }

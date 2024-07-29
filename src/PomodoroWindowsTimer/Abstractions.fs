@@ -30,7 +30,7 @@ type ILooper =
         /// Tryes to pick TimePoint from queue, if it present
         /// emits TimePointStarted event and sets ActiveTimePoint.
         abstract PreloadTimePoint : unit -> unit
-        abstract GetActiveTimePoint : unit -> TimePoint option
+        abstract GetActiveTimePoint : unit -> ActiveTimePoint option
     end
 
 type IWorkRepository =

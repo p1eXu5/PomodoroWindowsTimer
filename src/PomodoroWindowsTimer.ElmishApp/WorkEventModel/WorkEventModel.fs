@@ -20,8 +20,8 @@ module WorkEventModel =
 
     let init (workEvent: WorkEvent) (offsetTime: TimeSpan option) (prevIsWork: bool) lastTimePointName =
         match workEvent with
-        | WorkStarted (dt, tpName) -> WorkEventDetailsModel.init "started" (tpName |> Some) dt offsetTime |> WorkEventModel.Work
-        | BreakStarted (dt, tpName) -> WorkEventDetailsModel.init "started" (tpName |> Some) dt offsetTime |> WorkEventModel.Break
+        | WorkStarted (dt, tpName, _) -> WorkEventDetailsModel.init "started" (tpName |> Some) dt offsetTime |> WorkEventModel.Work
+        | BreakStarted (dt, tpName, _) -> WorkEventDetailsModel.init "started" (tpName |> Some) dt offsetTime |> WorkEventModel.Break
         | Stopped (createdAt = dt) ->
             if prevIsWork then
                 WorkEventDetailsModel.init "stopped" lastTimePointName dt offsetTime |> WorkEventModel.Work

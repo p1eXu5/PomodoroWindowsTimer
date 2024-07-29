@@ -9,6 +9,7 @@ open Faqt.Operators
 
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Testing.Fakers
 
 [<Category("Projector")>]
 module WorkEventProjectorTests =
@@ -34,7 +35,7 @@ module WorkEventProjectorTests =
         seq {
             TestCaseData(
                 [
-                    (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
+                    (``23:00:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
                 ],
                 {
                     Period =
@@ -50,8 +51,8 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
-                    (``23:10:00``, "Break 1") |> WorkEvent.BreakStarted
+                    (``23:00:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
+                    (``23:10:00``, "Break 1", TimePointId.generate ()) |> WorkEvent.BreakStarted
                 ],
                 {
                     Period =
@@ -67,9 +68,9 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
-                    (``23:10:00``, "Break 1") |> WorkEvent.BreakStarted
-                    (``23:20:00``, "Work 2") |> WorkEvent.WorkStarted
+                    (``23:00:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
+                    (``23:10:00``, "Break 1", TimePointId.generate ()) |> WorkEvent.BreakStarted
+                    (``23:20:00``, "Work 2", TimePointId.generate ()) |> WorkEvent.WorkStarted
                 ],
                 {
                     Period =
@@ -85,10 +86,10 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
-                    (``23:10:00``, "Break 1") |> WorkEvent.BreakStarted
-                    (``23:20:00``, "Work 2") |> WorkEvent.WorkStarted
-                    (``23:30:00``, "Long Break") |> WorkEvent.BreakStarted
+                    (``23:00:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
+                    (``23:10:00``, "Break 1", TimePointId.generate ()) |> WorkEvent.BreakStarted
+                    (``23:20:00``, "Work 2", TimePointId.generate ()) |> WorkEvent.WorkStarted
+                    (``23:30:00``, "Long Break", TimePointId.generate ()) |> WorkEvent.BreakStarted
                 ],
                 {
                     Period =
@@ -104,7 +105,7 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
+                    (``23:00:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
                     (``23:10:00``) |> WorkEvent.Stopped
                 ],
                 {
@@ -121,7 +122,7 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    (``23:50:00``, "Work 1") |> WorkEvent.WorkStarted
+                    (``23:50:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
                     (``00:00:00``) |> WorkEvent.Stopped
                 ],
                 {
@@ -138,10 +139,10 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    (``23:00:00``, "Work 1") |> WorkEvent.WorkStarted
+                    (``23:00:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
                     (``23:10:00``)           |> WorkEvent.Stopped
-                    (``23:20:00``, "Work 1") |> WorkEvent.WorkStarted
-                    (``23:30:00``, "Break 1") |> WorkEvent.BreakStarted
+                    (``23:20:00``, "Work 1", TimePointId.generate ()) |> WorkEvent.WorkStarted
+                    (``23:30:00``, "Break 1", TimePointId.generate ()) |> WorkEvent.BreakStarted
                     (``23:40:00``) |> WorkEvent.Stopped
                 ],
                 {
@@ -158,11 +159,11 @@ module WorkEventProjectorTests =
 
             TestCaseData(
                 [
-                    WorkEvent.WorkStarted   (start23,               "W1")
+                    WorkEvent.WorkStarted   (start23,               "W1", TimePointId.generate ())
                     WorkEvent.WorkIncreased (start23.AddMinutes  5, TimeSpan.FromMinutes 60)
                     WorkEvent.Stopped       (start23.AddMinutes 10)        
-                    WorkEvent.WorkStarted   (start23.AddMinutes 20, "W1")
-                    WorkEvent.BreakStarted  (start23.AddMinutes 30, "B1")
+                    WorkEvent.WorkStarted   (start23.AddMinutes 20, "W1", TimePointId.generate ())
+                    WorkEvent.BreakStarted  (start23.AddMinutes 30, "B1", TimePointId.generate ())
                     WorkEvent.Stopped       (start23.AddMinutes 40)
                 ],
                 {

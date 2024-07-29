@@ -149,14 +149,12 @@ let update
             model
             |> withActiveTimePoint (tp |> Some)
             |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
-            |> withCmdNone
-            |> withNoIntent
+            |> withNoCmdAndIntent
 
-        | LooperMsg.TimePointStarted ({ NewOriginTimePoint = origTp; NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }) ->
+        | LooperMsg.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }) ->
             let time = timeProvider.GetUtcNow()
             let model =
                 model
-                |> withOriginTimePoint (origTp |> Some)
                 |> withActiveTimePoint (nextTp |> Some)
                 |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
 
@@ -227,31 +225,54 @@ let update
     // Active time changing
     // --------------------
     | Msg.PreChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
-
         match model.LooperState with
         | Playing ->
             looper.Stop()
             let time = timeProvider.GetUtcNow()
-            model |> withPreShiftActiveTimePointTimeSpan
+            model |> withPreShiftState
             , Cmd.batch [
                 if currentWork |> Option.isSome then
                     Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currentWork.Value.Id time) model.ActiveTimePoint.Value Msg.OnExn
             ]
             , Intent.None
         | _ ->
-            { model with LooperState = TimeShiftingAfterNotPlaying model.LooperState }, Cmd.none, Intent.None
+            model |> withPreShiftState |> withNoCmdAndIntent
 
     | Msg.ChangeActiveTimeSpan v when model.ActiveTimePoint |> Option.isSome ->
         let duration = model |> getActiveTimeDuration
         let shiftTime = (duration - v) * 1.0<sec>
         looper.Shift(shiftTime)
 
-        model |> withShiftTime shiftTime |> withCmdNone |> withNoIntent
+        model |> withNewActiveTimeSpan shiftTime |> withCmdNone |> withNoIntent
 
     |  Msg.PostChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
+        let update cmd intent =
+            match model.LooperState with
+            | LooperState.TimeShifting prevState ->
+                if prevState = LooperState.Playing then
+                    looper.Resume()
+                model |> withLooperState prevState
+            | _ -> model
+            |> withoutShiftAndPreShiftTimes
+            , cmd
+            , intent
+
+        (* TODO
+        // if slider has been moved back
+        if model.NewActiveTimeSpan > model.PreShiftActiveTimeSpan then
+            // найти последние евенты, TimePoint id который равне смещаемому и дата создания >= preshiftdate - preactivetimespan date - 1 min ()
+
+            // [ { WorkId, SpentTime (break or work) } ]
+            let workSpentTimeList = workEventStore.WorkSpentTimeList (model |> activeTimePointIdValue) model.PreShiftInitDate
+            match workSpentTimeList with
+            | [] -> model |> update Cmd.none Intent.None
+            | _ ->
+        *)
+                
+
         // TODO: check model.ShiftTime and ActiveTimePoint
         match model.LooperState with
-        | TimeShiftingAfterNotPlaying s ->
+        | TimeShifting s ->
             model |> withLooperState s |> withoutShiftAndPreShiftTimes |> withCmdNone |> withNoIntent
         | _ ->
             let time = timeProvider.GetUtcNow()

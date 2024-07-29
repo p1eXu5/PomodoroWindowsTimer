@@ -165,6 +165,7 @@ module StopResumeFeature =
         }
         |> Scenario.runTestAsync
 
+    // TODO: Failed - need to implement PlayerModel.Msg.PostChangeActiveTimeSpan handler.
     [<Test>]
     [<Category("UC0: Work TimePoint Scenarios")>]
     let ``UC0-8 - Start-Replay Work TimePoint Scenario`` () =

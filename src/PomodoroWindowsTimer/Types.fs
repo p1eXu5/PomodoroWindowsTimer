@@ -52,6 +52,17 @@ type TimePoint =
         KindAlias: Alias
     }
 
+type ActiveTimePoint =
+    {
+        Id: TimePointId
+        OriginId: TimePointId
+        Name: Name
+        // TODO: rename to RemaininigTimeSpan
+        RunningTimeSpan: TimeSpan
+        TimeSpan: TimeSpan
+        Kind: Kind
+        KindAlias: Alias
+    }
 
 type TimePointPrototype =
     {
@@ -64,13 +75,12 @@ type TimePointPrototype =
 
 type LooperEvent =
     | TimePointStarted of TimePointStartedEventArgs
-    | TimePointTimeReduced of TimePoint
+    | TimePointTimeReduced of ActiveTimePoint
 and
     TimePointStartedEventArgs =
         {
-            NewOriginTimePoint: TimePoint
-            NewActiveTimePoint: TimePoint
-            OldActiveTimePoint: TimePoint option
+            NewActiveTimePoint: ActiveTimePoint
+            OldActiveTimePoint: ActiveTimePoint option
         }
 
 
@@ -89,8 +99,8 @@ type Work =
     }
 
 type WorkEvent =
-    | WorkStarted of createdAt: DateTimeOffset * timePointName: string
-    | BreakStarted of createdAt: DateTimeOffset * timePointName: string
+    | WorkStarted of createdAt: DateTimeOffset * timePointName: string * activeTimePointId: TimePointId
+    | BreakStarted of createdAt: DateTimeOffset * timePointName: string * activeTimePointId: TimePointId
     | Stopped of createdAt: DateTimeOffset
     | WorkReduced of createdAt: DateTimeOffset * value: TimeSpan
     | WorkIncreased of createdAt: DateTimeOffset * value: TimeSpan
@@ -154,6 +164,12 @@ type ExcelRow =
     | WorkExcelRow of WorkExcelRow
     | IdleExcelRow of IdleExcelRow
 
+type WorkSpentTime =
+    {
+        Work: Work
+        TimeSpent: TimeSpan
+    }
+
 // ------------------------------- modules
 
 module DateOnlyPeriod =
@@ -168,9 +184,8 @@ module DateOnlyPeriod =
         period.Start = period.EndInclusive
 
 module TimePointStartedEventArgs =
-    let init newOriginTimePoint newActiveTimePoint oldActiveTimePoint : TimePointStartedEventArgs =
+    let init newActiveTimePoint oldActiveTimePoint : TimePointStartedEventArgs =
         {
-            NewOriginTimePoint = newOriginTimePoint
             NewActiveTimePoint = newActiveTimePoint
             OldActiveTimePoint = oldActiveTimePoint
         }
@@ -233,8 +248,8 @@ module WorkExcelRow =
 module WorkEvent =
 
     let createdAt = function
-        | WorkEvent.WorkStarted (dt, _)
-        | WorkEvent.BreakStarted (dt, _)
+        | WorkEvent.WorkStarted (dt, _, _)
+        | WorkEvent.BreakStarted (dt, _, _)
         | WorkEvent.Stopped (dt)
         | WorkEvent.WorkReduced (dt,_)
         | WorkEvent.WorkIncreased (dt,_) 
@@ -242,8 +257,8 @@ module WorkEvent =
         | WorkEvent.BreakIncreased (dt,_) -> dt
 
     let dateOnly = function
-        | WorkEvent.WorkStarted (dt, _)
-        | WorkEvent.BreakStarted (dt, _)
+        | WorkEvent.WorkStarted (dt, _, _)
+        | WorkEvent.BreakStarted (dt, _, _)
         | WorkEvent.Stopped (dt) 
         | WorkEvent.WorkReduced (dt,_)
         | WorkEvent.WorkIncreased (dt,_) 
@@ -252,8 +267,8 @@ module WorkEvent =
             DateOnly.FromDateTime(dt.DateTime)
 
     let localDateTime = function
-        | WorkEvent.WorkStarted (dt, _)
-        | WorkEvent.BreakStarted (dt, _)
+        | WorkEvent.WorkStarted (dt, _, _)
+        | WorkEvent.BreakStarted (dt, _, _)
         | WorkEvent.Stopped (dt)
         | WorkEvent.WorkReduced (dt,_)
         | WorkEvent.WorkIncreased (dt,_) 
@@ -262,8 +277,8 @@ module WorkEvent =
             dt.LocalDateTime
 
     let tpName = function
-        | WorkEvent.WorkStarted (_, n)
-        | WorkEvent.BreakStarted (_, n) -> n |> Some
+        | WorkEvent.WorkStarted (_, n, _)
+        | WorkEvent.BreakStarted (_, n, _) -> n |> Some
         | WorkEvent.Stopped _
         | WorkEvent.WorkReduced _
         | WorkEvent.WorkIncreased _ 
@@ -390,6 +405,7 @@ module TimePointPrototype =
 
 module TimePoint =
 
+    [<CompiledName("Defaults")>]
     let defaults =
         [
             { Id = Guid.NewGuid(); Name = "Focused Work 1"; TimeSpan = TimeSpan.FromMinutes(25); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
@@ -409,6 +425,22 @@ module TimePoint =
             { Id = Guid.NewGuid(); Name = "Focused Work 2"; TimeSpan = TimeSpan.FromSeconds(5); Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias }
             { Id = Guid.NewGuid(); Name = "Break 2"; TimeSpan = TimeSpan.FromSeconds(4); Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias }
         ]
+
+    [<CompiledName("ToActiveTimePointWith")>]
+    let toActiveTimePointWith (runningTimeSpan: TimeSpan) (timePoint: TimePoint) =
+        {
+            Id = Guid.NewGuid()
+            OriginId = timePoint.Id
+            Name = timePoint.Name
+            RunningTimeSpan = runningTimeSpan
+            TimeSpan = timePoint.TimeSpan
+            Kind = timePoint.Kind
+            KindAlias = timePoint.KindAlias
+        }
+
+    [<CompiledName("ToActiveTimePoint")>]
+    let toActiveTimePoint (timePoint: TimePoint) =
+        toActiveTimePointWith timePoint.TimeSpan timePoint
 
 module Pattern =
 

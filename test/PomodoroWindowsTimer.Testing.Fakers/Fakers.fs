@@ -7,6 +7,9 @@ open System
 
 let faker = Faker()
 
+module TimePointId =
+    let generate () = faker.Random.Uuid()
+
 let generateNumber () : string =
     sprintf "WORK-%s" (faker.Random.Int(1, 9999).ToString("0000"))
 
@@ -154,11 +157,11 @@ let generateWork () =
 
 let generateWorkStartedEvent () =
     WorkEvent.WorkStarted
-        (faker.Date.RecentOffset(7), generateTimePointName ())
+        (faker.Date.RecentOffset(7), generateTimePointName (), TimePointId.generate ())
 
 let generateBreakStartedEvent () =
     WorkEvent.BreakStarted
-        (faker.Date.RecentOffset(7), generateTimePointName ())
+        (faker.Date.RecentOffset(7), generateTimePointName (), TimePointId.generate ())
 
 let generateStoppedEvent () =
     WorkEvent.Stopped

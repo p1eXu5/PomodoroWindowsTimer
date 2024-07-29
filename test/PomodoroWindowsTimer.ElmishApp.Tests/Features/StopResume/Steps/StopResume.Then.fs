@@ -46,7 +46,7 @@ let rec ``Active Point is set on`` (timePoint: TimePoint) =
         
         match sut.MainModel.Player.ActiveTimePoint with
         | Some apt ->
-            apt.Id |> shouldL equal timePoint.Id $"Expected Active TimePoint is {timePoint} baut was {apt}"
+            apt.OriginId |> shouldL equal timePoint.Id $"Expected Active TimePoint is {timePoint} baut was {apt}"
         | None ->
             assertionExn "Active TimePoint has not been set."
     }
@@ -144,7 +144,7 @@ let rec ``Active Point remaining time is less then`` (timePoint: TimePoint) =
 
         match sut.MainModel.Player.ActiveTimePoint with
         | Some atp ->
-            atp.TimeSpan |> shouldL be (lessThan timePoint.TimeSpan) $"Active TimePoint is %A{atp}"
+            atp.RunningTimeSpan |> shouldL be (lessThan timePoint.TimeSpan) $"Active TimePoint is %A{atp}"
         | None ->
             assertionExn "Active TimePoint is not set."
     }

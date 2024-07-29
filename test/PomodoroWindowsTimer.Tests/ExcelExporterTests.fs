@@ -28,10 +28,10 @@ module ExcelExporterTests =
 
             let events =
                 [
-                    WorkEvent.WorkStarted  (startDt, "W1")
-                    WorkEvent.BreakStarted (startDt.AddMinutes 10, "B1")
+                    WorkEvent.WorkStarted  (startDt, "W1", TimePointId.generate ())
+                    WorkEvent.BreakStarted (startDt.AddMinutes 10, "B1", TimePointId.generate ())
                     WorkEvent.Stopped      (startDt.AddMinutes 20)
-                    WorkEvent.WorkStarted  (startDt.AddMinutes 60, "W2")
+                    WorkEvent.WorkStarted  (startDt.AddMinutes 60, "W2", TimePointId.generate ())
                     WorkEvent.Stopped      (startDt.AddMinutes 70)
                 ]
 
@@ -66,14 +66,14 @@ module ExcelExporterTests =
 
             let events1 =
                 [
-                    WorkEvent.WorkStarted  (startDt, "W1")
-                    WorkEvent.BreakStarted (startDt.AddMinutes 10, "B1")
+                    WorkEvent.WorkStarted  (startDt, "W1", TimePointId.generate ())
+                    WorkEvent.BreakStarted (startDt.AddMinutes 10, "B1", TimePointId.generate ())
                     WorkEvent.Stopped      (startDt.AddMinutes 20)
                 ]
 
             let events2 =
                 [
-                    WorkEvent.WorkStarted  (startDt.AddMinutes 60, "W2")
+                    WorkEvent.WorkStarted  (startDt.AddMinutes 60, "W2", TimePointId.generate ())
                     WorkEvent.Stopped      (startDt.AddMinutes 70)
                 ]
 
@@ -113,11 +113,11 @@ module ExcelExporterTests =
 
             let events =
                 [
-                    WorkEvent.WorkStarted    (startDt, "W1")
+                    WorkEvent.WorkStarted    (startDt, "W1", TimePointId.generate ())
                     WorkEvent.Stopped        (startDt.AddMinutes 20)
                     WorkEvent.WorkReduced    (startDt.AddMinutes 21, TimeSpan.FromMinutes(20))
                     WorkEvent.BreakIncreased (startDt.AddMinutes 22, TimeSpan.FromMinutes(20))
-                    WorkEvent.WorkStarted    (startDt.AddMinutes 23, "W1")
+                    WorkEvent.WorkStarted    (startDt.AddMinutes 23, "W1", TimePointId.generate ())
                 ]
 
             let workEventOffsetTimes =
@@ -148,10 +148,10 @@ module ExcelExporterTests =
 
             let events =
                 [
-                    WorkEvent.WorkStarted    (startDt, "W1")
+                    WorkEvent.WorkStarted    (startDt, "W1", TimePointId.generate ())
                     WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60)
                     WorkEvent.Stopped        (startDt.AddMinutes 20)
-                    WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1")
+                    WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1", TimePointId.generate ())
                     WorkEvent.Stopped        (startDt.AddMinutes 30)
                 ]
 
@@ -184,14 +184,14 @@ module ExcelExporterTests =
 
             let events1 =
                 [
-                    WorkEvent.WorkStarted    (startDt, "W1")
+                    WorkEvent.WorkStarted    (startDt, "W1", TimePointId.generate ())
                     WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60)
                     WorkEvent.Stopped        (startDt.AddMinutes 20)
                 ]
 
             let events2 =
                 [
-                    WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1")
+                    WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1", TimePointId.generate ())
                     WorkEvent.Stopped        (startDt.AddMinutes 30)
                 ]
 
@@ -224,9 +224,9 @@ module ExcelExporterTests =
 
             let events =
                 [
-                    WorkEvent.WorkStarted  (startDt, "W1")
+                    WorkEvent.WorkStarted  (startDt, "W1", TimePointId.generate ())
                     WorkEvent.Stopped      (startDt.AddMinutes 20)
-                    WorkEvent.WorkStarted  (startDt.AddMinutes 24, "W2")
+                    WorkEvent.WorkStarted  (startDt.AddMinutes 24, "W2", TimePointId.generate ())
                     WorkEvent.Stopped      (startDt.AddMinutes 30)
                 ]
 

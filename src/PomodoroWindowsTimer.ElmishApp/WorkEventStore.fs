@@ -6,10 +6,11 @@ open PomodoroWindowsTimer.Types
 
 type WorkEventStore =
     {
-        StoreStartedWorkEventTask: WorkId -> DateTimeOffset -> TimePoint -> Task<unit>
-        StoreStoppedWorkEventTask: WorkId -> DateTimeOffset -> TimePoint -> Task<unit>
+        StoreStartedWorkEventTask: WorkId -> DateTimeOffset -> ActiveTimePoint -> Task<unit>
+        StoreStoppedWorkEventTask: WorkId -> DateTimeOffset -> ActiveTimePoint -> Task<unit>
         StoreWorkReducedEventTask: WorkId -> DateTimeOffset -> TimeSpan -> Task<unit>
         StoreBreakIncreasedEventTask: WorkId -> DateTimeOffset -> TimeSpan -> Task<unit>
+        WorkSpentTimeListTask: TimePointId -> Task<WorkSpentTime list>
     }
 
 
@@ -18,15 +19,15 @@ module WorkEventStore =
     open System.Threading
     open PomodoroWindowsTimer.Abstractions
 
-    let private storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (timePoint: TimePoint) =
+    let private storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (activeTimePoint: ActiveTimePoint) =
         task {
             let workEvent =
-                match timePoint.Kind with
+                match activeTimePoint.Kind with
                 | Kind.Break
                 | Kind.LongBreak ->
-                    (time, timePoint.Name) |> WorkEvent.BreakStarted
+                    (time, activeTimePoint.Name, activeTimePoint.Id) |> WorkEvent.BreakStarted
                 | Kind.Work ->
-                    (time, timePoint.Name) |> WorkEvent.WorkStarted
+                    (time, activeTimePoint.Name, activeTimePoint.Id) |> WorkEvent.WorkStarted
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
@@ -35,7 +36,7 @@ module WorkEventStore =
             | Error err -> raise (InvalidOperationException(err))
         }
 
-    let private storeStoppedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (_: TimePoint) =
+    let private storeStoppedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (_: ActiveTimePoint) =
         task {
             let workEvent =
                 time |> WorkEvent.Stopped
@@ -71,11 +72,16 @@ module WorkEventStore =
             | Error err -> raise (InvalidOperationException(err))
         }
 
+    let private workSpentTimeListTask (workEventRepository: IWorkEventRepository) (timePointId: TimePointId) : Task<WorkSpentTime list> =
+        task {
+            return raise (NotImplementedException())
+        }
 
-    let init (workEventRepository: IWorkEventRepository) =
+    let init (workEventRepository: IWorkEventRepository) : WorkEventStore =
         {
             StoreStartedWorkEventTask = storeStartedWorkEventTask workEventRepository
             StoreStoppedWorkEventTask = storeStoppedWorkEventTask workEventRepository
             StoreWorkReducedEventTask = storeWorkReducedEventTask workEventRepository
             StoreBreakIncreasedEventTask = storeBreakIncreasedEventTask workEventRepository
+            WorkSpentTimeListTask = workSpentTimeListTask workEventRepository
         }

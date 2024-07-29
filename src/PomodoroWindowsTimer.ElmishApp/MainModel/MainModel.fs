@@ -89,7 +89,7 @@ module MainModel =
         | Terminate
     and
         LooperMsg =
-            | TimePointTimeReduced of TimePoint
+            | TimePointTimeReduced of ActiveTimePoint
             /// Includes SetActiveTimePoint and StoreStartedWorkEventTask 
             | TimePointStarted of TimePointStartedEventArgs
 

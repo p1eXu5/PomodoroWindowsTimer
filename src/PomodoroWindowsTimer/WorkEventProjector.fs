@@ -33,7 +33,7 @@ let internal project (workEvents: WorkEvent list) =
         | Calculating (stat, lastEvent) ->
             let evDate = ev |> WorkEvent.localDateTime
             match ev, lastEvent with
-            | WorkEvent.WorkStarted (currDt, n), WorkEvent.WorkStarted (createdAt = prevDt) ->
+            | WorkEvent.WorkStarted (currDt, n, _), WorkEvent.WorkStarted (createdAt = prevDt) ->
                 Calculating (
                     { stat with
                         WorkTime = stat.WorkTime + (currDt - prevDt)
@@ -41,7 +41,7 @@ let internal project (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
-            | WorkEvent.WorkStarted (currDt, n), WorkEvent.BreakStarted (createdAt = prevDt) ->
+            | WorkEvent.WorkStarted (currDt, n, _), WorkEvent.BreakStarted (createdAt = prevDt) ->
                 Calculating (
                     { stat with
                         BreakTime = stat.BreakTime + (currDt - prevDt)
@@ -56,7 +56,7 @@ let internal project (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
-            | WorkEvent.BreakStarted (currDt, n), WorkEvent.BreakStarted (createdAt = prevDt) ->
+            | WorkEvent.BreakStarted (currDt, n, _), WorkEvent.BreakStarted (createdAt = prevDt) ->
                 Calculating (
                     { stat with
                         BreakTime = stat.BreakTime + (currDt - prevDt)
@@ -64,7 +64,7 @@ let internal project (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
-            | WorkEvent.BreakStarted (currDt, n), WorkEvent.WorkStarted (createdAt = prevDt) ->
+            | WorkEvent.BreakStarted (currDt, n, _), WorkEvent.WorkStarted (createdAt = prevDt) ->
                 Calculating (
                     { stat with
                         WorkTime = stat.WorkTime + (currDt - prevDt)

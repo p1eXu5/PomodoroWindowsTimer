@@ -22,8 +22,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
         let workEvent = snd
 
         match head |> workEvent with
-        | WorkEvent.WorkStarted (ct, _)
-        | WorkEvent.BreakStarted (ct, _) ->
+        | WorkEvent.WorkStarted (ct, _, _)
+        | WorkEvent.BreakStarted (ct, _, _) ->
 
             let reduceTime work (startTime: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
                 let rec running (value: TimeSpan) (rows: ExcelRow list) res =
@@ -121,12 +121,12 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                 let (lastWork, lastEv) = last
 
                 match currEv, lastEv with
-                | WorkEvent.WorkStarted (currCt, _), WorkEvent.WorkStarted (lastCt, _)
-                | WorkEvent.WorkStarted (currCt, _), WorkEvent.BreakStarted (lastCt, _)
-                | WorkEvent.BreakStarted (currCt, _), WorkEvent.WorkStarted (lastCt, _)
-                | WorkEvent.BreakStarted (currCt, _), WorkEvent.BreakStarted (lastCt, _)
-                | WorkEvent.Stopped currCt, WorkEvent.BreakStarted (lastCt, _)
-                | WorkEvent.Stopped currCt, WorkEvent.WorkStarted (lastCt, _) when currWork.Id = lastWork.Id ->
+                | WorkEvent.WorkStarted (currCt, _, _), WorkEvent.WorkStarted (lastCt, _, _)
+                | WorkEvent.WorkStarted (currCt, _, _), WorkEvent.BreakStarted (lastCt, _, _)
+                | WorkEvent.BreakStarted (currCt, _, _), WorkEvent.WorkStarted (lastCt, _, _)
+                | WorkEvent.BreakStarted (currCt, _, _), WorkEvent.BreakStarted (lastCt, _, _)
+                | WorkEvent.Stopped currCt, WorkEvent.BreakStarted (lastCt, _, _)
+                | WorkEvent.Stopped currCt, WorkEvent.WorkStarted (lastCt, _, _) when currWork.Id = lastWork.Id ->
                     let (head, tail) = rows |> List.head, rows |> List.tail
                     (
                         (head |> ExcelRow.addTime (currCt - lastCt)) :: tail
@@ -134,8 +134,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                     )
                     |> Ok
                     
-                | WorkEvent.WorkStarted (currCt, _), WorkEvent.Stopped (lastCt)
-                | WorkEvent.BreakStarted (currCt, _), WorkEvent.Stopped (lastCt) ->
+                | WorkEvent.WorkStarted (currCt, _, _), WorkEvent.Stopped (lastCt)
+                | WorkEvent.BreakStarted (currCt, _, _), WorkEvent.Stopped (lastCt) ->
                     let diff = currCt - lastCt
                     if diff <= gluingThreshold then
                         if currWork.Id = lastWork.Id then

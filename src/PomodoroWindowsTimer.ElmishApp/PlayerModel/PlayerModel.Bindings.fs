@@ -40,7 +40,7 @@ type Bindings() =
         nameof __.PlayPauseButtonText
             |> Binding.oneWay (fun m ->
                 match m.LooperState with
-                | TimeShiftingAfterNotPlaying _
+                | TimeShifting _
                 | Initialized -> "Play"
                 | Playing -> "Stop"
                 | Stopped -> "Resume"
