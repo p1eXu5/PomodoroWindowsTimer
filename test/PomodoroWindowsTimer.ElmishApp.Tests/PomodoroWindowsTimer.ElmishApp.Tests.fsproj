@@ -12,33 +12,35 @@
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
     <Compile Include="FakerExtensions.fs" />
-    <Compile Include="ScenarioCE.fs" />
-    <Compile Include="TestDispatcher.fs" />
     <Compile Include="StubAndMocks.fs" />
-    <Compile Include="TestBootstrap.fs" />
-    <Compile Include="Sut.fs" />
-    <Compile Include="Features\Helpers.fs" />
-    <Compile Include="Features\CommonSteps\Common.fs" />
-    <Compile Include="Features\CommonSteps\Common.Given.fs" />
-    <Compile Include="Features\CommonSteps\Common.When.fs" />
-    <Compile Include="Features\CommonSteps\Common.Then.fs" />
-    <Compile Include="Features\StopResume\Steps\StopResume.Common.fs" />
-    <Compile Include="Features\StopResume\Steps\StopResume.When.fs" />
-    <Compile Include="Features\StopResume\Steps\StopResume.Then.fs" />
-    <Compile Include="Features\StopResume\StopResumeFeature.fs" />
-    <Compile Include="Features\StopResume\TimeSliderFeature.fs" />
-    <Compile Include="Features\Works\Steps\Works.Common.fs" />
-    <Compile Include="Features\Works\Steps\Works.Given.fs" />
-    <Compile Include="Features\Works\Steps\Works.When.fs" />
-    <Compile Include="Features\Works\Steps\Works.Then.fs" />
-    <Compile Include="Features\Works\WorkFeature.fs" />
-    <Compile Include="Features\Works\WorkEventFeature.fs" />
-    <Compile Include="Features\GenerateTimePoints\GenerateTimePointsFeature.fs" />
+    <Compile Include="Unit\PlayerModel.ProgramTests.fs" />
+    <Compile Include="BDD\ScenarioCE.fs" />
+    <Compile Include="BDD\TestDispatcher.fs" />
+    <Compile Include="BDD\TestBootstrap.fs" />
+    <Compile Include="BDD\Sut.fs" />
+    <Compile Include="BDD\Features\Helpers.fs" />
+    <Compile Include="BDD\Features\CommonSteps\Common.fs" />
+    <Compile Include="BDD\Features\CommonSteps\Common.Given.fs" />
+    <Compile Include="BDD\Features\CommonSteps\Common.When.fs" />
+    <Compile Include="BDD\Features\CommonSteps\Common.Then.fs" />
+    <Compile Include="BDD\Features\StopResume\Steps\StopResume.Common.fs" />
+    <Compile Include="BDD\Features\StopResume\Steps\StopResume.When.fs" />
+    <Compile Include="BDD\Features\StopResume\Steps\StopResume.Then.fs" />
+    <Compile Include="BDD\Features\StopResume\StopResumeFeature.fs" />
+    <Compile Include="BDD\Features\StopResume\TimeSliderFeature.fs" />
+    <Compile Include="BDD\Features\Works\Steps\Works.Common.fs" />
+    <Compile Include="BDD\Features\Works\Steps\Works.Given.fs" />
+    <Compile Include="BDD\Features\Works\Steps\Works.When.fs" />
+    <Compile Include="BDD\Features\Works\Steps\Works.Then.fs" />
+    <Compile Include="BDD\Features\Works\WorkFeature.fs" />
+    <Compile Include="BDD\Features\Works\WorkEventFeature.fs" />
+    <Compile Include="BDD\Features\GenerateTimePoints\GenerateTimePointsFeature.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.5.1" />
+    <PackageReference Include="Faqt" Version="1.3.12" />
     <PackageReference Include="FsUnit" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
     <PackageReference Include="NSubstitute" Version="5.1.0" />

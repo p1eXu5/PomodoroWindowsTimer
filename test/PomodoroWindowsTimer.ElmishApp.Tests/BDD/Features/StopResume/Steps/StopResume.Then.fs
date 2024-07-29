@@ -144,7 +144,7 @@ let rec ``Active Point remaining time is less then`` (timePoint: TimePoint) =
 
         match sut.MainModel.Player.ActiveTimePoint with
         | Some atp ->
-            atp.RunningTimeSpan |> shouldL be (lessThan timePoint.TimeSpan) $"Active TimePoint is %A{atp}"
+            atp.RemainingTimeSpan |> shouldL be (lessThan timePoint.TimeSpan) $"Active TimePoint is %A{atp}"
         | None ->
             assertionExn "Active TimePoint is not set."
     }
