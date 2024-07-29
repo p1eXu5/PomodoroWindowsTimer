@@ -12,6 +12,7 @@ type JsonString = JsonString of string
 [<Extension>]
 type JsonHelpers() =
     static let mutable _jsonSerializerOptions = Unchecked.defaultof<_>
+    static let mutable _jsonNoIndentSerializerOptions = Unchecked.defaultof<_>
 
     static member val JsonSerializerOptions =
         match _jsonSerializerOptions with
@@ -20,6 +21,15 @@ type JsonHelpers() =
             _jsonSerializerOptions <- options.SetJsonFSharpOptions()
             _jsonSerializerOptions
         | _ -> _jsonSerializerOptions
+        with get
+
+    static member val JsonNoIndentSerializerOptions =
+        match _jsonNoIndentSerializerOptions with
+        | null ->
+            let options = JsonSerializerOptions(JsonSerializerDefaults.General)
+            _jsonNoIndentSerializerOptions <- options.SetJsonNoIndentFSharpOptions()
+            _jsonNoIndentSerializerOptions
+        | _ -> _jsonNoIndentSerializerOptions
         with get
 
     ///
@@ -40,6 +50,18 @@ type JsonHelpers() =
             .AddToJsonSerializerOptions(options)
         options
 
+    [<Extension>]
+    static member SetJsonNoIndentFSharpOptions(options: JsonSerializerOptions) =
+        options.PropertyNameCaseInsensitive <- true
+        options.DefaultIgnoreCondition <- JsonIgnoreCondition.WhenWritingNull
+        options.Converters.Add(JsonStringEnumConverter())
+        options.Encoder <- JsonHelpers.GetJavaScriptEncoder()
+
+        JsonFSharpOptions.Default()
+            .WithSkippableOptionFields(SkippableOptionFields.FromJsonSerializerOptions)
+            .AddToJsonSerializerOptions(options)
+        options
+
     /// 
     static member SerializeToJsonString(o: #obj) =
         JsonSerializer.Serialize(o, JsonHelpers.JsonSerializerOptions)
@@ -47,6 +69,9 @@ type JsonHelpers() =
 
     static member Serialize(o: #obj) =
         JsonSerializer.Serialize(o, JsonHelpers.JsonSerializerOptions)
+
+    static member SerializeNoIndent(o: #obj) =
+        JsonSerializer.Serialize(o, JsonHelpers.JsonNoIndentSerializerOptions)
 
     static member Deserialize<'T>(s: string) =
         JsonSerializer.Deserialize<'T>(s, JsonHelpers.JsonSerializerOptions)
