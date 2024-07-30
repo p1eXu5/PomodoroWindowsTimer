@@ -3,6 +3,7 @@
 open System
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Types
 
 type RollbackWorkModel =
     {
@@ -30,11 +31,11 @@ module RollbackWorkModel =
         | SubstractWorkAddBreakAndClose
         | DefaultedAndClose
 
-    let init workId time timeSpan =
+    let init (workSpentTime: WorkSpentTime) time =
         {
-            WorkId = workId
+            WorkId = workSpentTime.Work.Id
             Time = time
-            Difference = timeSpan
+            Difference = workSpentTime.TimeSpent
             RememberChoice = false
         }
 

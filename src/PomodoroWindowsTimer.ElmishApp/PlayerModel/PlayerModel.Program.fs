@@ -277,17 +277,35 @@ let update
             else
                 model
                 |> withResumeState
+                |> withoutShiftAndPreShiftTimes
                 |> withRetreiveWorkSpentTimesState deff
-                , Cmd.OfTask.perform workEventStore.WorkSpentTimeListTask (atp.Id, cts.Token) (AsyncOperation.finishWithin Msg.PostChangeActiveTimeSpan cts)
+                , Cmd.OfTask.perform
+                    workEventStore.WorkSpentTimeListTask
+                    (atp.Id, timeProvider.GetUtcNow(), (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds), cts.Token)
+                    (AsyncOperation.finishWithin Msg.PostChangeActiveTimeSpan cts)
                 , Intent.None
 
     | MsgWith.``Finish of PostChangeActiveTimeSpan`` model res ->
         match res with
         | Error err ->
-            model |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
+            model
+            |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
             , Cmd.ofMsg (Msg.OnError err)
             , Intent.None
-        | Ok (deff, workSpentTimeList, atp, shiftTimes) ->
+
+        | Ok (deff, [], atp) ->
+             model
+            |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
+            , Cmd.ofMsg (Msg.OnError "Work spent time list is unexpected empty!")
+            , Intent.None
+
+        | Ok (deff, [ workSpentTime ], atp) ->
+            model
+            |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
+            , Cmd.none
+            , Intent.ShowRollbackDialog (workSpentTime, timeProvider.GetUtcNow())
+
+        | Ok (deff, workSpentTimeList, atp) ->
             model, Cmd.none, Intent.None
             (*
             // TODO

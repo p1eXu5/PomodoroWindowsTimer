@@ -25,11 +25,11 @@ let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
     | PlayerModel.Intent.None ->
         model |> withPlayerModel playerModel
         , Cmd.map Msg.PlayerModelMsg playerCmd
-    | PlayerModel.Intent.ShowRollbackDialog (workId, time, diff) ->
+    | PlayerModel.Intent.ShowRollbackDialog (workSpentTime, time) ->
         model |> withPlayerModel playerModel
         , Cmd.batch [
             Cmd.map Msg.PlayerModelMsg playerCmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workId, time, diff)))
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, time)))
         ]
 
 let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =

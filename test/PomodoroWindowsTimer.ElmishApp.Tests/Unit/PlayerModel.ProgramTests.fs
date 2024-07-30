@@ -27,18 +27,21 @@ module ProgramTests =
     type private Sut =
         {
             LooperMock: ILooper
+            TimeProvider: System.TimeProvider
             Update: Work option -> PlayerModel.Msg -> PlayerModel -> (PlayerModel * Cmd<PlayerModel.Msg> * PlayerModel.Intent)
         }
 
     let private sutFactory () =
         let looperMock = Substitute.For<ILooper>()
+        let timeProvider = Substitute.For<System.TimeProvider>()
         {
             LooperMock = looperMock
+            TimeProvider = timeProvider
             Update =
                 PlayerModel.Program.update
                     looperMock
                     (Substitute.For<IWindowsMinimizer>())
-                    (Substitute.For<System.TimeProvider>())
+                    timeProvider
                     (WorkEventStore.init (Substitute.For<IWorkEventRepository>()))
                     (Substitute.For<IThemeSwitcher>())
                     (Substitute.For<ITelegramBot>())
@@ -461,7 +464,7 @@ module ProgramTests =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
-                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
+                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
 
                 LooperState = LooperState.TimeShifting (LooperState.Playing)
                 LastAtpWhenPlayOrNextIsManuallyPressed = None
@@ -497,7 +500,7 @@ module ProgramTests =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
-                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
+                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
 
                 LooperState = LooperState.TimeShifting (state)
                 LastAtpWhenPlayOrNextIsManuallyPressed = None
@@ -539,7 +542,7 @@ module ProgramTests =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
-                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
+                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
 
                 LooperState = LooperState.TimeShifting state
                 LastAtpWhenPlayOrNextIsManuallyPressed = None
@@ -567,4 +570,167 @@ module ProgramTests =
 
         %cmd.Should().HaveLength(1)
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
+        sut.LooperMock.DidNotReceive().Resume()
+
+    // ===============================
+
+    let private notShiftingStates : System.Collections.IEnumerable =
+        seq {
+            TestCaseData(LooperState.Initialized)
+            TestCaseData(LooperState.Stopped)
+            TestCaseData(LooperState.Playing)
+        }
+
+    [<TestCaseSource(nameof notShiftingStates)>]
+    [<Category("shifting backward")>]
+    let ``04-0: PostChangeActiveTimeSpan Finish -> error -> resets ShiftAndPreShiftTimes, emits OnError msg, no intent`` (state: LooperState) =
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let retrieveWorkSpentTimesState, cts =
+            AsyncDeferredState.NotRequested
+            |> AsyncDeferredState.forceInProgressWithCancellation
+
+        let beforePlayerModel : PlayerModel =
+            {
+                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
+
+                LooperState = state
+                LastAtpWhenPlayOrNextIsManuallyPressed = None
+
+                ShiftAndPreShiftTimes = None
+
+                DisableSkipBreak = false
+                DisableMinimizeMaximizeWindows = true
+
+                RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
+            }
+        let sut = sutFactory ()
+        let currentWork = Work.generate ()
+
+        // act
+        let (afterPlayerModel, cmd, intent) =
+            beforePlayerModel
+            |> sut.Update
+                (currentWork |> Some)
+                (AsyncOperation.finishWithin PlayerModel.Msg.PostChangeActiveTimeSpan cts (Error "test error"))
+
+        // assert
+        %afterPlayerModel
+            .Should()
+            .Be(
+                { beforePlayerModel with
+                    ShiftAndPreShiftTimes = None
+                    LooperState = state
+                    RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
+                }
+            )
+
+        %cmd.Should().HaveLength(1)
+        do cmd[0] (fun msg -> %msg.Should().BeOfCase(PlayerModel.Msg.OnError))
+
+        %intent.Should().BeOfCase(PlayerModel.Intent.None)
+        sut.LooperMock.DidNotReceive().Resume()
+
+    [<TestCaseSource(nameof notShiftingStates)>]
+    [<Category("shifting backward")>]
+    let ``04-1: PostChangeActiveTimeSpan Finish -> ok with empty -> resets ShiftAndPreShiftTimes, no cmd, no intent`` (state: LooperState) =
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let retrieveWorkSpentTimesState, cts =
+            AsyncDeferredState.NotRequested
+            |> AsyncDeferredState.forceInProgressWithCancellation
+
+        let beforePlayerModel : PlayerModel =
+            {
+                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
+
+                LooperState = state
+                LastAtpWhenPlayOrNextIsManuallyPressed = None
+
+                ShiftAndPreShiftTimes = None
+
+                DisableSkipBreak = false
+                DisableMinimizeMaximizeWindows = true
+
+                RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
+            }
+        let sut = sutFactory ()
+        let currentWork = Work.generate ()
+
+        // act
+        let (afterPlayerModel, cmd, intent) =
+            beforePlayerModel
+            |> sut.Update
+                (currentWork |> Some)
+                (AsyncOperation.finishWithin PlayerModel.Msg.PostChangeActiveTimeSpan cts (Ok []))
+
+        // assert
+        %afterPlayerModel
+            .Should()
+            .Be(
+                { beforePlayerModel with
+                    ShiftAndPreShiftTimes = None
+                    LooperState = state
+                    RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
+                }
+            )
+
+        %cmd.Should().HaveLength(1)
+        do cmd[0] (fun msg -> %msg.Should().Be(PlayerModel.Msg.OnError "Work spent time list is unexpected empty!"))
+
+        %intent.Should().BeOfCase(PlayerModel.Intent.None)
+        sut.LooperMock.DidNotReceive().Resume()
+
+    [<TestCaseSource(nameof notShiftingStates)>]
+    [<Category("shifting backward")>]
+    let ``04-3: PostChangeActiveTimeSpan Finish -> ok with single work -> resets ShiftAndPreShiftTimes, no cmd, ShowRollbackDialog intent`` (state: LooperState) =
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let retrieveWorkSpentTimesState, cts =
+            AsyncDeferredState.NotRequested
+            |> AsyncDeferredState.forceInProgressWithCancellation
+
+        let beforePlayerModel : PlayerModel =
+            {
+                ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
+
+                LooperState = state
+                LastAtpWhenPlayOrNextIsManuallyPressed = None
+
+                ShiftAndPreShiftTimes = None
+
+                DisableSkipBreak = false
+                DisableMinimizeMaximizeWindows = true
+
+                RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
+            }
+        let sut = sutFactory ()
+
+        let nowDate = System.TimeProvider.System.GetUtcNow()
+        %sut.TimeProvider.GetUtcNow().Returns(nowDate)
+
+        let currentWork = Work.generate ()
+        let workSpentTime =
+            {
+                Work = currentWork
+                TimeSpent = TimeSpan.FromSeconds(3)
+            }
+
+        // act
+        let (afterPlayerModel, cmd, intent) =
+            beforePlayerModel
+            |> sut.Update
+                (currentWork |> Some)
+                (AsyncOperation.finishWithin PlayerModel.Msg.PostChangeActiveTimeSpan cts (Ok [ workSpentTime ]))
+
+        // assert
+        %afterPlayerModel
+            .Should()
+            .Be(
+                { beforePlayerModel with
+                    ShiftAndPreShiftTimes = None
+                    LooperState = state
+                    RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
+                }
+            )
+
+        %cmd.Should().BeEmpty()
+        %intent.Should().Be(PlayerModel.Intent.ShowRollbackDialog (workSpentTime, nowDate))
         sut.LooperMock.DidNotReceive().Resume()

@@ -11,7 +11,7 @@ type WorkEventStore =
         StoreStoppedWorkEventTask: WorkId -> DateTimeOffset -> ActiveTimePoint -> Task<unit>
         StoreWorkReducedEventTask: WorkId -> DateTimeOffset -> TimeSpan -> Task<unit>
         StoreBreakIncreasedEventTask: WorkId -> DateTimeOffset -> TimeSpan -> Task<unit>
-        WorkSpentTimeListTask: TimePointId * CancellationToken -> Task<Result<WorkSpentTime list, string>>
+        WorkSpentTimeListTask: TimePointId * DateTimeOffset * float<sec> * CancellationToken -> Task<Result<WorkSpentTime list, string>>
     }
 
 
@@ -73,7 +73,7 @@ module WorkEventStore =
             | Error err -> raise (InvalidOperationException(err))
         }
 
-    let private workSpentTimeListTask (workEventRepository: IWorkEventRepository) (timePointId: TimePointId, cancellationToken: CancellationToken) : Task<Result<WorkSpentTime list, string>> =
+    let private workSpentTimeListTask (workEventRepository: IWorkEventRepository) (timePointId: TimePointId, beforeDate: DateTimeOffset, diff: float<sec>, cancellationToken: CancellationToken) : Task<Result<WorkSpentTime list, string>> =
         task {
             return raise (NotImplementedException())
         }

@@ -98,18 +98,18 @@ module PlayerModel =
             | _ -> None
 
         let (|``Finish of PostChangeActiveTimeSpan``|_|) (model: PlayerModel) (msg: Msg) =
-            match msg, model.ActiveTimePoint, model.ShiftAndPreShiftTimes with
-            | Msg.PostChangeActiveTimeSpan (AsyncOperation.Finish (res, cts)), Some atp, Some shiftTimes ->
+            match msg, model.ActiveTimePoint with
+            | Msg.PostChangeActiveTimeSpan (AsyncOperation.Finish (res, cts)), Some atp ->
                 model.RetrieveWorkSpentTimesState
                 |> AsyncDeferredState.chooseRetrievedResultWithin res cts
-                |> Option.map (Result.map (fun (deff, list) -> (deff, list, atp, shiftTimes)))
+                |> Option.map (Result.map (fun (deff, list) -> (deff, list, atp)))
             | _ -> None
 
     [<RequireQualifiedAccess>]
     type Intent =
         | None
-        /// TODO: Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (model.CurrentWork.Value.Id, time, diff)))
-        | ShowRollbackDialog of WorkId * time: DateTimeOffset * diff: TimeSpan
+        | ShowRollbackDialog of WorkSpentTime * time: DateTimeOffset
+        | MultipleRollback of WorkSpentTime list * time: DateTimeOffset * diff: TimeSpan
         /// When slider has been rolled forward.
         | SkipOrApplyMissingTime of WorkId * diff: TimeSpan * atpKind: Kind
 

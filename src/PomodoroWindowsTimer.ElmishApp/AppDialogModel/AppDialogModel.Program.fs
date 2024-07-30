@@ -63,8 +63,8 @@ let update
         | BotSettingsModel.Intent.CloseDialogRequested ->
             AppDialogModel.NoDialog, Cmd.none
 
-    | Msg.LoadRollbackWorkDialogModel (workId, time, diff) ->
-        RollbackWorkModel.init workId time diff |> AppDialogModel.RollbackWorkDialog
+    | Msg.LoadRollbackWorkDialogModel (workSpentTime, time) ->
+        RollbackWorkModel.init workSpentTime time |> AppDialogModel.RollbackWorkDialog
         , Cmd.none
 
     | MsgWith.RollbackWorkModelMsg model (rmsg, rm) ->

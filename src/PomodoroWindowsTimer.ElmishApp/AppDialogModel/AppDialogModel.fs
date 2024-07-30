@@ -4,6 +4,7 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open System
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.Types
 
 
 type AppDialogModel =
@@ -27,7 +28,7 @@ module AppDialogModel =
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
 
-        | LoadRollbackWorkDialogModel of workId: uint64 * DateTimeOffset * TimeSpan
+        | LoadRollbackWorkDialogModel of WorkSpentTime * DateTimeOffset
         | RollbackWorkModelMsg of RollbackWorkModel.Msg
 
         | Unload

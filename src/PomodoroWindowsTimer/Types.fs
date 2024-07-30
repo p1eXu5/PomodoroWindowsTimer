@@ -438,6 +438,9 @@ module TimePoint =
             KindAlias = timePoint.KindAlias
         }
 
+    let toActiveTimePointWithSec (runningSeconds: float<sec>) (timePoint: TimePoint) =
+        toActiveTimePointWith (TimeSpan.FromSeconds(float runningSeconds)) timePoint
+
     [<CompiledName("ToActiveTimePoint")>]
     let toActiveTimePoint (timePoint: TimePoint) =
         toActiveTimePointWith timePoint.TimeSpan timePoint
