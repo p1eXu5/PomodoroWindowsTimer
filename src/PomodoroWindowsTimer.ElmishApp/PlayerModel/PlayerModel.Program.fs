@@ -29,7 +29,7 @@ let update
     (timePointQueue: ITimePointQueue)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<PlayerModel>)
-    (currentWork: Work option) msg model
+    (currentWorkOpt: Work option) msg model
     =
     let minimizeAllRestoreAppWindowCmd () =
         if model.DisableMinimizeMaximizeWindows then
@@ -98,7 +98,7 @@ let update
 
         let model = model |> withLooperState Playing
         let storeCmd =
-            match currentWork with
+            match currentWorkOpt with
             | Some work ->
                 Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask work.Id time) model.ActiveTimePoint.Value Msg.OnExn
             | _ ->
@@ -119,7 +119,7 @@ let update
         let time = timeProvider.GetUtcNow()
         let model = model |> withLooperState Stopped
         let cmd =
-            match currentWork, model.ActiveTimePoint with
+            match currentWorkOpt, model.ActiveTimePoint with
             | Some work, Some tp ->
                 Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask work.Id time) tp Msg.OnExn
             | _ ->
@@ -137,7 +137,7 @@ let update
             Cmd.batch [
                 Cmd.ofMsg (Msg.PreChangeActiveTimeSpan);
                 Cmd.ofMsg (Msg.ChangeActiveTimeSpan 0.0);
-                Cmd.ofMsg (Msg.PostChangeActiveTimeSpan);
+                Cmd.ofMsg (AsyncOperation.startUnit Msg.PostChangeActiveTimeSpan);
                 if model.LooperState = LooperState.Stopped then
                     Cmd.ofMsg (Msg.Resume);
             ]
@@ -161,7 +161,7 @@ let update
             let timePointKind = model |> timePointKindEnum
 
             let storeStartedWorkEventCmd =
-                match currentWork, model.LooperState with
+                match currentWorkOpt, model.LooperState with
                 | Some work, LooperState.Playing ->
                     Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask work.Id time) nextTp Msg.OnExn
                 | _ ->
@@ -231,8 +231,8 @@ let update
             let time = timeProvider.GetUtcNow()
             model |> withPreShiftState
             , Cmd.batch [
-                if currentWork |> Option.isSome then
-                    Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currentWork.Value.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                if currentWorkOpt |> Option.isSome then
+                    Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currentWorkOpt.Value.Id time) model.ActiveTimePoint.Value Msg.OnExn
             ]
             , Intent.None
         | _ ->
@@ -240,78 +240,109 @@ let update
 
     | Msg.ChangeActiveTimeSpan v when model.ActiveTimePoint |> Option.isSome ->
         let duration = model |> getActiveTimeDuration
-        let shiftTime = (duration - v) * 1.0<sec>
-        looper.Shift(shiftTime)
+        let remainingSeconds = (duration - v) * 1.0<sec>
+        looper.Shift(remainingSeconds)
 
-        model |> withNewActiveTimeSpan shiftTime |> withCmdNone |> withNoIntent
+        model |> withNewActiveRemainingSeconds remainingSeconds |> withCmdNone |> withNoIntent
 
-    |  Msg.PostChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
-        let update cmd intent =
+    |  MsgWith.``Start of PostChangeActiveTimeSpan`` model (deff, cts, atp, shiftTimes)->
+        let withResumeState model =
             match model.LooperState with
             | LooperState.TimeShifting prevState ->
                 if prevState = LooperState.Playing then
                     looper.Resume()
                 model |> withLooperState prevState
             | _ -> model
+
+        match currentWorkOpt with
+        | None ->
+            model
+            |> withResumeState
             |> withoutShiftAndPreShiftTimes
-            , cmd
-            , intent
-
-        (* TODO
-        // if slider has been moved back
-        if model.NewActiveTimeSpan > model.PreShiftActiveTimeSpan then
-            // найти последние евенты, TimePoint id который равне смещаемому и дата создания >= preshiftdate - preactivetimespan date - 1 min ()
-
-            // [ { WorkId, SpentTime (break or work) } ]
-            let workSpentTimeList = workEventStore.WorkSpentTimeList (model |> activeTimePointIdValue) model.PreShiftInitDate
-            match workSpentTimeList with
-            | [] -> model |> update Cmd.none Intent.None
-            | _ ->
-        *)
-                
-
-        // TODO: check model.ShiftTime and ActiveTimePoint
-        match model.LooperState with
-        | TimeShifting s ->
-            model |> withLooperState s |> withoutShiftAndPreShiftTimes |> withCmdNone |> withNoIntent
-        | _ ->
-            let time = timeProvider.GetUtcNow()
-            looper.Resume()
-
-            let atp = model.ActiveTimePoint.Value
-            let rollbackWorkStrategy = userSettings.RollbackWorkStrategy
-
-            let cmds = [
-                if currentWork |> Option.isSome then
-                    Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask currentWork.Value.Id time) atp Msg.OnExn
-            ]
-
-            if atp.Kind = Kind.Work && model.NewActiveTimeSpan > model.PreShiftActiveTimeSpan && currentWork |> Option.isSome then
-                let diff = TimeSpan.FromSeconds(float (model.NewActiveTimeSpan - model.PreShiftActiveTimeSpan))
-                match rollbackWorkStrategy with
-                | RollbackWorkStrategy.SubstractWorkAddBreak ->
-                    model |> withoutShiftAndPreShiftTimes
-                    , Cmd.batch [
-                        Cmd.OfTask.attempt (workEventStore.StoreWorkReducedEventTask currentWork.Value.Id (time.AddMilliseconds(-2))) diff Msg.OnExn
-                        Cmd.OfTask.attempt (workEventStore.StoreBreakIncreasedEventTask currentWork.Value.Id (time.AddMilliseconds(-1))) diff Msg.OnExn
-                        yield! cmds
-                    ]
-                    , Intent.None
-
-                | RollbackWorkStrategy.UserChoiceIsRequired ->
-                    model |> withoutShiftAndPreShiftTimes
-                    , Cmd.batch cmds
-                    , Intent.ShowRollbackDialog (currentWork.Value.Id, time, diff)
-
-                | RollbackWorkStrategy.Default ->
-                    model |> withoutShiftAndPreShiftTimes
-                    , Cmd.batch cmds
-                    , Intent.None
+            |> withNoCmdAndIntent
+        | Some currentWork ->
+            if Math.Abs(float (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds)) < 1.0 then
+                model
+                |> withResumeState
+                |> withoutShiftAndPreShiftTimes
+                |> withNoCmdAndIntent
+            // shifting forward
+            elif shiftTimes.NewActiveRemainingSeconds < shiftTimes.PreShiftActiveRemainingSeconds then
+                    model
+                    |> withResumeState
+                    |> withoutShiftAndPreShiftTimes
+                    , Cmd.none
+                    , Intent.SkipOrApplyMissingTime (currentWork.Id, TimeSpan.FromSeconds(float (shiftTimes.PreShiftActiveRemainingSeconds - shiftTimes.NewActiveRemainingSeconds)), atp.Kind)
+            // shifting backward
             else
-                model |> withoutShiftAndPreShiftTimes
-                , Cmd.batch cmds
+                model
+                |> withResumeState
+                |> withRetreiveWorkSpentTimesState deff
+                , Cmd.OfTask.perform workEventStore.WorkSpentTimeListTask (atp.Id, cts.Token) (AsyncOperation.finishWithin Msg.PostChangeActiveTimeSpan cts)
                 , Intent.None
-    
+
+    | MsgWith.``Finish of PostChangeActiveTimeSpan`` model res ->
+        match res with
+        | Error err ->
+            model |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
+            , Cmd.ofMsg (Msg.OnError err)
+            , Intent.None
+        | Ok (deff, workSpentTimeList, atp, shiftTimes) ->
+            model, Cmd.none, Intent.None
+            (*
+            // TODO
+            match workSpentTimeList with
+            | [] -> model |> withUpdatedModel Cmd.none Intent.None
+            | _ ->
+                model |> withUpdatedModel Cmd.none Intent.None
+
+            // TODO: check model.ShiftTime and ActiveTimePoint
+            match model.LooperState with
+            | TimeShifting s ->
+                model |> withLooperState s |> withoutShiftAndPreShiftTimes |> withCmdNone |> withNoIntent
+            | _ ->
+                let time = timeProvider.GetUtcNow()
+                looper.Resume()
+
+                let atp = model.ActiveTimePoint.Value
+                let rollbackWorkStrategy = userSettings.RollbackWorkStrategy
+
+                let cmds = [
+                    if currentWork |> Option.isSome then
+                        Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask currentWork.Value.Id time) atp Msg.OnExn
+                ]
+
+                if atp.Kind = Kind.Work && model.NewActiveRemainingSeconds > model.PreShiftActiveRemainingSeconds && currentWork |> Option.isSome then
+                    let diff = TimeSpan.FromSeconds(float (model.NewActiveRemainingSeconds - model.PreShiftActiveRemainingSeconds))
+                    match rollbackWorkStrategy with
+                    | RollbackWorkStrategy.SubstractWorkAddBreak ->
+                        model |> withoutShiftAndPreShiftTimes
+                        , Cmd.batch [
+                            Cmd.OfTask.attempt (workEventStore.StoreWorkReducedEventTask currentWork.Value.Id (time.AddMilliseconds(-2))) diff Msg.OnExn
+                            Cmd.OfTask.attempt (workEventStore.StoreBreakIncreasedEventTask currentWork.Value.Id (time.AddMilliseconds(-1))) diff Msg.OnExn
+                            yield! cmds
+                        ]
+                        , Intent.None
+
+                    | RollbackWorkStrategy.UserChoiceIsRequired ->
+                        model |> withoutShiftAndPreShiftTimes
+                        , Cmd.batch cmds
+                        , Intent.ShowRollbackDialog (currentWork.Value.Id, time, diff)
+
+                    | RollbackWorkStrategy.Default ->
+                        model |> withoutShiftAndPreShiftTimes
+                        , Cmd.batch cmds
+                        , Intent.None
+                else
+                    model |> withoutShiftAndPreShiftTimes
+                    , Cmd.batch cmds
+                    , Intent.None
+            *)
+
+    | Msg.OnError err ->
+        errorMessageQueue.EnqueueError err
+        model, Cmd.none, Intent.None
+
     | Msg.OnExn ex ->
         errorMessageQueue.EnqueueError ex.Message
         model |> withCmdNone |> withNoIntent

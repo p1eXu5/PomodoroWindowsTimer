@@ -94,7 +94,7 @@
             Margin="0,40,0,0"
             Foreground="{Binding ElementName=m_TimerRoot,
                                  Path=Foreground}"
-            IsEnabled="{Binding IsActiveTimePointSet}"
+            IsEnabled="{Binding CanShiftActiveTime}"
             Maximum="{Binding ActiveTimeDuration}"
             Minimum="0"
             Orientation="Horizontal"

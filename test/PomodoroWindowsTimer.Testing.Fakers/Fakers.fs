@@ -127,13 +127,39 @@ let breakTP (timeSpan: float<sec>) =
                 Kind = Kind.Break
     }
 
-let longBreakTP (timeSpan: float<sec>) =
-    {
-        timePointFaker "LongBreak"
-            with
-                TimeSpan = TimeSpan.FromSeconds(float timeSpan)
-                Kind = Kind.LongBreak
-    }
+
+module Kind =
+    let generate () : Kind =
+        faker.Random.ArrayElement(
+            [|
+                fun () -> Kind.Work
+                fun () -> Kind.Break
+                fun () -> Kind.LongBreak
+            |]
+        )()
+
+
+module TimePoint =
+    let generateWith timeSpan : TimePoint =
+        let kind = Kind.generate ()
+        {
+            Id = TimePointId.generate ()
+            TimeSpan = timeSpan
+            Name = generateTimePointName ()
+            Kind = kind
+            KindAlias = kind |> Kind.alias
+        }
+
+    let gewerateLongBreakTP (timeSpan: float<sec>) =
+        {
+            timePointFaker "LongBreak"
+                with
+                    TimeSpan = TimeSpan.FromSeconds(float timeSpan)
+                    Kind = Kind.LongBreak
+        }
+
+let longBreakTP (seconds: float<sec>) =
+    TimePoint.gewerateLongBreakTP seconds
 
 // ---------------------------
 

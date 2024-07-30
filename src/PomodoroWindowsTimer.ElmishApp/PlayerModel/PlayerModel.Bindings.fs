@@ -79,6 +79,9 @@ type Bindings() =
     member val IsActiveTimePointSet : Binding =
         nameof __.IsActiveTimePointSet |> Binding.oneWay (fun m -> m.ActiveTimePoint |> Option.isSome)
 
+    member val CanShiftActiveTime : Binding =
+        nameof __.CanShiftActiveTime |> Binding.oneWay (canShiftActiveTime)
+
     member val ActiveTimeSeconds : Binding =
         nameof __.ActiveTimeSeconds |> Binding.twoWay (getActiveSpentTime, Msg.ChangeActiveTimeSpan)
 
@@ -86,7 +89,7 @@ type Bindings() =
         nameof __.PreChangeActiveTimeSpanCommand |> Binding.cmd (Msg.PreChangeActiveTimeSpan)
 
     member val PostChangeActiveTimeSpanCommand : Binding =
-        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd (Msg.PostChangeActiveTimeSpan)
+        nameof __.PostChangeActiveTimeSpanCommand |> Binding.cmd (Msg.PostChangeActiveTimeSpan (AsyncOperation.Start ()))
 
     member val IsBreak : Binding =
         nameof __.IsBreak

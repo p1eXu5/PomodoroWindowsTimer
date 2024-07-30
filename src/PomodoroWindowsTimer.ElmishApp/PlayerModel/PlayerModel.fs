@@ -17,11 +17,12 @@ type PlayerModel =
         LooperState : LooperState
         LastAtpWhenPlayOrNextIsManuallyPressed: UIInitiator option
 
-        PreShiftActiveTimeSpan: float<sec>
-        NewActiveTimeSpan: float<sec>
+        ShiftAndPreShiftTimes: ShiftAndPreShiftTimes option
 
         DisableSkipBreak: bool
         DisableMinimizeMaximizeWindows: bool
+
+        RetrieveWorkSpentTimesState: AsyncDeferredState
     }
 and
     LooperState =
@@ -32,6 +33,13 @@ and
         | TimeShifting of previousState: LooperState
 and
     UIInitiator = UIInitiator of ActiveTimePoint
+and
+    [<Struct>]
+    ShiftAndPreShiftTimes =
+        {
+            PreShiftActiveRemainingSeconds: float<sec>
+            NewActiveRemainingSeconds: float<sec>
+        }
 
 module PlayerModel =
 
@@ -48,7 +56,8 @@ module PlayerModel =
         | Resume
         | PreChangeActiveTimeSpan
         | ChangeActiveTimeSpan of float
-        | PostChangeActiveTimeSpan
+        | PostChangeActiveTimeSpan of AsyncOperation<unit, Result<WorkSpentTime list, string>>
+        | OnError of string
         | OnExn of exn
     and
         LooperMsg =
@@ -74,12 +83,35 @@ module PlayerModel =
             | Playing -> Msg.Stop
             | Stopped -> Msg.Resume
 
+    module MsgWith =
+        let (|``Start of PostChangeActiveTimeSpan``|_|) (model: PlayerModel) (msg: Msg) =
+            match msg, model.ActiveTimePoint, model.ShiftAndPreShiftTimes with
+            | Msg.PostChangeActiveTimeSpan (AsyncOperation.Start _), Some atp, Some shiftTimes ->
+                let (deff, cts) = model.RetrieveWorkSpentTimesState |> AsyncDeferredState.forceInProgressWithCancellation
+                (
+                    deff
+                    , cts
+                    , atp
+                    , shiftTimes
+                )
+                |> Some
+            | _ -> None
+
+        let (|``Finish of PostChangeActiveTimeSpan``|_|) (model: PlayerModel) (msg: Msg) =
+            match msg, model.ActiveTimePoint, model.ShiftAndPreShiftTimes with
+            | Msg.PostChangeActiveTimeSpan (AsyncOperation.Finish (res, cts)), Some atp, Some shiftTimes ->
+                model.RetrieveWorkSpentTimesState
+                |> AsyncDeferredState.chooseRetrievedResultWithin res cts
+                |> Option.map (Result.map (fun (deff, list) -> (deff, list, atp, shiftTimes)))
+            | _ -> None
+
     [<RequireQualifiedAccess>]
     type Intent =
         | None
         /// TODO: Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (model.CurrentWork.Value.Id, time, diff)))
         | ShowRollbackDialog of WorkId * time: DateTimeOffset * diff: TimeSpan
-
+        /// When slider has been rolled forward.
+        | SkipOrApplyMissingTime of WorkId * diff: TimeSpan * atpKind: Kind
 
     let init (usrSettings: IUserSettings) =
         {
@@ -87,12 +119,13 @@ module PlayerModel =
             
             LooperState = Initialized
             LastAtpWhenPlayOrNextIsManuallyPressed = None
-            
-            PreShiftActiveTimeSpan = -1.0<sec>
-            NewActiveTimeSpan = -1.0<sec>
+
+            ShiftAndPreShiftTimes = None
 
             DisableSkipBreak = usrSettings.DisableSkipBreak
             DisableMinimizeMaximizeWindows = false
+
+            RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
         }
 
     // ---------------------------------------------------
@@ -186,16 +219,24 @@ module PlayerModel =
         | _ ->
             model
 
-    let withNewActiveTimeSpan seconds (model: PlayerModel) =
-        { model with NewActiveTimeSpan = seconds }
+
+    let withNewActiveRemainingSeconds seconds (model: PlayerModel) =
+        { model with
+            ShiftAndPreShiftTimes = model.ShiftAndPreShiftTimes |> Option.map (fun sm -> { sm with NewActiveRemainingSeconds = seconds })
+        }
 
     let withoutShiftAndPreShiftTimes (model: PlayerModel) =
-        { model with NewActiveTimeSpan = -1.0<sec>; PreShiftActiveTimeSpan = -1.0<sec>; }
+        { model with ShiftAndPreShiftTimes = None }
 
     let withPreShiftState (model: PlayerModel) =
         let atp = model.ActiveTimePoint.Value
         { model with
-            PreShiftActiveTimeSpan = atp.RemainingTimeSpan.TotalSeconds * 1.0<sec>
+            ShiftAndPreShiftTimes =
+                {
+                    PreShiftActiveRemainingSeconds = atp.RemainingTimeSpan.TotalSeconds * 1.0<sec>
+                    NewActiveRemainingSeconds = atp.RemainingTimeSpan.TotalSeconds * 1.0<sec>
+                }
+                |> Some
             LooperState = TimeShifting model.LooperState
         }
 
@@ -205,3 +246,11 @@ module PlayerModel =
     let withDisableMinimizeMaximizeWindows v (model: PlayerModel) =
         { model with DisableMinimizeMaximizeWindows = v }
 
+    let withRetreiveWorkSpentTimesState deff (model: PlayerModel) =
+        { model with RetrieveWorkSpentTimesState = deff }
+
+    let canShiftActiveTime (model: PlayerModel) =
+        match model.ActiveTimePoint, model.RetrieveWorkSpentTimesState with
+        | Some _, AsyncDeferredState.NotRequested
+        | Some _, AsyncDeferredState.Retrieved -> true
+        | _ -> false

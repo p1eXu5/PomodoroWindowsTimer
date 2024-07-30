@@ -3,6 +3,7 @@
 open System
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
+open System.Threading
 
 type WorkEventStore =
     {
@@ -10,7 +11,7 @@ type WorkEventStore =
         StoreStoppedWorkEventTask: WorkId -> DateTimeOffset -> ActiveTimePoint -> Task<unit>
         StoreWorkReducedEventTask: WorkId -> DateTimeOffset -> TimeSpan -> Task<unit>
         StoreBreakIncreasedEventTask: WorkId -> DateTimeOffset -> TimeSpan -> Task<unit>
-        WorkSpentTimeListTask: TimePointId -> Task<WorkSpentTime list>
+        WorkSpentTimeListTask: TimePointId * CancellationToken -> Task<Result<WorkSpentTime list, string>>
     }
 
 
@@ -72,7 +73,7 @@ module WorkEventStore =
             | Error err -> raise (InvalidOperationException(err))
         }
 
-    let private workSpentTimeListTask (workEventRepository: IWorkEventRepository) (timePointId: TimePointId) : Task<WorkSpentTime list> =
+    let private workSpentTimeListTask (workEventRepository: IWorkEventRepository) (timePointId: TimePointId, cancellationToken: CancellationToken) : Task<Result<WorkSpentTime list, string>> =
         task {
             return raise (NotImplementedException())
         }

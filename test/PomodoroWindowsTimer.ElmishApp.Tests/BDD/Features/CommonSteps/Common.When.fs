@@ -145,7 +145,7 @@ let rec ``PreChangeActiveTimeSpan msg has been dispatched`` times =
 let rec ``PostChangeActiveTimeSpan msg has been dispatched`` times =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = PlayerModel.Msg.PostChangeActiveTimeSpan |> MainModel.Msg.PlayerModelMsg
+        let msg = PlayerModel.Msg.PostChangeActiveTimeSpan (Start ()) |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2SecT "PostChangeActiveTimeSpan" times ((=) msg)
     }

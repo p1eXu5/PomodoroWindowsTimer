@@ -6,8 +6,24 @@ open System.Collections.Generic
 open p1eXu5.FSharp.Testing.ShouldExtensions
 
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp
+
+type LooperStub (activeTimePoint: ActiveTimePoint option) =
+    member val ResumeCalledTimes : int = 0 with get, set
+    member this.IsResumeCalled = this.ResumeCalledTimes > 0
+    interface ILooper with
+        member _.Dispose () = ()
+         member _.Start() = ()
+         member _.Stop() = ()
+         member _.Next() = ()
+         member _.Shift _ = ()
+         member _.ShiftAck _ = ()
+         member this.Resume() = this.ResumeCalledTimes <- this.ResumeCalledTimes + 1
+         member _.AddSubscriber _ = ()
+         member _.PreloadTimePoint() = ()
+         member _.GetActiveTimePoint() = activeTimePoint
 
 
 type UserSettingsStub () =
