@@ -51,7 +51,7 @@ module WorkFeature =
             do! When.``WorkSelector drawer is opening`` ()
             do! When.``CreatingWork sub model has been shown`` ()
 
-            let work = generateWork ()
+            let work = Work.generate ()
             do! When.``CreatingWork SetNumber msg has been dispatched with`` work.Number
             do! When.``CreatingWork SetTitle msg has been dispatched with`` work.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
@@ -72,7 +72,7 @@ module WorkFeature =
             do! When.``WorkSelector drawer is opening`` ()
             do! When.``CreatingWork sub model has been shown`` ()
 
-            let work1 = generateWork ()
+            let work1 = Work.generate ()
             do! When.``CreatingWork SetNumber msg has been dispatched with`` work1.Number
             do! When.``CreatingWork SetTitle msg has been dispatched with`` work1.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
@@ -81,7 +81,7 @@ module WorkFeature =
             do! When.``WorkListModel CreateWork msg has been dispatched`` ()
             do! When.``CreatingWork sub model has been shown`` ()
 
-            let work2 = generateWork ()
+            let work2 = Work.generate ()
             do! When.``CreatingWork SetNumber msg has been dispatched with`` work2.Number
             do! When.``CreatingWork SetTitle msg has been dispatched with`` work2.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
@@ -127,7 +127,7 @@ module WorkFeature =
             do! When.``WorkListModel Edit WorkModel msg has been dispatched`` work
             do! When.``UpdatingWork sub model has been shown`` ()
 
-            let updatedWork = generateWork ()
+            let updatedWork = Work.generate ()
             do! When.``UpdatingWork SetNumber msg has been dispatched with`` updatedWork.Number
             do! When.``UpdatingWork SetTitle msg has been dispatched with`` updatedWork.Title
             do! When.``Update WorkModel msg has been dispatched`` ()

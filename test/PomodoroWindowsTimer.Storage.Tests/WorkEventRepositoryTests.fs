@@ -2,22 +2,16 @@
 
 open System
 open System.IO
-open Microsoft.Extensions.Options
 
 open NUnit.Framework
 open FsUnit
-open p1eXu5.AspNetCore.Testing.Logging
 open p1eXu5.FSharp.Testing.ShouldExtensions
+open FsUnitTyped
 open FsToolkit.ErrorHandling
 
 open PomodoroWindowsTimer.Storage
-open PomodoroWindowsTimer.Storage.Configuration
 open PomodoroWindowsTimer.Testing.Fakers
-open FsUnitTyped
 open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstractions
-open p1eXu5.FSharp.Testing.ShouldExtensions
-
 
 
 [<Category("DB. WorkEvent")>]
@@ -25,41 +19,14 @@ module WorkEventRepositoryTests =
 
     let private dbFileName = "work_event_test.db"
 
-    let mutable private connectionString = Unchecked.defaultof<string>
     let mutable private workId1 = Unchecked.defaultof<uint64>
     let mutable private workId2 = Unchecked.defaultof<uint64>
 
-    let getConnectionString () =
-        if String.IsNullOrWhiteSpace(connectionString) then
-            let dataSource = dbFileName |> dataSource
-            if File.Exists(dataSource) then
-                File.Delete(dataSource)
-            connectionString <- $"Data Source=%s{dataSource};"
-            connectionString
-        else
-            connectionString
+    let mutable private activeTimePointId = TimePointId.generate ()
 
-    let workDbOptions () =
-        { new IOptions<WorkDbOptions> with
-            member _.Value : WorkDbOptions = 
-                { ConnectionString=getConnectionString () }
-        }
-
-    let workRepository () =
-        new WorkRepository(
-            workDbOptions (),
-            System.TimeProvider.System,
-            TestLogger<WorkRepository>(TestContextWriters.Default)
-        )
-        :> IWorkRepository
-    
-    let workEventRepository () =
-        new WorkEventRepository(
-            workDbOptions (),
-            System.TimeProvider.System,
-            TestLogger<WorkEventRepository>(TestContextWriters.Default)
-        )
-        :> IWorkEventRepository
+    let private workRepository () = TestDb.workRepository dbFileName
+    let private workEventRepository () = TestDb.workEventRepository dbFileName
+    let private activeTimePointRepository () = TestDb.activeTimePointRepository dbFileName
 
     let private createWork () =
         task {
@@ -71,6 +38,10 @@ module WorkEventRepositoryTests =
     let Setup () =
         task {
             match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+
+            match! activeTimePointRepository () :?> ActiveTimePointRepository |> _.CreateTableAsync(ct) with
             | Ok _ -> ()
             | Error err -> raise (InvalidOperationException(err))
 
@@ -90,6 +61,14 @@ module WorkEventRepositoryTests =
                 workId2 <- id
             | Error err ->
                 assertionExn err
+
+            let atp = ActiveTimePoint.generate ()
+            let! res = (activeTimePointRepository ()).InsertAsync atp ct
+            match res with
+            | Ok () ->
+                activeTimePointId <- atp.Id
+            | Error err ->
+                assertionExn err
         }
 
     [<OneTimeTearDown>]
@@ -106,8 +85,8 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let! id1 = workEventRepo.InsertAsync workId1 (generateWorkEvent ()) ct
-            let! id2 = workEventRepo.InsertAsync workId1 (generateWorkEvent ()) ct
+            let! id1 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith activeTimePointId) ct
+            let! id2 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith activeTimePointId) ct
 
             id1 |> shouldBeGreaterThan 0UL
             id2 |> shouldBeGreaterThan id1
@@ -119,7 +98,7 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let workEvent = generateWorkEvent ()
+            let workEvent = WorkEvent.generateWith activeTimePointId
             let! _ = workEventRepo.InsertAsync workId1 workEvent ct
 
             let! rows = workEventRepo.FindByWorkIdAsync workId1 ct
@@ -133,11 +112,11 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let workEvent1 = generateWorkEvent ()
-            let workEvent2 = generateWorkEvent ()
-            let workEvent3 = generateWorkEvent ()
-            let workEvent4 = generateWorkEvent ()
-            let workEvent5 = generateWorkEvent ()
+            let workEvent1 = WorkEvent.generateWith activeTimePointId
+            let workEvent2 = WorkEvent.generateWith activeTimePointId
+            let workEvent3 = WorkEvent.generateWith activeTimePointId
+            let workEvent4 = WorkEvent.generateWith activeTimePointId
+            let workEvent5 = WorkEvent.generateWith activeTimePointId
 
             let! _ = workEventRepo.InsertAsync workId1 workEvent1 ct
             let! _ = workEventRepo.InsertAsync workId1 workEvent2 ct
@@ -156,11 +135,11 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let workEvent1 = generateWorkEvent ()
-            let workEvent2 = generateWorkEvent ()
-            let workEvent3 = generateWorkEvent ()
-            let workEvent4 = generateWorkEvent ()
-            let workEvent5 = generateWorkEvent ()
+            let workEvent1 = WorkEvent.generateWith activeTimePointId
+            let workEvent2 = WorkEvent.generateWith activeTimePointId
+            let workEvent3 = WorkEvent.generateWith activeTimePointId
+            let workEvent4 = WorkEvent.generateWith activeTimePointId
+            let workEvent5 = WorkEvent.generateWith activeTimePointId
 
             let! _ = workEventRepo.InsertAsync workId1 workEvent1 ct
             let! _ = workEventRepo.InsertAsync workId1 workEvent2 ct
@@ -183,20 +162,20 @@ module WorkEventRepositoryTests =
 
             let work1Events =
                 [
-                    generateWorkEvent ()
-                    generateWorkEvent ()
-                    generateWorkEvent ()
-                    generateWorkEvent ()
-                    generateWorkEvent ()
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
                 ]
 
             let work2Events =
                 [
-                    generateWorkEvent ()
-                    generateWorkEvent ()
-                    generateWorkEvent ()
-                    generateWorkEvent ()
-                    generateWorkEvent ()
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith activeTimePointId
                 ]
 
             for i in 0 .. 4 do

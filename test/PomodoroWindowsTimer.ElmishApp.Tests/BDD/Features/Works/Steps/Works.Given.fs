@@ -47,7 +47,7 @@ let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint 
 /// Returns `MainModel.CurrentWork.Value.Work`.
 let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint list) =
     scenario {
-        let currentWork = generateWork ()
+        let currentWork = Work.generate ()
 
         do! Given.``Stored TimePoints`` timePoints
         do! Given.``Stored CurrentWork`` currentWork

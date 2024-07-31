@@ -18,10 +18,15 @@ type DbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHost
         task {
             let workRepository = serviceProvider.GetRequiredService<WorkRepository>()
             let workEventRepository = serviceProvider.GetRequiredService<WorkEventRepository>()
+            let activeTimePointRepository = serviceProvider.GetRequiredService<ActiveTimePointRepository>()
 
             do LastEventCreatedAtHandler.Register()
 
             let! res = workRepository.CreateTableAsync(stoppingToken)
+            if res |> Result.isError then
+                appLifetime.StopApplication()
+
+            let! res = activeTimePointRepository.CreateTableAsync(stoppingToken)
             if res |> Result.isError then
                 appLifetime.StopApplication()
 

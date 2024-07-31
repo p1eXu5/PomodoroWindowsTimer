@@ -24,8 +24,11 @@ type DependencyInjectionExtensions() =
 
         services.TryAddSingleton<WorkRepository>()
         services.TryAddSingleton<IWorkRepository, WorkRepository>()
+
         services.TryAddSingleton<WorkEventRepository>()
         services.TryAddSingleton<IWorkEventRepository, WorkEventRepository>()
+
+        services.TryAddSingleton<ActiveTimePointRepository>()
 
         services.AddHostedService<DbSeederHostedService>()
 

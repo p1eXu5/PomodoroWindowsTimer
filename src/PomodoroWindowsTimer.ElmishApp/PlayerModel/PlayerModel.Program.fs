@@ -293,20 +293,23 @@ let update
             , Cmd.ofMsg (Msg.OnError err)
             , Intent.None
 
-        | Ok (deff, [], atp) ->
+        | Ok (_, [], _) ->
              model
             |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
             , Cmd.ofMsg (Msg.OnError "Work spent time list is unexpected empty!")
             , Intent.None
 
-        | Ok (deff, [ workSpentTime ], atp) ->
+        | Ok (_, [ workSpentTime ], atp) ->
             model
             |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
             , Cmd.none
-            , Intent.ShowRollbackDialog (workSpentTime, timeProvider.GetUtcNow())
+            , Intent.RollbackTime (workSpentTime, timeProvider.GetUtcNow(), atp.Kind)
 
-        | Ok (deff, workSpentTimeList, atp) ->
-            model, Cmd.none, Intent.None
+        | Ok (_, workSpentTimeList, atp) ->
+            model
+            |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
+            , Cmd.none
+            , Intent.MultipleRollbackTime (workSpentTimeList, timeProvider.GetUtcNow(), atp.Kind)
             (*
             // TODO
             match workSpentTimeList with

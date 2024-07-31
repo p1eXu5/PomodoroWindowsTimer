@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="8.0.300" />
+    <PackageReference Update="FSharp.Core" Version="8.0.301" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +28,7 @@
     <Compile Include="RepositoryBase.fs" />
     <Compile Include="WorkRepository.fs" />
     <Compile Include="WorkEventRepository.fs" />
+    <Compile Include="ActiveTimePointRepository.fs" />
     <Compile Include="DbSeederHostedService.fs" />
     <Compile Include="DependencyInjectionExtensions.fs" />
   </ItemGroup>

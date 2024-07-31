@@ -84,3 +84,71 @@ WHERE event_json LIKE '%"Case":_"WorkStarted"%' OR event_json LIKE '%"Case":"Wor
 ORDER BY created_at ASC;
 
 SELECT COUNT(*) from work_event we; 
+
+
+SELECT
+	CASE 
+		WHEN
+			event_json LIKE '%"Case":_"WorkStarted"%'
+			OR
+			event_json LIKE '%"Case":"WorkStarted"%'
+		THEN
+			'WorkStarted'
+		WHEN
+			event_json LIKE '%"Case":_"BreakStarted"%'
+			OR
+			event_json LIKE '%"Case":"BreakStarted"%'
+		THEN
+			'BreakStarted'
+		WHEN
+			event_json LIKE '%"Case":_"Stopped"%'
+			OR
+			event_json LIKE '%"Case":"Stopped"%'
+		THEN
+			'Stopped'
+		WHEN
+			event_json LIKE '%"Case":_"WorkReduced"%'
+			OR
+			event_json LIKE '%"Case":"WorkReduced"%'
+		THEN
+			'WorkReduced'
+		WHEN
+			event_json LIKE '%"Case":_"WorkIncreased"%'
+			OR
+			event_json LIKE '%"Case":"WorkIncreased"%'
+		THEN
+			'WorkIncreased'
+		WHEN
+			event_json LIKE '%"Case":_"BreakReduced"%'
+			OR
+			event_json LIKE '%"Case":"BreakReduced"%'
+		THEN
+			'BreakReduced'
+		WHEN
+			event_json LIKE '%"Case":_"BreakIncreased"%'
+			OR
+			event_json LIKE '%"Case":"BreakIncreased"%'
+		THEN
+			'BreakIncreased'
+	END AS event_name
+FROM work_event
+;
+
+
+
+
+CREATE TEMPORARY TABLE work_event_backup(id, work_id, event_json, created_at, active_time_point_id, event_name);
+INSERT INTO work_event_backup SELECT id, work_id, event_json, created_at, active_time_point_id, event_name FROM work_event;
+SELECT id, work_id, event_json, created_at, active_time_point_id, event_name
+FROM work_event_backup
+ORDER BY id;
+DROP TABLE work_event_backup;
+
+
+
+
+
+
+
+
+

@@ -144,7 +144,7 @@ type Looper(
             // in first time next time point is equal to preloaded timepoint
             match timePointQueue.TryGetNext(), state.ActiveTimePoint with
             | Some nextTp, Some actTp ->
-                if nextTp.Id = actTp.OriginId && actTp.RemainingTimeSpan = TimeSpan.Zero then
+                if nextTp.Id = actTp.OriginalId && actTp.RemainingTimeSpan = TimeSpan.Zero then
                     timePointQueue.TryGetNext()
                 else
                     nextTp |> Some
@@ -156,7 +156,7 @@ type Looper(
         | Some nextTp ->
             let (newAtp, oldAtp) =
                 state.ActiveTimePoint
-                |> Option.filter (fun t -> t.OriginId = nextTp.Id)
+                |> Option.filter (fun t -> t.OriginalId = nextTp.Id)
                 |> Option.map (fun t -> (t, None))
                 |> Option.defaultValue (nextTp |> TimePoint.toActiveTimePoint, state.ActiveTimePoint)
 

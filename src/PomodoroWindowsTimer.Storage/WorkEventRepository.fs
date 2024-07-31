@@ -22,6 +22,7 @@ module internal WorkEventRepository =
 
     module Table = PomodoroWindowsTimer.Storage.Tables.WorkEvent
     module WorkTable = PomodoroWindowsTimer.Storage.Tables.Work
+    module ActiveTimePointTable = PomodoroWindowsTimer.Storage.Tables.ActiveTimePoint
 
     module Sql =
         let CREATE_TABLE = $"""
@@ -30,18 +31,25 @@ module internal WorkEventRepository =
                 , {Table.Columns.work_id} INTEGER NOT NULL
                 , {Table.Columns.event_json} TEXT NOT NULL
                 , {Table.Columns.created_at} INTEGER NOT NULL
+                , {Table.Columns.active_time_point_id} TEXT
+                , {Table.Columns.event_name} TEXT NOT NULL
 
                 , FOREIGN KEY ({Table.Columns.work_id})
                     REFERENCES {WorkTable.NAME} ({WorkTable.Columns.id})
                     ON DELETE CASCADE 
                     ON UPDATE NO ACTION
-                );
+
+                , FOREIGN KEY ({Table.Columns.active_time_point_id})
+                    REFERENCES {ActiveTimePointTable.NAME} ({ActiveTimePointTable.Columns.id})
+                    ON DELETE SET NULL 
+                    ON UPDATE NO ACTION
+            );
             """
 
-        /// Parameters: WorkId, EventJson, CreatedAt.
+        /// Parameters: WorkId, EventJson, CreatedAt, @ActiveTimePointId, @EventName.
         let INSERT = $"""
-            INSERT INTO {Table.NAME} ({Table.Columns.work_id}, {Table.Columns.event_json}, {Table.Columns.created_at})
-            VALUES (@WorkId, @EventJson, @CreatedAt)
+            INSERT INTO {Table.NAME} ({Table.Columns.work_id}, {Table.Columns.event_json}, {Table.Columns.created_at}, {Table.Columns.active_time_point_id}, {Table.Columns.event_name})
+            VALUES (@WorkId, @EventJson, @CreatedAt, @ActiveTimePointId, @EventName)
             ;
 
             SELECT {Table.Columns.id}
@@ -127,6 +135,8 @@ module internal WorkEventRepository =
                         WorkId = workId
                         EventJson = JsonHelpers.Serialize(workEvent)
                         CreatedAt = WorkEvent.createdAt(workEvent).ToUnixTimeMilliseconds()
+                        ActiveTimePointId = workEvent |> WorkEvent.activeTimePointId |> Option.map _.ToString() |> Option.defaultValue null
+                        EventName = workEvent |> WorkEvent.name
                     |},
                     cancellationToken = ct
                 )
@@ -302,3 +312,7 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
 
         member _.FindLastByWorkIdByDateAsync workId date cancellationToken =
             raise (NotImplementedException())
+
+        member this.FindByActiveTimePointIdByDateAsync timePointId notAfter cancellationToken =
+            raise (System.NotImplementedException())
+

@@ -65,6 +65,7 @@ module PlayerModel =
             /// Includes SetActiveTimePoint and StoreStartedWorkEventTask 
             | TimePointStarted of TimePointStartedEventArgs
 
+
     module Msg = 
         let tryNext (model: PlayerModel) =
             model.ActiveTimePoint
@@ -82,6 +83,7 @@ module PlayerModel =
             | Initialized -> Msg.Play
             | Playing -> Msg.Stop
             | Stopped -> Msg.Resume
+
 
     module MsgWith =
         let (|``Start of PostChangeActiveTimeSpan``|_|) (model: PlayerModel) (msg: Msg) =
@@ -105,13 +107,18 @@ module PlayerModel =
                 |> Option.map (Result.map (fun (deff, list) -> (deff, list, atp)))
             | _ -> None
 
+
     [<RequireQualifiedAccess>]
     type Intent =
         | None
-        | ShowRollbackDialog of WorkSpentTime * time: DateTimeOffset
-        | MultipleRollback of WorkSpentTime list * time: DateTimeOffset * diff: TimeSpan
         /// When slider has been rolled forward.
         | SkipOrApplyMissingTime of WorkId * diff: TimeSpan * atpKind: Kind
+        /// When slider has been rolled backward and only one work is counted.
+        | RollbackTime of WorkSpentTime * time: DateTimeOffset * atpKind: Kind
+        /// When slider has been rolled backward and multiple worka are counted.
+        | MultipleRollbackTime of WorkSpentTime list * time: DateTimeOffset * atpKind: Kind
+
+    // ---------------------------------------------------
 
     let init (usrSettings: IUserSettings) =
         {

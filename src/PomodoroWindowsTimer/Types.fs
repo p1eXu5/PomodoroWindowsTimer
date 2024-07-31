@@ -55,7 +55,7 @@ type TimePoint =
 type ActiveTimePoint =
     {
         Id: TimePointId
-        OriginId: TimePointId
+        OriginalId: TimePointId
         Name: Name
         // TODO: rename to RemaininigTimeSpan
         RemainingTimeSpan: TimeSpan
@@ -289,6 +289,35 @@ module WorkEvent =
         | WorkEvent.Stopped _ -> true
         | _ -> false
 
+    let activeTimePointId = function
+        | WorkEvent.WorkStarted (_, _, id)
+        | WorkEvent.BreakStarted (_, _, id) -> id |> Some
+        | WorkEvent.Stopped _
+        | WorkEvent.WorkReduced _
+        | WorkEvent.WorkIncreased _ 
+        | WorkEvent.BreakReduced _
+        | WorkEvent.BreakIncreased _ -> None
+
+    let name = function
+        | WorkEvent.WorkStarted _ -> nameof WorkEvent.WorkStarted
+        | WorkEvent.BreakStarted _ -> nameof WorkEvent.BreakStarted
+        | WorkEvent.Stopped _ -> nameof WorkEvent.Stopped
+        | WorkEvent.WorkReduced _ -> nameof WorkEvent.WorkReduced
+        | WorkEvent.WorkIncreased _ -> nameof WorkEvent.WorkIncreased
+        | WorkEvent.BreakReduced _ -> nameof WorkEvent.BreakReduced
+        | WorkEvent.BreakIncreased _ -> nameof WorkEvent.BreakIncreased
+
+    let withActiveTimePointId (activeTimePointId: TimePointId) (workEvent: WorkEvent) =
+        match workEvent with
+        | WorkEvent.WorkStarted (d, n , _) -> WorkEvent.WorkStarted (d, n, activeTimePointId)
+        | WorkEvent.BreakStarted (d, n , _) -> WorkEvent.BreakStarted (d, n, activeTimePointId)
+        | WorkEvent.Stopped _
+        | WorkEvent.WorkReduced _
+        | WorkEvent.WorkIncreased _
+        | WorkEvent.BreakReduced _
+        | WorkEvent.BreakIncreased _ -> workEvent
+
+
 module WorkEventList =
     module List =
         let groupByDay (workEvents: WorkEventList list) =
@@ -384,6 +413,7 @@ module Kind =
         | LongBreak -> "LB"
 
 
+
 module TimePointPrototype =
 
     let defaults =
@@ -430,7 +460,7 @@ module TimePoint =
     let toActiveTimePointWith (runningTimeSpan: TimeSpan) (timePoint: TimePoint) =
         {
             Id = Guid.NewGuid()
-            OriginId = timePoint.Id
+            OriginalId = timePoint.Id
             Name = timePoint.Name
             RemainingTimeSpan = runningTimeSpan
             TimeSpan = timePoint.TimeSpan

@@ -46,7 +46,7 @@ let rec ``Active Point is set on`` (timePoint: TimePoint) =
         
         match sut.MainModel.Player.ActiveTimePoint with
         | Some apt ->
-            apt.OriginId |> shouldL equal timePoint.Id $"Expected Active TimePoint is {timePoint} baut was {apt}"
+            apt.OriginalId |> shouldL equal timePoint.Id $"Expected Active TimePoint is {timePoint} baut was {apt}"
         | None ->
             assertionExn "Active TimePoint has not been set."
     }

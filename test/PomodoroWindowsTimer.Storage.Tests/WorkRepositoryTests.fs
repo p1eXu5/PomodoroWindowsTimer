@@ -23,40 +23,9 @@ module WorkRepositoryTests =
 
     let private dbFileName = "work_test.db"
 
-    let mutable private connectionString = Unchecked.defaultof<string>
-
-    let getConnectionString () =
-        if String.IsNullOrWhiteSpace(connectionString) then
-            let dataSource = dbFileName |> dataSource
-            if File.Exists(dataSource) then
-                File.Delete(dataSource)
-            connectionString <- $"Data Source=%s{dataSource};"
-            connectionString
-        else
-            connectionString
-
-    let workDbOptions () =
-        { new IOptions<WorkDbOptions> with
-            member _.Value : WorkDbOptions = 
-                { ConnectionString=getConnectionString () }
-        }
-
-    let workRepository () =
-        new WorkRepository(
-            workDbOptions (),
-            System.TimeProvider.System,
-            TestLogger<WorkRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
-        )
-        :> IWorkRepository
-    
-    let workEventRepository () =
-        new WorkEventRepository(
-            workDbOptions (),
-            System.TimeProvider.System,
-            TestLogger<WorkEventRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
-        )
-        :> IWorkEventRepository
-
+    let private workRepository () = TestDb.workRepository dbFileName
+    let private workEventRepository () = TestDb.workEventRepository dbFileName
+    let private activeTimePointRepository () = TestDb.activeTimePointRepository dbFileName
 
     [<OneTimeSetUp>]
     let Setup () =
@@ -64,6 +33,10 @@ module WorkRepositoryTests =
             LastEventCreatedAtHandler.Register()
 
             match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+
+            match! activeTimePointRepository () :?> ActiveTimePointRepository |> _.CreateTableAsync(ct) with
             | Ok _ -> ()
             | Error err -> raise (InvalidOperationException(err))
 
@@ -117,6 +90,10 @@ module WorkRepositoryTests =
         taskResult {
             let workRepo = workRepository ()
             let workEventRepo = workEventRepository ()
+            let atpRepo = activeTimePointRepository ()
+
+            let atp = ActiveTimePoint.generate ()
+            do! atpRepo.InsertAsync atp ct
 
             let number1 = generateNumber ()
             let title1 = generateTitle ()
@@ -125,9 +102,9 @@ module WorkRepositoryTests =
 
             let workEvents =
                 [
-                    WorkEvent.generate ()
-                    WorkEvent.generate ()
-                    WorkEvent.generate ()
+                    WorkEvent.generate () |> WorkEvent.withActiveTimePointId atp.Id
+                    WorkEvent.generate () |> WorkEvent.withActiveTimePointId atp.Id
+                    WorkEvent.generate () |> WorkEvent.withActiveTimePointId atp.Id
                 ]
 
             let! _ = workEventRepo.InsertAsync workId1 workEvents[0] ct

@@ -150,6 +150,9 @@ module TimePoint =
             KindAlias = kind |> Kind.alias
         }
 
+    let generate () =
+        generateWith (TimeSpan.FromMinutes(faker.Random.Int(1, 100)))
+
     let gewerateLongBreakTP (timeSpan: float<sec>) =
         {
             timePointFaker "LongBreak"
@@ -161,52 +164,71 @@ module TimePoint =
 let longBreakTP (seconds: float<sec>) =
     TimePoint.gewerateLongBreakTP seconds
 
-// ---------------------------
-
-let mutable private _workCounter = 1UL
-
-let generateWork () =
-    let date = faker.Date.RecentOffset()
-    let work =
-        {
-            Id = _workCounter
-            Number = sprintf "WORK-%i" _workCounter
-            Title = faker.Commerce.ProductName()
-            CreatedAt = date
-            UpdatedAt = date
-            LastEventCreatedAt = None
-        }
-    _workCounter <- _workCounter + 1UL
-    work
-
-// ---------------------------
-
-let generateWorkStartedEvent () =
-    WorkEvent.WorkStarted
-        (faker.Date.RecentOffset(7), generateTimePointName (), TimePointId.generate ())
-
-let generateBreakStartedEvent () =
-    WorkEvent.BreakStarted
-        (faker.Date.RecentOffset(7), generateTimePointName (), TimePointId.generate ())
-
-let generateStoppedEvent () =
-    WorkEvent.Stopped
-        (faker.Date.RecentOffset(7))
-
-let generateWorkEvent () : WorkEvent =
-    let eventFactory =
-        [|
-            fun () -> generateWorkStartedEvent ()
-            fun () -> generateBreakStartedEvent ()
-            fun () -> generateStoppedEvent ()
-        |]
-
-    (faker.Random.ArrayElement(eventFactory)) ()
-
 [<RequireQualifiedAccess>]
 module Work =
-    let generate = generateWork
+    let mutable private _workCounter = 1UL
+
+    let generate () =
+        let date = faker.Date.RecentOffset()
+        let work =
+            {
+                Id = _workCounter
+                Number = sprintf "WORK-%i" _workCounter
+                Title = faker.Commerce.ProductName()
+                CreatedAt = date
+                UpdatedAt = date
+                LastEventCreatedAt = None
+            }
+        _workCounter <- _workCounter + 1UL
+        work
 
 [<RequireQualifiedAccess>]
 module WorkEvent =
-    let generate = generateWorkEvent
+    let createdAt (date: DateOnly) (timeStr: string) =
+        let time = TimeOnly.ParseExact(timeStr, "HH:mm", null)
+        DateTimeOffset(date, time, System.TimeProvider.System.LocalTimeZone.BaseUtcOffset)
+
+    let generateWorkStarted () =
+        WorkEvent.WorkStarted
+            (faker.Date.RecentOffset(7), generateTimePointName (), TimePointId.generate ())
+
+    /// timeStr in "HH:mm" format.
+    let generateWorkStartedWith (date: DateOnly) (timeStr: string) =
+        WorkEvent.WorkStarted
+            (createdAt date timeStr, generateTimePointName (), TimePointId.generate ())
+
+    let generateBreakStarted () =
+        WorkEvent.BreakStarted
+            (faker.Date.RecentOffset(7), generateTimePointName (), TimePointId.generate ())
+
+    /// timeStr in "HH:mm" format.
+    let generateBreakStartedWith (date: DateOnly) (timeStr: string) =
+        WorkEvent.BreakStarted
+            (createdAt date timeStr, generateTimePointName (), TimePointId.generate ())
+
+    let generateStopped () =
+        WorkEvent.Stopped
+            (faker.Date.RecentOffset(7))
+
+    /// timeStr in "HH:mm" format.
+    let generateStoppedWith (date: DateOnly) (timeStr: string) =
+        WorkEvent.Stopped (createdAt date timeStr)
+
+    let generate () =
+        let eventFactory =
+            [|
+                fun () -> generateWorkStarted ()
+                fun () -> generateBreakStarted ()
+                fun () -> generateStopped ()
+            |]
+
+        (faker.Random.ArrayElement(eventFactory)) ()
+
+    let generateWith (activeTimePointId: TimePointId) =
+        generate () |> WorkEvent.withActiveTimePointId activeTimePointId
+
+[<RequireQualifiedAccess>]
+module ActiveTimePoint =
+    let generate () =
+        TimePoint.generate ()
+        |> TimePoint.toActiveTimePoint

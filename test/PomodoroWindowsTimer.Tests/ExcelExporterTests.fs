@@ -22,7 +22,7 @@ module ExcelExporterTests =
     [<Test>]
     let ``01: single work events with idle time, threshold is less then idle time`` () =
         result {
-            let work = Fakers.generateWork ()
+            let work = Fakers.Work.generate ()
 
             let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
 
@@ -59,8 +59,8 @@ module ExcelExporterTests =
     [<Test>]
     let ``02: multiple work events with idle time, threshold is less then idle time`` () =
         result {
-            let work1 = Fakers.generateWork ()
-            let work2 = Fakers.generateWork ()
+            let work1 = Fakers.Work.generate ()
+            let work2 = Fakers.Work.generate ()
 
             let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
 
@@ -107,7 +107,7 @@ module ExcelExporterTests =
     [<Test>]
     let ``03: single work events with reduce-increase time in the middle`` () =
         result {
-            let work = Fakers.generateWork ()
+            let work = Fakers.Work.generate ()
 
             let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
 
@@ -142,7 +142,7 @@ module ExcelExporterTests =
     [<Test>]
     let ``04: single work events with increase time in the middle`` () =
         result {
-            let work = Fakers.generateWork ()
+            let work = Fakers.Work.generate ()
 
             let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
 
@@ -177,8 +177,8 @@ module ExcelExporterTests =
     [<Test>]
     let ``05: multiple work events with increase time in the middle`` () =
         result {
-            let work1 = Fakers.generateWork ()
-            let work2 = Fakers.generateWork ()
+            let work1 = Fakers.Work.generate ()
+            let work2 = Fakers.Work.generate ()
 
             let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
 
@@ -218,7 +218,7 @@ module ExcelExporterTests =
     [<Test>]
     let ``06: threshold test`` () =
         result {
-            let work = Fakers.generateWork ()
+            let work = Fakers.Work.generate ()
 
             let startDt = DateTimeOffset(DateOnly(2024, 1, 1), TimeOnly(8, 0, 0), TimeSpan.Zero)
 

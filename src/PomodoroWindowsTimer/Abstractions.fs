@@ -46,16 +46,23 @@ type IWorkRepository =
 
 type IWorkEventRepository =
     interface
-        abstract InsertAsync: workId: WorkId -> WorkEvent -> CancellationToken -> Task<Result<uint64, string>>
+        abstract InsertAsync: workId: WorkId -> WorkEvent -> cancellationToken: CancellationToken -> Task<Result<uint64, string>>
         // abstract FindByWorkId: workId: WorkId -> Result<WorkEvent list, string>
-        abstract FindByWorkIdAsync: workId: WorkId -> CancellationToken -> Task<Result<WorkEvent list, string>>
-        abstract FindByWorkIdByDateAsync: workId: WorkId -> DateOnly -> CancellationToken -> Task<Result<WorkEvent list, string>>
-        abstract FindByWorkIdByPeriodAsync: workId: WorkId -> DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkIdAsync: workId: WorkId -> cancellationToken: CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkIdByDateAsync: workId: WorkId -> DateOnly -> cancellationToken: CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindByWorkIdByPeriodAsync: workId: WorkId -> DateOnlyPeriod -> cancellationToken: CancellationToken -> Task<Result<WorkEvent list, string>>
+        abstract FindLastByWorkIdByDateAsync: workId: WorkId -> DateOnly -> cancellationToken: CancellationToken -> Task<Result<WorkEvent option, string>>
         
         /// Returns work event list ordered by work id then by created at time.
         abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
         
-        abstract FindLastByWorkIdByDateAsync: workId: WorkId -> DateOnly -> CancellationToken -> Task<Result<WorkEvent option, string>>
+        abstract FindByActiveTimePointIdByDateAsync: timePointId: TimePointId -> notAfter: DateTimeOffset -> cancellationToken: CancellationToken -> Task<Result<WorkEventList list, string>>
+    end
+
+type IActiveTimePointRepository =
+    interface
+        abstract InsertAsync: activeTimePoint: ActiveTimePoint -> cancellationToken: CancellationToken -> Task<Result<unit, string>>
+        abstract ReadAllAsync: cancellationToken: CancellationToken -> Task<Result<ActiveTimePoint list, string>>
     end
 
 type StartRow = int
