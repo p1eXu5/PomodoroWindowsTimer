@@ -8,6 +8,8 @@ open FsUnit
 open p1eXu5.FSharp.Testing.ShouldExtensions
 open FsUnitTyped
 open FsToolkit.ErrorHandling
+open Faqt
+open Faqt.Operators
 
 open PomodoroWindowsTimer.Storage
 open PomodoroWindowsTimer.Testing.Fakers
@@ -20,9 +22,12 @@ module WorkEventRepositoryTests =
     let private dbFileName = "work_event_test.db"
 
     let mutable private workId1 = Unchecked.defaultof<uint64>
+    let mutable private work1 = Unchecked.defaultof<Work>
     let mutable private workId2 = Unchecked.defaultof<uint64>
+    let mutable private work2 = Unchecked.defaultof<Work>
 
-    let mutable private activeTimePointId = TimePointId.generate ()
+    let mutable private atpId1 = Unchecked.defaultof<TimePointId>
+    let mutable private atpId2 = Unchecked.defaultof<TimePointId>
 
     let private workRepository () = TestDb.workRepository dbFileName
     let private workEventRepository () = TestDb.workEventRepository dbFileName
@@ -31,7 +36,23 @@ module WorkEventRepositoryTests =
     let private createWork () =
         task {
             let repo = workRepository ()
-            return! repo.InsertAsync (generateNumber ()) (generateTitle ()) ct
+            let number = generateNumber ()
+            let title = generateTitle ()
+
+            let! res = repo.InsertAsync number title ct
+            match res with
+            | Ok (id, createdAt) ->
+                return 
+                    {
+                        Id = id
+                        Number = number
+                        Title = title
+                        CreatedAt = createdAt
+                        UpdatedAt = createdAt
+                        LastEventCreatedAt = None
+                    }
+                    |> Ok
+            | Error err -> return Error err
         }
 
     [<OneTimeSetUp>]
@@ -51,22 +72,32 @@ module WorkEventRepositoryTests =
 
             let! res = createWork ()
             match res with
-            | Ok (id, _) ->
-                workId1 <- id
+            | Ok (w1) ->
+                workId1 <- w1.Id
+                work1 <- w1
             | Error err -> raise (InvalidOperationException(err))
 
             let! res = createWork ()
             match res with
-            | Ok (id, _) ->
-                workId2 <- id
+            | Ok (w2) ->
+                workId2 <- w2.Id
+                work2 <- w2
             | Error err ->
                 assertionExn err
 
-            let atp = ActiveTimePoint.generate ()
-            let! res = (activeTimePointRepository ()).InsertAsync atp ct
+            let atp1 = ActiveTimePoint.generate ()
+            let! res = (activeTimePointRepository ()).InsertAsync atp1 ct
             match res with
             | Ok () ->
-                activeTimePointId <- atp.Id
+                atpId1 <- atp1.Id
+            | Error err ->
+                assertionExn err
+
+            let atp2 = ActiveTimePoint.generate ()
+            let! res = (activeTimePointRepository ()).InsertAsync atp2 ct
+            match res with
+            | Ok () ->
+                atpId2 <- atp2.Id
             | Error err ->
                 assertionExn err
         }
@@ -85,8 +116,8 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let! id1 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith activeTimePointId) ct
-            let! id2 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith activeTimePointId) ct
+            let! id1 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith atpId1) ct
+            let! id2 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith atpId1) ct
 
             id1 |> shouldBeGreaterThan 0UL
             id2 |> shouldBeGreaterThan id1
@@ -98,7 +129,7 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let workEvent = WorkEvent.generateWith activeTimePointId
+            let workEvent = WorkEvent.generateWith atpId1
             let! _ = workEventRepo.InsertAsync workId1 workEvent ct
 
             let! rows = workEventRepo.FindByWorkIdAsync workId1 ct
@@ -112,11 +143,11 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let workEvent1 = WorkEvent.generateWith activeTimePointId
-            let workEvent2 = WorkEvent.generateWith activeTimePointId
-            let workEvent3 = WorkEvent.generateWith activeTimePointId
-            let workEvent4 = WorkEvent.generateWith activeTimePointId
-            let workEvent5 = WorkEvent.generateWith activeTimePointId
+            let workEvent1 = WorkEvent.generateWith atpId1
+            let workEvent2 = WorkEvent.generateWith atpId1
+            let workEvent3 = WorkEvent.generateWith atpId1
+            let workEvent4 = WorkEvent.generateWith atpId1
+            let workEvent5 = WorkEvent.generateWith atpId1
 
             let! _ = workEventRepo.InsertAsync workId1 workEvent1 ct
             let! _ = workEventRepo.InsertAsync workId1 workEvent2 ct
@@ -135,11 +166,11 @@ module WorkEventRepositoryTests =
         taskResult {
             let workEventRepo = workEventRepository ()
 
-            let workEvent1 = WorkEvent.generateWith activeTimePointId
-            let workEvent2 = WorkEvent.generateWith activeTimePointId
-            let workEvent3 = WorkEvent.generateWith activeTimePointId
-            let workEvent4 = WorkEvent.generateWith activeTimePointId
-            let workEvent5 = WorkEvent.generateWith activeTimePointId
+            let workEvent1 = WorkEvent.generateWith atpId1
+            let workEvent2 = WorkEvent.generateWith atpId1
+            let workEvent3 = WorkEvent.generateWith atpId1
+            let workEvent4 = WorkEvent.generateWith atpId1
+            let workEvent5 = WorkEvent.generateWith atpId1
 
             let! _ = workEventRepo.InsertAsync workId1 workEvent1 ct
             let! _ = workEventRepo.InsertAsync workId1 workEvent2 ct
@@ -162,20 +193,20 @@ module WorkEventRepositoryTests =
 
             let work1Events =
                 [
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
                 ]
 
             let work2Events =
                 [
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
-                    WorkEvent.generateWith activeTimePointId
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
+                    WorkEvent.generateWith atpId1
                 ]
 
             for i in 0 .. 4 do
@@ -211,3 +242,55 @@ module WorkEventRepositoryTests =
         }
         |> TaskResult.runTest
 
+    type CaseData =
+        {
+            Date: DateOnly
+            Events: WorkEvent list
+        }
+
+    let caseData () =
+        let date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().Date)
+        {
+            Date = date
+            Events =
+                [
+                    WorkEvent.generateWorkStartedWith date "12:00" |> WorkEvent.withActiveTimePointId atpId1
+                    WorkEvent.generateStoppedWith date "12:10" |> WorkEvent.withActiveTimePointId atpId1
+                    WorkEvent.generateWorkIncreasedWith date "12:20"
+
+                    WorkEvent.generateWorkStartedWith date "12:30" |> WorkEvent.withActiveTimePointId atpId2
+                    WorkEvent.generateStoppedWith date "12:40" |> WorkEvent.withActiveTimePointId atpId2
+
+                    WorkEvent.generateWorkStartedWith date "12:50" |> WorkEvent.withActiveTimePointId atpId2
+                    WorkEvent.generateStoppedWith date "13:00" |> WorkEvent.withActiveTimePointId atpId2
+                ]
+        }
+
+    [<Test>]
+    let ``FindByActiveTimePointIdByDateAsync test`` () =
+        taskResult {
+            let caseData = caseData ()
+            let workEventRepo = workEventRepository ()
+            for ev in caseData.Events do
+                let! _ = workEventRepo.InsertAsync workId1 ev ct
+                ()
+
+            // act
+            let! rows = workEventRepo.FindByActiveTimePointIdByDateAsync atpId2 (WorkEvent.generateCreatedAt caseData.Date "12:40") ct
+
+            // assert
+            let expected : WorkEventList list =
+                [
+                    {
+                        Work = work1
+                        Events =
+                            [
+                                caseData.Events[3] |> WorkEvent.trimMicroseconds
+                                caseData.Events[4] |> WorkEvent.trimMicroseconds
+                            ]
+                    }
+                ]
+
+            do %rows.Should().Be(expected)
+        }
+        |> TaskResult.runTest

@@ -49,6 +49,11 @@ type LoggingExtensions() =
         new EventId(5, nameof LoggingExtensions.FailedToFindWorkEventsByPeriod),
         "Failed to find work events by period [{StartDate} - {EndDateInclusive}].")
 
+    static let failedToFindByActiveTimePointIdByDate = LoggerMessage.Define<TimePointId, DateTimeOffset>(
+        LogLevel.Error,
+        new EventId(6, nameof LoggingExtensions.FailedToFindByActiveTimePointIdByDate),
+        "Failed to find work events by active time point id {ActiveTimePointId} and created not after {NotAfterDate}.")
+
     [<Extension>]
     static member FailedToOpenConnection(logger: ILogger, ex: Exception) =
         failedToOpenConnection.Invoke(logger, ex)
@@ -81,3 +86,7 @@ type LoggingExtensions() =
     [<Extension>]
     static member FailedToFindWorkEventsByPeriod(logger: ILogger, period: DateOnlyPeriod, ex: Exception) =
         failedToFindWorkEventsByPeriod.Invoke(logger, period.Start, period.EndInclusive, ex);
+
+    [<Extension>]
+    static member FailedToFindByActiveTimePointIdByDate(logger: ILogger, activeTimePointId: TimePointId, notAfter: DateTimeOffset, ex: Exception) =
+        failedToFindByActiveTimePointIdByDate.Invoke(logger, activeTimePointId, notAfter, ex);

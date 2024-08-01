@@ -80,13 +80,35 @@ module internal WorkEventRepository =
             """
 
         /// Parameters: DateMin, DateMax.
-        let SELECT_JOIN_WORK_BY_PERIOD = $"""
+        let SELECT_JOIN_WORK_BY_WORK_ID_BY_PERIOD = $"""
             SELECT e.*, '' AS split, w.*
             FROM {Table.NAME} e
                 INNER JOIN {WorkTable.NAME} w ON w.{WorkTable.Columns.id} = e.{Table.Columns.work_id} 
             WHERE
                 e.{Table.Columns.created_at} >= @DateMin
                 AND e.{Table.Columns.created_at} < @DateMax
+            ORDER BY
+                  e.{Table.Columns.work_id}
+                , e.{Table.Columns.created_at} ASC
+            ;
+            """
+
+        /// Parameters: CreatedAtMax, AtpId.
+        let SELECT_JOIN_WORK_BY_ATP_ID_BY_MAX_DATE = $"""
+            WITH first_event_created_at ({Table.Columns.created_at}) AS (
+                SELECT e1.{Table.Columns.created_at}
+                FROM {Table.NAME} e1
+                WHERE e1.{Table.Columns.active_time_point_id} = @AtpId
+                ORDER BY e1.{Table.Columns.created_at}
+                LIMIT 1
+            )
+            SELECT e.*, '' AS split, w.*
+            FROM {Table.NAME} e
+                INNER JOIN {WorkTable.NAME} w ON w.{WorkTable.Columns.id} = e.{Table.Columns.work_id} 
+            WHERE
+                e.{Table.Columns.created_at} >= (SELECT {Table.Columns.created_at} FROM first_event_created_at LIMIT 1)
+                AND e.{Table.Columns.created_at} <= @CreatedAtMax
+                AND (e.{Table.Columns.active_time_point_id} = @AtpId OR e.{Table.Columns.active_time_point_id} IS NULL)
             ORDER BY
                   e.{Table.Columns.work_id}
                 , e.{Table.Columns.created_at} ASC
@@ -228,6 +250,22 @@ module internal WorkEventRepository =
                 return! Error (ex.Format($"Failed to find work events by workId {WorkId} and by period [{period.Start} - {period.EndInclusive}]."))
         }
 
+    let toWorkEventLists (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
+        rows
+        |> Seq.map (fun (r, w) ->
+            let work = w |> WorkTable.Row.ToWork
+            let ev = JsonHelpers.Deserialize<WorkEvent>(r.event_json)
+            (work, ev)
+        )
+        |> Seq.groupBy fst
+        |> Seq.map (fun (w, evs) ->
+            {
+                Work = w
+                Events = evs |> Seq.map snd |> Seq.toList
+            }
+        )
+        |> Seq.toList
+
     let findAllByPeriodAsync deps (period: DateOnlyPeriod) =
         cancellableTaskResult {
             let! (dbConnection: DbConnection) = deps.GetDbConnection
@@ -240,7 +278,7 @@ module internal WorkEventRepository =
 
             let command =
                 CommandDefinition(
-                    Sql.SELECT_JOIN_WORK_BY_PERIOD,
+                    Sql.SELECT_JOIN_WORK_BY_WORK_ID_BY_PERIOD,
                     parameters = {|
                         DateMin = dateMin
                         DateMax = dateMax
@@ -260,24 +298,46 @@ module internal WorkEventRepository =
                     )
                 return
                     rows
-                    |> Seq.map (fun (r, w) ->
-                        let work = w |> WorkTable.Row.ToWork
-                        let ev = JsonHelpers.Deserialize<WorkEvent>(r.event_json)
-                        (work, ev)
-                    )
-                    |> Seq.groupBy fst
-                    |> Seq.map (fun (w, evs) ->
-                        {
-                            Work = w
-                            Events = evs |> Seq.map snd |> Seq.toList
-                        }
-                    )
-                    |> Seq.toList
+                    |> toWorkEventLists
             with ex ->
                 deps.Logger.FailedToFindWorkEventsByPeriod(period, ex)
                 return! Error (ex.Format($"Failed to find work events by period [{period.Start} - {period.EndInclusive}]."))
         }
 
+    let findByActiveTimePointIdByDateAsync deps (activeTimePointId: TimePointId) (notAfter: DateTimeOffset) =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_JOIN_WORK_BY_ATP_ID_BY_MAX_DATE,
+                    parameters = {|
+                        CreatedAtMax = notAfter.ToUnixTimeMilliseconds()
+                        AtpId = activeTimePointId.ToString()
+                    |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows =
+                    dbConnection.QueryAsync<Table.Row, WorkTable.Row, Table.Row * WorkTable.Row>(
+                        command,
+                        Func<Table.Row, WorkTable.Row, Table.Row * WorkTable.Row>(
+                            fun f s ->
+                                (f, s)
+                        ),
+                        "split"
+                    )
+                return
+                    rows
+                    |> toWorkEventLists
+            with ex ->
+                deps.Logger.FailedToFindByActiveTimePointIdByDate(activeTimePointId, notAfter, ex)
+                return! Error (ex.Format($"Failed to find work events by active time point id {activeTimePointId} and created not after {notAfter}."))
+        }
 
 
 type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.TimeProvider, logger: ILogger<WorkEventRepository>) =
@@ -313,6 +373,6 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
         member _.FindLastByWorkIdByDateAsync workId date cancellationToken =
             raise (NotImplementedException())
 
-        member this.FindByActiveTimePointIdByDateAsync timePointId notAfter cancellationToken =
-            raise (System.NotImplementedException())
+        member _.FindByActiveTimePointIdByDateAsync activeTimePointId notAfter cancellationToken =
+            WorkEventRepository.findByActiveTimePointIdByDateAsync deps activeTimePointId notAfter cancellationToken
 

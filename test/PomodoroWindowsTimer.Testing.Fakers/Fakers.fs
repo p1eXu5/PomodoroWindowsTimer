@@ -8,7 +8,10 @@ open System
 let faker = Faker()
 
 module TimePointId =
-    let generate () = faker.Random.Uuid()
+    let generate () : TimePointId = faker.Random.Uuid()
+
+module WorkId =
+    let generate () : WorkId = faker.Random.ULong(1UL, 100UL)
 
 let generateNumber () : string =
     sprintf "WORK-%s" (faker.Random.Int(1, 9999).ToString("0000"))
@@ -184,7 +187,7 @@ module Work =
 
 [<RequireQualifiedAccess>]
 module WorkEvent =
-    let createdAt (date: DateOnly) (timeStr: string) =
+    let generateCreatedAt (date: DateOnly) (timeStr: string) =
         let time = TimeOnly.ParseExact(timeStr, "HH:mm", null)
         DateTimeOffset(date, time, System.TimeProvider.System.LocalTimeZone.BaseUtcOffset)
 
@@ -195,7 +198,7 @@ module WorkEvent =
     /// timeStr in "HH:mm" format.
     let generateWorkStartedWith (date: DateOnly) (timeStr: string) =
         WorkEvent.WorkStarted
-            (createdAt date timeStr, generateTimePointName (), TimePointId.generate ())
+            (generateCreatedAt date timeStr, generateTimePointName (), TimePointId.generate ())
 
     let generateBreakStarted () =
         WorkEvent.BreakStarted
@@ -204,7 +207,7 @@ module WorkEvent =
     /// timeStr in "HH:mm" format.
     let generateBreakStartedWith (date: DateOnly) (timeStr: string) =
         WorkEvent.BreakStarted
-            (createdAt date timeStr, generateTimePointName (), TimePointId.generate ())
+            (generateCreatedAt date timeStr, generateTimePointName (), TimePointId.generate ())
 
     let generateStopped () =
         WorkEvent.Stopped
@@ -212,7 +215,10 @@ module WorkEvent =
 
     /// timeStr in "HH:mm" format.
     let generateStoppedWith (date: DateOnly) (timeStr: string) =
-        WorkEvent.Stopped (createdAt date timeStr)
+        WorkEvent.Stopped (generateCreatedAt date timeStr)
+
+    let generateWorkIncreasedWith (date: DateOnly) (timeStr: string) =
+        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)))
 
     let generate () =
         let eventFactory =
@@ -226,6 +232,19 @@ module WorkEvent =
 
     let generateWith (activeTimePointId: TimePointId) =
         generate () |> WorkEvent.withActiveTimePointId activeTimePointId
+
+    let trimMicroseconds (workEvent: WorkEvent) =
+        let trim (createdAt: DateTimeOffset) =
+            DateTimeOffset.FromUnixTimeMilliseconds(createdAt.ToUnixTimeMilliseconds())
+
+        match workEvent with
+        | WorkEvent.WorkStarted (createdAt, n, id) -> WorkEvent.WorkStarted (createdAt |> trim, n, id)
+        | WorkEvent.BreakStarted (createdAt, n, id) -> WorkEvent.BreakStarted (createdAt |> trim, n, id)
+        | WorkEvent.Stopped (createdAt) -> WorkEvent.Stopped (createdAt |> trim)
+        | WorkEvent.WorkReduced (createdAt, v) -> WorkEvent.WorkReduced (createdAt |> trim, v)
+        | WorkEvent.WorkIncreased (createdAt, v) -> WorkEvent.WorkIncreased (createdAt |> trim, v)
+        | WorkEvent.BreakReduced (createdAt, v) -> WorkEvent.BreakReduced (createdAt |> trim, v)
+        | WorkEvent.BreakIncreased (createdAt, v) -> WorkEvent.BreakIncreased (createdAt |> trim, v)
 
 [<RequireQualifiedAccess>]
 module ActiveTimePoint =

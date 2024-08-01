@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.0" />
+    <PackageReference Include="Faqt" Version="2.0.0" />
     <PackageReference Include="FsUnit" Version="6.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>

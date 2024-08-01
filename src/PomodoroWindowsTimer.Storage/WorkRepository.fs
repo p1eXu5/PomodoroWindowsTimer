@@ -143,8 +143,7 @@ module internal WorkRepository =
 
             let! ct = CancellableTask.getCancellationToken ()
 
-            let createdAt = deps.TimeProvider.GetUtcNow();
-            let createdAtMs = createdAt.ToUnixTimeMilliseconds();
+            let createdAtMs = deps.TimeProvider.GetUtcNow().ToUnixTimeMilliseconds();
 
             let command =
                 CommandDefinition(
@@ -159,7 +158,7 @@ module internal WorkRepository =
 
             try
                 let! createdWorkId = dbConnection.ExecuteScalarAsync<uint64>(command)
-                return (createdWorkId, createdAt)
+                return (createdWorkId, DateTimeOffset.FromUnixTimeMilliseconds(createdAtMs))
             with ex ->
                 deps.Logger.FailedToCreateTable(Table.NAME, ex)
                 return! Error (ex.Format($"Failed to create table {Table.NAME}."))

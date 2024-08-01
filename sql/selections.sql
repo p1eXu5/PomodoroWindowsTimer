@@ -145,7 +145,24 @@ ORDER BY id;
 DROP TABLE work_event_backup;
 
 
-
+WITH first_event_created_at (created_at) AS (
+    SELECT e1.created_at
+    FROM work_event e1
+    WHERE e1.active_time_point_id = '19e45107-d6f2-4588-ab71-d50943d37d7f'
+    ORDER BY e1.created_at
+    LIMIT 1
+)
+SELECT e.*, '' AS split, w.*
+FROM work_event e
+    INNER JOIN work w ON w.id = e.work_id
+WHERE
+    e.created_at >= (SELECT created_at FROM first_event_created_at LIMIT 1)
+    AND e.created_at <= 1715530226320
+    AND (e.active_time_point_id ='19e45107-d6f2-4588-ab71-d50943d37d7f' OR e.active_time_point_id IS NULL)
+ORDER BY
+      e.work_id
+    , e.created_at ASC
+;
 
 
 
