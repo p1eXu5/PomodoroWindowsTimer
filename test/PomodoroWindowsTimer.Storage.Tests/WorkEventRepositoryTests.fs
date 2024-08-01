@@ -255,14 +255,15 @@ module WorkEventRepositoryTests =
             Events =
                 [
                     WorkEvent.generateWorkStartedWith date "12:00" |> WorkEvent.withActiveTimePointId atpId1
-                    WorkEvent.generateStoppedWith date "12:10" |> WorkEvent.withActiveTimePointId atpId1
+                    WorkEvent.generateStoppedWith date "12:10"
                     WorkEvent.generateWorkIncreasedWith date "12:20"
 
                     WorkEvent.generateWorkStartedWith date "12:30" |> WorkEvent.withActiveTimePointId atpId2
-                    WorkEvent.generateStoppedWith date "12:40" |> WorkEvent.withActiveTimePointId atpId2
+                    WorkEvent.generateWorkIncreasedWith date "12:31"
+                    WorkEvent.generateStoppedWith date "12:40"
 
                     WorkEvent.generateWorkStartedWith date "12:50" |> WorkEvent.withActiveTimePointId atpId2
-                    WorkEvent.generateStoppedWith date "13:00" |> WorkEvent.withActiveTimePointId atpId2
+                    WorkEvent.generateStoppedWith date "13:00"
                 ]
         }
 
@@ -286,7 +287,7 @@ module WorkEventRepositoryTests =
                         Events =
                             [
                                 caseData.Events[3] |> WorkEvent.trimMicroseconds
-                                caseData.Events[4] |> WorkEvent.trimMicroseconds
+                                caseData.Events[5] |> WorkEvent.trimMicroseconds
                             ]
                     }
                 ]

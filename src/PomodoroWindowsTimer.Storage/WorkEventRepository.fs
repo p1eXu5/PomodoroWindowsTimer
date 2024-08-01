@@ -93,7 +93,7 @@ module internal WorkEventRepository =
             ;
             """
 
-        /// Parameters: CreatedAtMax, AtpId.
+        /// Parameters: CreatedAtMax, AtpId, EventNames.
         let SELECT_JOIN_WORK_BY_ATP_ID_BY_MAX_DATE = $"""
             WITH first_event_created_at ({Table.Columns.created_at}) AS (
                 SELECT e1.{Table.Columns.created_at}
@@ -109,6 +109,7 @@ module internal WorkEventRepository =
                 e.{Table.Columns.created_at} >= (SELECT {Table.Columns.created_at} FROM first_event_created_at LIMIT 1)
                 AND e.{Table.Columns.created_at} <= @CreatedAtMax
                 AND (e.{Table.Columns.active_time_point_id} = @AtpId OR e.{Table.Columns.active_time_point_id} IS NULL)
+                AND e.{Table.Columns.event_name} IN @EventNames
             ORDER BY
                   e.{Table.Columns.work_id}
                 , e.{Table.Columns.created_at} ASC
@@ -317,6 +318,7 @@ module internal WorkEventRepository =
                     parameters = {|
                         CreatedAtMax = notAfter.ToUnixTimeMilliseconds()
                         AtpId = activeTimePointId.ToString()
+                        EventNames = [| nameof WorkEvent.WorkStarted; nameof WorkEvent.BreakStarted; nameof WorkEvent.Stopped |]
                     |},
                     cancellationToken = ct
                 )
