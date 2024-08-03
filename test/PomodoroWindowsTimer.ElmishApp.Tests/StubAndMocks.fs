@@ -38,6 +38,7 @@ type UserSettingsStub () =
         dict.Add("CurrentWork", Option<Work>.None)
         dict.Add("LastStatisticPeriod", Option<Work>.None)
         dict.Add("RollbackWorkStrategy", RollbackWorkStrategy.Default)
+        dict.Add("LastDayCount", 0)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v

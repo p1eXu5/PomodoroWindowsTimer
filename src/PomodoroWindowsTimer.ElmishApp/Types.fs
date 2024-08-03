@@ -8,9 +8,16 @@ type TimePointKind =
 
 type Message = string
 
+(* TODO
 [<Struct>]
 type RollbackWorkStrategy = 
     | UserChoiceIsRequired
     | SubstractWorkAddBreak
     | Default
+*)
 
+[<Struct>]
+type LocalRollbackStrategy = 
+    | DoNotCorrect
+    | SubstractSpentTime
+    | InvertSpentTime

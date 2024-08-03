@@ -29,12 +29,12 @@ let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: 
             (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
         )
 
-let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =
-    Common.``Looper TimePointReduced event has been despatched with`` activeTimePointId expectedSeconds tolerance
+let ``Looper TimePointReduced event has been despatched with`` (timePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =
+    Common.``Looper TimePointReduced event has been despatched with`` timePointId expectedSeconds tolerance
     |> Scenario.log (
         sprintf "Then.``%s %A %A sec with %A tolerance``."
             (nameof Common.``Looper TimePointReduced event has been despatched with``)
-            activeTimePointId
+            timePointId
             expectedSeconds
             tolerance
         )
@@ -156,9 +156,9 @@ let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
 
         match sut.MainModel.Player.ActiveTimePoint with
         | Some atp ->
-            atp.TimeSpan.TotalSeconds
+            atp.RemainingTimeSpan.TotalSeconds
             |> shouldL equal (float seconds)
-                $"Active TimePoint time: {atp.TimeSpan.TotalSeconds} sec., expected time: {seconds} sec."
+                $"Active TimePoint time: {atp.RemainingTimeSpan.TotalSeconds} sec., expected time: {seconds} sec."
         | None ->
             assertionExn "Active TimePoint has not been set"
     }

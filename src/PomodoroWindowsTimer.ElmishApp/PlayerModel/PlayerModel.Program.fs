@@ -100,7 +100,7 @@ let update
         let storeCmd =
             match currentWorkOpt with
             | Some work ->
-                Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask work.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (work.Id, time, model.ActiveTimePoint.Value) Msg.OnExn
             | _ ->
                 Cmd.none
 
@@ -121,7 +121,7 @@ let update
         let cmd =
             match currentWorkOpt, model.ActiveTimePoint with
             | Some work, Some tp ->
-                Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask work.Id time) tp Msg.OnExn
+                Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (work.Id, time, tp) Msg.OnExn
             | _ ->
                 Cmd.none
         let winCmd =
@@ -163,7 +163,7 @@ let update
             let storeStartedWorkEventCmd =
                 match currentWorkOpt, model.LooperState with
                 | Some work, LooperState.Playing ->
-                    Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask work.Id time) nextTp Msg.OnExn
+                    Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (work.Id, time, nextTp) Msg.OnExn
                 | _ ->
                     Cmd.none
 
@@ -232,7 +232,7 @@ let update
             model |> withPreShiftState
             , Cmd.batch [
                 if currentWorkOpt |> Option.isSome then
-                    Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currentWorkOpt.Value.Id time) model.ActiveTimePoint.Value Msg.OnExn
+                    Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currentWorkOpt.Value.Id, time, model.ActiveTimePoint.Value) Msg.OnExn
             ]
             , Intent.None
         | _ ->

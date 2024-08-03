@@ -167,7 +167,7 @@ type ExcelRow =
 type WorkSpentTime =
     {
         Work: Work
-        TimeSpent: TimeSpan
+        SpentTime: TimeSpan
     }
 
 // ------------------------------- modules

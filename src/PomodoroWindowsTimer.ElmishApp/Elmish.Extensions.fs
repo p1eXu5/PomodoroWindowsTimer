@@ -148,6 +148,26 @@ module List =
                     mapFirstRec (model :: reverseFront) cmd tailModels
         mapFirstRec [] Cmd.none modelList
 
+    let mapFirstIntent predicate updatef defaultIntent modelList =
+        let rec mapFirstRec reverseFront back =
+            match back with
+            | [] ->
+                (*
+                 * Conceptually, the correct value to return is
+                 * reverseFront |> List.rev
+                 * but this is the same as
+                 * input
+                 * so returning that instead.
+                 *)
+                modelList, defaultIntent
+            | model :: tailModels ->
+                if predicate model then
+                    let (model, intent) = updatef model
+                    (reverseFront |> List.rev) @ (model :: tailModels), intent
+                else
+                    mapFirstRec (model :: reverseFront) tailModels
+        mapFirstRec [] modelList
+
 
 module Utils =
     open System.Reflection

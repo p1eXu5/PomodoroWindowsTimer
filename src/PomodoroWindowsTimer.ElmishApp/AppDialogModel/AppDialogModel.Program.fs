@@ -1,95 +1,83 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.AppDialogModel.Program
 
-open System
-open System.Threading
 open Elmish
 open Elmish.Extensions
-open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstractions
+
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.AppDialogModel
 
-let storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (offset: TimeSpan) =
-    task {
-        let workEvent =
-            WorkEvent.WorkReduced (time, offset)
 
-        let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
+let private ofBotSettingsIntent botSettingsModel intent =
+    match intent with
+    | BotSettingsModel.Intent.None ->
+        botSettingsModel |> AppDialogModel.BotSettings |> withCmdNone
 
-        match res with
-        | Ok _ -> ()
-        | Error err -> raise (InvalidOperationException(err))
-    }
+    | BotSettingsModel.Intent.CloseDialogRequested ->
+        AppDialogModel.NoDialog |> withCmdNone
 
-let storeBreakIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (time: DateTimeOffset) (offset: TimeSpan) =
-    task {
-        let workEvent =
-            WorkEvent.BreakIncreased (time, offset)
 
-        let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
+let private ofRollbackWorkModelIntent (workEventStore: WorkEventStore) (userSettings: IUserSettings) rollbackWorkModel intent =
+    match intent with
+    | RollbackWorkModel.Intent.None ->
+        rollbackWorkModel |> AppDialogModel.RollbackWork |> withCmdNone
 
-        match res with
-        | Ok _ -> ()
-        | Error err -> raise (InvalidOperationException(err))
-    }
+    | RollbackWorkModel.Intent.DefaultedAndClose ->
+        if rollbackWorkModel.RememberChoice then
+            userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.Default
+        AppDialogModel.NoDialog |> withCmdNone
+        
+    | RollbackWorkModel.Intent.SubstractWorkAddBreakAndClose ->
+        if rollbackWorkModel.RememberChoice then
+            userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.SubstractWorkAddBreak
+
+        AppDialogModel.NoDialog
+        , Cmd.batch [
+            Cmd.OfTask.attempt workEventStore.StoreWorkReducedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(-2), rollbackWorkModel.Difference) Msg.EnqueueExn
+            Cmd.OfTask.attempt workEventStore.StoreBreakIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(-1), rollbackWorkModel.Difference) Msg.EnqueueExn
+        ]
+
+
+let private ofRollbackWorkListModelIntent (workEventStore: WorkEventStore) rollbackWorkListModel (intent: RollbackWorkListModel.Intent) =
+    rollbackWorkListModel |> AppDialogModel.RollbackWorkList |> withCmdNone
+
 
 let update
-    (cfg: AppDialogModel.Cfg)
+    (workEventStore: WorkEventStore)
+    (userSettings: IUserSettings)
+    (errorMessageQueue: IErrorMessageQueue)
     initBotSettingsModel
     updateBotSettingsModel
     updateRollbackWorkModel
-    (msg: AppDialogModel.Msg)
-    (model: AppDialogModel)
+    updateRollbackWorkListModel
+    (msg: AppDialogModel.Msg) (model: AppDialogModel)
     =
-    let storeWorkReducedEventTask =
-        storeWorkReducedEventTask cfg.WorkEventRepository
-
-    let storeBreakIncreasedEventTask =
-        storeBreakIncreasedEventTask cfg.WorkEventRepository
-
     match msg with
     | Msg.LoadBotSettingsDialogModel ->
-        initBotSettingsModel () |> AppDialogModel.BotSettingsDialog
+        initBotSettingsModel () |> AppDialogModel.BotSettings
         , Cmd.none
 
     | MsgWith.BotSettingsModelMsg model (bmsg, bm) ->
-        let (m, intent) = updateBotSettingsModel bmsg bm
-        match intent with
-        | BotSettingsModel.Intent.None ->
-            m |> AppDialogModel.BotSettingsDialog, Cmd.none
+        updateBotSettingsModel bmsg bm ||> ofBotSettingsIntent
 
-        | BotSettingsModel.Intent.CloseDialogRequested ->
-            AppDialogModel.NoDialog, Cmd.none
-
-    | Msg.LoadRollbackWorkDialogModel (workSpentTime, time) ->
-        RollbackWorkModel.init workSpentTime time |> AppDialogModel.RollbackWorkDialog
-        , Cmd.none
+    | Msg.LoadRollbackWorkDialogModel (workSpentTime, time, rollbackStrategy) ->
+        RollbackWorkModel.init workSpentTime time rollbackStrategy |> AppDialogModel.RollbackWork |> withCmdNone
 
     | MsgWith.RollbackWorkModelMsg model (rmsg, rm) ->
-        let (rm, intent) = updateRollbackWorkModel rmsg rm
-        match intent with
-        | RollbackWorkModel.Intent.None ->
-            rm |> AppDialogModel.RollbackWorkDialog |> withCmdNone
-        | RollbackWorkModel.Intent.DefaultedAndClose ->
-            if rm.RememberChoice then
-                cfg.UserSettings.RollbackWorkStrategy <- RollbackWorkStrategy.Default
-            AppDialogModel.NoDialog |> withCmdNone
-        | RollbackWorkModel.Intent.SubstractWorkAddBreakAndClose ->
-            if rm.RememberChoice then
-                cfg.UserSettings.RollbackWorkStrategy <- RollbackWorkStrategy.SubstractWorkAddBreak
-            AppDialogModel.NoDialog
-            , Cmd.batch [
-                Cmd.OfTask.attempt (storeWorkReducedEventTask rm.WorkId (rm.Time.AddMilliseconds(-2))) rm.Difference Msg.EnqueueExn
-                Cmd.OfTask.attempt (storeBreakIncreasedEventTask rm.WorkId (rm.Time.AddMilliseconds(-1))) rm.Difference Msg.EnqueueExn
-            ]
+        updateRollbackWorkModel rmsg rm ||> ofRollbackWorkModelIntent workEventStore userSettings
+
+    | Msg.LoadRollbackWorkListDialogModel (workSpentTimeList, time, rollbackStrategy) ->
+        RollbackWorkListModel.init workSpentTimeList time rollbackStrategy |> AppDialogModel.RollbackWorkList |> withCmdNone
+
+    | MsgWith.RollbackWorkListModelMsg model (rmsg, rm) ->
+        updateRollbackWorkListModel rmsg rm ||> ofRollbackWorkListModelIntent workEventStore
 
     | Msg.Unload ->
         AppDialogModel.NoDialog, Cmd.none
 
     | Msg.EnqueueExn e ->
-        cfg.MainErrorMessageQueue.EnqueueError (sprintf "%A" e)
+        errorMessageQueue.EnqueueError (sprintf "%A" e)
         model, Cmd.none
 
     | _ ->

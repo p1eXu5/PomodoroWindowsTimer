@@ -30,7 +30,7 @@ let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
         model |> withPlayerModel playerModel
         , Cmd.batch [
             Cmd.map Msg.PlayerModelMsg playerCmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, time)))
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, time, LocalRollbackStrategy.InvertSpentTime)))
         ]
 
 let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =
@@ -166,8 +166,8 @@ let update
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currWork.Id (time.AddMilliseconds(-1))) model.Player.ActiveTimePoint.Value Msg.OnExn
-                        Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask workModel.Id time) model.Player.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time.AddMilliseconds(-1), model.Player.ActiveTimePoint.Value) Msg.OnExn
+                        Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (workModel.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
                 | Some _ ->
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
@@ -176,7 +176,7 @@ let update
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (workEventStore.StoreStartedWorkEventTask workModel.Id time) model.Player.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (workModel.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
             else
                 model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
@@ -192,7 +192,7 @@ let update
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
                     , Cmd.batch [
                         cmd
-                        Cmd.OfTask.attempt (workEventStore.StoreStoppedWorkEventTask currWork.Id time) model.Player.ActiveTimePoint.Value Msg.OnExn
+                        Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
                 | None ->
                     model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None

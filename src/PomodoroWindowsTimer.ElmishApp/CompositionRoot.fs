@@ -107,12 +107,18 @@ let compose
         let updateRollbackWorkModel =
             RollbackWorkModel.Program.update userSettings
 
+        let updateRollbackWorkListModel =
+            RollbackWorkListModel.Program.update updateRollbackWorkModel
+
         let updateAppDialogModel =
             AppDialogModel.Program.update
-                appDialogModelCfg
+                workEventStore
+                userSettings
+                mainErrorMessageQueue
                 initBotSettingsModel
                 updateBotSettingsModel
                 updateRollbackWorkModel
+                updateRollbackWorkListModel
 
         let updateWorkModel =
             WorkModel.Program.update workRepository (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue

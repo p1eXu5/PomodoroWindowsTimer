@@ -11,15 +11,15 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
 
 
-let ``Looper TimePointReduced event has been despatched with`` (activeTimePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =
+let ``Looper TimePointReduced event has been despatched with`` (timePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =
     scenario {
         do! Scenario.msgDispatchedWithin2Sec "TimePointReduced" (fun msg ->
             match msg with
-            | MainModel.Msg.LooperMsg (LooperMsg.TimePointTimeReduced tp) ->
-                tp.Id = activeTimePointId
+            | MainModel.Msg.LooperMsg (LooperMsg.TimePointTimeReduced atp) ->
+                atp.OriginalId = timePointId
                 && (
-                    float (expectedSeconds - tolerance) <= tp.TimeSpan.TotalSeconds
-                    && tp.TimeSpan.TotalSeconds <= float (expectedSeconds + tolerance)
+                    float (expectedSeconds - tolerance) <= atp.RemainingTimeSpan.TotalSeconds
+                    && atp.RemainingTimeSpan.TotalSeconds <= float (expectedSeconds + tolerance)
                 )
 
             | _ -> false

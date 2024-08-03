@@ -28,7 +28,9 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Storag
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{AEF376B7-DCF6-418F-BFCA-840E40450343}"
 	ProjectSection(SolutionItems) = preProject
-		docs\development-notes.md = docs\development-notes.md
+		docs\design\development-notes.md = docs\design\development-notes.md
+		docs\design\er-diagram.md = docs\design\er-diagram.md
+		docs\design\time-shifting-with-slider.md = docs\design\time-shifting-with-slider.md
 	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Testing.Fakers", "test\PomodoroWindowsTimer.Testing.Fakers\PomodoroWindowsTimer.Testing.Fakers.fsproj", "{73C67F31-8529-4D7D-BEAA-5F627CE0BA31}"
@@ -44,7 +46,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Storage", "src\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj", "{C57EC492-3405-4E54-A210-F8B2A7377BC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.csproj", "{99D0C7BE-CC16-424F-A928-A896088E76DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.csproj", "{99D0C7BE-CC16-424F-A928-A896088E76DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

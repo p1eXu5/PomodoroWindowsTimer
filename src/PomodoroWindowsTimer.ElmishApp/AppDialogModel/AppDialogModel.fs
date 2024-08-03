@@ -5,13 +5,14 @@ open System
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
 
-
+[<RequireQualifiedAccess>]
 type AppDialogModel =
     | NoDialog
-    | BotSettingsDialog of BotSettingsModel
-    | RollbackWorkDialog of RollbackWorkModel
-
+    | BotSettings of BotSettingsModel
+    | RollbackWork of RollbackWorkModel
+    | RollbackWorkList of RollbackWorkListModel
 
 module AppDialogModel =
 
@@ -28,8 +29,11 @@ module AppDialogModel =
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
 
-        | LoadRollbackWorkDialogModel of WorkSpentTime * DateTimeOffset
+        | LoadRollbackWorkDialogModel of WorkSpentTime * DateTimeOffset * LocalRollbackStrategy
         | RollbackWorkModelMsg of RollbackWorkModel.Msg
+
+        | LoadRollbackWorkListDialogModel of WorkSpentTime list * DateTimeOffset * LocalRollbackStrategy
+        | RollbackWorkListModelMsg of RollbackWorkListModel.Msg
 
         | Unload
 
@@ -39,13 +43,19 @@ module AppDialogModel =
     module MsgWith =
         let (|BotSettingsModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
             match msg, model with
-            | Msg.BotSettingsModelMsg msg, AppDialogModel.BotSettingsDialog m ->
+            | Msg.BotSettingsModelMsg msg, AppDialogModel.BotSettings m ->
                 (msg, m) |> Some
             | _ -> None
 
         let (|RollbackWorkModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
             match msg, model with
-            | Msg.RollbackWorkModelMsg msg, AppDialogModel.RollbackWorkDialog m ->
+            | Msg.RollbackWorkModelMsg msg, AppDialogModel.RollbackWork m ->
+                (msg, m) |> Some
+            | _ -> None
+
+        let (|RollbackWorkListModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
+            match msg, model with
+            | Msg.RollbackWorkListModelMsg msg, AppDialogModel.RollbackWorkList m ->
                 (msg, m) |> Some
             | _ -> None
 
@@ -57,20 +67,27 @@ module AppDialogModel =
         | TimePointsGeneratorDialogId
         | WorkStatisticsDialogId
         | RollbackWorkDialogId
+        | RollbackWorkListDialogId
 
     let appDialogId = function
         | AppDialogModel.NoDialog -> None
-        | AppDialogModel.BotSettingsDialog _ -> AppDialogId.BotSettingsDialogId |> Some
-        | AppDialogModel.RollbackWorkDialog _ -> AppDialogId.RollbackWorkDialogId |> Some
+        | AppDialogModel.BotSettings _ -> AppDialogId.BotSettingsDialogId |> Some
+        | AppDialogModel.RollbackWork _ -> AppDialogId.RollbackWorkDialogId |> Some
+        | AppDialogModel.RollbackWorkList _ -> AppDialogId.RollbackWorkListDialogId |> Some
 
-    let botSettingsModel (model: AppDialogModel) =
+    let tryBotSettingsModel (model: AppDialogModel) =
         match model with
-        | AppDialogModel.BotSettingsDialog m -> m |> Some
+        | AppDialogModel.BotSettings m -> m |> Some
         | _ -> None
 
-    let rollbackWorkModel (model: AppDialogModel) =
+    let tryRollbackWorkModel (model: AppDialogModel) =
         match model with
-        | AppDialogModel.RollbackWorkDialog m -> m |> Some
+        | AppDialogModel.RollbackWork m -> m |> Some
+        | _ -> None
+
+    let tryRollbackWorkListModel (model: AppDialogModel) =
+        match model with
+        | AppDialogModel.RollbackWorkList m -> m |> Some
         | _ -> None
 
 

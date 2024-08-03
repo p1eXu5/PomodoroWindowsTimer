@@ -3,49 +3,86 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
+             xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             Width="380"
-             Height="185"
-             mc:Ignorable="d"
+             Height="Auto"
+             MaxWidth="500"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
+             mc:Ignorable="d"
              >
-    <StackPanel Margin="10"
-                VerticalAlignment="Top"
-                Orientation="Vertical"
+  <UserControl.Resources>
+    <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
+  </UserControl.Resources>
+  <StackPanel Margin="10"
+              VerticalAlignment="Top"
+              Orientation="Vertical"
+              >
+
+    <TextBlock HorizontalAlignment="Center"
+               FontSize="20"
+               Text="ROLLBACK TIME"
+               TextAlignment="Center"
+               TextWrapping="Wrap"
+               />
+    <TextBlock Margin="10,24,10,0"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Bottom"
+               materialDesign:HintAssist.Hint="Number"
+               Text="{Binding Number,
+                              Converter={StaticResource conv_NoNumberConverter},
+                              FallbackValue='NO NUMBER'}"
+               FontWeight="Normal"
+               FontSize="11"
+               />
+    <TextBlock ToolTip="{Binding Title}"
+               Margin="10,5"
+               VerticalAlignment="Top"
+               materialDesign:HintAssist.Hint="Title"
+               FontSize="16"
+               FontWeight="Normal"
+               Text="{Binding Title,
+                              FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+               TextTrimming="CharacterEllipsis"
+               TextWrapping="Wrap"
+               />
+    <TextBlock Margin="0,20"
+               HorizontalAlignment="Center"
+               FontSize="20"
+               Text="{Binding Time,
+                              Converter={StaticResource conv_TimeSpanToMinutes},
+                              FallbackValue='20 mimutes'}"
+               TextAlignment="Center"
+               TextWrapping="Wrap"
+               />
+    <StackPanel HorizontalAlignment="Center"
+                Orientation="Horizontal"
                 >
+      <Button DockPanel.Dock="Bottom"
+              Command="{Binding SubstractWorkAddBreakCommand}"
+              Content="AS BREAK"
+              Style="{StaticResource PomodoroDialogButton}"
+              />
 
-        <TextBlock HorizontalAlignment="Center"
-                   FontSize="20"
-                   Text="How to interpret rollback Work time?"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap"
-                   />
-        <TextBlock Margin="0,20,0,10"
-                   HorizontalAlignment="Center"
-                   FontSize="20"
-                   Text="{Binding Time, Converter={StaticResource conv_TimeSpanToMinutes}, FallbackValue='20 mimutes'}"
-                   TextAlignment="Center"
-                   TextWrapping="Wrap"
-                   />
-        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding SubstractWorkAddBreakCommand}"
-                    Content="AS BREAK"
-                    Style="{StaticResource PomodoroOkDialogButton}"
-                    />
+      <Button DockPanel.Dock="Bottom"
+              Command="{Binding CloseCommand}"
+              Content="ERASE"
+              Style="{StaticResource PomodoroDialogButton}"
+              />
 
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding CloseCommand}"
-                    Content="AS WORK"
-                    Style="{StaticResource PomodoroCancelDialogButton}"
-                    />
-        </StackPanel>
-
-        <CheckBox Margin="0,10,0,0"
-                  HorizontalAlignment="Center"
-                  Content="Remember my choice"
-                  IsChecked="{Binding RememberChoice}"
-                  />
+      <Button DockPanel.Dock="Bottom"
+              Command="{Binding CloseCommand}"
+              Content="LEAVE AS WORK"
+              Style="{StaticResource PomodoroDialogButton}"
+              />
     </StackPanel>
+
+    <CheckBox Content="Remember my choice"
+              Margin="0,10,0,0"
+              HorizontalAlignment="Center"
+              IsChecked="{Binding RememberChoice}"
+              Visibility="Collapsed"
+              />
+  </StackPanel>
 </UserControl>

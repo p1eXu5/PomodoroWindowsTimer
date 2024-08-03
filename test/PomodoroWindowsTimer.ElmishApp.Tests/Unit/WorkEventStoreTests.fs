@@ -48,19 +48,90 @@ module WorkEventStoreTests =
                                         WorkEvent.generateWorkStartedWith date "12:00"
                                         WorkEvent.generateStoppedWith date "12:10"
                                     ]
+                                    |> List.rev
                             }
                         ]
-                    BeforeDate =  WorkEvent.createdAt date "12:10"
+                    BeforeDate =  WorkEvent.generateCreatedAt date "12:10"
                     Diff = 5.0 * min
                 }
             ).Returns(
                 [
                     {
                         Work = work1
-                        TimeSpent = TimeSpan.FromMinutes(5)
+                        SpentTime = TimeSpan.FromMinutes(5)
                     }
                 ]
-            ).SetName("01: Single Work")
+            ).SetName("01: single Work, single start-stop")
+
+            TestCaseData(
+                {
+                    WorkEventLists =
+                        [
+                            {
+                                Work = work1
+                                Events =
+                                    [
+                                        WorkEvent.generateWorkStartedWith date "12:07"
+                                        WorkEvent.generateStoppedWith date "12:08"
+                                        WorkEvent.generateWorkStartedWith date "12:09"
+                                        WorkEvent.generateStoppedWith date "12:10"
+                                    ]
+                                    |> List.rev
+                            }
+                        ]
+                    BeforeDate =  WorkEvent.generateCreatedAt date "12:10"
+                    Diff = 5.0 * min
+                }
+            ).Returns(
+                [
+                    {
+                        Work = work1
+                        SpentTime = TimeSpan.FromMinutes(2)
+                    }
+                ]
+            ).SetName("02: single Work, severtal start-stop")
+
+            let work2 = Work.generate ()
+            TestCaseData(
+                {
+                    WorkEventLists =
+                        [
+                            {
+                                Work = work1
+                                Events =
+                                    [
+                                        WorkEvent.generateBreakStartedWith date "12:07"
+                                        WorkEvent.generateStoppedWith date "12:08"
+                                        WorkEvent.generateBreakStartedWith date "12:09"
+                                        WorkEvent.generateStoppedWith date "12:10"
+                                    ]
+                                    |> List.rev
+                            }
+                            {
+                                Work = work2
+                                Events =
+                                    [
+                                        WorkEvent.generateBreakStartedWith date "11:50"
+                                        WorkEvent.generateStoppedWith date "12:06"
+                                    ]
+                                    |> List.rev
+                            }
+                        ]
+                    BeforeDate =  WorkEvent.generateCreatedAt date "12:10"
+                    Diff = 5.0 * min
+                }
+            ).Returns(
+                [
+                    {
+                        Work = work1
+                        SpentTime = TimeSpan.FromMinutes(2)
+                    }
+                    {
+                        Work = work2
+                        SpentTime = TimeSpan.FromMinutes(1)
+                    }
+                ]
+            ).SetName("03: two Works, severtal start-stop")
         }
 
 

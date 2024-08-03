@@ -162,7 +162,7 @@ module WorkEventRepositoryTests =
         |> TaskResult.runTest
 
     [<Test>]
-    let ``findByWorkIdByDate date without event test`` () =
+    let ``04: FindByWorkIdByDateAsync date without event test`` () =
         taskResult {
             let workEventRepo = workEventRepository ()
 
@@ -187,7 +187,7 @@ module WorkEventRepositoryTests =
         |> TaskResult.runTest
 
     [<Test>]
-    let ``findAllByPeriod period with events test`` () =
+    let ``05: FindAllByPeriodAsync period with events test`` () =
         taskResult {
             let workEventRepo = workEventRepository ()
 
@@ -268,7 +268,7 @@ module WorkEventRepositoryTests =
         }
 
     [<Test>]
-    let ``FindByActiveTimePointIdByDateAsync test`` () =
+    let ``06: FindByActiveTimePointIdByDateAsync - start, stop and increase events exists - returns start and stop events`` () =
         taskResult {
             let caseData = caseData ()
             let workEventRepo = workEventRepository ()
@@ -286,8 +286,8 @@ module WorkEventRepositoryTests =
                         Work = work1
                         Events =
                             [
-                                caseData.Events[3] |> WorkEvent.trimMicroseconds
                                 caseData.Events[5] |> WorkEvent.trimMicroseconds
+                                caseData.Events[3] |> WorkEvent.trimMicroseconds
                             ]
                     }
                 ]

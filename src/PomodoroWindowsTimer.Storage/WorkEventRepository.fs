@@ -112,7 +112,7 @@ module internal WorkEventRepository =
                 AND e.{Table.Columns.event_name} IN @EventNames
             ORDER BY
                   e.{Table.Columns.work_id}
-                , e.{Table.Columns.created_at} ASC
+                , e.{Table.Columns.created_at} DESC
             ;
             """
 

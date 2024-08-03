@@ -35,12 +35,12 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     // -------------------------------------------------
     member val OpenBotSettingsDialogCommand : Binding =
         nameof __.OpenBotSettingsDialogCommand
-            |> Binding.cmdIf (function NoDialog -> Msg.LoadBotSettingsDialogModel |> Some | _ -> None)
+            |> Binding.cmdIf (function AppDialogModel.NoDialog -> Msg.LoadBotSettingsDialogModel |> Some | _ -> None)
 
     member val BotSettingsDialog : Binding =
         nameof __.BotSettingsDialog
             |> Binding.SubModel.opt (BotSettingsModel.Bindings.ToList)
-            |> Binding.mapModel (botSettingsModel)
+            |> Binding.mapModel (tryBotSettingsModel)
             |> Binding.mapMsg (Msg.BotSettingsModelMsg)
 
     // -------------------------------------------------
@@ -48,7 +48,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
     member val RollbackWorkDialog : Binding =
         nameof __.RollbackWorkDialog
             |> Binding.SubModel.opt (RollbackWorkModel.Bindings.bindings)
-            |> Binding.mapModel (rollbackWorkModel)
+            |> Binding.mapModel (tryRollbackWorkModel)
             |> Binding.mapMsg (Msg.RollbackWorkModelMsg)
 
     // -------------------------------------------------

@@ -4,6 +4,7 @@ open System
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
 
 type RollbackWorkModel =
     {
@@ -11,6 +12,7 @@ type RollbackWorkModel =
         Time: DateTimeOffset
         Difference: TimeSpan
         RememberChoice: bool
+        LocalStrategy: LocalRollbackStrategy
     }
 
 module RollbackWorkModel =
@@ -22,58 +24,23 @@ module RollbackWorkModel =
         }
 
     type Msg =
-        | SetRememberChoice of bool
-        | SubstractWorkAddBreak
-        | Close
+        // TODO: | SetRememberChoice of bool
+        | SetLocalRollbackStrategy of LocalRollbackStrategy
+        | SetLocalRollbackStrategyAndClose of LocalRollbackStrategy
 
+    [<RequireQualifiedAccess>]
     type Intent =
         | None
         | SubstractWorkAddBreakAndClose
         | DefaultedAndClose
 
-    let init (workSpentTime: WorkSpentTime) time =
+    let init (workSpentTime: WorkSpentTime) time localStrategy =
         {
             WorkId = workSpentTime.Work.Id
             Time = time
-            Difference = workSpentTime.TimeSpent
+            Difference = workSpentTime.SpentTime
             RememberChoice = false
+            LocalStrategy = localStrategy
         }
 
-
-namespace PomodoroWindowsTimer.ElmishApp.RollbackWorkModel
-
-open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.RollbackWorkModel
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-
-module Program =
-
-    let update (userSettings: IUserSettings) msg model =
-
-        match msg with
-        | Msg.SetRememberChoice v ->
-            if not v then
-                userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.UserChoiceIsRequired
-            { model with RememberChoice = v }, Intent.None
-
-        | Msg.SubstractWorkAddBreak ->
-            model
-            , Intent.SubstractWorkAddBreakAndClose
-
-        | Msg.Close ->
-            model
-            , Intent.DefaultedAndClose
-
-
-module Bindings =
-
-    open Elmish.WPF
-
-    let bindings () =
-        [
-            "RememberChoice" |> Binding.twoWay (_.RememberChoice, Msg.SetRememberChoice)
-            "SubstractWorkAddBreakCommand" |> Binding.cmd Msg.SubstractWorkAddBreak
-            "CloseCommand" |> Binding.cmd Msg.Close
-        ]
 

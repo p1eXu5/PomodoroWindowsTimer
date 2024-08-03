@@ -132,7 +132,7 @@ public sealed class Script005_FillActiveTimePointId : IScript
         {
             public override string ToString()
             {
-                return $"    ('{Value.Id}', '{Value.OriginId}', '{Value.Name}', '{new DateTime(Value.TimeSpan.Ticks).ToString("yyyy-MM-dd HH:mm:ss.fff")}', '{Value.Kind}', '{Value.KindAlias}', {TimeProvider.System.GetUtcNow().ToUnixTimeMilliseconds()}),";
+                return $"    ('{Value.Id}', '{Value.OriginalId}', '{Value.Name}', '{new DateTime(Value.TimeSpan.Ticks).ToString("yyyy-MM-dd HH:mm:ss.fff")}', '{Value.Kind}', '{Value.KindAlias}', {TimeProvider.System.GetUtcNow().ToUnixTimeMilliseconds()}),";
             }
         }
 

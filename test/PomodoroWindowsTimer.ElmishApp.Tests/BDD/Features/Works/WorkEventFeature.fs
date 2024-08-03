@@ -160,7 +160,7 @@ module WorkEventFeature =
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
@@ -180,7 +180,7 @@ module WorkEventFeature =
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
@@ -204,12 +204,12 @@ module WorkEventFeature =
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
             do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 2<times>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 2<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
@@ -236,12 +236,12 @@ module WorkEventFeature =
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
             do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
-            do! When.``PostChangeActiveTimeSpan msg has been dispatched`` 2<times>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 2<times>
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
