@@ -13,12 +13,11 @@ let update (userSettings: IUserSettings) msg model =
     //        userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.UserChoiceIsRequired
     //    { model with RememberChoice = v }, Intent.None
 
-    | Msg.SubstractWorkAddBreak ->
-        model
-        , Intent.SubstractWorkAddBreakAndClose
+    | Msg.SetLocalRollbackStrategyAndClose strategy ->
+        model |> withRollbackStrategy strategy
+        , Intent.CorrectAndClose
 
-    | Msg.Close ->
-        model
-        , Intent.DefaultedAndClose
-
+    | Msg.SetLocalRollbackStrategy strategy ->
+        model |> withRollbackStrategy strategy
+        , Intent.None
 

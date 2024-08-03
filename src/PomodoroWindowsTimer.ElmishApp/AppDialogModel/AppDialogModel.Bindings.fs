@@ -47,7 +47,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val RollbackWorkDialog : Binding =
         nameof __.RollbackWorkDialog
-            |> Binding.SubModel.opt (RollbackWorkModel.Bindings.bindings)
+            |> Binding.SubModel.opt (RollbackWorkModel.Bindings.ToList)
             |> Binding.mapModel (tryRollbackWorkModel)
             |> Binding.mapMsg (Msg.RollbackWorkModelMsg)
 

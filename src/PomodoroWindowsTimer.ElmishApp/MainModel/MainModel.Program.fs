@@ -21,16 +21,32 @@ let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
         model.Player
         |> updatef (model.CurrentWork |> Option.map _.Work) pmsg
 
+    let cmd = Cmd.map Msg.PlayerModelMsg playerCmd
+
     match playerIntent with
     | PlayerModel.Intent.None ->
         model |> withPlayerModel playerModel
-        , Cmd.map Msg.PlayerModelMsg playerCmd
+        , cmd
 
-    | PlayerModel.Intent.RollbackTime (workSpentTime, time, kind) ->
+    | PlayerModel.Intent.RollbackTime (workSpentTime, kind, time) ->
         model |> withPlayerModel playerModel
         , Cmd.batch [
-            Cmd.map Msg.PlayerModelMsg playerCmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, time, LocalRollbackStrategy.InvertSpentTime)))
+            cmd
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, kind, time)))
+        ]
+
+    | PlayerModel.Intent.MultipleRollbackTime (workSpentTime, kind, time) ->
+        model |> withPlayerModel playerModel
+        , Cmd.batch [
+            cmd
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkListDialogModel (workSpentTime, kind, time)))
+        ]
+
+    | PlayerModel.Intent.SkipOrApplyMissingTime (workId, kind, diff) ->
+        model |> withPlayerModel playerModel
+        , Cmd.batch [
+            cmd
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadSkipOrApplyMissingTimeDialogModel (workId, kind, diff)))
         ]
 
 let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =

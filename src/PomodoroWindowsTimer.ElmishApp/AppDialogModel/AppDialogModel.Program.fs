@@ -23,14 +23,16 @@ let private ofRollbackWorkModelIntent (workEventStore: WorkEventStore) (userSett
     | RollbackWorkModel.Intent.None ->
         rollbackWorkModel |> AppDialogModel.RollbackWork |> withCmdNone
 
-    | RollbackWorkModel.Intent.DefaultedAndClose ->
-        if rollbackWorkModel.RememberChoice then
-            userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.Default
+    | RollbackWorkModel.Intent.Close ->
+        // TODO:
+        // if rollbackWorkModel.RememberChoice then
+        //     userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.Default
         AppDialogModel.NoDialog |> withCmdNone
         
-    | RollbackWorkModel.Intent.SubstractWorkAddBreakAndClose ->
-        if rollbackWorkModel.RememberChoice then
-            userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.SubstractWorkAddBreak
+    | RollbackWorkModel.Intent.CorrectAndClose ->
+        // TODO:
+        // if rollbackWorkModel.RememberChoice then
+        //     userSettings.RollbackWorkStrategy <- RollbackWorkStrategy.SubstractWorkAddBreak
 
         AppDialogModel.NoDialog
         , Cmd.batch [
@@ -61,14 +63,14 @@ let update
     | MsgWith.BotSettingsModelMsg model (bmsg, bm) ->
         updateBotSettingsModel bmsg bm ||> ofBotSettingsIntent
 
-    | Msg.LoadRollbackWorkDialogModel (workSpentTime, time, rollbackStrategy) ->
-        RollbackWorkModel.init workSpentTime time rollbackStrategy |> AppDialogModel.RollbackWork |> withCmdNone
+    | Msg.LoadRollbackWorkDialogModel (workSpentTime, kind, time) ->
+        RollbackWorkModel.init workSpentTime kind time |> AppDialogModel.RollbackWork |> withCmdNone
 
     | MsgWith.RollbackWorkModelMsg model (rmsg, rm) ->
         updateRollbackWorkModel rmsg rm ||> ofRollbackWorkModelIntent workEventStore userSettings
 
-    | Msg.LoadRollbackWorkListDialogModel (workSpentTimeList, time, rollbackStrategy) ->
-        RollbackWorkListModel.init workSpentTimeList time rollbackStrategy |> AppDialogModel.RollbackWorkList |> withCmdNone
+    | Msg.LoadRollbackWorkListDialogModel (workSpentTimeList, kind, time) ->
+        RollbackWorkListModel.init workSpentTimeList kind time |> AppDialogModel.RollbackWorkList |> withCmdNone
 
     | MsgWith.RollbackWorkListModelMsg model (rmsg, rm) ->
         updateRollbackWorkListModel rmsg rm ||> ofRollbackWorkListModelIntent workEventStore

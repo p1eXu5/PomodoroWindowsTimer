@@ -60,7 +60,7 @@
                 Orientation="Horizontal"
                 >
       <Button DockPanel.Dock="Bottom"
-              Command="{Binding SubstractWorkAddBreakCommand}"
+              Command="{Binding AsBreakCommand}"
               Content="AS BREAK"
               Style="{StaticResource PomodoroDialogButton}"
               />

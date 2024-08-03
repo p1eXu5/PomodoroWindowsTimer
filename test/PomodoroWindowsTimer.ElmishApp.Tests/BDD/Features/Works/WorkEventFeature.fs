@@ -18,19 +18,19 @@ open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
 module WorkEventFeature =
 
     [<Test>]
-    let ``UC5-1: Initialization Work TimePoint Scenario`` () =
+    let ``UC5-01: Initialization Work TimePoint Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
             do! Then.``Current Work has been set to`` currentWork
-            do! Then.``Have no work events in db within`` 1UL // newly created work Id
+            do! Then.``Have no work events in db within`` currentWork.Id // newly created work Id
         }
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-2: Start Work adds WorkStarted event Scenario`` () =
+    let ``UC5-02: Start Work adds WorkStarted event Scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             let! currentWork =
@@ -45,7 +45,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-3: Start Work -> Stop Work -> Resume Work -> adds 3 events`` () =
+    let ``UC5-03: Start Work -> Stop Work -> Resume Work -> adds 3 events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! currentWork =
@@ -70,7 +70,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-4: Start Work -> Stop Work -> Resume Work -> Next to Break -> adds 4 events`` () =
+    let ``UC5-04: Start Work -> Stop Work -> Resume Work -> Next to Break -> adds 4 events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP 10.0<sec> ]
             let! currentWork =
@@ -98,7 +98,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-5: Start Work -> Stop Work -> Resume Work -> Next to Break -> Next to Work -> adds 4 events`` () =
+    let ``UC5-05: Start Work -> Stop Work -> Resume Work -> Next to Break -> Next to Work -> adds 4 events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP 10.0<sec> ]
             let! currentWork =
@@ -129,7 +129,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-6: Start Work -> Next Work -> adds 3 events`` () =
+    let ``UC5-06: Start Work -> Next Work -> adds 3 events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP 10.0<sec>; workTP 10.0<sec> ]
             let! currentWork =
@@ -227,7 +227,7 @@ module WorkEventFeature =
     let ``UC5-13: Moving time slider forward and backward when Playing and RollbackWorkStrategy is SubstractWorkAddBreak -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
-            do! Given.``RollbackWorkStrategy is SubstractWorkAddBreak`` ()
+            // TODO: do! Given.``RollbackWorkStrategy is SubstractWorkAddBreak`` ()
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 

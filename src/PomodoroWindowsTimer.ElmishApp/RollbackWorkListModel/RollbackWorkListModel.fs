@@ -25,9 +25,9 @@ module RollbackWorkListModel =
         | ProcessRollbackAndClose
         | DefaultedAndClose
 
-    let init workSpenTimeList time localStrategy =
+    let init workSpenTimeList timePointKind time =
         {
-            RollbackList = workSpenTimeList |> List.map (fun wst -> RollbackWorkModel.init wst time localStrategy)
+            RollbackList = workSpenTimeList |> List.map (fun wst -> RollbackWorkModel.init wst timePointKind time)
         }
 
     let withRollbackList rollbackList (model: RollbackWorkListModel) =

@@ -112,11 +112,11 @@ module PlayerModel =
     type Intent =
         | None
         /// When slider has been rolled forward.
-        | SkipOrApplyMissingTime of WorkId * diff: TimeSpan * atpKind: Kind
+        | SkipOrApplyMissingTime of WorkId * atpKind: Kind * diff: TimeSpan
         /// When slider has been rolled backward and only one work is counted.
-        | RollbackTime of WorkSpentTime * time: DateTimeOffset * atpKind: Kind
+        | RollbackTime of WorkSpentTime * atpKind: Kind * time: DateTimeOffset
         /// When slider has been rolled backward and multiple worka are counted.
-        | MultipleRollbackTime of WorkSpentTime list * time: DateTimeOffset * atpKind: Kind
+        | MultipleRollbackTime of WorkSpentTime list * atpKind: Kind * time: DateTimeOffset
 
     // ---------------------------------------------------
 

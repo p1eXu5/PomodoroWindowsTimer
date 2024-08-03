@@ -171,6 +171,7 @@ internal class UserSettings : IUserSettings
         }
     }
 
+    /* TODO:
     public RollbackWorkStrategy RollbackWorkStrategy
     {
         get
@@ -199,6 +200,7 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+    */
 
     public int LastDayCount
     {

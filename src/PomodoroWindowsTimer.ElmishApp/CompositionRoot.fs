@@ -18,7 +18,7 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 let compose
     (title: string)
-    (workStatisticWindowFactory: System.Func<#System.Windows.Window>)
+    (workStatisticWindowFactory: System.Func<System.Windows.Window>)
     (looper: ILooper)
     (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)

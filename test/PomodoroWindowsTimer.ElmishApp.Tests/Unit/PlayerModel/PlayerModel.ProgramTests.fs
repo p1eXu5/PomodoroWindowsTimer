@@ -327,7 +327,7 @@ module ProgramTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, TimeSpan.FromSeconds(3), timePoint.Kind))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3)))
         sut.LooperMock.Received(1).Resume()
 
     let statesTestCases : System.Collections.IEnumerable =
@@ -421,7 +421,7 @@ module ProgramTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, TimeSpan.FromSeconds(3), timePoint.Kind))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3)))
         sut.LooperMock.DidNotReceive().Resume()
 
     // -------------------------------
@@ -749,7 +749,7 @@ module ProgramTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.RollbackTime (workSpentTime, nowDate, timePoint.Kind))
+        %intent.Should().Be(PlayerModel.Intent.RollbackTime (workSpentTime, timePoint.Kind, nowDate))
         sut.LooperMock.DidNotReceive().Resume()
 
     [<TestCaseSource(nameof notShiftingStates)>]
@@ -813,6 +813,6 @@ module ProgramTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.MultipleRollbackTime ([ previousWorkSpentTime; currentWorkSpentTime ], nowDate, timePoint.Kind))
+        %intent.Should().Be(PlayerModel.Intent.MultipleRollbackTime ([ previousWorkSpentTime; currentWorkSpentTime ], timePoint.Kind, nowDate))
         sut.LooperMock.DidNotReceive().Resume()
 

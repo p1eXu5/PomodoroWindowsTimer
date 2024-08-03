@@ -61,6 +61,7 @@ let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint lis
         return sut.MainModel.CurrentWork.Value.Work
     }
 
+(* TODO:
 let ``RollbackWorkStrategy is SubstractWorkAddBreak`` () =
     scenario {
         do! Scenario.replaceStateWith (fun f ->
@@ -71,3 +72,4 @@ let ``RollbackWorkStrategy is SubstractWorkAddBreak`` () =
                 sut'
         )
     }
+*)

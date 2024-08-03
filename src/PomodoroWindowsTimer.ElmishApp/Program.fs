@@ -15,7 +15,7 @@ let internal title = "Pomodoro Windows Timer"
 
 let internal main
     (window: System.Windows.Window)
-    (workStatisticWindowFactory: System.Func<#System.Windows.Window>)
+    (workStatisticWindowFactory: System.Func<System.Windows.Window>)
     (looper: ILooper)
     (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)

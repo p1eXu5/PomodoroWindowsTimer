@@ -9,10 +9,11 @@ open PomodoroWindowsTimer.ElmishApp
 type RollbackWorkModel =
     {
         WorkId: uint64
+        TimePointKind: Kind
         Time: DateTimeOffset
         Difference: TimeSpan
         RememberChoice: bool
-        LocalStrategy: LocalRollbackStrategy
+        RollbackStrategy: LocalRollbackStrategy
     }
 
 module RollbackWorkModel =
@@ -31,16 +32,31 @@ module RollbackWorkModel =
     [<RequireQualifiedAccess>]
     type Intent =
         | None
-        | SubstractWorkAddBreakAndClose
-        | DefaultedAndClose
+        | CorrectAndClose
+        | Close
 
-    let init (workSpentTime: WorkSpentTime) time localStrategy =
+    let init (workSpentTime: WorkSpentTime) timePointKind time =
         {
             WorkId = workSpentTime.Work.Id
+            TimePointKind = timePointKind
             Time = time
             Difference = workSpentTime.SpentTime
             RememberChoice = false
-            LocalStrategy = localStrategy
+            RollbackStrategy = LocalRollbackStrategy.DoNotCorrect
         }
 
+
+    let chooseIfWorkKind msg (model: RollbackWorkModel) =
+        match model.TimePointKind with
+        | Kind.Work -> msg |> Some
+        | _ -> None
+
+    let chooseIfBreakKind msg (model: RollbackWorkModel) =
+        match model.TimePointKind with
+        | Kind.Break
+        | Kind.LongBreak -> msg |> Some
+        | _ -> None
+
+    let withRollbackStrategy strategy (model: RollbackWorkModel) =
+        { model with RollbackStrategy = strategy }
 

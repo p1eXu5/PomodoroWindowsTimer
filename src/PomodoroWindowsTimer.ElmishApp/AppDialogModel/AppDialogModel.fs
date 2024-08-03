@@ -29,11 +29,13 @@ module AppDialogModel =
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
 
-        | LoadRollbackWorkDialogModel of WorkSpentTime * DateTimeOffset * LocalRollbackStrategy
+        | LoadRollbackWorkDialogModel of WorkSpentTime * Kind * DateTimeOffset
         | RollbackWorkModelMsg of RollbackWorkModel.Msg
 
-        | LoadRollbackWorkListDialogModel of WorkSpentTime list * DateTimeOffset * LocalRollbackStrategy
+        | LoadRollbackWorkListDialogModel of WorkSpentTime list * Kind * DateTimeOffset
         | RollbackWorkListModelMsg of RollbackWorkListModel.Msg
+
+        | LoadSkipOrApplyMissingTimeDialogModel of WorkId * Kind * TimeSpan
 
         | Unload
 

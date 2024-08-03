@@ -1,4 +1,7 @@
-﻿module PomodoroWindowsTimer.ElmishApp.RollbackWorkModel.Bindings
+﻿namespace PomodoroWindowsTimer.ElmishApp.RollbackWorkModel
+
+open Elmish.WPF
+open Elmish.Extensions
 
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
@@ -6,12 +9,32 @@ open PomodoroWindowsTimer.ElmishApp.Models.RollbackWorkModel
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 
 
-open Elmish.WPF
+type private Binding = Binding<RollbackWorkModel, RollbackWorkModel.Msg>
 
-let bindings () =
-    [
-        // "RememberChoice" |> Binding.twoWay (_.RememberChoice, Msg.SetRememberChoice)
-        "SubstractWorkAddBreakCommand" |> Binding.cmd Msg.SubstractWorkAddBreak
-        "CloseCommand" |> Binding.cmd Msg.Close
-    ]
+[<Sealed>]
+type Bindings() =
+    static let props = Utils.bindingProperties typeof<Bindings>
+    static let mutable __ = Unchecked.defaultof<Bindings>
+    static member Instance() =
+        if System.Object.ReferenceEquals(__, null) then
+            __ <- Bindings()
+            __
+        else __
+
+    static member ToList () =
+        Utils.bindings<Binding>
+            (Bindings.Instance())
+            props
+
+    member val InterpretAsBreakAndCloseCommand : Binding =
+        nameof __.InterpretAsBreakAndCloseCommand
+            |> Binding.cmdIf (chooseIfWorkKind (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.InvertSpentTime))
+
+    member val InterpretAsWorkAndCloseCommand : Binding =
+        nameof __.InterpretAsWorkAndCloseCommand
+            |> Binding.cmdIf (chooseIfBreakKind (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.InvertSpentTime))
+
+    member val CloseCommand : Binding =
+        nameof __.CloseCommand |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.DoNotCorrect)
+
 
