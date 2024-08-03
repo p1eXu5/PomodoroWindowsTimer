@@ -14,7 +14,8 @@
     <Compile Include="FakerExtensions.fs" />
     <Compile Include="StubAndMocks.fs" />
     <Compile Include="Unit\WorkEventStoreTests.fs" />
-    <Compile Include="Unit\PlayerModel\PlayerModel.ProgramTests.fs" />
+    <Compile Include="Unit\PlayerModel\PlayerModel.Helpers.fs" />
+    <Compile Include="Unit\PlayerModel\PlayerModel.PostChangeActiveTimeSpanTests.fs" />
     <Compile Include="BDD\ScenarioCE.fs" />
     <Compile Include="BDD\TestDispatcher.fs" />
     <Compile Include="BDD\TestBootstrap.fs" />

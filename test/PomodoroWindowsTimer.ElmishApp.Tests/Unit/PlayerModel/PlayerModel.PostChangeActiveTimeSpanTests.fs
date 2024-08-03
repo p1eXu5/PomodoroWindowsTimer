@@ -2,7 +2,7 @@
 
 open System.ComponentModel
 
-module ProgramTests =
+module PostChangeActiveTimeSpanTests =
 
     open System
     open Microsoft.Extensions.Logging
@@ -25,33 +25,6 @@ module ProgramTests =
     
     open PomodoroWindowsTimer.Testing.Fakers
     open PomodoroWindowsTimer.ElmishApp.Tests
-
-    type private Sut =
-        {
-            LooperMock: ILooper
-            TimeProvider: System.TimeProvider
-            Update: Work option -> PlayerModel.Msg -> PlayerModel -> (PlayerModel * Cmd<PlayerModel.Msg> * PlayerModel.Intent)
-        }
-
-    let private sutFactory () =
-        let looperMock = Substitute.For<ILooper>()
-        let timeProvider = Substitute.For<System.TimeProvider>()
-        {
-            LooperMock = looperMock
-            TimeProvider = timeProvider
-            Update =
-                PlayerModel.Program.update
-                    looperMock
-                    (Substitute.For<IWindowsMinimizer>())
-                    timeProvider
-                    (WorkEventStore.init (Substitute.For<IWorkEventRepository>()))
-                    (Substitute.For<IThemeSwitcher>())
-                    (Substitute.For<ITelegramBot>())
-                    (Substitute.For<IUserSettings>())
-                    (Substitute.For<ITimePointQueue>())
-                    (Substitute.For<IErrorMessageQueue>())
-                    (Substitute.For<ILogger<PlayerModel>>())
-        }
 
     [<TestCase(0.0)>]
     [<TestCase(0.9)>]
