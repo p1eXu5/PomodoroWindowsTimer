@@ -29,20 +29,21 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                 let rec running (value: TimeSpan) (rows: ExcelRow list) res =
                     match rows with
                     | [] ->
-                        if value <> TimeSpan.Zero then Error $"Have no excel rows to reduce time on {value}"
+                        if value <> TimeSpan.Zero then
+                            Error $"Have no excel rows to reduce time on {value}"
                         else
                             res |> List.rev |> Ok
                     | (ExcelRow.WorkExcelRow head) :: [] ->
                         if head.Work.Id = work.Id then
                             let diff = head.End - startTime - value
-                            if diff >= TimeSpan.Zero then
-                                [
-                                    yield! res |> List.map (fun r -> r |> ExcelRow.subTime value) |> List.rev
-                                    yield head |> WorkExcelRow.subTime value |> ExcelRow.WorkExcelRow
-                                ]
-                                |> Ok
-                            else
-                                Error $"First excel row has no match time to reduce time on {value}"
+                            //if diff >= TimeSpan.Zero then
+                            [
+                                yield! res |> List.map (fun r -> r |> ExcelRow.subTime value) |> List.rev
+                                yield head |> WorkExcelRow.subTime value |> ExcelRow.WorkExcelRow
+                            ]
+                            |> Ok
+                            //else
+                            //    Error $"First excel row has no match time to reduce time on {value}"
                         else
                             ((head |> ExcelRow.WorkExcelRow) :: res)
                             |> running value []
