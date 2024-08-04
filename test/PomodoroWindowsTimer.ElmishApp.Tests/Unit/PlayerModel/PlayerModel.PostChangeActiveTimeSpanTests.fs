@@ -1,6 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.Unit.PlayerModel
 
 open System.ComponentModel
+open System.Threading
 
 module PostChangeActiveTimeSpanTests =
 
@@ -52,7 +53,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update None (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -97,7 +98,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -151,7 +152,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update None (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -194,7 +195,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -239,7 +240,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update None (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -284,7 +285,7 @@ module PostChangeActiveTimeSpanTests =
             }
 
         let currentWork = Work.generate ()
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (currentWork |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -333,7 +334,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update None (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -378,7 +379,7 @@ module PostChangeActiveTimeSpanTests =
             }
 
         let currentWork = Work.generate ()
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (currentWork |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -423,7 +424,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update None (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -445,7 +446,7 @@ module PostChangeActiveTimeSpanTests =
     [<Test>]
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
-    let ``03-1: PostChangeActiveTimeSpan Start -> some current work, shifting backward, preshift state is playing -> resume, cmd, no intent`` () =
+    let ``03-1: PostChangeActiveTimeSpan Start -> some current work, shifting backward, preshift state is playing -> resume, cmd with StoreStoppedWorkEventTask, no intent`` () =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
@@ -466,7 +467,9 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+
+        let workSpentTimeList : WorkSpentTime list = []
+        let sut = Sut.initWithWorkEventStore (WorkEventStoreStub.initWithWorkSpentTimeList workSpentTimeList)
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -476,6 +479,23 @@ module PostChangeActiveTimeSpanTests =
         %afterPlayerModel.RetrieveWorkSpentTimesState.Should().BeOfCase(AsyncDeferredState.InProgress)
 
         %cmd.Should().HaveLength(1)
+
+        use semaphore = new SemaphoreSlim(0, 1)
+        do cmd[0] (fun msg ->
+            %msg.Should().Be(
+                PlayerModel.Msg.PostChangeActiveTimeSpan (
+                    AsyncOperation.Finish (
+                        Ok workSpentTimeList
+                        , afterPlayerModel.RetrieveWorkSpentTimesState |> AsyncDeferredState.tryCts |> Option.get
+                    )
+                )
+            )
+
+            %semaphore.Release()
+        )
+
+        semaphore.Wait()
+
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.Received(1).Resume()
 
@@ -503,7 +523,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update None (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -546,7 +566,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -591,7 +611,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
         let currentWork = Work.generate ()
 
         // act
@@ -641,7 +661,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
         let currentWork = Work.generate ()
 
         // act
@@ -691,7 +711,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         let nowDate = System.TimeProvider.System.GetUtcNow()
         %sut.TimeProvider.GetUtcNow().Returns(nowDate)
@@ -748,7 +768,7 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = retrieveWorkSpentTimesState
             }
-        let sut = sutFactory ()
+        let sut = Sut.init ()
 
         let nowDate = System.TimeProvider.System.GetUtcNow()
         %sut.TimeProvider.GetUtcNow().Returns(nowDate)

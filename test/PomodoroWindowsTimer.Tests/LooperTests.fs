@@ -72,9 +72,11 @@ let ``PreloadTimePoint -> raises TimePointStarted event with None nextTp`` () =
         )
     use _ = disp
 
+    // act
     do looper.PreloadTimePoint()
     do eventQueue |> waitEventCount 1
 
+    // assert
     %eventQueue.Should().ContainExactlyOneItemMatching(fun ev -> 
         match ev with
         | LooperEvent.TimePointStarted args ->
@@ -82,33 +84,28 @@ let ``PreloadTimePoint -> raises TimePointStarted event with None nextTp`` () =
         | _ -> false
     )
 
+[<Test>]
+let ``PreloadTimePoint, Next -> raises TimePointStarted event with None nextTp two times`` () =
+    let (looper, eventQueue, disp) =
+        testLooper testTimePoints (fun mock ->
+            %mock.LocalTimeZone.Returns(TimeZoneInfo.Utc)
+            %mock.GetUtcNow().Returns(DateTimeOffset(date, startTime, TimeSpan.Zero))
+            mock
+        )
+    use _ = disp
 
-//[<Test>]
-//let ``Next test``() =
-//    task {
-//        use tpQueue = timePointQueue ()
-//        use looper = new Looper(tpQueue, timeProvider (), 200<ms>, TestLogger<Looper>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<Looper>, CancellationToken.None)
-//        use semaphore = new SemaphoreSlim(0, 1)
+    do looper.PreloadTimePoint()
+    do eventQueue |> waitEventCount 1
 
-//        let mutable startedTPStack = Queue<TimePoint>()
-//        let subscriber looperEvent =
-//            async {
-//                if startedTPStack.Count < 8 then
-//                    match looperEvent with
-//                    | TimePointStarted (newTimePoint, _) ->
-//                        startedTPStack.Enqueue(newTimePoint)
-//                    | _ -> ()
-//                else
-//                    semaphore.Release() |> ignore
-//            }
-//        looper.Start([ subscriber ])
+    // act
+    do looper.Next()
+    do eventQueue |> waitEventCount 2
 
-//        //looper.PreloadTimePoint()
-//        looper.Next()
+    // assert
+    %eventQueue.Should().AllSatisfy(fun ev -> 
+        match ev with
+        | LooperEvent.TimePointStarted args ->
+            args.NewActiveTimePoint.OriginalId = testTimePoints[0].Id && args.OldActiveTimePoint = None
+        | _ -> false
+    )
 
-//        let! _ = semaphore.WaitAsync(TimeSpan.FromSeconds(1.0 * 8.0 * 2.0))
-
-//        startedTPStack |> Seq.map _.Id |> should equalSeq ((testTimePoints @ testTimePoints) |> Seq.map _.Id)
-//        // Looper is discrete according to tickMilliseconds parameter. If active taime point time span is less then second, reminder will be added to the next time point
-//        startedTPStack |> Seq.map _.TimeSpan |> Seq.forall (fun span -> span >= TimeSpan.FromSeconds(1) && span < TimeSpan.FromSeconds(2)) |> should be True
-//    }
