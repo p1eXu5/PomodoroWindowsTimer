@@ -3,7 +3,8 @@ name: testing
 on:
   push:
     branches:
-      - '**'
+      - 'master'
+      - 'v3.1.0'
 
 jobs:
   build:
