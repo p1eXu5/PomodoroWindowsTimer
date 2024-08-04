@@ -11,7 +11,9 @@ type WorkEventStore =
         StoreStartedWorkEventTask:    WorkId * DateTimeOffset * ActiveTimePoint -> Task<unit>
         StoreStoppedWorkEventTask:    WorkId * DateTimeOffset * ActiveTimePoint -> Task<unit>
         StoreWorkReducedEventTask:    WorkId * DateTimeOffset * TimeSpan -> Task<unit>
+        StoreBreakReducedEventTask:   WorkId * DateTimeOffset * TimeSpan -> Task<unit>
         StoreBreakIncreasedEventTask: WorkId * DateTimeOffset * TimeSpan -> Task<unit>
+        StoreWorkIncreasedEventTask:  WorkId * DateTimeOffset * TimeSpan -> Task<unit>
         WorkSpentTimeListTask:   TimePointId * DateTimeOffset * float<sec> * CancellationToken -> Task<Result<WorkSpentTime list, string>>
     }
 
@@ -53,8 +55,18 @@ module WorkEventStore =
 
     let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64, time: DateTimeOffset, offset: TimeSpan) =
         task {
-            let workEvent =
-                WorkEvent.WorkReduced (time, offset)
+            let workEvent = WorkEvent.WorkReduced (time, offset)
+
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
+
+            match res with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+        }
+
+    let private storeBreakReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64, time: DateTimeOffset, offset: TimeSpan) =
+        task {
+            let workEvent = WorkEvent.BreakReduced (time, offset)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
@@ -67,6 +79,18 @@ module WorkEventStore =
         task {
             let workEvent =
                 WorkEvent.BreakIncreased (time, offset)
+
+            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
+
+            match res with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+        }
+
+    let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64, time: DateTimeOffset, offset: TimeSpan) =
+        task {
+            let workEvent =
+                WorkEvent.WorkIncreased (time, offset)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
@@ -127,6 +151,8 @@ module WorkEventStore =
             StoreStartedWorkEventTask = storeStartedWorkEventTask workEventRepository activeTimePointRepository
             StoreStoppedWorkEventTask = storeStoppedWorkEventTask workEventRepository
             StoreWorkReducedEventTask = storeWorkReducedEventTask workEventRepository
+            StoreBreakReducedEventTask = storeBreakReducedEventTask workEventRepository
             StoreBreakIncreasedEventTask = storeBreakIncreasedEventTask workEventRepository
+            StoreWorkIncreasedEventTask = storeWorkIncreasedEventTask workEventRepository
             WorkSpentTimeListTask = workSpentTimeListTask workEventRepository
         }

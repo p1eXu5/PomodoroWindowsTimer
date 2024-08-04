@@ -53,6 +53,14 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     // -------------------------------------------------
 
+    member val SkipOrApplyMissingTimeDialog : Binding =
+        nameof __.SkipOrApplyMissingTimeDialog
+            |> Binding.SubModel.opt (RollbackWorkModel.Bindings.ToList)
+            |> Binding.mapModel (trySkipOrApplyMissingTimeModel)
+            |> Binding.mapMsg (Msg.SkipOrApplyMissingTimeModelMsg)
+
+    // -------------------------------------------------
+
     member val UnloadDialogModelCommand : Binding =
         nameof __.UnloadDialogModelCommand |> Binding.cmd Msg.Unload
 

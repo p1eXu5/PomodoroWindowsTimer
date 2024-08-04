@@ -236,44 +236,69 @@ let update
 
         model |> withNewActiveRemainingSeconds remainingSeconds |> withCmdNone |> withNoIntent
 
-    | MsgWith.``Start of PostChangeActiveTimeSpan`` model (deff, cts, atp, shiftTimes)->
-        let withResumeState model =
+    | MsgWith.``Start of PostChangeActiveTimeSpan`` model (deff, cts, atp, shiftTimes) ->
+        let now = timeProvider.GetUtcNow()
+
+        let prevState, storeWorkStartedCmd =
             match model.LooperState with
             | LooperState.TimeShifting prevState ->
-                if prevState = LooperState.Playing then
+                match prevState with
+                | LooperState.Playing ->
                     looper.Resume()
-                model |> withLooperState prevState
-            | _ -> model
+                    prevState
+                    , Cmd.batch [
+                        if currentWorkOpt |> Option.isSome then
+                            Cmd.OfTask.attempt
+                                workEventStore.StoreStartedWorkEventTask
+                                (
+                                    currentWorkOpt.Value.Id
+                                    , now.AddMilliseconds(1.0) // started event must not be included int work spent time list
+                                    , model.ActiveTimePoint.Value
+                                )
+                                Msg.OnExn
+                        ]
+                | _ ->
+                    prevState, Cmd.none
+            | _ -> model.LooperState, Cmd.none
 
         match currentWorkOpt with
         | None ->
             model
-            |> withResumeState
+            |> withLooperState prevState
             |> withoutShiftAndPreShiftTimes
             |> withNoCmdAndIntent
         | Some currentWork ->
             if Math.Abs(float (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds)) < 1.0 then
                 model
-                |> withResumeState
+                |> withLooperState prevState
                 |> withoutShiftAndPreShiftTimes
-                |> withNoCmdAndIntent
+                , storeWorkStartedCmd
+                , Intent.None
             // shifting forward
             elif shiftTimes.NewActiveRemainingSeconds < shiftTimes.PreShiftActiveRemainingSeconds then
                     model
-                    |> withResumeState
+                    |> withLooperState prevState
                     |> withoutShiftAndPreShiftTimes
-                    , Cmd.none
-                    , Intent.SkipOrApplyMissingTime (currentWork.Id, atp.Kind, TimeSpan.FromSeconds(float (shiftTimes.PreShiftActiveRemainingSeconds - shiftTimes.NewActiveRemainingSeconds)))
+                    , storeWorkStartedCmd
+                    , Intent.SkipOrApplyMissingTime (
+                        currentWork.Id,
+                        atp.Kind,
+                        TimeSpan.FromSeconds(float (shiftTimes.PreShiftActiveRemainingSeconds - shiftTimes.NewActiveRemainingSeconds)),
+                        timeProvider.GetUtcNow()
+                    )
             // shifting backward
             else
                 model
-                |> withResumeState
+                |> withLooperState prevState
                 |> withoutShiftAndPreShiftTimes
                 |> withRetreiveWorkSpentTimesState deff
-                , Cmd.OfTask.perform
-                    workEventStore.WorkSpentTimeListTask
-                    (atp.Id, timeProvider.GetUtcNow(), (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds), cts.Token)
-                    (AsyncOperation.finishWithin Msg.PostChangeActiveTimeSpan cts)
+                , Cmd.batch [
+                    storeWorkStartedCmd
+                    Cmd.OfTask.perform
+                        workEventStore.WorkSpentTimeListTask
+                        (atp.Id, now, (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds), cts.Token)
+                        (AsyncOperation.finishWithin Msg.PostChangeActiveTimeSpan cts)
+                ]
                 , Intent.None
 
     | MsgWith.``Finish of PostChangeActiveTimeSpan`` model res ->

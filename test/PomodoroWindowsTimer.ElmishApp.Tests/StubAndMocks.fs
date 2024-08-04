@@ -87,7 +87,9 @@ module WorkEventStoreStub =
             StoreStartedWorkEventTask = fun _ -> task { return () }
             StoreStoppedWorkEventTask = fun _ -> task { return () }
             StoreWorkReducedEventTask = fun _ -> task { return () }
+            StoreBreakReducedEventTask = fun _ -> task { return () }
             StoreBreakIncreasedEventTask = fun _ -> task { return () }
+            StoreWorkIncreasedEventTask = fun _ -> task { return () }
             WorkSpentTimeListTask =
                 fun _ ->
                     task {

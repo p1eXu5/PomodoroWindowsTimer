@@ -74,9 +74,13 @@ let ``Work events in db exist`` (workId: uint64) (eventExpr: #Quotations.Expr se
 
         match workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously with
         | Ok workEvents ->
-            workEvents |> List.length |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> List.length}. The events are {workEvents}"
+            workEvents
+            |> List.length
+            |> shouldL equal (eventExpr |> Seq.length) $"Actual work event length is {workEvents |> List.length}. The events are {workEvents |> JsonHelpers.Serialize}"
+            
             Seq.zip workEvents eventExpr
-            |> Seq.iter (fun (ev, expr) -> ev |> should be (ofCase expr))
+            |> Seq.iter (fun (ev, expr) -> ev |> shouldL be (ofCase expr) $"Actual work event length is {workEvents |> List.length}. The events are {workEvents |> JsonHelpers.Serialize}")
+
         | Error err ->
             assertionExn err
     }

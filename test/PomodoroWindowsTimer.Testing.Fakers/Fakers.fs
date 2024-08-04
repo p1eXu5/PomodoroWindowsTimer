@@ -169,21 +169,34 @@ let longBreakTP (seconds: float<sec>) =
 
 [<RequireQualifiedAccess>]
 module Work =
-    let mutable private _workCounter = 1UL
+
+    type private Msg =
+        | GenerateWorkId of AsyncReplyChannel<WorkId>
+
+    let private agent = MailboxProcessor<Msg>.Start(fun inbox ->
+        let rec loop prevWorkId =
+            async {
+                let! msg = inbox.Receive()
+                match msg with
+                | GenerateWorkId replyChannel ->
+                    replyChannel.Reply(prevWorkId + 1UL)
+                    return! loop (prevWorkId + 1UL)
+            }
+
+        loop 0UL
+    )
 
     let generate () =
+        let workId = agent.PostAndReply(GenerateWorkId)
         let date = faker.Date.RecentOffset()
-        let work =
-            {
-                Id = _workCounter
-                Number = sprintf "WORK-%i" _workCounter
-                Title = faker.Commerce.ProductName()
-                CreatedAt = date
-                UpdatedAt = date
-                LastEventCreatedAt = None
-            }
-        _workCounter <- _workCounter + 1UL
-        work
+        {
+            Id = workId
+            Number = sprintf "WORK-%i" workId
+            Title = faker.Commerce.ProductName()
+            CreatedAt = date
+            UpdatedAt = date
+            LastEventCreatedAt = None
+        }
 
 [<RequireQualifiedAccess>]
 module WorkEvent =

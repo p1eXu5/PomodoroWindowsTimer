@@ -67,7 +67,7 @@ module PostChangeActiveTimeSpanTests =
     [<TestCase(-0.9)>]
     [<Category("no shifting")>]
     [<Category("PlayerModel")>]
-    let ``01-1: PostChangeActiveTimeSpan Start -> some current work, shifting less than 1 sec, preshift state is playing -> resume, no cmd, no intent`` (offset: float) =
+    let ``01-1: PostChangeActiveTimeSpan Start -> some current work, shifting less than 1 sec, preshift state is playing -> resume, store strarted cmd, no intent`` (offset: float) =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
@@ -103,7 +103,7 @@ module PostChangeActiveTimeSpanTests =
                 }
             )
 
-        %cmd.Should().BeEmpty()
+        %cmd.Should().HaveLength(1)
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.Received(1).Resume()
 
@@ -252,7 +252,7 @@ module PostChangeActiveTimeSpanTests =
     [<Test>]
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
-    let ``02-1: PostChangeActiveTimeSpan Start -> some current work, shifting forward, preshift state is playing -> resume, no cmd, SkipOrApply intent`` () =
+    let ``02-1: PostChangeActiveTimeSpan Start -> some current work, shifting forward, preshift state is playing -> resume, store started cmd, SkipOrApply intent`` () =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
@@ -276,6 +276,8 @@ module PostChangeActiveTimeSpanTests =
 
         let currentWork = Work.generate ()
         let sut = Sut.init ()
+        let now = System.TimeProvider.System.GetUtcNow()
+        %sut.TimeProvider.GetUtcNow().Returns(now)
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (currentWork |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -290,8 +292,8 @@ module PostChangeActiveTimeSpanTests =
                 }
             )
 
-        %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3)))
+        %cmd.Should().HaveLength(1)
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3), now))
         sut.LooperMock.Received(1).Resume()
 
     let initializedAndStoppedStates : System.Collections.IEnumerable =
@@ -370,6 +372,8 @@ module PostChangeActiveTimeSpanTests =
 
         let currentWork = Work.generate ()
         let sut = Sut.init ()
+        let now = System.TimeProvider.System.GetUtcNow()
+        %sut.TimeProvider.GetUtcNow().Returns(now)
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (currentWork |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -385,7 +389,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3)))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3), now))
         sut.LooperMock.DidNotReceive().Resume()
 
     // -------------------------------
@@ -468,10 +472,10 @@ module PostChangeActiveTimeSpanTests =
         %afterPlayerModel.LooperState.Should().Be(LooperState.Playing)
         %afterPlayerModel.RetrieveWorkSpentTimesState.Should().BeOfCase(AsyncDeferredState.InProgress)
 
-        %cmd.Should().HaveLength(1)
+        %cmd.Should().HaveLength(2)
 
         use semaphore = new SemaphoreSlim(0, 1)
-        do cmd[0] (fun msg ->
+        do cmd[1] (fun msg ->
             %msg.Should().Be(
                 PlayerModel.Msg.PostChangeActiveTimeSpan (
                     AsyncOperation.Finish (

@@ -2,6 +2,7 @@
 
 open System
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open PomodoroWindowsTimer.ElmishApp.Tests
@@ -178,7 +179,75 @@ let ``Canceling the creation of work`` () =
             |> MainModel.Msg.WorkSelectorModelMsg
 
         do sut.Dispatcher.Dispatch msg
-
         do! Scenario.msgDispatchedWithin2Sec "CreatingWorkModel Cancel" ((=) msg)
     }
+
+let ``SkipOrApplyMissingTimeDialog has been opened`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        do! Scenario.modelSatisfiesWithin2Sec "SkipOrApplyMissingTimeDialog has been opened" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.SkipOrApplyMissingTimeDialog _ -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"When.``{nameof ``SkipOrApplyMissingTimeDialog has been opened``}``"
+
+let ``User skipping missing time`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let msg = MainModel.Msg.AppDialogModelMsg (
+            AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+            )
+        )
+
+        do sut.Dispatcher.Dispatch msg
+        do! Scenario.msgDispatchedWithin2Sec "SetLocalRollbackStrategyAndClose DoNotCorrect" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``User skipping missing time``}``"
+
+let ``RollbackWorkDialog has been opened`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        do! Scenario.modelSatisfiesWithin2Sec "RollbackWorkDialog has been opened" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.RollbackWork _ -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"When.``{nameof ``RollbackWorkDialog has been opened``}``"
+
+let ``User do not correct time`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let msg = MainModel.Msg.AppDialogModelMsg (
+            AppDialogModel.Msg.RollbackWorkModelMsg (
+                RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+            )
+        )
+
+        do sut.Dispatcher.Dispatch msg
+        do! Scenario.msgDispatchedWithin2Sec "SetLocalRollbackStrategyAndClose DoNotCorrect" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``User do not correct time``}``"
+
+let ``User inverts time`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let msg = MainModel.Msg.AppDialogModelMsg (
+            AppDialogModel.Msg.RollbackWorkModelMsg (
+                RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.InvertSpentTime)
+            )
+        )
+
+        do sut.Dispatcher.Dispatch msg
+        do! Scenario.msgDispatchedWithin2Sec "SetLocalRollbackStrategyAndClose InvertSpentTime" ((=) msg)
+    }
+    |> Scenario.log $"When.``{nameof ``User inverts time``}``"
 

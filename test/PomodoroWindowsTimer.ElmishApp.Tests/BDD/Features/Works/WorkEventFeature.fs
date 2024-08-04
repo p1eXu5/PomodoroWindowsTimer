@@ -159,7 +159,7 @@ module WorkEventFeature =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
-            do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
+            do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
@@ -169,7 +169,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-11: Moving time slider when Playing -> adds events Scenario`` () =
+    let ``UC5-11: Moving time slider forward when Playing -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             let! currentWork =
@@ -179,9 +179,11 @@ module WorkEventFeature =
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
-            do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
+            do! When.``Active time point slider value is changing to`` 5.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
+            do! When.``SkipOrApplyMissingTimeDialog has been opened`` ()
+            do! When.``User skipping missing time`` ()
 
             do! Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` 1UL [ // newly created work Id
@@ -203,14 +205,18 @@ module WorkEventFeature =
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
-            do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
+            do! When.``Active time point slider value is changing to`` 5.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
+            do! When.``SkipOrApplyMissingTimeDialog has been opened`` ()
+            do! When.``User skipping missing time`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
-            do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
+            do! When.``Active time point slider value is changing to`` 1.5<sec> // backward
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 2<times>
             do! When.``Spent 2.5 ticks`` ()
+            do! When.``RollbackWorkDialog has been opened`` ()
+            do! When.``User do not correct time`` ()
 
             do! Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` 1UL [ // newly created work Id
@@ -224,7 +230,7 @@ module WorkEventFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    let ``UC5-13: Moving time slider forward and backward when Playing and RollbackWorkStrategy is SubstractWorkAddBreak -> adds events Scenario`` () =
+    let ``UC5-13: Moving time slider forward and backward when Playing and User inverts time -> adds events Scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
             // TODO: do! Given.``RollbackWorkStrategy is SubstractWorkAddBreak`` ()
@@ -235,13 +241,18 @@ module WorkEventFeature =
             do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
-            do! When.``ActiveTimeSeconds changed to`` 5.5<sec>
+            do! When.``Active time point slider value is changing to`` 5.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
+            do! When.``SkipOrApplyMissingTimeDialog has been opened`` ()
+            do! When.``User skipping missing time`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
-            do! When.``ActiveTimeSeconds changed to`` 1.5<sec>
+            do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 2<times>
+            do! When.``Spent 2.5 ticks`` ()
+            do! When.``RollbackWorkDialog has been opened`` ()
+            do! When.``User inverts time`` ()
             do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Current Work has been set to`` currentWork
@@ -250,9 +261,9 @@ module WorkEventFeature =
                 <@@ WorkEvent.Stopped @@>
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.WorkReduced @@>
                 <@@ WorkEvent.BreakIncreased @@>
-                <@@ WorkEvent.WorkStarted @@>
             ]
         }
         |> Scenario.runTestAsync

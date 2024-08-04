@@ -151,13 +151,14 @@ let rec ``PostChangeActiveTimeSpan Start msg has been dispatched`` times =
     }
     |> Scenario.log $"When.``{nameof ``PostChangeActiveTimeSpan Start msg has been dispatched``}``"
 
-let rec ``ActiveTimeSeconds changed to`` (seconds: float<sec>) =
+/// `spentSeconds` parameter - slider value.
+let rec ``Active time point slider value is changing to`` (spentSeconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let msg = PlayerModel.Msg.ChangeActiveTimeSpan (float seconds) |> MainModel.Msg.PlayerModelMsg
+        let msg = PlayerModel.Msg.ChangeActiveTimeSpan (float spentSeconds) |> MainModel.Msg.PlayerModelMsg
         do sut.Dispatcher.DispatchWithTimeout(msg)
         do! Scenario.msgDispatchedWithin2Sec "PostChangeActiveTimeSpan" ((=) msg)
     }
-    |> Scenario.log $"When.``{nameof ``ActiveTimeSeconds changed to``} {seconds} sec``."
+    |> Scenario.log $"When.``{nameof ``Active time point slider value is changing to``} {spentSeconds} sec``."
 
 

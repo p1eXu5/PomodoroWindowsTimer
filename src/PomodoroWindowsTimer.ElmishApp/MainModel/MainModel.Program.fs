@@ -42,15 +42,15 @@ let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
             Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkListDialogModel (workSpentTime, kind, time)))
         ]
 
-    | PlayerModel.Intent.SkipOrApplyMissingTime (workId, kind, diff) ->
+    | PlayerModel.Intent.SkipOrApplyMissingTime (workId, kind, diff, time) ->
         model |> withPlayerModel playerModel
         , Cmd.batch [
             cmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadSkipOrApplyMissingTimeDialogModel (workId, kind, diff)))
+            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadSkipOrApplyMissingTimeDialogModel (workId, kind, diff, time)))
         ]
 
 let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =
-    let (tplModel) = model.TimePointList |> TimePointListModel.Program.update tplMsg
+    let (tplModel) = model.TimePointList |> updatef tplMsg
     model |> withTimePointListModel tplModel |> withCmdNone
 
 let private chain f (model, cmd) =

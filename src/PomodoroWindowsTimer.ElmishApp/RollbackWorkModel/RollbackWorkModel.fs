@@ -45,6 +45,16 @@ module RollbackWorkModel =
             RollbackStrategy = LocalRollbackStrategy.DoNotCorrect
         }
 
+    let initWithMissingTime workId timePointKind difference time =
+        {
+            WorkId = workId
+            TimePointKind = timePointKind
+            Time = time
+            Difference = difference
+            RememberChoice = false
+            RollbackStrategy = LocalRollbackStrategy.DoNotCorrect
+        }
+
 
     let chooseIfWorkKind msg (model: RollbackWorkModel) =
         match model.TimePointKind with
