@@ -245,7 +245,7 @@ let update
 
         model |> withNewActiveRemainingSeconds remainingSeconds |> withCmdNone |> withNoIntent
 
-    |  MsgWith.``Start of PostChangeActiveTimeSpan`` model (deff, cts, atp, shiftTimes)->
+    | MsgWith.``Start of PostChangeActiveTimeSpan`` model (deff, cts, atp, shiftTimes)->
         let withResumeState model =
             match model.LooperState with
             | LooperState.TimeShifting prevState ->
