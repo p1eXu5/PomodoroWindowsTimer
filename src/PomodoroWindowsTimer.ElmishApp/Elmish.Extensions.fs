@@ -407,6 +407,11 @@ module AsyncDeferredState =
             asyncOperationCts.Dispose() // just dispose operation cts
             None
 
+    let tryCts (asyncDeferred: AsyncDeferredState) =
+        match asyncDeferred with
+        | AsyncDeferredState.InProgress (cts) -> cts |> Some
+        | _ -> None
+
 [<RequireQualifiedAccess>]
 module AsyncDeferred =
     /// If asyncDeferred is InProgress then cancels it. Returns None if AsyncDeferred is already retrieved.
