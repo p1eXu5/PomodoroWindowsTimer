@@ -152,17 +152,12 @@ let update
             |> withNoCmdAndIntent
 
         | LooperMsg.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }) ->
-            let time = timeProvider.GetUtcNow()
-            let model =
-                model
-                |> withActiveTimePoint (nextTp |> Some)
-                |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
-
-            let timePointKind = model |> timePointKindEnum
+            let timePointKind = nextTp |> TimePointKind.ofActiveTimePoint
 
             let storeStartedWorkEventCmd =
                 match currentWorkOpt, model.LooperState with
                 | Some work, LooperState.Playing ->
+                    let time = timeProvider.GetUtcNow()
                     Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (work.Id, time, nextTp) Msg.OnExn
                 | _ ->
                     Cmd.none
@@ -170,56 +165,52 @@ let update
             let sendToChatBotCmd message =
                 Cmd.OfTask.attempt telegramBot.SendMessage message Msg.OnExn
 
-            match nextTp.Kind with
-            | LongBreak
-            | Break when model.LooperState <> LooperState.Playing ->
-                model, switchThemeCmd timePointKind, Intent.None
-
-            | LongBreak
-            | Break when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Break || oldTp.Value.Kind = Kind.LongBreak) ->
-                model, storeStartedWorkEventCmd, Intent.None
-
-            | LongBreak
-            | Break ->
-                model
-                , Cmd.batch [
-                    storeStartedWorkEventCmd
+            let cmd =
+                match nextTp.Kind with
+                | LongBreak | Break when model.LooperState <> LooperState.Playing ->
                     switchThemeCmd timePointKind
-                    minimizeAllRestoreAppWindowCmd ()
-                ]
-                , Intent.None
 
-            // initialized
-            | Work when model.LooperState <> LooperState.Playing ->
-                model, switchThemeCmd timePointKind, Intent.None
-
-            // do not send a notification if the user manually presses the Next button or the Play button
-            | Work when isLastAtpWhenPlayOrNextIsManuallyPressed oldTp model || oldTp |> Option.isNone ->
-                model
-                , Cmd.batch [
+                | LongBreak | Break when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Break || oldTp.Value.Kind = Kind.LongBreak) ->
                     storeStartedWorkEventCmd
+
+                | LongBreak | Break ->
+                    Cmd.batch [
+                        storeStartedWorkEventCmd
+                        switchThemeCmd timePointKind
+                        minimizeAllRestoreAppWindowCmd ()
+                    ]
+
+                // initialized, not playing, just switch theme
+                | Work when model.LooperState <> LooperState.Playing ->
                     switchThemeCmd timePointKind
-                    restoreAllMinimizedCmd ()
-                ]
-                , Intent.None
 
-            | Work when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Work) ->
-                model
-                , Cmd.batch [
-                    storeStartedWorkEventCmd
-                    sendToChatBotCmd $"It's time to {nextTp.Name}!!"
-                ]
-                , Intent.None
+                // do not send a message to the Telegram if the user manually presses the Next button or the Play button
+                | Work when oldTp |> Option.isNone || isLastAtpWhenPlayOrNextIsManuallyPressed oldTp model ->
+                    Cmd.batch [
+                        storeStartedWorkEventCmd
+                        switchThemeCmd timePointKind
+                        restoreAllMinimizedCmd ()
+                    ]
 
-            | Work ->
-                model
-                , Cmd.batch [
-                    storeStartedWorkEventCmd
-                    switchThemeCmd timePointKind
-                    restoreAllMinimizedCmd ()
-                    sendToChatBotCmd $"It's time to {nextTp.Name}!!"
-                ]
-                , Intent.None
+                | Work when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Work) ->
+                    Cmd.batch [
+                        storeStartedWorkEventCmd
+                        sendToChatBotCmd $"It's time to {nextTp.Name}!!"
+                    ]
+
+                | Work ->
+                    Cmd.batch [
+                        storeStartedWorkEventCmd
+                        switchThemeCmd timePointKind
+                        restoreAllMinimizedCmd ()
+                        sendToChatBotCmd $"It's time to {nextTp.Name}!!"
+                    ]
+
+            model
+            |> withActiveTimePoint (nextTp |> Some)
+            |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+            , cmd
+            , Intent.None
 
     // --------------------
     // Active time changing

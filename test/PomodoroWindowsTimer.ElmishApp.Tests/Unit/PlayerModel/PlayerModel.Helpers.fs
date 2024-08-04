@@ -44,5 +44,5 @@ module Sut =
         }
 
     let internal init () =
-        initWithWorkEventStore (WorkEventStore.init (Substitute.For<IWorkEventRepository>()))
+        initWithWorkEventStore (WorkEventStore.init (Substitute.For<IWorkEventRepository>()) (Substitute.For<IActiveTimePointRepository>()))
 

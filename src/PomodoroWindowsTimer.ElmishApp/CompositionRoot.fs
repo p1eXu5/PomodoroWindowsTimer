@@ -23,6 +23,7 @@ let compose
     (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)
     (workEventRepository: IWorkEventRepository)
+    (activeTimePointRepository: IActiveTimePointRepository)
     (telegramBot: ITelegramBot)
     (windowsMinimizer: IWindowsMinimizer)
     (themeSwitcher: IThemeSwitcher)
@@ -57,7 +58,7 @@ let compose
             MainErrorMessageQueue = mainErrorMessageQueue
         }
 
-    let workEventStore = WorkEventStore.init workEventRepository
+    let workEventStore = WorkEventStore.init workEventRepository activeTimePointRepository
 
     // init
     let initMainModel () =

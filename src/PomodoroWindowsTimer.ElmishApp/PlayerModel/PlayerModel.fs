@@ -15,7 +15,7 @@ type PlayerModel =
         ActiveTimePoint: ActiveTimePoint option
 
         LooperState : LooperState
-        LastAtpWhenPlayOrNextIsManuallyPressed: UIInitiator option
+        LastAtpWhenPlayOrNextIsManuallyPressed: TimePointId option
 
         ShiftAndPreShiftTimes: ShiftAndPreShiftTimes option
 
@@ -31,8 +31,6 @@ and
         | Stopped
         /// To restore LooperState when shifting end and previous state was not Playing.
         | TimeShifting of previousState: LooperState
-and
-    UIInitiator = UIInitiator of ActiveTimePoint
 and
     [<Struct>]
     ShiftAndPreShiftTimes =
@@ -161,14 +159,14 @@ module PlayerModel =
 
     let withLastAtpWhenPlayOrNextIsManuallyPressed (model: PlayerModel) =
         model.ActiveTimePoint
-        |> Option.map (fun tp ->
-            { model with LastAtpWhenPlayOrNextIsManuallyPressed = tp |> UIInitiator |> Some }
+        |> Option.map (fun atp ->
+            { model with LastAtpWhenPlayOrNextIsManuallyPressed = atp.Id |> Some }
         )
         |> Option.defaultValue model
 
-    let isLastAtpWhenPlayOrNextIsManuallyPressed (tpOpt: ActiveTimePoint option) (model: PlayerModel) =
-        match model.LastAtpWhenPlayOrNextIsManuallyPressed, tpOpt with
-        | Some (UIInitiator atp), Some tp -> atp.Id = tp.Id
+    let isLastAtpWhenPlayOrNextIsManuallyPressed (atpOpt: ActiveTimePoint option) (model: PlayerModel) =
+        match model.LastAtpWhenPlayOrNextIsManuallyPressed, atpOpt with
+        | Some atpId, Some atp -> atpId = atp.Id
         | _ -> false
 
     let isLooperStateIsNotInitialized (model: PlayerModel) =

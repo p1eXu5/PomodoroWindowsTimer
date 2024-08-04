@@ -110,6 +110,7 @@ type TestBootstrap () =
                 factory.TimePointQueue
                 factory.WorkRepository
                 factory.WorkEventRepository
+                factory.ActiveTimePointRepository
                 factory.TelegramBot
                 factory.WindowsMinimizer
                 factory.ThemeSwitcher

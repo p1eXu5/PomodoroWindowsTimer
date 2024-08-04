@@ -62,6 +62,7 @@ type IWorkEventRepository =
 type IActiveTimePointRepository =
     interface
         abstract InsertAsync: activeTimePoint: ActiveTimePoint -> cancellationToken: CancellationToken -> Task<Result<unit, string>>
+        abstract InsertIfNotExistsAsync: activeTimePoint: ActiveTimePoint -> cancellationToken: CancellationToken -> Task<Result<unit, string>>
         abstract ReadAllAsync: cancellationToken: CancellationToken -> Task<Result<ActiveTimePoint list, string>>
     end
 

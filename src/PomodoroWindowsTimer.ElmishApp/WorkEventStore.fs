@@ -2,11 +2,9 @@
 
 open System
 open System.Threading.Tasks
-open PomodoroWindowsTimer.Types
 open System.Threading
-open PomodoroWindowsTimer.Types.WorkEvent
-open FsToolkit.ErrorHandling
-open System
+
+open PomodoroWindowsTimer.Types
 
 type WorkEventStore =
     {
@@ -20,10 +18,10 @@ type WorkEventStore =
 
 module WorkEventStore =
 
-    open System.Threading
+    open FsToolkit.ErrorHandling
     open PomodoroWindowsTimer.Abstractions
 
-    let private storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (workId: uint64, time: DateTimeOffset, activeTimePoint: ActiveTimePoint) =
+    let private storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (activeTimePointRepository: IActiveTimePointRepository) (workId: uint64, time: DateTimeOffset, activeTimePoint: ActiveTimePoint) =
         task {
             let workEvent =
                 match activeTimePoint.Kind with
@@ -33,10 +31,11 @@ module WorkEventStore =
                 | Kind.Work ->
                     (time, activeTimePoint.Name, activeTimePoint.Id) |> WorkEvent.WorkStarted
 
-            let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
-
-            match res with
-            | Ok _ -> ()
+            match! activeTimePointRepository.InsertIfNotExistsAsync activeTimePoint CancellationToken.None with
+            | Ok _ ->
+                match! workEventRepository.InsertAsync workId workEvent CancellationToken.None with
+                | Ok _ -> ()
+                | Error err -> raise (InvalidOperationException(err))
             | Error err -> raise (InvalidOperationException(err))
         }
 
@@ -123,9 +122,9 @@ module WorkEventStore =
                     )
         }
 
-    let init (workEventRepository: IWorkEventRepository) : WorkEventStore =
+    let init (workEventRepository: IWorkEventRepository) (activeTimePointRepository: IActiveTimePointRepository) : WorkEventStore =
         {
-            StoreStartedWorkEventTask = storeStartedWorkEventTask workEventRepository
+            StoreStartedWorkEventTask = storeStartedWorkEventTask workEventRepository activeTimePointRepository
             StoreStoppedWorkEventTask = storeStoppedWorkEventTask workEventRepository
             StoreWorkReducedEventTask = storeWorkReducedEventTask workEventRepository
             StoreBreakIncreasedEventTask = storeBreakIncreasedEventTask workEventRepository

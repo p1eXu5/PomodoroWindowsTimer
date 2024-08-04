@@ -22,6 +22,9 @@ module WorkEventStoreTests =
     open PomodoroWindowsTimer.Testing.Fakers
     open PomodoroWindowsTimer.ElmishApp.Tests
 
+    let private workId = WorkId.generate ()
+    let private anyWorkEvent = Arg.Any<WorkEvent>()
+
     let private activeTimePointId = TimePointId.generate ()
     let private date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().Date)
     let private ct = CancellationToken.None
@@ -138,17 +141,70 @@ module WorkEventStoreTests =
     [<TestCaseSource(nameof testCases)>]
     let ``WorkSpentTimeListTask -> repo returns single work event -> returns list with single item with TimeSpent equal to diff`` (caseData: CaseData) =
         task {
-            let workEventRepoMock = Substitute.For<IWorkEventRepository>()
+            let mockActiveTimePointRepo = Substitute.For<IActiveTimePointRepository>()
+            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
             do 
-                workEventRepoMock.FindByActiveTimePointIdByDateAsync activeTimePointId caseData.BeforeDate ct
+                mockWorkEventRepo.FindByActiveTimePointIdByDateAsync activeTimePointId caseData.BeforeDate ct
                 |> _.Returns(Ok caseData.WorkEventLists)
                 |> ignore
 
-            let workEventStore = WorkEventStore.init workEventRepoMock
+            let workEventStore = WorkEventStore.init mockWorkEventRepo mockActiveTimePointRepo
 
             let! res = workEventStore.WorkSpentTimeListTask (activeTimePointId, caseData.BeforeDate, caseData.Diff, ct)
             match res with
             | Error err -> return assertionExn err
             | Ok ok -> return ok
+        }
+
+    [<Test>]
+    let ``04: StoreStartedWorkEventTask -> by default -> calls IActiveTimePointRepository.InsertIfNotExistsAsync`` () =
+        task {
+            let activeTimePoint = ActiveTimePoint.generate ()
+            let date = System.TimeProvider.System.GetUtcNow()
+
+            let mockActiveTimePointRepo = Substitute.For<IActiveTimePointRepository>()
+            do
+                mockActiveTimePointRepo.InsertIfNotExistsAsync activeTimePoint ct
+                |> _.Returns(Ok ())
+                |> ignore
+
+            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
+            do
+                mockWorkEventRepo.InsertAsync workId anyWorkEvent ct
+                |> _.Returns(Ok 1UL)
+                |> ignore
+
+            let workEventStore = WorkEventStore.init mockWorkEventRepo mockActiveTimePointRepo
+
+            // act
+            do! workEventStore.StoreStartedWorkEventTask (workId, date, activeTimePoint)
+
+            let! _ = mockActiveTimePointRepo.Received(1).InsertIfNotExistsAsync activeTimePoint ct
+            let! _ = mockWorkEventRepo.ReceivedWithAnyArgs(1).InsertAsync workId anyWorkEvent ct
+            return ()
+        }
+
+    [<Test>]
+    let ``05: StoreStartedWorkEventTask -> active time point inssertion is failed -> throws`` () =
+        task {
+            let activeTimePoint = ActiveTimePoint.generate ()
+            let date = System.TimeProvider.System.GetUtcNow()
+
+            let mockActiveTimePointRepo = Substitute.For<IActiveTimePointRepository>()
+            do
+                mockActiveTimePointRepo.InsertIfNotExistsAsync activeTimePoint ct
+                |> _.Returns(Error "test error")
+                |> ignore
+
+            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
+
+            let workEventStore = WorkEventStore.init mockWorkEventRepo mockActiveTimePointRepo
+
+            // act
+            let _ = Assert.ThrowsAsync<InvalidOperationException>(fun () -> workEventStore.StoreStartedWorkEventTask (workId, date, activeTimePoint))
+
+            let! _ = mockActiveTimePointRepo.Received(1).InsertIfNotExistsAsync activeTimePoint ct
+            let! _ = mockWorkEventRepo.DidNotReceiveWithAnyArgs().InsertAsync workId anyWorkEvent ct
+            return ()
         }
 

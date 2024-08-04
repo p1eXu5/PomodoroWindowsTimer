@@ -20,6 +20,7 @@ let internal main
     (timePointQueue: ITimePointQueue)
     (workRepository: IWorkRepository)
     (workEventRepository: IWorkEventRepository)
+    (activeTimePointRepository: IActiveTimePointRepository)
     (telegramBot: ITelegramBot)
     (windowsMinimizer: IWindowsMinimizer)
     (themeSwitcher: IThemeSwitcher)
@@ -38,6 +39,7 @@ let internal main
             timePointQueue
             workRepository
             workEventRepository
+            activeTimePointRepository
             telegramBot
             windowsMinimizer
             themeSwitcher

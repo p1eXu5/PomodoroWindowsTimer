@@ -1,27 +1,17 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.Unit.PlayerModel
 
-open System.ComponentModel
-open System.Threading
-
 module PostChangeActiveTimeSpanTests =
 
     open System
-    open Microsoft.Extensions.Logging
+    open System.Threading
 
     open NUnit.Framework
     open Faqt
     open Faqt.Operators
-    open p1eXu5.FSharp.Testing.ShouldExtensions
     open NSubstitute
-
-    open Elmish
     open Elmish.Extensions
 
-    open PomodoroWindowsTimer
-    open PomodoroWindowsTimer.Abstractions
     open PomodoroWindowsTimer.Types
-    open PomodoroWindowsTimer.ElmishApp
-    open PomodoroWindowsTimer.ElmishApp.Abstractions
     open PomodoroWindowsTimer.ElmishApp.Models
     
     open PomodoroWindowsTimer.Testing.Fakers
@@ -304,16 +294,16 @@ module PostChangeActiveTimeSpanTests =
         %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3)))
         sut.LooperMock.Received(1).Resume()
 
-    let statesTestCases : System.Collections.IEnumerable =
+    let initializedAndStoppedStates : System.Collections.IEnumerable =
         seq {
             TestCaseData(LooperState.Initialized)
             TestCaseData(LooperState.Stopped)
         }
 
-    [<TestCaseSource(nameof statesTestCases)>]
+    [<TestCaseSource(nameof initializedAndStoppedStates)>]
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
-    let ``02-2: PostChangeActiveTimeSpan Start -> no current work, shifting forward, preshift state is nor playing -> no resume call, no cmd, no intent`` (state: LooperState) =
+    let ``02-2: PostChangeActiveTimeSpan Start -> no current work, shifting forward, preshift state is not playing -> no resume call, no cmd, no intent`` (state: LooperState) =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
@@ -353,7 +343,7 @@ module PostChangeActiveTimeSpanTests =
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.DidNotReceive().Resume()
 
-    [<TestCaseSource(nameof statesTestCases)>]
+    [<TestCaseSource(nameof initializedAndStoppedStates)>]
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
     let ``02-3: PostChangeActiveTimeSpan Start -> some current work, shifting forward, preshift state is not playing -> no resume call, no cmd, SkipOrApply intent`` (state: LooperState) =
@@ -493,16 +483,15 @@ module PostChangeActiveTimeSpanTests =
 
             %semaphore.Release()
         )
-
         semaphore.Wait()
 
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.Received(1).Resume()
 
-    [<TestCaseSource(nameof statesTestCases)>]
+    [<TestCaseSource(nameof initializedAndStoppedStates)>]
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
-    let ``03-2: PostChangeActiveTimeSpan Start -> no current work, shifting backward, preshift state is nor playing -> no resume call, no cmd, no intent`` (state: LooperState) =
+    let ``03-2: PostChangeActiveTimeSpan Start -> no current work, shifting backward, preshift state is not playing -> no resume call, no cmd, no intent`` (state: LooperState) =
         let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
         let beforePlayerModel : PlayerModel =
             {
@@ -542,7 +531,7 @@ module PostChangeActiveTimeSpanTests =
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.DidNotReceive().Resume()
 
-    [<TestCaseSource(nameof statesTestCases)>]
+    [<TestCaseSource(nameof initializedAndStoppedStates)>]
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``03-3: PostChangeActiveTimeSpan Start -> some current work, shifting backward, preshift state is playing -> no resume call, cmd, no intent`` (state: LooperState) =
@@ -566,7 +555,8 @@ module PostChangeActiveTimeSpanTests =
 
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
-        let sut = Sut.init ()
+        let workSpentTimeList : WorkSpentTime list = []
+        let sut = Sut.initWithWorkEventStore (WorkEventStoreStub.initWithWorkSpentTimeList workSpentTimeList)
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -575,7 +565,21 @@ module PostChangeActiveTimeSpanTests =
         %afterPlayerModel.LooperState.Should().Be(state)
         %afterPlayerModel.RetrieveWorkSpentTimesState.Should().BeOfCase(AsyncDeferredState.InProgress)
 
-        %cmd.Should().HaveLength(1)
+        use semaphore = new SemaphoreSlim(0, 1)
+        do cmd[0] (fun msg ->
+            %msg.Should().Be(
+                PlayerModel.Msg.PostChangeActiveTimeSpan (
+                    AsyncOperation.Finish (
+                        Ok workSpentTimeList
+                        , afterPlayerModel.RetrieveWorkSpentTimesState |> AsyncDeferredState.tryCts |> Option.get
+                    )
+                )
+            )
+
+            %semaphore.Release()
+        )
+        semaphore.Wait()
+
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.DidNotReceive().Resume()
 

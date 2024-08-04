@@ -251,3 +251,8 @@ module ActiveTimePoint =
     let generate () =
         TimePoint.generate ()
         |> TimePoint.toActiveTimePoint
+
+    let withNoRemainingTimeSpan (atp: ActiveTimePoint) =
+        { atp with
+            RemainingTimeSpan = TimeSpan.Zero
+        }

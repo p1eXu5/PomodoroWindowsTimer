@@ -12,6 +12,7 @@ internal sealed class ElmishProgramFactory(
     ITimePointQueue timePointQueue,
     IWorkRepository workRepository,
     IWorkEventRepository workEventRepository,
+    IActiveTimePointRepository activeTimePointRepository,
     ITelegramBot telegramBot,
     IWindowsMinimizer windowsMinimizer,
     IThemeSwitcher themeSwitcher,
@@ -28,6 +29,7 @@ internal sealed class ElmishProgramFactory(
     internal ITimePointQueue TimePointQueue => timePointQueue;
     internal IWorkRepository WorkRepository => workRepository;
     internal IWorkEventRepository WorkEventRepository => workEventRepository;
+    internal IActiveTimePointRepository ActiveTimePointRepository => activeTimePointRepository;
     internal ITelegramBot TelegramBot => telegramBot;
     internal IWindowsMinimizer WindowsMinimizer => windowsMinimizer;
     internal IThemeSwitcher ThemeSwitcher => themeSwitcher;
@@ -47,6 +49,7 @@ internal sealed class ElmishProgramFactory(
             TimePointQueue,
             WorkRepository,
             WorkEventRepository,
+            ActiveTimePointRepository,
             TelegramBot,
             WindowsMinimizer,
             ThemeSwitcher,

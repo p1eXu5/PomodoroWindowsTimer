@@ -8,6 +8,8 @@ open FsUnit
 open p1eXu5.FSharp.Testing.ShouldExtensions
 open FsUnitTyped
 open FsToolkit.ErrorHandling
+open Faqt
+open Faqt.Operators
 
 open PomodoroWindowsTimer.Storage
 open PomodoroWindowsTimer.Testing.Fakers
@@ -70,6 +72,25 @@ module ActiveTimePointRepositoryTests =
             let! rows = atpRepo.ReadAllAsync(ct)
 
             // assert
-            rows |> shouldContain ({ atp with RemainingTimeSpan = TimeSpan.Zero })
+            rows |> shouldContain (atp |> ActiveTimePoint.withNoRemainingTimeSpan)
         }
         |> TaskResult.runTest
+
+    [<Test>]
+    let ``03: InsertIfNotExistsAsync test`` () =
+        taskResult {
+            let atpRepo = activeTimePointRepository ()
+
+            let atp = ActiveTimePoint.generate ()
+            let! _ = atpRepo.InsertIfNotExistsAsync atp ct
+            let! _ = atpRepo.InsertIfNotExistsAsync atp ct
+
+            let! dbAtp = (atpRepo :?> ActiveTimePointRepository).FindByIdAsync atp.Id ct
+
+            %dbAtp.IsSome.Should().BeTrue()
+            %dbAtp.Value.Should().Be(atp |> ActiveTimePoint.withNoRemainingTimeSpan)
+
+            return ()
+        }
+        |> TaskResult.runTest
+
