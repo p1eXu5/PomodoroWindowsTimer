@@ -9,7 +9,7 @@ open PomodoroWindowsTimer.ElmishApp
 type RollbackWorkModel =
     {
         WorkId: uint64
-        TimePointKind: Kind
+        Kind: Kind
         Time: DateTimeOffset
         Difference: TimeSpan
         RememberChoice: bool
@@ -38,7 +38,7 @@ module RollbackWorkModel =
     let init (workSpentTime: WorkSpentTime) timePointKind time =
         {
             WorkId = workSpentTime.Work.Id
-            TimePointKind = timePointKind
+            Kind = timePointKind
             Time = time
             Difference = workSpentTime.SpentTime
             RememberChoice = false
@@ -48,7 +48,7 @@ module RollbackWorkModel =
     let initWithMissingTime workId timePointKind difference time =
         {
             WorkId = workId
-            TimePointKind = timePointKind
+            Kind = timePointKind
             Time = time
             Difference = difference
             RememberChoice = false
@@ -57,12 +57,12 @@ module RollbackWorkModel =
 
 
     let chooseIfWorkKind msg (model: RollbackWorkModel) =
-        match model.TimePointKind with
+        match model.Kind with
         | Kind.Work -> msg |> Some
         | _ -> None
 
     let chooseIfBreakKind msg (model: RollbackWorkModel) =
-        match model.TimePointKind with
+        match model.Kind with
         | Kind.Break
         | Kind.LongBreak -> msg |> Some
         | _ -> None

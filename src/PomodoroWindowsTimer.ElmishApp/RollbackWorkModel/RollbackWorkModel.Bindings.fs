@@ -3,6 +3,7 @@
 open Elmish.WPF
 open Elmish.Extensions
 
+open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.RollbackWorkModel
@@ -34,7 +35,23 @@ type Bindings() =
         nameof __.InterpretAsWorkAndCloseCommand
             |> Binding.cmdIf (chooseIfBreakKind (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.InvertSpentTime))
 
+    member val ApplyAsWorkAndCloseCommand : Binding =
+        nameof __.ApplyAsWorkAndCloseCommand
+            |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.ApplyAsWorkTime)
+
+    member val ApplyAsBreakAndCloseCommand : Binding =
+        nameof __.ApplyAsBreakAndCloseCommand
+            |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.ApplyAsBreakTime)
+
     member val CloseCommand : Binding =
         nameof __.CloseCommand |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.DoNotCorrect)
 
+    member val IsWorkKind : Binding =
+        nameof __.IsWorkKind |> Binding.oneWay (_.Kind >> Kind.isWork)
+    
+    member val IsBreakKind : Binding =
+        nameof __.IsBreakKind |> Binding.oneWay (_.Kind >> Kind.isBreak)
+
+    member val Difference : Binding =
+        nameof __.Difference |> Binding.oneWay _.Difference
 

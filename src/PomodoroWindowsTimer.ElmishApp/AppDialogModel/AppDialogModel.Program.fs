@@ -39,7 +39,7 @@ let private ofRollbackWorkModelIntent (workEventStore: WorkEventStore) (userSett
         | LocalRollbackStrategy.DoNotCorrect ->
             AppDialogModel.NoDialog |> withCmdNone
 
-        | LocalRollbackStrategy.InvertSpentTime when rollbackWorkModel.TimePointKind = Kind.Work ->
+        | LocalRollbackStrategy.InvertSpentTime when rollbackWorkModel.Kind = Kind.Work ->
             AppDialogModel.NoDialog
             , Cmd.batch [
                 // we are adding 1 ms cause in Player we are storing strt event with addind 1ms too because this event must not be included into the work spent time list
@@ -55,7 +55,7 @@ let private ofRollbackWorkModelIntent (workEventStore: WorkEventStore) (userSett
             ]
 
         | LocalRollbackStrategy.SubstractSpentTime ->
-            match rollbackWorkModel.TimePointKind with
+            match rollbackWorkModel.Kind with
             | Kind.Work ->
                 // we are adding 1 ms cause in Player we are storing strt event with addind 1ms too because this event must not be included into the work spent time list
                 AppDialogModel.NoDialog
@@ -64,6 +64,14 @@ let private ofRollbackWorkModelIntent (workEventStore: WorkEventStore) (userSett
                 // we are adding 1 ms cause in Player we are storing strt event with addind 1ms too because this event must not be included into the work spent time list
                 AppDialogModel.NoDialog
                 ,Cmd.OfTask.attempt workEventStore.StoreBreakReducedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(2), rollbackWorkModel.Difference) Msg.EnqueueExn
+
+        | LocalRollbackStrategy.ApplyAsWorkTime ->
+            AppDialogModel.NoDialog
+            , Cmd.OfTask.attempt workEventStore.StoreWorkIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(1), rollbackWorkModel.Difference) Msg.EnqueueExn
+
+        | LocalRollbackStrategy.ApplyAsBreakTime ->
+            AppDialogModel.NoDialog
+            , Cmd.OfTask.attempt workEventStore.StoreBreakIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(1), rollbackWorkModel.Difference) Msg.EnqueueExn
 
 
 let private ofRollbackWorkListModelIntent (workEventStore: WorkEventStore) rollbackWorkListModel (intent: RollbackWorkListModel.Intent) =

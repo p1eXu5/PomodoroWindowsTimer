@@ -75,6 +75,10 @@
     <settings:RollbackWork DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.RollbackWorkDialog}" />
   </DataTemplate>
 
+  <DataTemplate x:Key="dt_SkipOrApplyMissingTimeDialog">
+    <settings:SkipOrApplyMissingTime DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.SkipOrApplyMissingTimeDialog}" />
+  </DataTemplate>
+
   <DataTemplate x:Key="dt_WorkStatisticsDialog">
     <workStatistic:DailyStatisticTableList />
   </DataTemplate>

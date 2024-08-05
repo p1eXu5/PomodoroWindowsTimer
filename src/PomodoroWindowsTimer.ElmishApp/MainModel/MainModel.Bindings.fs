@@ -72,7 +72,7 @@ type Bindings(
         nameof __.IsPlaying |> Binding.oneWay (fun m -> m.Player |> PlayerModel.isPlaying)
 
     member val ActiveTime : Binding =
-        nameof __.ActiveTime |> Binding.oneWay (fun m -> m.Player |> PlayerModel.getActiveTimeSpan)
+        nameof __.ActiveTime |> Binding.oneWay (fun m -> m.Player |> PlayerModel.getRemainingTimeSpan)
 
     // ----------------------------------------------------
     /// For the test purpose

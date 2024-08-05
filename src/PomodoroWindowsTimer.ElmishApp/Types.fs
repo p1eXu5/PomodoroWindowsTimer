@@ -23,6 +23,8 @@ type LocalRollbackStrategy =
     | DoNotCorrect
     | SubstractSpentTime
     | InvertSpentTime
+    | ApplyAsBreakTime
+    | ApplyAsWorkTime
 
 [<RequireQualifiedAccess>]
 module TimePointKind =

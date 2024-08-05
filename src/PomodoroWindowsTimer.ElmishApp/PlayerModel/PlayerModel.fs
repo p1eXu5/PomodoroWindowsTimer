@@ -188,14 +188,14 @@ module PlayerModel =
         |> Option.get
         |> _.Id
 
-    let getActiveTimeSpan (model: PlayerModel) =
+    let getRemainingTimeSpan (model: PlayerModel) =
         model.ActiveTimePoint
-        |> Option.map (fun tp -> tp.TimeSpan)
+        |> Option.map _.RemainingTimeSpan
         |> Option.defaultValue TimeSpan.Zero
 
     let getActiveSpentTime (model: PlayerModel) =
         match model.ActiveTimePoint with
-        | Some atp -> (atp.RemainingTimeSpan).TotalSeconds
+        | Some atp -> (atp.TimeSpan - atp.RemainingTimeSpan).TotalSeconds
         | _ -> 0.0
 
     /// Returns model OriginTimePoint.TimeSpan.TotalSeconds.

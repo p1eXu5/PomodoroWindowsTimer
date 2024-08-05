@@ -68,7 +68,7 @@ type Bindings() =
         nameof __.ActiveTimePointName |> Binding.oneWayOpt (fun m -> m.ActiveTimePoint |> Option.map (fun tp -> tp.Name))
 
     member val ActiveTime : Binding =
-        nameof __.ActiveTime |> Binding.oneWay getActiveTimeSpan
+        nameof __.ActiveTime |> Binding.oneWay getRemainingTimeSpan
 
     member val ActiveTimeDuration : Binding =
         nameof __.ActiveTimeDuration |> Binding.oneWay (getActiveTimeDuration)

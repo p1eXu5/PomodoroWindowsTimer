@@ -412,6 +412,13 @@ module Kind =
         | Break -> "BR"
         | LongBreak -> "LB"
 
+    let isWork = function
+        | Work -> true
+        | _ -> false
+
+    let isBreak = function
+        | Break | LongBreak -> true
+        | _ -> false
 
 
 module TimePointPrototype =
