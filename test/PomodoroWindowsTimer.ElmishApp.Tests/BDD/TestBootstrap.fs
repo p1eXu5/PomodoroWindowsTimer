@@ -20,6 +20,7 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 open PomodoroWindowsTimer.WpfClient
 open System.Collections.Concurrent
+open PomodoroWindowsTimer.Abstractions
 
 type TestBootstrap () =
     inherit Bootstrap()
@@ -92,7 +93,7 @@ type TestBootstrap () =
 
     override _.PostConfigureHost(builder: IHostBuilder) =
         builder.AddMockRepository(
-            [ Service<IThemeSwitcher>(); Service<IWindowsMinimizer>() ],
+            [ Service<IThemeSwitcher>(); Service<IWindowsMinimizer>(); Service<IWorkEventRepository>() ],
             TestLogWriter(TestLogger<TestBootstrap>(TestContextWriters.Default, LogOut.All)),
             (fun mr -> mockRepository <- mr)
         )

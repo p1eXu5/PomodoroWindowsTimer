@@ -188,7 +188,7 @@ let ``SkipOrApplyMissingTimeDialog has been opened`` () =
 
         do! Scenario.modelSatisfiesWithin2Sec "SkipOrApplyMissingTimeDialog has been opened" (fun mainModel ->
             match mainModel.AppDialog with
-            | AppDialogModel.SkipOrApplyMissingTimeDialog _ -> true
+            | AppDialogModel.SkipOrApplyMissingTime _ -> true
             | _ -> false
         )
     }

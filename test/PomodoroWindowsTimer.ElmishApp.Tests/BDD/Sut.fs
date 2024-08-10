@@ -3,13 +3,16 @@
 open System
 open System.Threading.Tasks
 open System.Collections.Generic
+open System.Collections.Concurrent
+
 open NUnit.Framework
-open PomodoroWindowsTimer.WpfClient
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Abstractions
 open p1eXu5.AspNetCore.Testing
 open p1eXu5.AspNetCore.Testing.MockRepository
-open System.Collections.Concurrent
+
+open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.ElmishApp.Models
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.WpfClient
 
 type ISut =
     inherit IScenarioContext
@@ -36,6 +39,7 @@ module Sut =
         try
             bootstrap.StartHost()
 
+            // make substitutions:
             let _ = bootstrap.MockRepository.TrySubstitute<IWindowsMinimizer>()
             let _ = bootstrap.MockRepository.TrySubstitute<IThemeSwitcher>()
 

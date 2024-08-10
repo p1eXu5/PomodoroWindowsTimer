@@ -13,7 +13,7 @@ type AppDialogModel =
     | BotSettings of BotSettingsModel
     | RollbackWork of RollbackWorkModel
     | RollbackWorkList of RollbackWorkListModel
-    | SkipOrApplyMissingTimeDialog of RollbackWorkModel
+    | SkipOrApplyMissingTime of RollbackWorkModel
 
 module AppDialogModel =
 
@@ -65,7 +65,7 @@ module AppDialogModel =
 
         let (|SkipOrApplyMissingTimeModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
             match msg, model with
-            | Msg.SkipOrApplyMissingTimeModelMsg msg, AppDialogModel.SkipOrApplyMissingTimeDialog m ->
+            | Msg.SkipOrApplyMissingTimeModelMsg msg, AppDialogModel.SkipOrApplyMissingTime m ->
                 (msg, m) |> Some
             | _ -> None
 
@@ -84,7 +84,7 @@ module AppDialogModel =
         | AppDialogModel.BotSettings _ -> AppDialogId.BotSettingsDialogId |> Some
         | AppDialogModel.RollbackWork _ -> AppDialogId.RollbackWorkDialogId |> Some
         | AppDialogModel.RollbackWorkList _ -> AppDialogId.RollbackWorkListDialogId |> Some
-        | AppDialogModel.SkipOrApplyMissingTimeDialog _ -> AppDialogId.SkipOrApplyMissingTimeDialogId |> Some
+        | AppDialogModel.SkipOrApplyMissingTime _ -> AppDialogId.SkipOrApplyMissingTimeDialogId |> Some
 
     let tryBotSettingsModel (model: AppDialogModel) =
         match model with
@@ -103,7 +103,7 @@ module AppDialogModel =
 
     let trySkipOrApplyMissingTimeModel (model: AppDialogModel) =
         match model with
-        | AppDialogModel.SkipOrApplyMissingTimeDialog m -> m |> Some
+        | AppDialogModel.SkipOrApplyMissingTime m -> m |> Some
         | _ -> None
 
 

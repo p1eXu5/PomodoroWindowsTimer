@@ -5,6 +5,7 @@ open System
 open Elmish.Extensions
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
 
 type [<Measure>] times
 
@@ -14,7 +15,13 @@ module MainModel =
     ()
 
     module Msg =
-        ()
+        module AppDialog =
+            let skipTimeMsg () =
+                MainModel.Msg.AppDialogModelMsg (
+                    AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                    )
+                )
 
     module MsgWith =
         ()

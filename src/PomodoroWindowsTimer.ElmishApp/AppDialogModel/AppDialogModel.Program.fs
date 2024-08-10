@@ -112,10 +112,10 @@ let update
 
     // ------------------------------------
     | Msg.LoadSkipOrApplyMissingTimeDialogModel (workId, kind, difference, time) ->
-        RollbackWorkModel.initWithMissingTime workId kind difference time |> AppDialogModel.SkipOrApplyMissingTimeDialog |> withCmdNone
+        RollbackWorkModel.initWithMissingTime workId kind difference time |> AppDialogModel.SkipOrApplyMissingTime |> withCmdNone
 
     | MsgWith.SkipOrApplyMissingTimeModelMsg model (smsg, sm) ->
-        updateRollbackWorkModel smsg sm ||> ofRollbackWorkModelIntent workEventStore userSettings AppDialogModel.SkipOrApplyMissingTimeDialog
+        updateRollbackWorkModel smsg sm ||> ofRollbackWorkModelIntent workEventStore userSettings AppDialogModel.SkipOrApplyMissingTime
 
     // ------------------------------------
 

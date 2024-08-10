@@ -1,13 +1,16 @@
-﻿module PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps.Then
+﻿module rec PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps.Then
 
 open System
+open System.Threading
 open Microsoft.Extensions.DependencyInjection
 
 open FsUnit
 open p1eXu5.FSharp.Testing.ShouldExtensions
 open NSubstitute
+open p1eXu5.AspNetCore.Testing.MockRepository
 
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
@@ -163,4 +166,38 @@ let ``Active TimePoint remaining time is equal to`` (seconds: float<sec>) =
             assertionExn "Active TimePoint has not been set"
     }
     |> Scenario.log "Then.``Active TimePoint remaining time is equal to``"
+
+let ``SkipOrApplyMissingTime dialog has been shown`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "SkipOrApplyMissingTime dialog has been shown" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.SkipOrApplyMissingTime _ -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``SkipOrApplyMissingTime dialog has been shown``}``"
+
+let ``Dialog has been closed`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "Dialog has been closed" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.NoDialog -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``Dialog has been closed``}``"
+
+let ``No event have been storred`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let mockWorkEventRepo = sut.MockRepository.Substitute<IWorkEventRepository>()
+        do
+            mockWorkEventRepo
+                .DidNotReceiveWithAnyArgs()
+                .InsertAsync (Arg.Any<WorkId>()) (Arg.Any<WorkEvent>()) (Arg.Any<CancellationToken>())
+                |> Async.AwaitTask
+                |> Async.Ignore
+                |> Async.RunSynchronously
+    }
 

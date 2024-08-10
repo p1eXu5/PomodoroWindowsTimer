@@ -17,7 +17,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps
 module TimeSliderFeature =
 
     [<Test>]
-    [<Category("UC2: Time slider Initial Scenarios")>]
+    [<Category("UC2: Time slider Initial Scenarios, Work is not set")>]
     let ``UC2-0 - Initial time point move forward when no work is set scenario`` () =
         scenario {
             let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
@@ -39,7 +39,7 @@ module TimeSliderFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    [<Category("UC2: Time slider Initial Scenarios")>]
+    [<Category("UC2: Time slider Initial Scenarios, Work is not set")>]
     let ``UC2-1 - Initial time point move forward then backward when no work is set scenario`` () =
         scenario {
             let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
@@ -67,7 +67,7 @@ module TimeSliderFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    [<Category("UC2: Time slider Initial Scenarios")>]
+    [<Category("UC2: Time slider Initial Scenarios, Work is not set")>]
     let ``UC2-2 - Initial Break time point move forward to the end then play when no work is set scenario`` () =
         scenario {
             let timePoints = [ breakTP ``3 sec``; workTP 10.0<sec> ]
@@ -95,7 +95,7 @@ module TimeSliderFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    [<Category("UC2: Time slider Initial Scenarios")>]
+    [<Category("UC2: Time slider Initial Scenarios, Work is not set")>]
     let ``UC2-3 - Initial Work time point move forward to the end then play when no work is set scenario`` () =
         scenario {
             let timePoints = [ workTP ``3 sec``; breakTP 10.0<sec>;  ]
@@ -123,7 +123,7 @@ module TimeSliderFeature =
     // ---------------------------------
 
     [<Test>]
-    [<Category("UC3: Time slider Playing Scenarios")>]
+    [<Category("UC3: Time slider Playing Scenarios, Work is not set")>]
     let ``UC3-0 - Playing time point move forward when no work is set scenario`` () =
         scenario {
             let timePoints = [ workTP 5.0<sec>; breakTP ``3 sec``;  ]
@@ -149,7 +149,7 @@ module TimeSliderFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    [<Category("UC3: Time slider Playing Scenarios")>]
+    [<Category("UC3: Time slider Playing Scenarios, Work is not set")>]
     let ``UC3-1 - Playing time point move forward then backward when no work is set scenario`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec``;  ]
@@ -180,7 +180,7 @@ module TimeSliderFeature =
         |> Scenario.runTestAsync
 
     [<Test>]
-    [<Category("UC3: Time slider Playing Scenarios")>]
+    [<Category("UC3: Time slider Playing Scenarios, Work is not set")>]
     let ``UC3-2 - Playing time point move forward to the end, transition to the next time point when no work is set scenario`` () =
         scenario {
             let timePoints = [ workTP 5.0<sec>; breakTP ``3 sec``;  ]
@@ -203,3 +203,31 @@ module TimeSliderFeature =
             do! Then.``Telegrtam bot should not be notified`` ()
         }
         |> Scenario.runTestAsync
+
+    // ---------------------------------
+
+    [<Test>]
+    [<Category("UC6: Time slider Initial Scenarios, Work is set")>]
+    let ``UC6-0 - Initial time point move forward when work is set scenario`` () =
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            let work = Work.generate ()
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Stored CurrentWork`` work
+            do! Given.``WorkEventStore substitution`` ()
+            do! Given.``Initialized Program`` ()
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``Active time point slider value is changing to`` 1.5<sec>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
+
+            do! Then.``SkipOrApplyMissingTime dialog has been shown`` ()
+
+            do! When.``User skips time`` ()
+
+            do! Then.``Dialog has been closed`` ()
+            do! Then.``No event have been storred`` ()
+        }
+        |> Scenario.runTestAsync
+

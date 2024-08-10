@@ -1,11 +1,16 @@
 ﻿module PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps.Given
 
 open Microsoft.Extensions.DependencyInjection
+
+open p1eXu5.AspNetCore.Testing
+open p1eXu5.AspNetCore.Testing.MockRepository
+
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer
+open PomodoroWindowsTimer.Abstractions
 
 let ``Initialized Program`` () =
     scenario {
@@ -40,3 +45,14 @@ let ``Stored CurrentWork`` (work) =
             )
     }
     |> Scenario.log "Given.``Stored TimePoints``"
+
+let ``WorkEventStore substitution`` () =
+    scenario {
+        do!
+            Scenario.replaceStateWith (fun f ->
+                fun sut ->
+                    let (sut': #ISut) = f sut
+                    let _ = sut'.MockRepository.TrySubstitute<IWorkEventRepository>()
+                    sut'
+            )
+    }
