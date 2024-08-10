@@ -22,3 +22,9 @@ let ``User skips time`` () =
         do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.skipTimeMsg ())
     }
 
+let ``User applies time`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.applyMissingTimeMsg ())
+    }
+

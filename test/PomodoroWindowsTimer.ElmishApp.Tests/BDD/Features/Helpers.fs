@@ -23,6 +23,13 @@ module MainModel =
                     )
                 )
 
+            let applyMissingTimeMsg () =
+                MainModel.Msg.AppDialogModelMsg (
+                    AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsBreakTime)
+                    )
+                )
+
     module MsgWith =
         ()
 
@@ -83,6 +90,22 @@ module Scenario =
                 Func<bool>(fun () -> state.MainModel |> modelPredicate),
                 ``2sec``)
             msgPresents |> shouldL be True $"%A{modelDescription} is not satisfies modelPredicate. MainModel:\n{state.MainModel}"
+        }
+
+    let mockSatisfiesWithin2Sec description mockPredicate =
+        scenario {
+            let! (state: ISut) = Scenario.getState
+            let mockSatisfy = SpinWait.SpinUntil(
+                Func<bool>(fun () ->
+                    try
+                        state.MockRepository |> mockPredicate
+                        true
+                    with ex ->
+                        writeLine $"Error: {ex.Message}"
+                        false
+                ),
+                ``2sec``)
+            mockSatisfy |> shouldL be True $"%A{description} is not satisfies."
         }
 
     let dispatch msg =

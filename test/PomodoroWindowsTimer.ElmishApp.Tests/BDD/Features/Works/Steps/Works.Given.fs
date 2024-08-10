@@ -50,7 +50,7 @@ let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint lis
         let currentWork = Work.generate ()
 
         do! Given.``Stored TimePoints`` timePoints
-        do! Given.``Stored CurrentWork`` currentWork
+        do! Given.``CurrentWork in UserSettings`` currentWork
         do! Given.``Initialized Program`` ()
 
         do! Common.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None

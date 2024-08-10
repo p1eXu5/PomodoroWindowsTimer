@@ -7,7 +7,10 @@ open Microsoft.Extensions.DependencyInjection
 open FsUnit
 open p1eXu5.FSharp.Testing.ShouldExtensions
 open NSubstitute
+open p1eXu5.AspNetCore.Testing
 open p1eXu5.AspNetCore.Testing.MockRepository
+open Faqt
+open Faqt.Operators
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
@@ -200,4 +203,31 @@ let ``No event have been storred`` () =
                 |> Async.Ignore
                 |> Async.RunSynchronously
     }
+    |> Scenario.log $"Then.``{nameof ``No event have been storred``}``"
+
+let ``BreakIncreased event has been storred`` workIdKey time =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let work = sut.ScenarioContext[workIdKey] :?> Work
+        do!
+            Scenario.mockSatisfiesWithin2Sec "BreakIncreased event insertion" (fun mockRepo ->
+                let mockWorkEventRepo = mockRepo.Substitute<IWorkEventRepository>()
+                do
+                    mockWorkEventRepo
+                        .Received(1)
+                        .InsertAsync
+                            work.Id
+                            (Verify.That<WorkEvent>(fun we ->
+                                match we with
+                                | BreakIncreased (_, t) ->
+                                    %t.TotalSeconds.Should().BeInRange(float time, float (time + 0.5<sec>))
+                                | _ -> assertionExn "Work event is not BreakIncreased"
+                            ))
+                            (Arg.Any<CancellationToken>())
+                        |> Async.AwaitTask
+                        |> Async.Ignore
+                        |> Async.RunSynchronously
+            )
+    }
+
 

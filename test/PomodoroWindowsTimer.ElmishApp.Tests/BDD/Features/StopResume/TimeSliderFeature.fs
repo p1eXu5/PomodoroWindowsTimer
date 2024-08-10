@@ -208,12 +208,11 @@ module TimeSliderFeature =
 
     [<Test>]
     [<Category("UC6: Time slider Initial Scenarios, Work is set")>]
-    let ``UC6-0 - Initial time point move forward when work is set scenario`` () =
+    let ``UC6-0 - Initial time point move forward when work is set and time skipping scenario`` () =
         scenario {
             let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-            let work = Work.generate ()
             do! Given.``Stored TimePoints`` timePoints
-            do! Given.``Stored CurrentWork`` work
+            do! Given.``Work in WorkRepository and UserSettings`` ()
             do! Given.``WorkEventStore substitution`` ()
             do! Given.``Initialized Program`` ()
 
@@ -230,4 +229,55 @@ module TimeSliderFeature =
             do! Then.``No event have been storred`` ()
         }
         |> Scenario.runTestAsync
+
+    [<Test>]
+    [<Category("UC6: Time slider Initial Scenarios, Work is set")>]
+    let ``UC6-1 - Initial time point move forward when work is set and time applying scenario`` () =
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``Work in WorkRepository and UserSettings`` ()
+            do! Given.``WorkEventStore substitution`` ()
+            do! Given.``Initialized Program`` ()
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``Active time point slider value is changing to`` 1.5<sec>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
+
+            do! Then.``SkipOrApplyMissingTime dialog has been shown`` ()
+
+            do! When.``User applies time`` ()
+
+            do! Then.``Dialog has been closed`` ()
+            do! Then.``BreakIncreased event has been storred`` "CurrentWork" 1.5<sec>
+        }
+        |> Scenario.runTestAsync
+
+
+    [<Test>]
+    [<Category("UC6: Time slider Initial Scenarios, Work is set")>]
+    let ``UC6-2 - Initial time point move forward then backward when work is set scenario`` () =
+        scenario {
+            let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
+            let work = Work.generate ()
+            do! Given.``Stored TimePoints`` timePoints
+            do! Given.``CurrentWork in UserSettings`` work
+            do! Given.``WorkEventStore substitution`` ()
+            do! Given.``Initialized Program`` ()
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``Active time point slider value is changing to`` 1.5<sec>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
+
+            do! Then.``SkipOrApplyMissingTime dialog has been shown`` ()
+
+            do! When.``User skips time`` ()
+
+            do! Then.``Dialog has been closed`` ()
+            do! Then.``No event have been storred`` ()
+        }
+        |> Scenario.runTestAsync
+        
 
