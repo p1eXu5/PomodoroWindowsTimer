@@ -317,6 +317,26 @@ module WorkEvent =
         | WorkEvent.BreakReduced _
         | WorkEvent.BreakIncreased _ -> workEvent
 
+    let filterBreakStartStopped = function
+        | WorkEvent.BreakStarted _ 
+        | WorkEvent.Stopped _ -> true
+        | _ -> false
+
+    let filterBreakIncreasedReduced = function
+        | WorkEvent.BreakIncreased _ 
+        | WorkEvent.BreakReduced _ -> true
+        | _ -> false
+
+    let filterWorkStartStopped = function
+        | WorkEvent.WorkStarted _ 
+        | WorkEvent.Stopped _ -> true
+        | _ -> false
+
+    let filterWorkIncreasedReduced = function
+        | WorkEvent.WorkIncreased _ 
+        | WorkEvent.WorkReduced _ -> true
+        | _ -> false
+
 
 module WorkEventList =
     module List =

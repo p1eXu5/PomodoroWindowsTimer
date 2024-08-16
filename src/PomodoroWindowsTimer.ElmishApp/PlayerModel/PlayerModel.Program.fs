@@ -312,7 +312,7 @@ let update
         | Ok (_, [], _) ->
              model
             |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
-            , Cmd.ofMsg (Msg.OnError "Work spent time list is unexpected empty!")
+            , Cmd.none
             , Intent.None
 
         | Ok (_, [ workSpentTime ], atp) ->

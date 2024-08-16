@@ -23,12 +23,34 @@ module MainModel =
                     )
                 )
 
-            let applyMissingTimeMsg () =
+            let applyMissingTimeAsBreakMsg () =
                 MainModel.Msg.AppDialogModelMsg (
                     AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
                         RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsBreakTime)
                     )
                 )
+
+            let applyMissingTimeAsWorkMsg () =
+                MainModel.Msg.AppDialogModelMsg (
+                    AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsWorkTime)
+                    )
+                )
+
+            let leaveAsBreakMsg () =
+                MainModel.Msg.AppDialogModelMsg (
+                    AppDialogModel.Msg.RollbackWorkModelMsg (
+                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                    )
+                )
+
+            let leaveAsWorkMsg () =
+                MainModel.Msg.AppDialogModelMsg (
+                    AppDialogModel.Msg.RollbackWorkModelMsg (
+                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                    )
+                )
+
 
     module MsgWith =
         ()

@@ -180,6 +180,16 @@ let ``SkipOrApplyMissingTime dialog has been shown`` () =
     }
     |> Scenario.log $"Then.``{nameof ``SkipOrApplyMissingTime dialog has been shown``}``"
 
+let ``RollbackWork dialog has been shown`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "RollbackWork dialog has been shown" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.RollbackWork _ -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``RollbackWork dialog has been shown``}``"
+
 let ``Dialog has been closed`` () =
     scenario {
         do! Scenario.modelSatisfiesWithin2Sec "Dialog has been closed" (fun mainModel ->
@@ -190,7 +200,7 @@ let ``Dialog has been closed`` () =
     }
     |> Scenario.log $"Then.``{nameof ``Dialog has been closed``}``"
 
-let ``No event have been storred`` () =
+let ``No event have been storred (with mock)`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
 
@@ -203,9 +213,9 @@ let ``No event have been storred`` () =
                 |> Async.Ignore
                 |> Async.RunSynchronously
     }
-    |> Scenario.log $"Then.``{nameof ``No event have been storred``}``"
+    |> Scenario.log $"Then.``{nameof ``No event have been storred (with mock)``}``"
 
-let ``BreakIncreased event has been storred`` workIdKey time =
+let ``BreakIncreased event has been storred (with mock)`` workIdKey time =
     scenario {
         let! (sut: ISut) = Scenario.getState
         let work = sut.ScenarioContext[workIdKey] :?> Work
@@ -230,4 +240,38 @@ let ``BreakIncreased event has been storred`` workIdKey time =
             )
     }
 
+let ``WorkIncreased event has been storred (with mock)`` workIdKey time =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let work = sut.ScenarioContext[workIdKey] :?> Work
+        do!
+            Scenario.mockSatisfiesWithin2Sec "WorkIncreased event insertion" (fun mockRepo ->
+                let mockWorkEventRepo = mockRepo.Substitute<IWorkEventRepository>()
+                do
+                    mockWorkEventRepo
+                        .Received(1)
+                        .InsertAsync
+                            work.Id
+                            (Verify.That<WorkEvent>(fun we ->
+                                match we with
+                                | WorkIncreased (_, t) ->
+                                    %t.TotalSeconds.Should().BeInRange(float time, float (time + 0.5<sec>))
+                                | _ -> assertionExn "Work event is not WorkIncreased"
+                            ))
+                            (Arg.Any<CancellationToken>())
+                        |> Async.AwaitTask
+                        |> Async.Ignore
+                        |> Async.RunSynchronously
+            )
+    }
+
+let ``No dialog has been shown`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "No dialog has been shown" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.NoDialog -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``No dialog has been shown``}``"
 

@@ -63,7 +63,18 @@
               Command="{Binding AsBreakCommand}"
               Content="AS BREAK"
               Style="{StaticResource PomodoroDialogButton}"
+              Visibility="{Binding IsWorkKind,
+                                   Converter={StaticResource conv_BooleanToVisibility}}"
               />
+
+      <Button DockPanel.Dock="Bottom"
+              Command="{Binding AsWorkCommand}"
+              Content="AS WORK"
+              Style="{StaticResource PomodoroDialogButton}"
+              Visibility="{Binding IsBreakKind,
+                                   Converter={StaticResource conv_BooleanToVisibility}}"
+              />
+
 
       <Button DockPanel.Dock="Bottom"
               Command="{Binding CloseCommand}"
@@ -75,6 +86,16 @@
               Command="{Binding CloseCommand}"
               Content="LEAVE AS WORK"
               Style="{StaticResource PomodoroDialogButton}"
+              Visibility="{Binding IsWorkKind,
+                                   Converter={StaticResource conv_BooleanToVisibility}}"
+              />
+
+      <Button DockPanel.Dock="Bottom"
+              Command="{Binding CloseCommand}"
+              Content="LEAVE AS BREAK"
+              Style="{StaticResource PomodoroDialogButton}"
+              Visibility="{Binding IsBreakKind,
+                                   Converter={StaticResource conv_BooleanToVisibility}}"
               />
     </StackPanel>
 

@@ -38,6 +38,7 @@
     <Compile Include="BDD\Features\Works\Steps\Works.Then.fs" />
     <Compile Include="BDD\Features\Works\WorkFeature.fs" />
     <Compile Include="BDD\Features\Works\WorkEventFeature.fs" />
+    <Compile Include="BDD\Features\Works\TimeSliderFeature.fs" />
     <Compile Include="BDD\Features\GenerateTimePoints\GenerateTimePointsFeature.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

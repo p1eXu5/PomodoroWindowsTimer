@@ -305,12 +305,28 @@ module internal WorkEventRepository =
                 return! Error (ex.Format($"Failed to find work events by period [{period.Start} - {period.EndInclusive}]."))
         }
 
-    let findByActiveTimePointIdByDateAsync deps (activeTimePointId: TimePointId) (notAfter: DateTimeOffset) =
+    let findByActiveTimePointIdByDateAsync deps (activeTimePointId: TimePointId) (activeTimePointKind: Kind) (notAfter: DateTimeOffset) =
         cancellableTaskResult {
             let! (dbConnection: DbConnection) = deps.GetDbConnection
             use _ = dbConnection
 
             let! ct = CancellableTask.getCancellationToken ()
+
+            let eventNames =
+                if activeTimePointKind |> Kind.isWork then
+                    [|
+                        nameof WorkEvent.WorkStarted
+                        nameof WorkEvent.Stopped
+                        nameof WorkEvent.WorkIncreased
+                        nameof WorkEvent.WorkReduced
+                    |]
+                else
+                    [|
+                        nameof WorkEvent.BreakStarted
+                        nameof WorkEvent.Stopped
+                        nameof WorkEvent.BreakIncreased
+                        nameof WorkEvent.BreakReduced
+                    |]
 
             let command =
                 CommandDefinition(
@@ -318,7 +334,11 @@ module internal WorkEventRepository =
                     parameters = {|
                         CreatedAtMax = notAfter.ToUnixTimeMilliseconds()
                         AtpId = activeTimePointId.ToString()
-                        EventNames = [| nameof WorkEvent.WorkStarted; nameof WorkEvent.BreakStarted; nameof WorkEvent.Stopped |]
+                        EventNames = [|
+                            nameof WorkEvent.WorkStarted;
+                            nameof WorkEvent.BreakStarted;
+                            nameof WorkEvent.Stopped;
+                        |]
                     |},
                     cancellationToken = ct
                 )

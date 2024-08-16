@@ -1,6 +1,13 @@
-﻿module PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps.Then
+﻿module rec PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps.Then
+
+open Microsoft.Extensions.DependencyInjection
+
+open Faqt
+open Faqt.Operators
 
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp.Abstractions
+
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
@@ -17,4 +24,16 @@ let ``Looper TimePointStarted event has been despatched with`` newTimePoint oldT
             | _ -> false
         )
     }
-    |> Scenario.log "Then.``Finish of LoadRecipeCards has been dispatched``"
+    |> Scenario.log $"Then.{nameof ``Looper TimePointStarted event has been despatched with``}"
+
+let ``No errors are emitted`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let mainErrorMessageQueue = sut.ServiceProvider.GetRequiredKeyedService<IErrorMessageQueue>("main") :?> ErrorMessageQueueStub.T
+        let dialogErrorMessageQueue = sut.ServiceProvider.GetRequiredKeyedService<IErrorMessageQueue>("dialog") :?> ErrorMessageQueueStub.T
+
+        %mainErrorMessageQueue.ErrorQueue.Should().BeEmpty()
+        %dialogErrorMessageQueue.ErrorQueue.Should().BeEmpty()
+    }
+    |> Scenario.log $"Then.{nameof ``No errors are emitted``}"
+

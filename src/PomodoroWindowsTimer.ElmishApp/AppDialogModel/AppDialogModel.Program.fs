@@ -67,11 +67,11 @@ let private ofRollbackWorkModelIntent (workEventStore: WorkEventStore) (userSett
 
         | LocalRollbackStrategy.ApplyAsWorkTime ->
             AppDialogModel.NoDialog
-            , Cmd.OfTask.attempt workEventStore.StoreWorkIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(1), rollbackWorkModel.Difference) Msg.EnqueueExn
+            , Cmd.OfTask.attempt workEventStore.StoreWorkIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time, rollbackWorkModel.Difference) Msg.EnqueueExn
 
         | LocalRollbackStrategy.ApplyAsBreakTime ->
             AppDialogModel.NoDialog
-            , Cmd.OfTask.attempt workEventStore.StoreBreakIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time.AddMilliseconds(1), rollbackWorkModel.Difference) Msg.EnqueueExn
+            , Cmd.OfTask.attempt workEventStore.StoreBreakIncreasedEventTask (rollbackWorkModel.WorkId, rollbackWorkModel.Time, rollbackWorkModel.Difference) Msg.EnqueueExn
 
 
 let private ofRollbackWorkListModelIntent (workEventStore: WorkEventStore) rollbackWorkListModel (intent: RollbackWorkListModel.Intent) =

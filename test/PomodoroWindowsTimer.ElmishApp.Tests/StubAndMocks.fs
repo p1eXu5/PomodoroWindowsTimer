@@ -56,11 +56,22 @@ type UserSettingsStub () =
 [<RequireQualifiedAccess>]
 module ErrorMessageQueueStub =
 
-    let create (key: string) =
-        { new IErrorMessageQueue with
-            member _.EnqueueError errorMsg =
-                writeLine (sprintf "error: IErrorMessageQueue.%s:%s    %s" key Environment.NewLine errorMsg)
+    type T =
+        {
+            Name: string
+            ErrorQueue: Queue<string>
         }
+        interface IErrorMessageQueue with
+            member this.EnqueueError errorMsg =
+                this.ErrorQueue.Enqueue(errorMsg)
+                writeLine (sprintf "error: IErrorMessageQueue.%s:%s    %s" this.Name Environment.NewLine errorMsg)
+
+    let create (key: string) =
+        {
+            Name = key
+            ErrorQueue = Queue<string>()
+        }
+        :> IErrorMessageQueue
 
 [<RequireQualifiedAccess>]
 module ThemeSwitcherStub =

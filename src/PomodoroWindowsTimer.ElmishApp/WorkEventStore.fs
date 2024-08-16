@@ -14,7 +14,7 @@ type WorkEventStore =
         StoreBreakReducedEventTask:   WorkId * DateTimeOffset * TimeSpan -> Task<unit>
         StoreBreakIncreasedEventTask: WorkId * DateTimeOffset * TimeSpan -> Task<unit>
         StoreWorkIncreasedEventTask:  WorkId * DateTimeOffset * TimeSpan -> Task<unit>
-        WorkSpentTimeListTask:   TimePointId * DateTimeOffset * float<sec> * CancellationToken -> Task<Result<WorkSpentTime list, string>>
+        WorkSpentTimeListTask:   TimePointId * Kind * DateTimeOffset * float<sec> * CancellationToken -> Task<Result<WorkSpentTime list, string>>
     }
 
 
@@ -127,9 +127,13 @@ module WorkEventStore =
         | head :: _ -> Error $"Unexpected {head |> WorkEvent.name} work event."
 
 
-    let private workSpentTimeListTask (workEventRepository: IWorkEventRepository) (timePointId: TimePointId, notAfterDate: DateTimeOffset, diff: float<sec>, cancellationToken: CancellationToken) : Task<Result<WorkSpentTime list, string>> =
+    let private workSpentTimeListTask
+        (workEventRepository: IWorkEventRepository)
+        (activeTimePointId: TimePointId, activeTimePointKind: Kind, notAfterDate: DateTimeOffset, diff: float<sec>, cancellationToken: CancellationToken)
+        : Task<Result<WorkSpentTime list, string>>
+        =
         task {
-            let! res = workEventRepository.FindByActiveTimePointIdByDateAsync timePointId notAfterDate cancellationToken
+            let! res = workEventRepository.FindByActiveTimePointIdByDateAsync activeTimePointId notAfterDate cancellationToken
 
             let spentTime = spentTime (notAfterDate.Subtract(TimeSpan.FromSeconds(float diff)))
 
@@ -139,10 +143,34 @@ module WorkEventStore =
                 return
                     workEventLists
                     |> List.traverseResultM (fun wel ->
+                        let (filterA, filterB) =
+                            if activeTimePointKind |> Kind.isWork then
+                                WorkEvent.filterWorkStartStopped, WorkEvent.filterWorkIncreasedReduced
+                            else
+                                WorkEvent.filterBreakStartStopped, WorkEvent.filterBreakIncreasedReduced
+
                         wel.Events
+                        |> List.filter filterA
                         |> spentTime
-                        |> Result.map (fun timeSpent -> { Work = wel.Work; SpentTime = timeSpent })
+                        |> Result.map (fun timeSpent ->
+                            match wel.Events |> List.filter filterB |> changeTime with
+                            | Some t ->
+                                ({ Work = wel.Work; SpentTime = timeSpent}, t)
+                            | None -> 
+                                ({ Work = wel.Work; SpentTime = timeSpent}, TimeSpan.Zero)
                         |> Result.mapError (fun err -> $"Failed to calculate spent time for {wel.Work.Id} work. {err}")
+                    )
+                    |> Result.map (fun l ->
+                        let startStopSum = l |> List.sumBy (fst >> _.SpentTime)
+                        let increasedReducedExist = l |> List.exists (snd >> (<) TimeSpan.Zero)
+
+                        if startStopSum.TotalSeconds < (float diff) && increasedReducedExist then
+                            let rec substract l remaining res =
+
+                        else
+
+
+
                     )
         }
 
