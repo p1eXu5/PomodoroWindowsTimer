@@ -33,6 +33,7 @@ module WorkEventStoreTests =
     type CaseData =
         {
             WorkEventLists: WorkEventList list
+            Kind: Kind
             BeforeDate: DateTimeOffset
             Diff: float<sec>
         }
@@ -54,6 +55,7 @@ module WorkEventStoreTests =
                                     |> List.rev
                             }
                         ]
+                    Kind = Kind.Work
                     BeforeDate =  WorkEvent.generateCreatedAt date "12:10"
                     Diff = 5.0 * min
                 }
@@ -82,6 +84,7 @@ module WorkEventStoreTests =
                                     |> List.rev
                             }
                         ]
+                    Kind = Kind.Work
                     BeforeDate =  WorkEvent.generateCreatedAt date "12:10"
                     Diff = 5.0 * min
                 }
@@ -120,6 +123,7 @@ module WorkEventStoreTests =
                                     |> List.rev
                             }
                         ]
+                    Kind = Kind.Break
                     BeforeDate =  WorkEvent.generateCreatedAt date "12:10"
                     Diff = 5.0 * min
                 }
@@ -144,13 +148,13 @@ module WorkEventStoreTests =
             let mockActiveTimePointRepo = Substitute.For<IActiveTimePointRepository>()
             let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
             do 
-                mockWorkEventRepo.FindByActiveTimePointIdByDateAsync activeTimePointId caseData.BeforeDate ct
+                mockWorkEventRepo.FindByActiveTimePointIdByDateAsync activeTimePointId caseData.Kind caseData.BeforeDate ct
                 |> _.Returns(Ok caseData.WorkEventLists)
                 |> ignore
 
             let workEventStore = WorkEventStore.init mockWorkEventRepo mockActiveTimePointRepo
 
-            let! res = workEventStore.WorkSpentTimeListTask (activeTimePointId, caseData.BeforeDate, caseData.Diff, ct)
+            let! res = workEventStore.WorkSpentTimeListTask (activeTimePointId, caseData.Kind, caseData.BeforeDate, caseData.Diff, ct)
             match res with
             | Error err -> return assertionExn err
             | Ok ok -> return ok

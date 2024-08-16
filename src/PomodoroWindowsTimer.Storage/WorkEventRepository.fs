@@ -395,6 +395,6 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
         member _.FindLastByWorkIdByDateAsync workId date cancellationToken =
             raise (NotImplementedException())
 
-        member _.FindByActiveTimePointIdByDateAsync activeTimePointId notAfter cancellationToken =
-            WorkEventRepository.findByActiveTimePointIdByDateAsync deps activeTimePointId notAfter cancellationToken
+        member _.FindByActiveTimePointIdByDateAsync timePointId timePointKind notAfter cancellationToken =
+            WorkEventRepository.findByActiveTimePointIdByDateAsync deps timePointId timePointKind notAfter cancellationToken
 

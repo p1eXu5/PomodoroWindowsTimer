@@ -6,6 +6,7 @@ open Microsoft.Extensions.Logging
 open Elmish
 open Elmish.Extensions
 
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp
@@ -296,7 +297,13 @@ let update
                     storeWorkStartedCmd
                     Cmd.OfTask.perform
                         workEventStore.WorkSpentTimeListTask
-                        (atp.Id, now, (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds), cts.Token)
+                        (
+                            atp.Id,
+                            atp.Kind,
+                            now,
+                            (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds),
+                            cts.Token
+                        )
                         (AsyncOperation.finishWithin Msg.PostChangeActiveTimeSpan cts)
                 ]
                 , Intent.None

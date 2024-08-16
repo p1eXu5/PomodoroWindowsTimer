@@ -248,7 +248,7 @@ module WorkEventRepositoryTests =
             Events: WorkEvent list
         }
 
-    let caseData () =
+    let workCaseData () =
         let date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().Date)
         {
             Date = date
@@ -270,14 +270,14 @@ module WorkEventRepositoryTests =
     [<Test>]
     let ``06: FindByActiveTimePointIdByDateAsync - start, stop and increase events exists - returns start and stop events`` () =
         taskResult {
-            let caseData = caseData ()
+            let caseData = workCaseData ()
             let workEventRepo = workEventRepository ()
             for ev in caseData.Events do
                 let! _ = workEventRepo.InsertAsync workId1 ev ct
                 ()
 
             // act
-            let! rows = workEventRepo.FindByActiveTimePointIdByDateAsync atpId2 (WorkEvent.generateCreatedAt caseData.Date "12:40") ct
+            let! rows = workEventRepo.FindByActiveTimePointIdByDateAsync atpId2 Kind.Work (WorkEvent.generateCreatedAt caseData.Date "12:40") ct
 
             // assert
             let expected : WorkEventList list =

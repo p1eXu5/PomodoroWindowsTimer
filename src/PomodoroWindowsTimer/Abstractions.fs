@@ -3,9 +3,7 @@
 open System
 open System.Threading
 open System.Threading.Tasks
-open FSharp.Control
 open PomodoroWindowsTimer.Types
-open System.Threading
 
 type ITimePointQueue =
     inherit IDisposable
@@ -56,7 +54,7 @@ type IWorkEventRepository =
         /// Returns work event list ordered by work id then by created at time.
         abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
         
-        abstract FindByActiveTimePointIdByDateAsync: timePointId: TimePointId -> notAfter: DateTimeOffset -> cancellationToken: CancellationToken -> Task<Result<WorkEventList list, string>>
+        abstract FindByActiveTimePointIdByDateAsync: timePointId: TimePointId -> kind: Kind -> notAfter: DateTimeOffset -> cancellationToken: CancellationToken -> Task<Result<WorkEventList list, string>>
     end
 
 type IActiveTimePointRepository =

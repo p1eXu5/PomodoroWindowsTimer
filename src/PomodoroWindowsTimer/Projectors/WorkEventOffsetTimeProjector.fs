@@ -5,7 +5,7 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 
 
-let internal project (workEvents: WorkEvent list) =
+let internal projectOffsets (workEvents: WorkEvent list) =
     match workEvents with
     | [] -> []
     | head::tail ->
@@ -74,7 +74,7 @@ let internal project (workEvents: WorkEvent list) =
 let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: DateOnlyPeriod) ct =
     task {
         let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
-        return res |> Result.map project
+        return res |> Result.map projectOffsets
     }
 
 let projectByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
@@ -86,7 +86,7 @@ let projectByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPerio
                 List.map (fun wel ->
                     {
                         Work = wel.Work
-                        OffsetTimes = wel.Events |> project
+                        OffsetTimes = wel.Events |> projectOffsets
                     }
                 )
             )

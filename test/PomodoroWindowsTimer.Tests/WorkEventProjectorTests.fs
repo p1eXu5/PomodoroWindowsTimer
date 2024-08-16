@@ -182,6 +182,6 @@ module WorkEventProjectorTests =
 
     [<TestCaseSource(nameof testCases)>]
     let ``project WorkStarted event test`` (events: WorkEvent list, expectedStat: Statistic option) =
-        let stat = WorkEventProjector.project events
+        let stat = WorkEventProjector.projectStatistic events
         %stat.Should().Be(expectedStat)
 

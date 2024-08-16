@@ -391,6 +391,24 @@ module AsyncDeferredState =
 
     /// Is operation cts is equal to in progress deferred cts then return Some with cts disposing
     /// or returns None with disposing operation cts.
+    let chooseRetrieved<'Args,'Res,'Error>
+        (asyncOperationResult: 'Res)
+        (asyncOperationCts: Cts)
+        (asyncDeferred: AsyncDeferredState)
+        : (AsyncDeferredState * 'Res) option
+        =
+        match asyncDeferred with
+        | AsyncDeferredState.InProgress (cts) when obj.ReferenceEquals(cts, asyncOperationCts) ->
+            cts.Dispose()
+            asyncOperationResult
+            |> fun retrievedValue -> (AsyncDeferredState.Retrieved, retrievedValue)
+            |> Some
+        | _ -> // finished operation that we do not expect
+            asyncOperationCts.Dispose() // just dispose operation cts
+            None
+
+    /// Is operation cts is equal to in progress deferred cts then return Some with cts disposing
+    /// or returns None with disposing operation cts.
     let chooseRetrievedResultWithin<'Args,'Res,'Error>
         (asyncOperationResult: Result<'Res,'Error>)
         (asyncOperationCts: Cts)

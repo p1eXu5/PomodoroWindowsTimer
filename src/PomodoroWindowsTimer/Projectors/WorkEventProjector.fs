@@ -9,7 +9,7 @@ type private StatisticBuilder =
     | Calculating of Statistic * lastWorkEvent: WorkEvent
 
 
-let internal project (workEvents: WorkEvent list) =
+let internal projectStatistic (workEvents: WorkEvent list) =
     workEvents
     |> List.fold (fun builder ev ->
         match builder with
@@ -30,6 +30,7 @@ let internal project (workEvents: WorkEvent list) =
                     TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
                 }
             (statistic, ev) |> Calculating
+
         | Calculating (stat, lastEvent) ->
             let evDate = ev |> WorkEvent.localDateTime
             match ev, lastEvent with
@@ -139,7 +140,7 @@ let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPe
                 |> List.map (fun workEvents ->
                     {
                         Work = workEvents.Work
-                        Statistic = workEvents.Events |> project
+                        Statistic = workEvents.Events |> projectStatistic
                     }
                 )
             )
@@ -161,7 +162,7 @@ let projectDailyByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnly
                             |> List.map (fun wel ->
                                 {
                                     Work = wel.Work
-                                    Statistic = wel.Events |> project
+                                    Statistic = wel.Events |> projectStatistic
                                 }
                             )
                     }

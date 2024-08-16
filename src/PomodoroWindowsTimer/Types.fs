@@ -432,13 +432,15 @@ module Kind =
         | Break -> "BR"
         | LongBreak -> "LB"
 
-    let isWork = function
-        | Work -> true
-        | _ -> false
-
+    [<CompiledName("IsBreak")>]
     let isBreak = function
-        | Break | LongBreak -> true
-        | _ -> false
+        | Work -> false
+        | Break
+        | LongBreak -> true
+
+    [<CompiledName("IsWork")>]
+    let isWork = isBreak >> not
+
 
 
 module TimePointPrototype =
