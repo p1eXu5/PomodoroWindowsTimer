@@ -101,7 +101,7 @@ let mutable private num = 1
 
 let timePointFaker namePrefix =
     let kind = faker.Random.ArrayElement([| Kind.Work; Kind.Break; Kind.LongBreak |])
-    let id = Guid.Parse($"00000000-0000-0000-0000-0000000000" + num.ToString("00"))
+    let id = Guid.Parse($"00000000-0000-0000-0000-000000000" + num.ToString("000"))
     num <- num + 1
     {
         Id = id

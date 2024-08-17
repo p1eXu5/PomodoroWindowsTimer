@@ -59,7 +59,8 @@ module WorkFeature =
             do! Then.``WorkList sub model has been shown`` 2<times>
             do! Then.``WorkList sub model selected work is set on`` 1UL
             do! Then.``WorkList sub model work list contains`` work
-            do! Then.``Current Work has been set to`` work
+            let! _ = Then.``Current Work has been set to`` work
+            return ()
         }
         |> Scenario.runTestAsync
 
@@ -89,7 +90,8 @@ module WorkFeature =
 
             do! Then.``WorkList sub model selected work is set on`` 2UL
             do! Then.``WorkList sub model work list contains`` work2
-            do! Then.``Current Work has been set to`` work2
+            let! _ = Then.``Current Work has been set to`` work2
+            return ()
         }
         |> Scenario.runTestAsync
 

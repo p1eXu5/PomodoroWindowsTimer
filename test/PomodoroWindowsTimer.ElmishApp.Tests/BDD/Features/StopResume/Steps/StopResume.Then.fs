@@ -190,6 +190,16 @@ let ``RollbackWork dialog has been shown`` () =
     }
     |> Scenario.log $"Then.``{nameof ``RollbackWork dialog has been shown``}``"
 
+let ``RollbackWorkList dialog has been shown`` () =
+    scenario {
+        do! Scenario.modelSatisfiesWithin2Sec "RollbackWorkList dialog has been shown" (fun mainModel ->
+            match mainModel.AppDialog with
+            | AppDialogModel.RollbackWorkList _ -> true
+            | _ -> false
+        )
+    }
+    |> Scenario.log $"Then.``{nameof ``RollbackWorkList dialog has been shown``}``"
+
 let ``Dialog has been closed`` () =
     scenario {
         do! Scenario.modelSatisfiesWithin2Sec "Dialog has been closed" (fun mainModel ->

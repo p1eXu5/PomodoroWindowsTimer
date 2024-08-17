@@ -34,8 +34,9 @@ let ``Current Work has been set to`` (expectedCurrentWork: Work) =
             actualCurrentWork.Work.Number |> should equal expectedCurrentWork.Number
             actualCurrentWork.Work.Title |> should equal expectedCurrentWork.Title
             // Created/UpdatedAt dates is different cause work is created in database
+            return actualCurrentWork
         | None ->
-            assertionExn "CurrentWork has not been set."
+            return assertionExn "CurrentWork has not been set."
     }
     |> Scenario.log $"Then.``{nameof ``Current Work has been set to``}``"
 

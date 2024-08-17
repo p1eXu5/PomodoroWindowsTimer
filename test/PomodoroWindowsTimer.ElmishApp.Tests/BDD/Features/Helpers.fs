@@ -16,41 +16,64 @@ module MainModel =
 
     module Msg =
         module AppDialog =
-            let skipTimeMsg () =
-                MainModel.Msg.AppDialogModelMsg (
-                    AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
-                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
-                    )
-                )
 
-            let applyMissingTimeAsBreakMsg () =
-                MainModel.Msg.AppDialogModelMsg (
-                    AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
-                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsBreakTime)
-                    )
-                )
+            module SkipOrApplyMissingTime =
 
-            let applyMissingTimeAsWorkMsg () =
-                MainModel.Msg.AppDialogModelMsg (
-                    AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
-                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsWorkTime)
+                let skipTimeMsg () =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                            RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                        )
                     )
-                )
 
-            let leaveAsBreakMsg () =
-                MainModel.Msg.AppDialogModelMsg (
-                    AppDialogModel.Msg.RollbackWorkModelMsg (
-                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                let applyMissingTimeAsBreakMsg () =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                            RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsBreakTime)
+                        )
                     )
-                )
 
-            let leaveAsWorkMsg () =
-                MainModel.Msg.AppDialogModelMsg (
-                    AppDialogModel.Msg.RollbackWorkModelMsg (
-                        RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                let applyMissingTimeAsWorkMsg () =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.SkipOrApplyMissingTimeModelMsg (
+                            RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.ApplyAsWorkTime)
+                        )
                     )
-                )
 
+            module RollbackWork =
+
+                let leaveAsBreakMsg () =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.RollbackWorkModelMsg (
+                            RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                        )
+                    )
+
+                let leaveAsWorkMsg () =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.RollbackWorkModelMsg (
+                            RollbackWorkModel.Msg.SetLocalRollbackStrategyAndClose (LocalRollbackStrategy.DoNotCorrect)
+                        )
+                    )
+
+            module RollbackWorkList =
+
+                let setSustractSpentTime workId =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.RollbackWorkListModelMsg (
+                            RollbackWorkListModel.Msg.RollbackWorkModelMsg (
+                                workId,
+                                RollbackWorkModel.Msg.SetLocalRollbackStrategy (LocalRollbackStrategy.SubstractSpentTime)
+                            )
+                        )
+                    )
+
+                let applyAndClose () =
+                    MainModel.Msg.AppDialogModelMsg (
+                        AppDialogModel.Msg.RollbackWorkListModelMsg (
+                            RollbackWorkListModel.Msg.ApplyAndClose 
+                        )
+                    )
 
     module MsgWith =
         ()

@@ -24,7 +24,7 @@ module WorkEventFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Have no work events in db within`` currentWork.Id // newly created work Id
         }
         |> Scenario.runTestAsync
@@ -39,7 +39,7 @@ module WorkEventFeature =
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` currentWork.Id [ <@ WorkEvent.WorkStarted @> ] // newly created work Id
         }
         |> Scenario.runTestAsync
@@ -58,7 +58,7 @@ module WorkEventFeature =
             do! When.``Resume msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent`` 1.0<sec>
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` currentWork.Id [
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -85,7 +85,7 @@ module WorkEventFeature =
             do! When.``Next msg has been dispatched`` 1<times>
             do! When.``Spent`` 1.0<sec>
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` currentWork.Id [
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -115,7 +115,7 @@ module WorkEventFeature =
             do! When.``Next msg has been dispatched`` 2<times>
             do! When.``Spent`` 1.0<sec>
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` currentWork.Id [
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -140,7 +140,7 @@ module WorkEventFeature =
             do! When.``StartTimePoint msg has been dispatched with 2.5 ticks timeout`` timePoints[2].Id
             do! When.``Spent`` 1.0<sec>
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` currentWork.Id [
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -163,7 +163,7 @@ module WorkEventFeature =
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``Spent 2.5 ticks`` ()
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Have no work events in db within`` 1UL // newly created work Id
         }
         |> Scenario.runTestAsync
@@ -185,7 +185,7 @@ module WorkEventFeature =
             do! When.``SkipOrApplyMissingTimeDialog has been opened`` ()
             do! When.``User skipping missing time`` ()
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` 1UL [ // newly created work Id
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -218,7 +218,7 @@ module WorkEventFeature =
             do! When.``RollbackWorkDialog has been opened`` ()
             do! When.``User do not correct time`` ()
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` 1UL [ // newly created work Id
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -255,7 +255,7 @@ module WorkEventFeature =
             do! When.``User inverts time`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! Then.``Current Work has been set to`` currentWork
+            let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` 1UL [ // newly created work Id
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
@@ -291,7 +291,7 @@ module WorkEventFeature =
             do! When.``WorkSelector drawer is closing`` ()
 
             do! Then.``MainModel WorkSelector becomes None`` ()
-            do! Then.``Current Work has been set to`` work2
+            let! _ = Then.``Current Work has been set to`` work2
             do! Then.``Have no work events in db within`` 1UL // first newly created work Id
             do! Then.``Have no work events in db within`` 2UL // second newly created work Id
         }
@@ -320,7 +320,7 @@ module WorkEventFeature =
             do! When.``WorkSelector drawer is closing`` ()
 
             do! Then.``MainModel WorkSelector becomes None`` ()
-            do! Then.``Current Work has been set to`` work2
+            let! _ = Then.``Current Work has been set to`` work2
             do! Then.``Work events in db exist`` 1UL [ // first newly created work Id
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>

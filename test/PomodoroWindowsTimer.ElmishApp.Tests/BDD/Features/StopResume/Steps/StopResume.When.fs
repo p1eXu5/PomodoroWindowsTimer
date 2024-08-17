@@ -20,27 +20,28 @@ let ``Looper TimePointReduced event has been despatched with`` (activeTimePointI
 let ``User skips time`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.skipTimeMsg ())
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.SkipOrApplyMissingTime.skipTimeMsg ())
     }
 
 let ``User applies time as break`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.applyMissingTimeAsBreakMsg ())
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.SkipOrApplyMissingTime.applyMissingTimeAsBreakMsg ())
     }
 
 let ``User applies time as work`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.applyMissingTimeAsWorkMsg ())
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.SkipOrApplyMissingTime.applyMissingTimeAsWorkMsg ())
     }
-
+    |> Scenario.log $"When.``{nameof ``User applies time as work``}``"
 
 let ``User leaves time as break`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.leaveAsBreakMsg ())
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.RollbackWork.leaveAsBreakMsg ())
     }
+    |> Scenario.log $"When.``{nameof ``User leaves time as break``}``"
 
 let ``SkipOrApplyMissingTime dialog has been shown`` () =
     scenario {
@@ -51,6 +52,19 @@ let ``SkipOrApplyMissingTime dialog has been shown`` () =
         )
     }
     |> Scenario.log $"When.``{nameof ``SkipOrApplyMissingTime dialog has been shown``}``"
+
+let ``User sets work time as rollback`` (workId: WorkId) =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.RollbackWorkList.setSustractSpentTime workId)
+    }
+    |> Scenario.log $"When.``{nameof ``User sets work time as rollback``} for {workId} work``"
+
+let ``User applies dialog settings`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        do sut.Dispatcher.Dispatch (MainModel.Msg.AppDialog.RollbackWorkList.applyAndClose ())
+    }
 
 let ``Dialog has been closed`` () =
     scenario {

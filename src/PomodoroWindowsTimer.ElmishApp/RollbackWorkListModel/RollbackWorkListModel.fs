@@ -11,6 +11,7 @@ module RollbackWorkListModel =
 
     type Msg =
         | RollbackWorkModelMsg of WorkId * RollbackWorkModel.Msg
+        | ApplyAndClose
         | Close
 
     //module MsgWith =
@@ -23,7 +24,7 @@ module RollbackWorkListModel =
     type Intent =
         | None
         | ProcessRollbackAndClose
-        | DefaultedAndClose
+        | Close
 
     let init workSpenTimeList timePointKind timePointId time =
         {
@@ -33,41 +34,4 @@ module RollbackWorkListModel =
     let withRollbackList rollbackList (model: RollbackWorkListModel) =
         { model with RollbackList = rollbackList }
 
-namespace PomodoroWindowsTimer.ElmishApp.RollbackWorkListModel
-
-open Elmish.Extensions
-
-open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.RollbackWorkListModel
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-
-module Program =
-
-    let private withNoIntent m = (m, Intent.None)
-
-    let update updateRollbackWorkModel msg model =
-        match msg with
-        | Msg.RollbackWorkModelMsg (workId, smsg) ->
-            model.RollbackList
-            |> List.mapFirstIntent (_.WorkId >> (=) workId) (updateRollbackWorkModel smsg) RollbackWorkModel.Intent.None
-            |> fst
-            |> flip withRollbackList model
-            |> withNoIntent
-
-        | Msg.Close ->
-            model
-            , Intent.DefaultedAndClose
-
-
-module Bindings =
-
-    open Elmish.WPF
-
-    let bindings () =
-        [
-            // "RememberChoice" |> Binding.twoWay (_.RememberChoice, Msg.SetRememberChoice)
-            // "SubstractWorkAddBreakCommand" |> Binding.cmd Msg.SubstractWorkAddBreak
-            // "CloseCommand" |> Binding.cmd Msg.Close
-        ]
 

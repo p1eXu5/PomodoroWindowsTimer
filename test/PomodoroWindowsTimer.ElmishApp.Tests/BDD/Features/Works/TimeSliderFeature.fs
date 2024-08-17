@@ -175,4 +175,64 @@ module TimeSliderFeature =
         }
         |> Scenario.runTestAsync
 
+    [<Test>]
+    [<Category("UC6: Time slider Initial Scenarios, Work is set")>]
+    let ``UC6-7 - Playing work time point, create new work, move backward, set both work times to rollback scenario`` () =
+        scenario {
+            let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
+            let! work1 =
+                Given.``Program has been initialized with CurrentWork`` timePoints
+
+            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
+            do! When.``Spent`` 1.0<sec>
+
+            // creating new work
+            do! When.``WorkSelector drawer is opening`` ()
+            do! When.``WorkList sub model has been shown`` 1<times>
+            do! When.``WorkListModel CreateWork msg has been dispatched`` ()
+            do! When.``CreatingWork sub model has been shown`` ()
+
+            let work2 = Work.generate ()
+            do! When.``CreatingWork SetNumber msg has been dispatched with`` work2.Number
+            do! When.``CreatingWork SetTitle msg has been dispatched with`` work2.Title
+            do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
+            do! When.``WorkList sub model has been shown`` 2<times>
+            do! When.``WorkSelector drawer is closing`` ()
+
+            do! Then.``MainModel WorkSelector becomes None`` ()
+            let! work2 = Then.``Current Work has been set to`` work2 // update work2 Id
+
+            // resum playing
+            do! When.``Spent`` 1.0<sec>
+
+            // moving backward
+            do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
+            do! When.``Active time point slider value is changing to`` 0.0<sec>
+            do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
+
+            do! Then.``RollbackWorkList dialog has been shown`` ()
+
+            do! When.``User sets work time as rollback`` work1.Id
+            do! When.``User sets work time as rollback`` work2.Id
+            do! When.``User applies dialog settings`` ()
+
+            do! Then.``Dialog has been closed`` ()
+            
+            do! Then.``Work events in db exist`` work1.Id [
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkReduced @@>
+            ]
+
+            do! Then.``Work events in db exist`` work2.Id [
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.Stopped @@>
+                <@@ WorkEvent.WorkStarted @@>
+                <@@ WorkEvent.WorkReduced @@>
+            ]
+
+            do! Then.``No errors are emitted`` ()
+        }
+        |> Scenario.runTestAsync
 

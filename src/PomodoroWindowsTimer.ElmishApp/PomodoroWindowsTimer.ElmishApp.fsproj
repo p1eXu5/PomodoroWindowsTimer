@@ -46,6 +46,8 @@
     <Compile Include="RollbackWorkModel\RollbackWorkModel.Program.fs" />
     <Compile Include="RollbackWorkModel\RollbackWorkModel.Bindings.fs" />
     <Compile Include="RollbackWorkListModel\RollbackWorkListModel.fs" />
+    <Compile Include="RollbackWorkListModel\RollbackWorkListModel.Program.fs" />
+    <Compile Include="RollbackWorkListModel\RollbackWorkListModel.Bindings.fs" />
     <Compile Include="TimePointPrototypeModel\TimePointPrototypeModel.fs" />
     <Compile Include="TimePointModel\TimePointModel.fs" />
     <Compile Include="TimePointsGeneratorModel\TimePointsGeneratorModel.fs" />
