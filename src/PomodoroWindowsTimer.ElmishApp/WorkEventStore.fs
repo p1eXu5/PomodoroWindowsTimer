@@ -115,6 +115,7 @@ module WorkEventStore =
             cancellationToken: CancellationToken
         ) =
             task {
+                // let! events = workEventRepository.GetAsync 0 10 cancellationToken
                 try
                     let! res =
                         WorkEventSpentTimeProjector.workSpentTimeListTask
