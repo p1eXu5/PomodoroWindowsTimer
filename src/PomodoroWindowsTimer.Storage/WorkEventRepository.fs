@@ -253,13 +253,17 @@ module internal WorkEventRepository =
                 return! Error (ex.Format($"Failed to find work events by workId {WorkId} and by period [{period.Start} - {period.EndInclusive}]."))
         }
 
-    let toWorkEventLists (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
+    let toWorkEventTupleList (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
         rows
         |> Seq.map (fun (r, w) ->
             let work = w |> WorkTable.Row.ToWork
             let ev = JsonHelpers.Deserialize<WorkEvent>(r.event_json)
             (work, ev)
         )
+
+    let toWorkEventLists (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
+        rows
+        |> toWorkEventTupleList
         |> Seq.groupBy fst
         |> Seq.map (fun (w, evs) ->
             {
@@ -268,6 +272,7 @@ module internal WorkEventRepository =
             }
         )
         |> Seq.toList
+
 
     let findAllByPeriodAsync deps (period: DateOnlyPeriod) =
         cancellableTaskResult {
@@ -353,7 +358,8 @@ module internal WorkEventRepository =
                     )
                 return
                     rows
-                    |> toWorkEventLists
+                    |> toWorkEventTupleList
+                    |> Seq.toList
             with ex ->
                 deps.Logger.FailedToFindByActiveTimePointIdByDate(activeTimePointId, notAfter, ex)
                 return! Error (ex.Format($"Failed to find work events by active time point id {activeTimePointId} and created not after {notAfter}."))

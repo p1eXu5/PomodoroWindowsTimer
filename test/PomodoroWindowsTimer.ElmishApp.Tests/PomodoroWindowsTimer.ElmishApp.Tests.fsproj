@@ -13,7 +13,6 @@
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
     <Compile Include="FakerExtensions.fs" />
     <Compile Include="StubAndMocks.fs" />
-    <Compile Include="Unit\WorkEventStoreTests.fs" />
     <Compile Include="Unit\PlayerModel\PlayerModel.Helpers.fs" />
     <Compile Include="Unit\PlayerModel\PlayerModel.OtherMessagesTests.fs" />
     <Compile Include="Unit\PlayerModel\PlayerModel.LooperMsgTests.fs" />

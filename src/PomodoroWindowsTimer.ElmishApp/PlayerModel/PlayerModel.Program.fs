@@ -155,11 +155,13 @@ let update
         | LooperMsg.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }) ->
             let timePointKind = nextTp |> TimePointKind.ofActiveTimePoint
 
-            let storeStartedWorkEventCmd =
+            let storeStartedWorkEventOrActiveTimePointCmd =
                 match currentWorkOpt, model.LooperState with
                 | Some work, LooperState.Playing ->
                     let time = timeProvider.GetUtcNow()
                     Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (work.Id, time, nextTp) Msg.OnExn
+                | _ when oldTp |> Option.isNone && model.LooperState <> LooperState.Playing ->
+                    Cmd.OfTask.attempt workEventStore.StoreActiveTimePointTask nextTp Msg.OnExn
                 | _ ->
                     Cmd.none
 
@@ -169,39 +171,45 @@ let update
             let cmd =
                 match nextTp.Kind with
                 | LongBreak | Break when model.LooperState <> LooperState.Playing ->
-                    switchThemeCmd timePointKind
+                    Cmd.batch [
+                        switchThemeCmd timePointKind
+                        storeStartedWorkEventOrActiveTimePointCmd
+                    ]
 
                 | LongBreak | Break when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Break || oldTp.Value.Kind = Kind.LongBreak) ->
-                    storeStartedWorkEventCmd
+                    storeStartedWorkEventOrActiveTimePointCmd
 
                 | LongBreak | Break ->
                     Cmd.batch [
-                        storeStartedWorkEventCmd
+                        storeStartedWorkEventOrActiveTimePointCmd
                         switchThemeCmd timePointKind
                         minimizeAllRestoreAppWindowCmd ()
                     ]
 
                 // initialized, not playing, just switch theme
                 | Work when model.LooperState <> LooperState.Playing ->
-                    switchThemeCmd timePointKind
+                    Cmd.batch [
+                        switchThemeCmd timePointKind
+                        storeStartedWorkEventOrActiveTimePointCmd
+                    ]
 
                 // do not send a message to the Telegram if the user manually presses the Next button or the Play button
                 | Work when oldTp |> Option.isNone || isLastAtpWhenPlayOrNextIsManuallyPressed oldTp model ->
                     Cmd.batch [
-                        storeStartedWorkEventCmd
+                        storeStartedWorkEventOrActiveTimePointCmd
                         switchThemeCmd timePointKind
                         restoreAllMinimizedCmd ()
                     ]
 
                 | Work when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Work) ->
                     Cmd.batch [
-                        storeStartedWorkEventCmd
+                        storeStartedWorkEventOrActiveTimePointCmd
                         sendToChatBotCmd $"It's time to {nextTp.Name}!!"
                     ]
 
                 | Work ->
                     Cmd.batch [
-                        storeStartedWorkEventCmd
+                        storeStartedWorkEventOrActiveTimePointCmd
                         switchThemeCmd timePointKind
                         restoreAllMinimizedCmd ()
                         sendToChatBotCmd $"It's time to {nextTp.Name}!!"
@@ -217,6 +225,7 @@ let update
     // Active time changing
     // --------------------
     | Msg.PreChangeActiveTimeSpan when model.ActiveTimePoint |> Option.isSome ->
+        let time = timeProvider.GetUtcNow()
         match model.LooperState with
         | Playing ->
             looper.Stop()
@@ -269,12 +278,14 @@ let update
             |> withoutShiftAndPreShiftTimes
             |> withNoCmdAndIntent
         | Some currentWork ->
+            // no shifting
             if Math.Abs(float (shiftTimes.NewActiveRemainingSeconds - shiftTimes.PreShiftActiveRemainingSeconds)) < 1.0 then
                 model
                 |> withLooperState prevState
                 |> withoutShiftAndPreShiftTimes
                 , storeWorkStartedCmd
                 , Intent.None
+
             // shifting forward
             elif shiftTimes.NewActiveRemainingSeconds < shiftTimes.PreShiftActiveRemainingSeconds then
                     model

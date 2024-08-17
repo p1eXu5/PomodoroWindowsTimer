@@ -59,7 +59,7 @@ type IWorkEventRepository =
             -> kind: Kind
             -> notAfter: DateTimeOffset
             -> cancellationToken: CancellationToken
-            -> Task<Result<WorkEventList list, string>>
+            -> Task<Result<(Work * WorkEvent) list, string>>
     end
 
 type IActiveTimePointRepository =

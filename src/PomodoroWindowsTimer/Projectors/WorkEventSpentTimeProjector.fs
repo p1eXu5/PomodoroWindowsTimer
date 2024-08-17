@@ -6,38 +6,104 @@ open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 
-let internal projectSpentTime kind (workEvents: WorkEvent list) =
+let rec internal projectSpentTime (lastWorkEvent: Work * WorkEvent) (workEvents: (Work * WorkEvent) list) remainingTime (res: Map<WorkId, WorkSpentTime>) =
     match workEvents with
-    | [] -> TimeSpan.Zero
-    | head::tail ->
-        tail
-        |> List.fold (fun (acc, lastEvent) ev ->
-            match ev, lastEvent with
-            | WorkEvent.Stopped endDt, WorkEvent.WorkStarted (createdAt = startDt)
-            | WorkEvent.Stopped endDt, WorkEvent.BreakStarted (createdAt = startDt) ->
-                (acc + (endDt - startDt), ev)
-            
-            | WorkEvent.WorkStarted _, WorkEvent.Stopped _
-            | WorkEvent.BreakStarted _, WorkEvent.Stopped _ ->
-                (acc, ev)
+    | [] ->
+        match lastWorkEvent with
+        | lastWork, WorkEvent.WorkIncreased (value = v)
+        | lastWork, WorkEvent.BreakIncreased (value = v) ->
+            let workSpentTime = 
+                match res |> Map.tryFind lastWork.Id with
+                | None ->
+                    { Work = lastWork; SpentTime = v }
+                | Some workSpentTime ->
+                    { workSpentTime with SpentTime = workSpentTime.SpentTime + v }
 
-            | WorkEvent.BreakReduced (value = v), _ when kind |> Kind.isBreak ->
-                (acc - v, lastEvent)
+            res |> Map.add lastWork.Id workSpentTime
 
-            | WorkEvent.BreakIncreased _, _ when kind |> Kind.isBreak ->
-                (acc, lastEvent)
+        | lastWork, WorkEvent.WorkReduced (value = v)
+        | lastWork, WorkEvent.BreakReduced (value = v) ->
+            let workSpentTime = 
+                match res |> Map.tryFind lastWork.Id with
+                | None ->
+                    { Work = lastWork; SpentTime = -v }
+                | Some workSpentTime ->
+                    { workSpentTime with SpentTime = workSpentTime.SpentTime - v }
 
-            | WorkEvent.WorkReduced (value = v), _ when kind |> Kind.isWork ->
-                (acc - v, lastEvent)
+            res |> Map.add lastWork.Id workSpentTime
 
-            | WorkEvent.WorkIncreased _, _ when kind |> Kind.isWork ->
-                (acc, lastEvent)
+        | _ ->
+            res
 
-            | _ ->
-                raise (ArgumentException($"Unpredictable event order. Current: {ev}, previous: {lastEvent}, kind: {kind}"))
+    | (work, ev) :: tail ->
+        match lastWorkEvent, ev with
+        | (lastWork, WorkEvent.Stopped endDt), WorkEvent.WorkStarted (createdAt = startDt)
+        | (lastWork, WorkEvent.Stopped endDt), WorkEvent.BreakStarted (createdAt = startDt) when work.Id = lastWork.Id ->
+            let spentTime = endDt - startDt
+            let workSpentTime = 
+                match res |> Map.tryFind work.Id with
+                | None ->
+                    { Work = work; SpentTime = spentTime }
+                | Some workSpentTime ->
+                    { workSpentTime with SpentTime = workSpentTime.SpentTime + spentTime }
 
-        ) (TimeSpan.Zero, head)
-        |> fst
+            if spentTime < remainingTime then
+                projectSpentTime
+                    lastWorkEvent
+                    tail
+                    (remainingTime - spentTime)
+                    (res |> Map.add work.Id workSpentTime)
+            else
+                (res |> Map.add work.Id workSpentTime)
+
+
+        | _, WorkEvent.Stopped _
+        | _, WorkEvent.Stopped _ ->
+            projectSpentTime
+                (work, ev)
+                tail
+                remainingTime
+                res
+
+        | _, WorkEvent.WorkReduced (value = v)
+        | _, WorkEvent.BreakReduced (value = v) ->
+            let workSpentTime = 
+                match res |> Map.tryFind work.Id with
+                | None ->
+                    { Work = work; SpentTime = -v }
+                | Some workSpentTime ->
+                    { workSpentTime with SpentTime = workSpentTime.SpentTime - v }
+
+            projectSpentTime
+                lastWorkEvent
+                tail
+                (remainingTime + v)
+                (res |> Map.add work.Id workSpentTime)
+
+
+        | _, WorkEvent.WorkIncreased (value = v)
+        | _, WorkEvent.BreakIncreased (value = v) ->
+            let workSpentTime = 
+                match res |> Map.tryFind work.Id with
+                | None ->
+                    { Work = work; SpentTime = v }
+                | Some workSpentTime ->
+                    { workSpentTime with SpentTime = workSpentTime.SpentTime + v }
+
+            let remainingTime = remainingTime - v
+
+            if remainingTime > TimeSpan.Zero then
+                projectSpentTime
+                    lastWorkEvent
+                    tail
+                    remainingTime
+                    (res |> Map.add work.Id workSpentTime)
+            else
+                res |> Map.add work.Id workSpentTime
+
+        | (_, lastEvent), _ ->
+            raise (ArgumentException($"Unpredictable event order. Current: {ev}, previous: {lastEvent}."))
+
 
 let workSpentTimeListTask
     (workEventRepository: IWorkEventRepository)
@@ -54,60 +120,17 @@ let workSpentTimeListTask
         | Error err -> return raise (InvalidOperationException $"Failed to obtain work events. {err}")
         | Ok workEventLists ->
             let spentTimes =
-                workEventLists
-                |> List.map (fun wel ->
-                    {
-                        Work = wel.Work
-                        SpentTime = wel.Events |> projectSpentTime activeTimePointKind
-                    }
-                )
-
-            let spentTimes =
-                let increaseLast spentTimes v =
-                    let remaining =
-                        spentTimes
-                        |> List.filter (_.SpentTime >> fun t -> t > TimeSpan.Zero )
-                        |> List.map _.SpentTime
-                        |> List.reduce (+)
-                        |> fun s -> (float diff) - s.TotalSeconds
-
-                    let lastSpentTime = spentTimes |> List.last
-
-                    spentTimes
-                    |> List.take (spentTimes.Length - 1)
-                    |> fun l -> l @ [ 
-                        { lastSpentTime with
-                            SpentTime = TimeSpan.FromSeconds(Math.Max((lastSpentTime.SpentTime + v).TotalSeconds, remaining))
-                        }
-                    ]
-
-                let rec findLastIncreased l =
-                    match l with
-                    | [] -> None
-                    | head :: tail ->
-                        match head with
-                        | WorkEvent.Stopped _
-                        | WorkEvent.WorkStarted _
-                        | WorkEvent.BreakStarted _ ->
-                            findLastIncreased tail
-                        | WorkEvent.BreakIncreased _ when activeTimePointKind |> Kind.isBreak -> head |> Some
-                        | WorkEvent.WorkIncreased _ when activeTimePointKind |> Kind.isWork -> head |> Some
-                        | _ -> None
-
-                match
-                    workEventLists
-                    |> List.last
-                    |> _.Events
-                    |> List.rev
-                    |> findLastIncreased
-                with
-                | Some ev ->
-                    match ev with
-                    | WorkEvent.WorkIncreased (value = v) when activeTimePointKind |> Kind.isWork -> increaseLast spentTimes v
-                    | WorkEvent.BreakIncreased (value = v) when activeTimePointKind |> Kind.isBreak -> increaseLast spentTimes v
-                    | _ -> spentTimes
-                | _ -> spentTimes
-                |> List.filter (_.SpentTime >> fun t -> t > TimeSpan.Zero )
+                match workEventLists with
+                | [] -> Map.empty
+                | head :: tail ->
+                    projectSpentTime
+                        head
+                        tail
+                        (TimeSpan.FromSeconds(float diff))
+                        Map.empty
+                |> Map.values
+                |> Seq.filter (_.SpentTime >> fun t -> t > TimeSpan.Zero)
+                |> List.ofSeq
 
             return spentTimes
     }

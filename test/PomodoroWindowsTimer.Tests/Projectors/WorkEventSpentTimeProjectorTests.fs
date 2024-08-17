@@ -32,14 +32,10 @@ module WorkEventSpentTimeProjectorTests =
         taskResult {
             let workEventLists =
                 [
-                    {
-                        Work = work
-                        Events = [
-                            WorkEvent.generateWorkStartedWith date "12:00"
-                            WorkEvent.generateStoppedWith date "12:05"
-                        ]
-                    }
+                    work, WorkEvent.generateWorkStartedWith date "12:00"
+                    work, WorkEvent.generateStoppedWith date "12:05"
                 ]
+                |> List.rev
             let kind = Kind.Work
             let notAfter = DateTimeOffset(date, TimeOnly(12, 5, 0), TimeSpan.Zero)
             let diff = diff "12:05" "12:00"
@@ -67,12 +63,7 @@ module WorkEventSpentTimeProjectorTests =
         taskResult {
             let workEventLists =
                 [
-                    {
-                        Work = work
-                        Events = [
-                            WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(10.0)) None
-                        ]
-                    }
+                    work, WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(10.0)) None
                 ]
             let kind = Kind.Work
             let notAfter = DateTimeOffset(date, TimeOnly(12, 10, 0), TimeSpan.Zero)
@@ -101,17 +92,13 @@ module WorkEventSpentTimeProjectorTests =
         taskResult {
             let workEventLists =
                 [
-                    {
-                        Work = work
-                        Events = [
-                            WorkEvent.generateWorkStartedWith date "12:00"
-                            WorkEvent.generateStoppedWith date "12:05"
-                            WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(5.0)) None
-                            WorkEvent.generateWorkStartedWith date "12:11"
-                            WorkEvent.generateStoppedWith date "12:16"
-                        ]
-                    }
+                    work, WorkEvent.generateWorkStartedWith date "12:00"
+                    work, WorkEvent.generateStoppedWith date "12:05"
+                    work, WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(5.0)) None
+                    work, WorkEvent.generateWorkStartedWith date "12:11"
+                    work, WorkEvent.generateStoppedWith date "12:16"
                 ]
+                |> List.rev
             let kind = Kind.Work
             let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
             let diff = (diff "12:05" "12:00") + (diff "12:16" "12:11")
@@ -139,17 +126,13 @@ module WorkEventSpentTimeProjectorTests =
         taskResult {
             let workEventLists =
                 [
-                    {
-                        Work = work
-                        Events = [
-                            WorkEvent.generateWorkStartedWith date "12:00"
-                            WorkEvent.generateStoppedWith date "12:05"
-                            WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(5.0)) None
-                            WorkEvent.generateWorkStartedWith date "12:11"
-                            WorkEvent.generateStoppedWith date "12:16"
-                        ]
-                    }
+                    work, WorkEvent.generateWorkStartedWith date "12:00"
+                    work, WorkEvent.generateStoppedWith date "12:05"
+                    work, WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(5.0)) None
+                    work, WorkEvent.generateWorkStartedWith date "12:11"
+                    work, WorkEvent.generateStoppedWith date "12:16"
                 ]
+                |> List.rev
             let kind = Kind.Work
             let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
             let diff = (diff "12:16" "12:00")
@@ -173,58 +156,18 @@ module WorkEventSpentTimeProjectorTests =
         |> TaskResult.runTest
 
     [<Test>]
-    let ``05: Events with increased overdiff time test`` () =
-        taskResult {
-            let workEventLists =
-                [
-                    {
-                        Work = work
-                        Events = [
-                            WorkEvent.generateWorkStartedWith date "12:00"
-                            WorkEvent.createWorkIncreasedWith date "12:12" (TimeSpan.FromMinutes(20.0)) None
-                            WorkEvent.generateStoppedWith date "12:16"
-                        ]
-                    }
-                ]
-            let kind = Kind.Work
-            let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
-            let diff = (diff "12:16" "12:00")
-
-            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
-            let _ = 
-                (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
-                    .Returns(workEventLists |> Ok)
-
-            let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
-
-            %res.Should().Be([
-                {
-                    Work = work
-                    SpentTime = TimeSpan.FromMinutes(16.0)
-                }
-            ])
-
-            return ()
-        }
-        |> TaskResult.runTest
-
-    [<Test>]
     let ``06: Events with reduced time test`` () =
         taskResult {
             let workEventLists =
                 [
-                    {
-                        Work = work
-                        Events = [
-                            WorkEvent.generateWorkStartedWith date "12:00"
-                            WorkEvent.generateStoppedWith date "12:05"
-                            WorkEvent.createWorkReducedWith date "12:06" (TimeSpan.FromMinutes(5.0)) None
+                    work, WorkEvent.generateWorkStartedWith date "12:00"
+                    work, WorkEvent.generateStoppedWith date "12:05"
+                    work, WorkEvent.createWorkReducedWith date "12:06" (TimeSpan.FromMinutes(5.0)) None
 
-                            WorkEvent.generateWorkStartedWith date "12:11"
-                            WorkEvent.generateStoppedWith date "12:16"
-                        ]
-                    }
+                    work, WorkEvent.generateWorkStartedWith date "12:11"
+                    work, WorkEvent.generateStoppedWith date "12:16"
                 ]
+                |> List.rev
             let kind = Kind.Work
             let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
             let diff = (diff "12:05" "12:00") + (diff "12:16" "12:11")

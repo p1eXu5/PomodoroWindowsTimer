@@ -59,6 +59,7 @@ module TimeSliderFeature =
             do! When.``User applies time as break`` ()
 
             do! Then.``Dialog has been closed`` ()
+            do! When.``Spent 2.5 ticks`` ()
             do! Then.``Work events in db exist`` currentWork.Id [
                 <@ WorkEvent.BreakIncreased @>
             ]

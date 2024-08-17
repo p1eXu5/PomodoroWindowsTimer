@@ -286,18 +286,11 @@ module WorkEventRepositoryTests =
             let! rows = workEventRepo.FindByActiveTimePointIdByDateAsync atpId2 Kind.Work (WorkEvent.generateCreatedAt caseData.Date "12:40") ct
 
             // assert
-            let expected : WorkEventList list =
+            let expected =
                 [
-                    {
-                        Work = work1
-                        Events =
-                            [
-                                // in real flow two first events are not grabbed cause dateBefore is trimmed by event[3]
-                                caseData.Events[6] |> WorkEvent.trimMicroseconds
-                                caseData.Events[5] |> WorkEvent.trimMicroseconds
-                                caseData.Events[3] |> WorkEvent.trimMicroseconds
-                            ]
-                    }
+                    work1, caseData.Events[6] |> WorkEvent.trimMicroseconds
+                    work1, caseData.Events[5] |> WorkEvent.trimMicroseconds
+                    work1, caseData.Events[3] |> WorkEvent.trimMicroseconds
                 ]
 
             do %rows.Should().Be(expected)

@@ -17,11 +17,17 @@ type WorkEventStore =
         StoreBreakIncreasedEventTask: WorkId * DateTimeOffset * TimeSpan * TimePointId option -> Task<unit>
         StoreWorkIncreasedEventTask:  WorkId * DateTimeOffset * TimeSpan * TimePointId option -> Task<unit>
         WorkSpentTimeListTask: TimePointId * Kind * DateTimeOffset * float<sec> * CancellationToken -> Task<Result<WorkSpentTime list, string>>
+        StoreActiveTimePointTask: ActiveTimePoint -> Task<unit>
     }
 
 
 module WorkEventStore =
-
+    let private storeActiveTimePointTask (activeTimePointRepository: IActiveTimePointRepository) (activeTimePoint: ActiveTimePoint) =
+        task {
+            match! activeTimePointRepository.InsertAsync activeTimePoint CancellationToken.None with
+            | Ok _ -> ()
+            | Error err -> raise (InvalidOperationException(err))
+        }
 
     let private storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (activeTimePointRepository: IActiveTimePointRepository) (workId: uint64, time: DateTimeOffset, activeTimePoint: ActiveTimePoint) =
         task {
@@ -133,4 +139,5 @@ module WorkEventStore =
             StoreBreakIncreasedEventTask = storeBreakIncreasedEventTask workEventRepository
             StoreWorkIncreasedEventTask = storeWorkIncreasedEventTask workEventRepository
             WorkSpentTimeListTask = workSpentTimeListTask workEventRepository
+            StoreActiveTimePointTask = storeActiveTimePointTask activeTimePointRepository
         }

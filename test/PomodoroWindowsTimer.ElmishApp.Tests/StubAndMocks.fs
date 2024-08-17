@@ -106,4 +106,5 @@ module WorkEventStoreStub =
                     task {
                         return Ok workSpentTimeList
                     }
+            StoreActiveTimePointTask = fun _ -> task { return () }
         }
