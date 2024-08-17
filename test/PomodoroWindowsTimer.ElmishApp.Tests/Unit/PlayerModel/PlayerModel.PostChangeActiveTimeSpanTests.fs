@@ -293,7 +293,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().HaveLength(1)
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3), now))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
         sut.LooperMock.Received(1).Resume()
 
     let initializedAndStoppedStates : System.Collections.IEnumerable =
@@ -389,7 +389,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, TimeSpan.FromSeconds(3), now))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
         sut.LooperMock.DidNotReceive().Resume()
 
     // -------------------------------
@@ -750,7 +750,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.RollbackTime (workSpentTime, timePoint.Kind, nowDate))
+        %intent.Should().Be(PlayerModel.Intent.RollbackTime (workSpentTime, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, nowDate))
         sut.LooperMock.DidNotReceive().Resume()
 
     [<TestCaseSource(nameof notShiftingStates)>]
@@ -814,6 +814,6 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.MultipleRollbackTime ([ previousWorkSpentTime; currentWorkSpentTime ], timePoint.Kind, nowDate))
+        %intent.Should().Be(PlayerModel.Intent.MultipleRollbackTime ([ previousWorkSpentTime; currentWorkSpentTime ], timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, nowDate))
         sut.LooperMock.DidNotReceive().Resume()
 

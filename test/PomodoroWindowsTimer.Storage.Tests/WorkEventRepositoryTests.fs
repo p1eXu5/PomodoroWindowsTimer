@@ -119,8 +119,12 @@ module WorkEventRepositoryTests =
             let! id1 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith atpId1) ct
             let! id2 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith atpId1) ct
 
+            let ev = WorkEvent.BreakIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), None)
+            let! id3 = workEventRepo.InsertAsync workId1 ev ct
+
             id1 |> shouldBeGreaterThan 0UL
             id2 |> shouldBeGreaterThan id1
+            id3 |> shouldBeGreaterThan id2
         }
         |> TaskResult.runTest
 
@@ -248,27 +252,28 @@ module WorkEventRepositoryTests =
             Events: WorkEvent list
         }
 
-    let workCaseData () =
-        let date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().Date)
-        {
-            Date = date
-            Events =
-                [
-                    WorkEvent.generateWorkStartedWith date "12:00" |> WorkEvent.withActiveTimePointId atpId1
-                    WorkEvent.generateStoppedWith date "12:10"
-                    WorkEvent.generateWorkIncreasedWith date "12:20"
-
-                    WorkEvent.generateWorkStartedWith date "12:30" |> WorkEvent.withActiveTimePointId atpId2
-                    WorkEvent.generateWorkIncreasedWith date "12:31"
-                    WorkEvent.generateStoppedWith date "12:40"
-
-                    WorkEvent.generateWorkStartedWith date "12:50" |> WorkEvent.withActiveTimePointId atpId2
-                    WorkEvent.generateStoppedWith date "13:00"
-                ]
-        }
 
     [<Test>]
     let ``06: FindByActiveTimePointIdByDateAsync - start, stop and increase events exists - returns start and stop events`` () =
+        let workCaseData () =
+            let date = DateOnly.FromDateTime(System.TimeProvider.System.GetUtcNow().Date)
+            {
+                Date = date
+                Events =
+                    [
+                        WorkEvent.generateWorkStartedWith date "12:00" |> WorkEvent.withActiveTimePointId atpId1
+                        WorkEvent.generateStoppedWith date "12:10"
+                        WorkEvent.generateWorkIncreasedWith date "12:20"
+
+                        WorkEvent.generateWorkStartedWith date "12:30" |> WorkEvent.withActiveTimePointId atpId2
+                        WorkEvent.generateWorkIncreasedWith date "12:31"
+                        WorkEvent.generateStoppedWith date "12:40"
+
+                        WorkEvent.generateWorkStartedWith date "12:50" |> WorkEvent.withActiveTimePointId atpId2
+                        WorkEvent.generateStoppedWith date "13:00"
+                    ]
+            }
+
         taskResult {
             let caseData = workCaseData ()
             let workEventRepo = workEventRepository ()
@@ -286,7 +291,9 @@ module WorkEventRepositoryTests =
                         Work = work1
                         Events =
                             [
+                                // in real flow two first events are not grabbed cause dateBefore is trimmed by event[3]
                                 caseData.Events[5] |> WorkEvent.trimMicroseconds
+                                caseData.Events[4] |> WorkEvent.trimMicroseconds
                                 caseData.Events[3] |> WorkEvent.trimMicroseconds
                             ]
                     }

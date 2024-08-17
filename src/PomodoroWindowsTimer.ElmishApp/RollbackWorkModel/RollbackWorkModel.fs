@@ -10,6 +10,7 @@ type RollbackWorkModel =
     {
         WorkId: uint64
         Kind: Kind
+        ActiveTimePointId: TimePointId
         Time: DateTimeOffset
         Difference: TimeSpan
         RememberChoice: bool
@@ -35,20 +36,22 @@ module RollbackWorkModel =
         | CorrectAndClose
         | Close
 
-    let init (workSpentTime: WorkSpentTime) timePointKind time =
+    let init (workSpentTime: WorkSpentTime) timePointKind timePointId time =
         {
             WorkId = workSpentTime.Work.Id
             Kind = timePointKind
+            ActiveTimePointId = timePointId
             Time = time
             Difference = workSpentTime.SpentTime
             RememberChoice = false
             RollbackStrategy = LocalRollbackStrategy.DoNotCorrect
         }
 
-    let initWithMissingTime workId timePointKind difference time =
+    let initWithMissingTime workId timePointKind timePointId difference time =
         {
             WorkId = workId
             Kind = timePointKind
+            ActiveTimePointId = timePointId
             Time = time
             Difference = difference
             RememberChoice = false

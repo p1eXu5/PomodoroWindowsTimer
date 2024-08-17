@@ -25,7 +25,7 @@ let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventReposito
         | Ok (Some ev) ->
             let time = ev |> WorkEvent.createdAt |> fun dt-> dt.AddMilliseconds(1) 
             let workEvent =
-                WorkEvent.WorkIncreased (time, offset)
+                WorkEvent.WorkIncreased (time, offset, None)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
@@ -46,7 +46,7 @@ let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository
         | Ok (Some ev) ->
             let time = ev |> WorkEvent.createdAt |> fun dt-> dt.AddMilliseconds(1) 
             let workEvent =
-                WorkEvent.WorkReduced (time, offset)
+                WorkEvent.WorkReduced (time, offset, None)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 

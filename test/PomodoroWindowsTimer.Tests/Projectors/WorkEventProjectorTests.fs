@@ -160,7 +160,7 @@ module WorkEventProjectorTests =
             TestCaseData(
                 [
                     WorkEvent.WorkStarted   (start23,               "W1", TimePointId.generate ())
-                    WorkEvent.WorkIncreased (start23.AddMinutes  5, TimeSpan.FromMinutes 60)
+                    WorkEvent.WorkIncreased (start23.AddMinutes  5, TimeSpan.FromMinutes 60, None)
                     WorkEvent.Stopped       (start23.AddMinutes 10)        
                     WorkEvent.WorkStarted   (start23.AddMinutes 20, "W1", TimePointId.generate ())
                     WorkEvent.BreakStarted  (start23.AddMinutes 30, "B1", TimePointId.generate ())

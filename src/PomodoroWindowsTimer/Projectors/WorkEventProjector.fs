@@ -97,25 +97,25 @@ let internal projectStatistic (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
-            | WorkEvent.WorkReduced (_, v), _ ->
+            | WorkEvent.WorkReduced (_, v, _), _ ->
                 Calculating (
                     { stat with
                         WorkTime = stat.WorkTime - v
                     }, lastWorkEvent = lastEvent)
 
-            | WorkEvent.WorkIncreased (_, v), _ ->
+            | WorkEvent.WorkIncreased (_, v, _), _ ->
                 Calculating (
                     { stat with
                         WorkTime = stat.WorkTime + v
                     }, lastWorkEvent = lastEvent)
 
-            | WorkEvent.BreakReduced (_, v), _ ->
+            | WorkEvent.BreakReduced (_, v, _), _ ->
                 Calculating (
                     { stat with
                         BreakTime = stat.BreakTime - v
                     }, lastWorkEvent = lastEvent)
 
-            | WorkEvent.BreakIncreased (_, v), _ ->
+            | WorkEvent.BreakIncreased (_, v, _), _ ->
                 Calculating (
                     { stat with
                         BreakTime = stat.BreakTime + v

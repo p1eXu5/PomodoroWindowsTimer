@@ -181,8 +181,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                         )
                         |> Ok
 
-                | WorkEvent.WorkIncreased (_, v), _
-                | WorkEvent.BreakIncreased (_, v), _ ->
+                | WorkEvent.WorkIncreased (_, v, _), _
+                | WorkEvent.BreakIncreased (_, v, _), _ ->
                     if v < TimeSpan.Zero then
                         rows
                         |> reduceTime currWork startDt -v
@@ -196,8 +196,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                             (rs, last)
                         )
 
-                | WorkEvent.WorkReduced (_, v), _
-                | WorkEvent.BreakReduced (_, v), _ ->
+                | WorkEvent.WorkReduced (_, v, _), _
+                | WorkEvent.BreakReduced (_, v, _), _ ->
                     if v < TimeSpan.Zero then
                         rows
                         |> increaseTime currWork startDt -v

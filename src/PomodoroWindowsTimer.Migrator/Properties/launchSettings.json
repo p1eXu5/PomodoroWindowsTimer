@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "dev-db-pc-copy": {
+    "db-terus-copy": {
       "commandName": "Project",
-      "commandLineArgs": "--connection \"Data Source=E:\\db\\PomodoroWindowsTimer\\work - Copy.db;\"",
+      "commandLineArgs": "--connection \"Data Source=D:\\Programming\\Go\\src\\srv-gitlab.techno.mos\\_account\\work-terus-copy.db;\"",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

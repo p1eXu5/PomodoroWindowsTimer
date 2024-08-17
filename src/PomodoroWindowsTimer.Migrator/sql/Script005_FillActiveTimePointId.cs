@@ -41,8 +41,7 @@ public sealed class Script005_FillActiveTimePointId : IScript
                 event_json LIKE '%"Case":_"BreakStarted"%'
                 OR
                 event_json LIKE '%"Case":"BreakStarted"%'
-            ORDER BY created_at ASC;SELECT *
-            ;
+            ORDER BY created_at ASC
             """;
 
         var atpInsertScript = new StringBuilder("INSERT INTO active_time_point").AppendLine().AppendLine("VALUES");
@@ -101,7 +100,6 @@ public sealed class Script005_FillActiveTimePointId : IScript
             }
         }
 
-        workEventUpdateScript.AppendLine(";");
         string sql = atpInsertScript.Remove(atpInsertScript.Length - 3, 1).AppendLine(";").AppendLine().AppendLine(workEventUpdateScript.ToString()).ToString();
         return sql;
     }

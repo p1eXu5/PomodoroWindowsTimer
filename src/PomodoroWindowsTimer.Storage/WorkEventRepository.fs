@@ -151,12 +151,14 @@ module internal WorkEventRepository =
 
             let! ct = CancellableTask.getCancellationToken ()
 
+            let eventJson = JsonHelpers.SerializeNoIndent(workEvent)
+
             let command =
                 CommandDefinition(
                     Sql.INSERT,
                     parameters = {|
                         WorkId = workId
-                        EventJson = JsonHelpers.Serialize(workEvent)
+                        EventJson = eventJson
                         CreatedAt = WorkEvent.createdAt(workEvent).ToUnixTimeMilliseconds()
                         ActiveTimePointId = workEvent |> WorkEvent.activeTimePointId |> Option.map _.ToString() |> Option.defaultValue null
                         EventName = workEvent |> WorkEvent.name
@@ -334,11 +336,7 @@ module internal WorkEventRepository =
                     parameters = {|
                         CreatedAtMax = notAfter.ToUnixTimeMilliseconds()
                         AtpId = activeTimePointId.ToString()
-                        EventNames = [|
-                            nameof WorkEvent.WorkStarted;
-                            nameof WorkEvent.BreakStarted;
-                            nameof WorkEvent.Stopped;
-                        |]
+                        EventNames = eventNames
                     |},
                     cancellationToken = ct
                 )

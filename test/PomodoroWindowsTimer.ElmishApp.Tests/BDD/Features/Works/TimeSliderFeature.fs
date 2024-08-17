@@ -24,10 +24,8 @@ module TimeSliderFeature =
     let ``UC6-0 - Initial break time point move forward when work is set and time skipping scenario`` () =
         scenario {
             let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-            do! Given.``Stored TimePoints`` timePoints
-            do! Given.``Work in WorkRepository and UserSettings`` ()
-            do! Given.``WorkEventStore substitution`` ()
-            do! Given.``Initialized Program`` ()
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
@@ -39,7 +37,7 @@ module TimeSliderFeature =
             do! When.``User skips time`` ()
 
             do! Then.``Dialog has been closed`` ()
-            do! Then.``No event have been storred (with mock)`` ()
+            do! Then.``Have no work events in db within`` currentWork.Id
         }
         |> Scenario.runTestAsync
 
@@ -48,10 +46,8 @@ module TimeSliderFeature =
     let ``UC6-1 - Initial break time point move forward when work is set and time applying scenario`` () =
         scenario {
             let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
-            do! Given.``Stored TimePoints`` timePoints
-            do! Given.``Work in WorkRepository and UserSettings`` ()
-            do! Given.``WorkEventStore substitution`` ()
-            do! Given.``Initialized Program`` ()
+            let! currentWork =
+                Given.``Program has been initialized with CurrentWork`` timePoints
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
@@ -63,7 +59,9 @@ module TimeSliderFeature =
             do! When.``User applies time as break`` ()
 
             do! Then.``Dialog has been closed`` ()
-            do! Then.``BreakIncreased event has been storred (with mock)`` "CurrentWork" 1.5<sec>
+            do! Then.``Work events in db exist`` currentWork.Id [
+                <@ WorkEvent.BreakIncreased @>
+            ]
         }
         |> Scenario.runTestAsync
 

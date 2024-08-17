@@ -9,6 +9,11 @@ let faker = Faker()
 
 module TimePointId =
     let generate () : TimePointId = faker.Random.Uuid()
+    let generateOption () : TimePointId option =
+        faker.Random.ArrayElement([|
+            fun () -> faker.Random.Uuid() |> Some
+            fun () -> None
+        |])()
 
 module WorkId =
     let generate () : WorkId = faker.Random.ULong(1UL, 100UL)
@@ -230,8 +235,26 @@ module WorkEvent =
     let generateStoppedWith (date: DateOnly) (timeStr: string) =
         WorkEvent.Stopped (generateCreatedAt date timeStr)
 
+    let generateWorkIncreased () =
+        WorkEvent.WorkIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+
     let generateWorkIncreasedWith (date: DateOnly) (timeStr: string) =
-        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)))
+        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+
+    let createWorkIncreasedWith (date: DateOnly) (timeStr: string) (time: TimeSpan) (timePointId: TimePointId option) =
+        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, time, timePointId)
+
+    let generateWorkReduced () =
+        WorkEvent.WorkReduced (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+
+    let createWorkReducedWith (date: DateOnly) (timeStr: string) (time: TimeSpan) (timePointId: TimePointId option) =
+        WorkEvent.WorkReduced (generateCreatedAt date timeStr, time, timePointId)
+
+    let generateBreakIncreased () =
+        WorkEvent.BreakIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+
+    let generateBreakReduced () =
+        WorkEvent.BreakReduced (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
 
     let generate () =
         let eventFactory =
@@ -239,6 +262,10 @@ module WorkEvent =
                 fun () -> generateWorkStarted ()
                 fun () -> generateBreakStarted ()
                 fun () -> generateStopped ()
+                fun () -> generateWorkIncreased ()
+                fun () -> generateWorkReduced ()
+                fun () -> generateBreakIncreased ()
+                fun () -> generateBreakReduced ()
             |]
 
         (faker.Random.ArrayElement(eventFactory)) ()
@@ -254,10 +281,10 @@ module WorkEvent =
         | WorkEvent.WorkStarted (createdAt, n, id) -> WorkEvent.WorkStarted (createdAt |> trim, n, id)
         | WorkEvent.BreakStarted (createdAt, n, id) -> WorkEvent.BreakStarted (createdAt |> trim, n, id)
         | WorkEvent.Stopped (createdAt) -> WorkEvent.Stopped (createdAt |> trim)
-        | WorkEvent.WorkReduced (createdAt, v) -> WorkEvent.WorkReduced (createdAt |> trim, v)
-        | WorkEvent.WorkIncreased (createdAt, v) -> WorkEvent.WorkIncreased (createdAt |> trim, v)
-        | WorkEvent.BreakReduced (createdAt, v) -> WorkEvent.BreakReduced (createdAt |> trim, v)
-        | WorkEvent.BreakIncreased (createdAt, v) -> WorkEvent.BreakIncreased (createdAt |> trim, v)
+        | WorkEvent.WorkReduced (createdAt, v, id) -> WorkEvent.WorkReduced (createdAt |> trim, v, id)
+        | WorkEvent.WorkIncreased (createdAt, v, id) -> WorkEvent.WorkIncreased (createdAt |> trim, v, id)
+        | WorkEvent.BreakReduced (createdAt, v, id) -> WorkEvent.BreakReduced (createdAt |> trim, v, id)
+        | WorkEvent.BreakIncreased (createdAt, v, id) -> WorkEvent.BreakIncreased (createdAt |> trim, v, id)
 
 [<RequireQualifiedAccess>]
 module ActiveTimePoint =

@@ -118,7 +118,7 @@ let update
     | MsgWith.``Start of AllocateBreakTime`` model (l, overall, deff, cts) ->
         let breakOffsets = l |> breakOffsets overall
         model |> withAllocateBreakTimeState deff
-        , Cmd.OfTask.perform (storeWorkEventsTask model.Day WorkEvent.BreakIncreased breakOffsets) cts.Token (AsyncOperation.finishWithin Msg.AllocateBreakTime cts)
+        , Cmd.OfTask.perform (storeWorkEventsTask model.Day (fun (ct, v) -> WorkEvent.BreakIncreased (ct, v, None)) breakOffsets) cts.Token (AsyncOperation.finishWithin Msg.AllocateBreakTime cts)
         , Intent.None
 
     | MsgWith.``Finish of AllocateBreakTime`` model res ->
@@ -132,7 +132,7 @@ let update
 
     | MsgWith.``Start of RedoAllocateBreakTime`` model (map, deff, cts) ->
         model |> withAllocateBreakTimeState deff
-        , Cmd.OfTask.perform (storeWorkEventsTask model.Day WorkEvent.BreakReduced map) cts.Token (AsyncOperation.finishWithin Msg.RedoAllocateBreakTime cts)
+        , Cmd.OfTask.perform (storeWorkEventsTask model.Day (fun (ct, v) -> WorkEvent.BreakReduced (ct, v, None)) map) cts.Token (AsyncOperation.finishWithin Msg.RedoAllocateBreakTime cts)
         , Intent.None
 
     | MsgWith.``Finish of RedoAllocateBreakTime`` model res ->

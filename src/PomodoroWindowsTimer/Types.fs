@@ -102,10 +102,10 @@ type WorkEvent =
     | WorkStarted of createdAt: DateTimeOffset * timePointName: string * activeTimePointId: TimePointId
     | BreakStarted of createdAt: DateTimeOffset * timePointName: string * activeTimePointId: TimePointId
     | Stopped of createdAt: DateTimeOffset
-    | WorkReduced of createdAt: DateTimeOffset * value: TimeSpan
-    | WorkIncreased of createdAt: DateTimeOffset * value: TimeSpan
-    | BreakReduced of createdAt: DateTimeOffset * value: TimeSpan
-    | BreakIncreased of createdAt: DateTimeOffset * value: TimeSpan
+    | WorkReduced of createdAt: DateTimeOffset * value: TimeSpan * activeTimePointId: TimePointId option
+    | WorkIncreased of createdAt: DateTimeOffset * value: TimeSpan * activeTimePointId: TimePointId option
+    | BreakReduced of createdAt: DateTimeOffset * value: TimeSpan * activeTimePointId: TimePointId option
+    | BreakIncreased of createdAt: DateTimeOffset * value: TimeSpan * activeTimePointId: TimePointId option
 
 type WorkEventList =
     {
@@ -251,29 +251,29 @@ module WorkEvent =
         | WorkEvent.WorkStarted (dt, _, _)
         | WorkEvent.BreakStarted (dt, _, _)
         | WorkEvent.Stopped (dt)
-        | WorkEvent.WorkReduced (dt,_)
-        | WorkEvent.WorkIncreased (dt,_) 
-        | WorkEvent.BreakReduced (dt,_)
-        | WorkEvent.BreakIncreased (dt,_) -> dt
+        | WorkEvent.WorkReduced (dt,_, _)
+        | WorkEvent.WorkIncreased (dt,_, _) 
+        | WorkEvent.BreakReduced (dt,_, _)
+        | WorkEvent.BreakIncreased (dt,_, _) -> dt
 
     let dateOnly = function
         | WorkEvent.WorkStarted (dt, _, _)
         | WorkEvent.BreakStarted (dt, _, _)
         | WorkEvent.Stopped (dt) 
-        | WorkEvent.WorkReduced (dt,_)
-        | WorkEvent.WorkIncreased (dt,_) 
-        | WorkEvent.BreakReduced (dt,_)
-        | WorkEvent.BreakIncreased (dt,_) ->
+        | WorkEvent.WorkReduced (dt,_, _)
+        | WorkEvent.WorkIncreased (dt,_, _) 
+        | WorkEvent.BreakReduced (dt,_, _)
+        | WorkEvent.BreakIncreased (dt,_, _) ->
             DateOnly.FromDateTime(dt.DateTime)
 
     let localDateTime = function
         | WorkEvent.WorkStarted (dt, _, _)
         | WorkEvent.BreakStarted (dt, _, _)
         | WorkEvent.Stopped (dt)
-        | WorkEvent.WorkReduced (dt,_)
-        | WorkEvent.WorkIncreased (dt,_) 
-        | WorkEvent.BreakReduced (dt,_)
-        | WorkEvent.BreakIncreased (dt,_) ->
+        | WorkEvent.WorkReduced (dt,_, _)
+        | WorkEvent.WorkIncreased (dt,_, _) 
+        | WorkEvent.BreakReduced (dt,_, _)
+        | WorkEvent.BreakIncreased (dt,_, _) ->
             dt.LocalDateTime
 
     let tpName = function
@@ -292,11 +292,11 @@ module WorkEvent =
     let activeTimePointId = function
         | WorkEvent.WorkStarted (_, _, id)
         | WorkEvent.BreakStarted (_, _, id) -> id |> Some
-        | WorkEvent.Stopped _
-        | WorkEvent.WorkReduced _
-        | WorkEvent.WorkIncreased _ 
-        | WorkEvent.BreakReduced _
-        | WorkEvent.BreakIncreased _ -> None
+        | WorkEvent.Stopped _ -> None
+        | WorkEvent.WorkReduced (_, _, id)
+        | WorkEvent.WorkIncreased (_, _, id) 
+        | WorkEvent.BreakReduced (_, _, id)
+        | WorkEvent.BreakIncreased (_, _, id) -> id
 
     let name = function
         | WorkEvent.WorkStarted _ -> nameof WorkEvent.WorkStarted
@@ -311,11 +311,11 @@ module WorkEvent =
         match workEvent with
         | WorkEvent.WorkStarted (d, n , _) -> WorkEvent.WorkStarted (d, n, activeTimePointId)
         | WorkEvent.BreakStarted (d, n , _) -> WorkEvent.BreakStarted (d, n, activeTimePointId)
-        | WorkEvent.Stopped _
-        | WorkEvent.WorkReduced _
-        | WorkEvent.WorkIncreased _
-        | WorkEvent.BreakReduced _
-        | WorkEvent.BreakIncreased _ -> workEvent
+        | WorkEvent.WorkReduced (d, v, _) -> WorkEvent.WorkReduced (d, v, activeTimePointId |> Some)
+        | WorkEvent.WorkIncreased (d, v, _) -> WorkEvent.WorkIncreased (d, v, activeTimePointId |> Some)
+        | WorkEvent.BreakReduced (d, v, _) -> WorkEvent.BreakReduced (d, v, activeTimePointId |> Some)
+        | WorkEvent.BreakIncreased (d, v, _) -> WorkEvent.BreakIncreased (d, v, activeTimePointId |> Some)
+        | WorkEvent.Stopped _ -> workEvent
 
     let filterBreakStartStopped = function
         | WorkEvent.BreakStarted _ 

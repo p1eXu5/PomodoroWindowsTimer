@@ -284,6 +284,7 @@ let update
                     , Intent.SkipOrApplyMissingTime (
                         currentWork.Id,
                         atp.Kind,
+                        atp.Id,
                         TimeSpan.FromSeconds(float (shiftTimes.PreShiftActiveRemainingSeconds - shiftTimes.NewActiveRemainingSeconds)),
                         timeProvider.GetUtcNow()
                     )
@@ -326,13 +327,13 @@ let update
             model
             |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
             , Cmd.none
-            , Intent.RollbackTime (workSpentTime, atp.Kind, timeProvider.GetUtcNow())
+            , Intent.RollbackTime (workSpentTime, atp.Kind, atp.Id, timeProvider.GetUtcNow())
 
         | Ok (_, workSpentTimeList, atp) ->
             model
             |> withRetreiveWorkSpentTimesState AsyncDeferredState.NotRequested
             , Cmd.none
-            , Intent.MultipleRollbackTime (workSpentTimeList, atp.Kind, timeProvider.GetUtcNow())
+            , Intent.MultipleRollbackTime (workSpentTimeList, atp.Kind, atp.Id, timeProvider.GetUtcNow())
             (*
             // TODO
             match workSpentTimeList with

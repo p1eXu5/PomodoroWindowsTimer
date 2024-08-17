@@ -229,7 +229,7 @@ let ``BreakIncreased event has been storred (with mock)`` workIdKey time =
                             work.Id
                             (Verify.That<WorkEvent>(fun we ->
                                 match we with
-                                | BreakIncreased (_, t) ->
+                                | BreakIncreased (_, t, _) ->
                                     %t.TotalSeconds.Should().BeInRange(float time, float (time + 0.5<sec>))
                                 | _ -> assertionExn "Work event is not BreakIncreased"
                             ))
@@ -254,7 +254,7 @@ let ``WorkIncreased event has been storred (with mock)`` workIdKey time =
                             work.Id
                             (Verify.That<WorkEvent>(fun we ->
                                 match we with
-                                | WorkIncreased (_, t) ->
+                                | WorkIncreased (_, t, _) ->
                                     %t.TotalSeconds.Should().BeInRange(float time, float (time + 0.5<sec>))
                                 | _ -> assertionExn "Work event is not WorkIncreased"
                             ))
