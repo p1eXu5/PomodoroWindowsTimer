@@ -297,7 +297,7 @@ let update
                         atp.Kind,
                         atp.Id,
                         TimeSpan.FromSeconds(float (shiftTimes.PreShiftActiveRemainingSeconds - shiftTimes.NewActiveRemainingSeconds)),
-                        timeProvider.GetUtcNow()
+                        now
                     )
             // shifting backward
             else
