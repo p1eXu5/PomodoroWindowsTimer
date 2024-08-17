@@ -266,7 +266,8 @@ module WorkEventRepositoryTests =
                         WorkEvent.generateWorkIncreasedWith date "12:20"
 
                         WorkEvent.generateWorkStartedWith date "12:30" |> WorkEvent.withActiveTimePointId atpId2
-                        WorkEvent.generateWorkIncreasedWith date "12:31"
+                        WorkEvent.generateWorkIncreasedWith date "12:31" 
+                        WorkEvent.generateWorkIncreasedWith date "12:32" |> WorkEvent.withActiveTimePointId atpId2
                         WorkEvent.generateStoppedWith date "12:40"
 
                         WorkEvent.generateWorkStartedWith date "12:50" |> WorkEvent.withActiveTimePointId atpId2
@@ -292,8 +293,8 @@ module WorkEventRepositoryTests =
                         Events =
                             [
                                 // in real flow two first events are not grabbed cause dateBefore is trimmed by event[3]
+                                caseData.Events[6] |> WorkEvent.trimMicroseconds
                                 caseData.Events[5] |> WorkEvent.trimMicroseconds
-                                caseData.Events[4] |> WorkEvent.trimMicroseconds
                                 caseData.Events[3] |> WorkEvent.trimMicroseconds
                             ]
                     }

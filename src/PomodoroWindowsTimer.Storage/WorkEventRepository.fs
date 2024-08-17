@@ -108,7 +108,7 @@ module internal WorkEventRepository =
             WHERE
                 e.{Table.Columns.created_at} >= (SELECT {Table.Columns.created_at} FROM first_event_created_at LIMIT 1)
                 AND e.{Table.Columns.created_at} <= @CreatedAtMax
-                AND (e.{Table.Columns.active_time_point_id} = @AtpId OR e.{Table.Columns.active_time_point_id} IS NULL)
+                AND (e.{Table.Columns.active_time_point_id} = @AtpId OR e.{Table.Columns.event_name} = '{nameof WorkEvent.Stopped}')
                 AND e.{Table.Columns.event_name} IN @EventNames
             ORDER BY
                   e.{Table.Columns.work_id}

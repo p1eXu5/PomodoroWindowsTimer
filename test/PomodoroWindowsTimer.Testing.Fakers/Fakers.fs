@@ -239,7 +239,7 @@ module WorkEvent =
         WorkEvent.WorkIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
 
     let generateWorkIncreasedWith (date: DateOnly) (timeStr: string) =
-        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)), None)
 
     let createWorkIncreasedWith (date: DateOnly) (timeStr: string) (time: TimeSpan) (timePointId: TimePointId option) =
         WorkEvent.WorkIncreased (generateCreatedAt date timeStr, time, timePointId)

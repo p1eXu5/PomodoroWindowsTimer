@@ -317,6 +317,16 @@ module WorkEvent =
         | WorkEvent.BreakIncreased (d, v, _) -> WorkEvent.BreakIncreased (d, v, activeTimePointId |> Some)
         | WorkEvent.Stopped _ -> workEvent
 
+    let withoutActiveTimePointId (workEvent: WorkEvent) =
+        match workEvent with
+        | WorkEvent.WorkReduced (d, v, _) -> WorkEvent.WorkReduced (d, v, None)
+        | WorkEvent.WorkIncreased (d, v, _) -> WorkEvent.WorkIncreased (d, v, None)
+        | WorkEvent.BreakReduced (d, v, _) -> WorkEvent.BreakReduced (d, v, None)
+        | WorkEvent.BreakIncreased (d, v, _) -> WorkEvent.BreakIncreased (d, v, None)
+        | WorkEvent.WorkStarted _
+        | WorkEvent.BreakStarted _
+        | WorkEvent.Stopped _ -> workEvent
+
     let filterBreakStartStopped = function
         | WorkEvent.BreakStarted _ 
         | WorkEvent.Stopped _ -> true
