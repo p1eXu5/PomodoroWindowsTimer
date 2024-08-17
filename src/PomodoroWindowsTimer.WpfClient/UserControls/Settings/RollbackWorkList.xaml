@@ -9,7 +9,7 @@
              xmlns:rollbackWorkListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.RollbackWorkListModel;assembly=PomodoroWindowsTimer.ElmishApp"
              d:DataContext="{d:DesignInstance Type=rollbackWorkListModel:Bindings, IsDesignTimeCreatable=False}"
              Height="Auto"
-             MaxWidth="500"
+             MaxWidth="600"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
@@ -36,24 +36,27 @@
               Command="{Binding ApplyAndCloseCommand}"
               Content="APPLY"
               Style="{StaticResource PomodoroDialogButton}"
+              IsDefault="True"
               />
       <Button DockPanel.Dock="Bottom"
               Command="{Binding CloseCommand}"
               Content="CANCEL"
               Style="{StaticResource PomodoroDialogButton}"
+              IsCancel="True"
               />
-
-      <ListBox MaxHeight="500"
-               ItemsSource="{Binding RollbackWorkModels}"
-               >
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <local:WorkRollbackStrategySelector />
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-
     </StackPanel>
+
+    <ListBox MaxHeight="500"
+             materialDesign:ListBoxItemAssist.ShowSelection="False"
+             ItemsSource="{Binding RollbackWorkModels}"
+             >
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <local:WorkRollbackStrategySelector />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
   </DockPanel>
 </UserControl>
 

@@ -39,7 +39,7 @@
   <ItemGroup>
     <PackageReference Include="dbup-sqlite" Version="5.0.40" />
     <PackageReference Include="DbUp.Extensions.Microsoft.Logging" Version="1.1.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.7" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
     <PackageReference Include="p1eXu5.CliBootstrap" Version="1.0.7" />
   </ItemGroup>
 

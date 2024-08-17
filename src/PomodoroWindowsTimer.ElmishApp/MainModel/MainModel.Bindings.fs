@@ -71,11 +71,11 @@ type Bindings(
     member val IsPlaying : Binding =
         nameof __.IsPlaying |> Binding.oneWay (fun m -> m.Player |> PlayerModel.isPlaying)
 
-    member val ActiveTime : Binding =
-        nameof __.ActiveTime |> Binding.oneWay (fun m -> m.Player |> PlayerModel.getRemainingTimeSpan)
+    // member val ActiveTime : Binding =
+    //     nameof __.ActiveTime |> Binding.oneWay (fun m -> m.Player |> PlayerModel.getRemainingTimeSpan)
 
     // ----------------------------------------------------
-    /// For the test purpose
+    // For the test purpose
     //member val MinimizeCommand : Binding =
     //    nameof __.MinimizeCommand |> Binding.cmd (Msg.MinimizeAllRestoreApp)
 

@@ -14,7 +14,9 @@
              d:DesignWidth="300"
              mc:Ignorable="d"
              >
-    <DockPanel Grid.IsSharedSizeScope="True">
+    <DockPanel Grid.IsSharedSizeScope="True"
+               LastChildFill="True"
+               >
         <!--  `SELECTED WORK` title. It's not shown if there is no any selected work  -->
         <local:SelectedWorkTitle DockPanel.Dock="Top"
                                  Padding="0"
@@ -47,12 +49,20 @@
                 BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
                 BorderThickness="0"
                 >
+            <!--<ScrollViewer Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                          AncestorType=Border},
+                                           Path=ActualHeight}"
+                          VerticalScrollBarVisibility="Visible"
+                          CanContentScroll="True"
+                          >-->
+
             <ItemsControl x:Name="m_WorkList"
                           Margin="0"
-                          HorizontalContentAlignment="Stretch"
-                          VerticalContentAlignment="Center"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
                           ItemsSource="{Binding WorkModelList}"
                           ScrollViewer.VerticalScrollBarVisibility="Visible"
+                          ScrollViewer.CanContentScroll="False"
                           >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -62,27 +72,29 @@
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel IsVirtualizing="True"
-                                                VirtualizationMode="Recycling"
+                                                VirtualizationMode="Standard"
                                                 />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Template>
                     <ControlTemplate TargetType="ItemsControl">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
-                                >
-                            <ScrollViewer Padding="{TemplateBinding Padding}"
-                                          CanContentScroll="True"
-                                          Focusable="False"
-                                          VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
-                                          >
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </Border>
+                        <!--
+                            CanContentScroll="True" produces bug, scroll position is unstable, timer is wriggle
+                        -->
+                        <ScrollViewer Padding="{TemplateBinding Padding}"
+                                      CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
+                                      Focusable="False"
+                                      VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      Background="{TemplateBinding Background}"
+                                      >
+                            <ItemsPresenter />
+                        </ScrollViewer>
                     </ControlTemplate>
                 </ItemsControl.Template>
             </ItemsControl>
+            <!--</ScrollViewer>-->
         </Border>
     </DockPanel>
 </UserControl>

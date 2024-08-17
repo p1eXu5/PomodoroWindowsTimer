@@ -18,7 +18,7 @@ public partial class WorkList : UserControl
     {
         InitializeComponent();
 
-        ((INotifyCollectionChanged)m_WorkList.Items).CollectionChanged += WorkList_CollectionChanged;
+        // ((INotifyCollectionChanged)m_WorkList.Items).CollectionChanged += WorkList_CollectionChanged;
     }
 
     private Predicate<object>? Filter => _filter ??= new Predicate<object>(o =>
@@ -184,5 +184,4 @@ public partial class WorkList : UserControl
         m_WorkList.Items.SortDescriptions.Add(
             new SortDescription(nameof(ElmishApp.WorkModel.Bindings.LastEventCreatedAt), ListSortDirection.Descending));
     }
-
 }

@@ -19,13 +19,6 @@
               VerticalAlignment="Top"
               Orientation="Vertical"
               >
-
-    <TextBlock HorizontalAlignment="Center"
-               FontSize="20"
-               Text="ROLLBACK TIME"
-               TextAlignment="Center"
-               TextWrapping="Wrap"
-               />
     <TextBlock Margin="10,24,10,0"
                HorizontalAlignment="Left"
                VerticalAlignment="Bottom"
@@ -52,7 +45,7 @@
                  Margin="0,0"
                  HorizontalAlignment="Center"
                  FontSize="20"
-                 Text="{Binding Time,
+                 Text="{Binding Difference,
                                 Converter={StaticResource conv_TimeSpanToMinutes},
                                 FallbackValue='20 mimutes'}"
                  TextAlignment="Center"
