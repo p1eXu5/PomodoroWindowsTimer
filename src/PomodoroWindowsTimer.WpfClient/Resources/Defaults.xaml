@@ -87,4 +87,8 @@
     <works:WorkList Width="300" />
   </DataTemplate>
 
+  <DataTemplate x:Key="dt_RollbackWorkListDialog">
+    <settings:RollbackWorkList DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.RollbackWorkListDialog}" />
+  </DataTemplate>
+
 </ResourceDictionary>

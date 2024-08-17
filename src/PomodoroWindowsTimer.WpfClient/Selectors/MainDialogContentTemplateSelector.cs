@@ -24,6 +24,11 @@ public sealed class MainDialogContentTemplateSelector : DataTemplateSelector
             {
                 return element.FindResource("dt_SkipOrApplyMissingTimeDialog") as DataTemplate;
             }
+
+            if (appDialogId.IsRollbackWorkListDialogId)
+            {
+                return element.FindResource("dt_RollbackWorkListDialog") as DataTemplate;
+            }
         }
         return null;
     }

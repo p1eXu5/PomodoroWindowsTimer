@@ -1,4 +1,4 @@
-﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.Features
+﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.Features.Works
 
 open System
 open NUnit.Framework
@@ -12,6 +12,7 @@ open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps
+open PomodoroWindowsTimer.ElmishApp.Tests.Features
 
 
 [<Category("UC5: Work Events Scenarios")>]
@@ -41,6 +42,7 @@ module WorkEventFeature =
 
             let! _ = Then.``Current Work has been set to`` currentWork
             do! Then.``Work events in db exist`` currentWork.Id [ <@ WorkEvent.WorkStarted @> ] // newly created work Id
+            do! Then.``No errors are emitted`` ()
         }
         |> Scenario.runTestAsync
 
