@@ -157,8 +157,9 @@ module TimeSliderFeature =
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
             do! When.``SkipOrApplyMissingTime dialog has been shown`` ()
-            do! When.``User applies time as work`` ()
+            do! When.``User applies time as break`` ()
             do! When.``Dialog has been closed`` ()
+            do! When.``Spent 2.5 ticks`` ()
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 2<times>
             do! When.``Active time point slider value is changing to`` 0.0<sec>

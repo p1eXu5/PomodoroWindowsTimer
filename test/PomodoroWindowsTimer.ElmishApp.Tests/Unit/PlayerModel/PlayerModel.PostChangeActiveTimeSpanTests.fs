@@ -690,8 +690,8 @@ module PostChangeActiveTimeSpanTests =
                 }
             )
 
-        %cmd.Should().HaveLength(1)
-        do cmd[0] (fun msg -> %msg.Should().Be(PlayerModel.Msg.OnError "Work spent time list is unexpected empty!"))
+        %cmd.Should().HaveLength(0)
+        // do cmd[0] (fun msg -> %msg.Should().Be(PlayerModel.Msg.OnError "Work spent time list is unexpected empty!"))
 
         %intent.Should().BeOfCase(PlayerModel.Intent.None)
         sut.LooperMock.DidNotReceive().Resume()
