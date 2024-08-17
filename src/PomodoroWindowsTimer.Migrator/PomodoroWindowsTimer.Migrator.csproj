@@ -15,6 +15,7 @@
     <None Remove="sql\Script004_CreateActiveTimePointIdIndex.sql" />
     <None Remove="sql\Script006_AddEventNameColumn.sql" />
     <None Remove="sql\Script007_MakeWorkEventEventNameNotNull.sql" />
+    <None Remove="sql\Script009_TrimWorkNumberAndTitle.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +33,7 @@
     <EmbeddedResource Include="sql\Script004_CreateActiveTimePointIdIndex.sql" />
     <EmbeddedResource Include="sql\Script006_AddEventNameColumn.sql" />
     <EmbeddedResource Include="sql\Script007_MakeWorkEventEventNameNotNull.sql" />
+    <EmbeddedResource Include="sql\Script009_TrimWorkNumberAndTitle.sql" />
   </ItemGroup>
 
   <ItemGroup>

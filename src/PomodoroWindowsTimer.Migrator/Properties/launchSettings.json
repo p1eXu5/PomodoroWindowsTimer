@@ -6,6 +6,13 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "db-debug": {
+      "commandName": "Project",
+      "commandLineArgs": "--connection \"Data Source=D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows\\work.db;\"",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }

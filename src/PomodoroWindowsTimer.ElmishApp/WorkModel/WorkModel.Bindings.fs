@@ -1,5 +1,6 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.WorkModel
 
+open System
 open Elmish.WPF
 open Elmish.Extensions
 
@@ -40,10 +41,10 @@ type Bindings() =
 
 
     member val EditNumber : Binding =
-        nameof __.EditNumber |> Binding.twoWay (_.EditableNumber, Msg.SetNumber)
+        nameof __.EditNumber |> Binding.twoWay (_.EditableNumber, (fun (v: string) -> v.Trim() |> Msg.SetNumber))
 
     member val EditTitle : Binding =
-        nameof __.EditTitle |> Binding.twoWay (_.EditableTitle, Msg.SetTitle)
+        nameof __.EditTitle |> Binding.twoWay (_.EditableTitle, (fun (v: string) -> v.Trim() |> Msg.SetTitle))
 
     member val UpdatedAt : Binding =
         nameof __.UpdatedAt |> Binding.oneWay (_.Work >> _.UpdatedAt)
