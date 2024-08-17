@@ -60,6 +60,8 @@ type IWorkEventRepository =
             -> notAfter: DateTimeOffset
             -> cancellationToken: CancellationToken
             -> Task<Result<(Work * WorkEvent) list, string>>
+
+        abstract GetAsync: skip: int -> take: int -> cancellationToken: CancellationToken -> Task<Result<WorkEvent list, string>>
     end
 
 type IActiveTimePointRepository =

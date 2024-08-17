@@ -67,6 +67,15 @@ module internal WorkEventRepository =
             ORDER BY {Table.Columns.created_at} ASC
             """
 
+        /// Parameters: Skip, Take.
+        let SELECT_PAGE = $"""
+            SELECT *
+            FROM {Table.NAME}
+            ORDER BY {Table.Columns.created_at} ASC
+            LIMIT @Skip, @Take
+            ;
+            """
+
         /// Parameters: WorkId, DateMin, DateMax.
         let SELECT_BY_WORK_ID_BY_PERIOD = $"""
             SELECT *
@@ -171,6 +180,28 @@ module internal WorkEventRepository =
             with ex ->
                 deps.Logger.FailedToInsert(Table.NAME, ex)
                 return! Error (ex.Format($"Failed to insert {Table.NAME}."))
+        }
+
+    let getAsync deps skip take =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_PAGE,
+                    parameters = {| Skip = skip; Take = take |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows = dbConnection.QueryAsync<Table.Row>(command)
+                return rows |> Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json)) |> Seq.toList
+            with ex ->
+                deps.Logger.LogError(ex, "Failed to get work event page.")
+                return! Error (ex.Format($"Failed to get work event page."))
         }
 
     let findByWorkIdAsync deps workId =
@@ -401,4 +432,9 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
 
         member _.FindByActiveTimePointIdByDateAsync timePointId timePointKind notAfter cancellationToken =
             WorkEventRepository.findByActiveTimePointIdByDateAsync deps timePointId timePointKind notAfter cancellationToken
+
+        member this.GetAsync skip take cancellationToken =
+            WorkEventRepository.getAsync deps skip take cancellationToken
+
+
 
