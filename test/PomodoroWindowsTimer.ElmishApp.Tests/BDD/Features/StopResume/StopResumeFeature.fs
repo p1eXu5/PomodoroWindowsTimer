@@ -228,6 +228,7 @@ module StopResumeFeature =
             let timePoints = [ breakTP ``3 sec``; workTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
+            do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! Then.``Active Point is set on`` timePoints.Head

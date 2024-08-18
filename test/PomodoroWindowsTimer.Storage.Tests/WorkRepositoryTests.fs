@@ -40,7 +40,7 @@ module WorkRepositoryTests =
             | Ok _ -> ()
             | Error err -> raise (InvalidOperationException(err))
 
-            match! workEventRepository () :?> WorkEventRepository |> _.CreateTableAsync(ct) with
+            match! workEventRepository () :?> WorkEventRepository |> _.CreateActualTableAsync(ct) with
             | Ok _ -> ()
             | Error err -> raise (InvalidOperationException(err))
         }

@@ -447,7 +447,7 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
         let ct = defaultArg cancellationToken CancellationToken.None
         WorkEventRepository.createTableAsync deps ct
 
-    member internal _.CreateTestTableAsync(?cancellationToken) =
+    member internal _.CreateActualTableAsync(?cancellationToken) =
         let ct = defaultArg cancellationToken CancellationToken.None
         WorkEventRepository.createTestTableAsync deps ct
 

@@ -30,7 +30,7 @@ type TestDbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: I
             if res |> Result.isError then
                 appLifetime.StopApplication()
 
-            let! res = workEventRepository.CreateTestTableAsync(stoppingToken)
+            let! res = workEventRepository.CreateActualTableAsync(stoppingToken)
             if res |> Result.isError then
                 appLifetime.StopApplication()
 
