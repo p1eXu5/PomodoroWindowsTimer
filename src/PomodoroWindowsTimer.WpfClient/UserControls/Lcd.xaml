@@ -52,23 +52,21 @@
                             DataContext="{Binding}"
                             />
 
-            <materialDesign:ColorZone VerticalAlignment="Center"
+            <materialDesign:ColorZone HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
                                       materialDesign:ThemeAssist.Theme="Inherit"
                                       Background="Transparent"
                                       >
-                <!--  Content  -->
-                <Grid Margin="0,0,0,20">
-                    <!--  Digit Panel  -->
-                    <mainScreen:MainScreen DockPanel.Dock="Top"
-                                           x:Name="m_DigitPanel"
-                                           DataContext="{Binding}"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
-                                           Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
-                                           />
 
-                </Grid>
+                <!--  Digit Panel  -->
+                <mainScreen:MainScreen x:Name="m_DigitPanel"
+                                       DataContext="{Binding}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
+                                       Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                       />
+
             </materialDesign:ColorZone>
         </DockPanel>
     </materialDesign:DrawerHost>
