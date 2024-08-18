@@ -33,6 +33,12 @@ Yet another Pomodoro timer for Windows with the following features:
 
 <br/>
 
+4. Before use new version run PomodoroWindowsTimer.Migrator to apply db migrations:
+
+```ps
+.\PomodoroWindowsTimer.Migrator.exe --connection "Data Source=..\..\..\..\PomodoroWindowsTimer.WpfClient\bin\Debug\net8.0-windows\work.db;"
+```
+
 ## Interface
 
 <br/>
