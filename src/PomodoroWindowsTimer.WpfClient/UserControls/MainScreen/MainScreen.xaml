@@ -17,14 +17,17 @@
              mc:Ignorable="d"
              >
 
-    <StackPanel HorizontalAlignment="Center"
-                Orientation="Vertical"
-                >
+    <DockPanel HorizontalAlignment="Stretch"
+               VerticalAlignment="Center"
+               LastChildFill="True"
+               >
         <!--  CurrentWork information  -->
-        <local:CurrentWorkInfo DataContext="{Binding CurrentWork}"
+        <local:CurrentWorkInfo DockPanel.Dock="Top"
+                               DataContext="{Binding CurrentWork}"
+                               MinHeight="54"
                                Visibility="{Binding DataContext.IsCurrentWorkSet,
                                                     ElementName=m_Root,
-                                                    Converter={StaticResource conv_BooleanToVisibility}}"
+                                                    Converter={StaticResource conv_BooleanToVisibilityHidden}}"
                                />
         <local:Timer DataContext="{Binding Player}"
                      Foreground="{Binding ElementName=m_Root,
@@ -32,5 +35,5 @@
                      DigitBackground="{Binding ElementName=m_Root,
                                                Path=DigitBackground}"
                      />
-    </StackPanel>
+    </DockPanel>
 </UserControl>

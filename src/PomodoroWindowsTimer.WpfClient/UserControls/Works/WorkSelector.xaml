@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkSelector"
-             x:Name="m_Root"
+             x:Name="m_WorkSelectorRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:WorkSelectorModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkSelectorModel;assembly=PomodoroWindowsTimer.ElmishApp"
@@ -22,7 +22,7 @@
     <Grid>
         <local:WorkList DataContext="{Binding WorkListModel}"
                         Visibility="{Binding DataContext.SubModelId,
-                                             ElementName=m_Root,
+                                             ElementName=m_WorkSelectorRoot,
                                              Converter={StaticResource conv_SubModelIdToVisibility},
                                              ConverterParameter='WorkListId'}"
                         />
@@ -34,7 +34,7 @@
                             OkCommand="{Binding CreateCommand}"
                             OkCommandContent="CREATE"
                             Visibility="{Binding DataContext.SubModelId,
-                                                 ElementName=m_Root,
+                                                 ElementName=m_WorkSelectorRoot,
                                                  Converter={StaticResource conv_SubModelIdToVisibility},
                                                  ConverterParameter='CreatingWorkId',
                                                  FallbackValue=Collapsed}"
@@ -47,7 +47,7 @@
                             OkCommand="{Binding UpdateCommand}"
                             OkCommandContent="UPDATE"
                             Visibility="{Binding DataContext.SubModelId,
-                                                 ElementName=m_Root,
+                                                 ElementName=m_WorkSelectorRoot,
                                                  Converter={StaticResource conv_SubModelIdToVisibility},
                                                  ConverterParameter='UpdatingWorkId',
                                                  FallbackValue=Collapsed}"

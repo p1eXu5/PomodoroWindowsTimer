@@ -9,39 +9,39 @@
              d:DesignWidth="800"
              mc:Ignorable="d"
              >
-  <materialDesign:ColorZone materialDesign:ElevationAssist.Elevation="Dp0"
-                            Mode="Custom"
-                            >
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto"
-                          SharedSizeGroup="PopupGroup"
-                          />
-      </Grid.ColumnDefinitions>
+    <materialDesign:ColorZone materialDesign:ElevationAssist.Elevation="Dp0"
+                              Mode="Custom"
+                              >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto"
+                                  SharedSizeGroup="PopupGroup"
+                                  />
+            </Grid.ColumnDefinitions>
 
-      <!--  title: SELECT WORK  -->
-      <TextBlock Grid.Row="0"
-                 Grid.Column="0"
-                 VerticalAlignment="Center"
-                 Text="SELECT WORK"
-                 TextAlignment="Center"
-                 Visibility="{Binding Path=HasSelectedWork,
-                                      Converter={StaticResource conv_InverseBooleanToVisibility}}"
-                 Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
-                 />
-      <materialDesign:PopupBox Grid.Row="0"
-                               Grid.Column="1"
-                               Margin="0,0,3,0"
-                               Padding="0"
-                               PlacementMode="BottomAndAlignRightEdges"
-                               StaysOpen="False"
-                               Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
-                               >
-        <Button Command="{Binding CreateWorkCommand}"
-                Content="Create New"
-                />
-      </materialDesign:PopupBox>
-    </Grid>
-  </materialDesign:ColorZone>
+            <!--  title: SELECT WORK  -->
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       VerticalAlignment="Center"
+                       Text="SELECT WORK"
+                       TextAlignment="Center"
+                       Visibility="{Binding Path=HasSelectedWork,
+                                            Converter={StaticResource conv_InverseBooleanToVisibility}}"
+                       Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
+                       />
+            <materialDesign:PopupBox Grid.Row="0"
+                                     Grid.Column="1"
+                                     Margin="0,0,3,0"
+                                     Padding="0"
+                                     PlacementMode="BottomAndAlignRightEdges"
+                                     StaysOpen="False"
+                                     Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                     >
+                <Button Command="{Binding CreateWorkCommand}"
+                        Content="Create New"
+                        />
+            </materialDesign:PopupBox>
+        </Grid>
+    </materialDesign:ColorZone>
 </UserControl>

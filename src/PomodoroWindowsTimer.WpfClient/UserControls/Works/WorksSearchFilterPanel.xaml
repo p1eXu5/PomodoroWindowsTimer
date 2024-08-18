@@ -12,50 +12,50 @@
              d:DesignWidth="300"
              mc:Ignorable="d"
              >
-  <!--  TODO: get scrollbar width to set right margin  -->
-  <Grid Margin="0,5">
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="*"
-                        SharedSizeGroup="gr_WorkName"
-                        />
-      <ColumnDefinition Width="50"
-                        SharedSizeGroup="gr_Button"
-                        />
-    </Grid.ColumnDefinitions>
+    <!--  TODO: get scrollbar width to set right margin  -->
+    <Grid Margin="0,5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"
+                              SharedSizeGroup="gr_WorkName"
+                              />
+            <ColumnDefinition Width="50"
+                              SharedSizeGroup="gr_Button"
+                              />
+        </Grid.ColumnDefinitions>
 
-    <!--  search  -->
-    <Grid Grid.Column="0">
-      <materialDesign:PackIcon VerticalAlignment="Center"
-                               Kind="Magnify"
-                               Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
-                               />
-      <TextBox x:Name="m_Search"
-               MinWidth="230"
-               Margin="0,0,2,0"
-               Padding="25,0,0,5"
-               HorizontalAlignment="Stretch"
-               VerticalAlignment="Bottom"
-               materialDesign:TextFieldAssist.HasClearButton="True"
-               TextChanged="SearchTextBox_TextChanged"
-               />
+        <!--  search  -->
+        <Grid Grid.Column="0">
+            <materialDesign:PackIcon VerticalAlignment="Center"
+                                     Kind="Magnify"
+                                     Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+                                     />
+            <TextBox x:Name="m_Search"
+                     MinWidth="230"
+                     Margin="0,0,2,0"
+                     Padding="25,0,0,5"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Bottom"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     TextChanged="SearchTextBox_TextChanged"
+                     />
+        </Grid>
+
+        <!--  filter  -->
+        <StackPanel Grid.Column="1"
+                    Orientation="Horizontal"
+                    >
+            <TextBox x:Name="m_Count"
+                     ToolTip="Filters works by the number of days from the current day to the time of last event or last update"
+                     Width="45"
+                     Margin="2,0,0,0"
+                     Padding="0,0,0,5"
+                     VerticalAlignment="Bottom"
+                     materialDesign:TextFieldAssist.HasClearButton="True"
+                     TextAlignment="Center"
+                     TextChanged="CountTextBox_TextChanged"
+                     Text="{Binding LastDayCount,
+                                    UpdateSourceTrigger=PropertyChanged}"
+                     />
+        </StackPanel>
     </Grid>
-
-    <!--  filter  -->
-    <StackPanel Grid.Column="1"
-                Orientation="Horizontal"
-                >
-      <TextBox x:Name="m_Count"
-               ToolTip="Filters works by the number of days from the current day to the time of last event or last update"
-               Width="45"
-               Margin="2,0,0,0"
-               Padding="0,0,0,5"
-               VerticalAlignment="Bottom"
-               materialDesign:TextFieldAssist.HasClearButton="True"
-               TextAlignment="Center"
-               TextChanged="CountTextBox_TextChanged"
-               Text="{Binding LastDayCount,
-                              UpdateSourceTrigger=PropertyChanged}"
-               />
-    </StackPanel>
-  </Grid>
 </UserControl>

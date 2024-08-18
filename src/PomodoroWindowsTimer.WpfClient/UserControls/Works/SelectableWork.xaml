@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.SelectableWork"
-             x:Name="m_Root"
+             x:Name="m_SelectableWorkRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -9,6 +9,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
+             MinHeight="51"
              d:DesignWidth="300"
              d:DesignHeight="70"
              MouseRightButtonDown="m_Root_MouseDown"
@@ -18,13 +19,13 @@
         <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
     </UserControl.Resources>
 
-    <Border VerticalAlignment="Center"
+    <Border VerticalAlignment="Stretch"
             BorderThickness="0,1,0,1"
             BorderBrush="Black"
             SnapsToDevicePixels="True"
             >
         <Border x:Name="m_Border"
-                VerticalAlignment="Center"
+                VerticalAlignment="Stretch"
                 SnapsToDevicePixels="True"
                 >
             <Border.Style>
@@ -35,7 +36,8 @@
                     <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsSelected,
-                                                       ElementName=m_Root}"
+                                                       ElementName=m_SelectableWorkRoot,
+                                                       Mode=OneWay}"
                                      Value="True"
                                      >
                             <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
@@ -43,6 +45,7 @@
                     </Style.Triggers>
                 </Style>
             </Border.Style>
+
             <Grid Margin="0"
                   VerticalAlignment="Center"
                   >
@@ -121,6 +124,7 @@
                                    />
                     </StackPanel>
                 </Button>
+
                 <Button Grid.RowSpan="2"
                         Grid.Column="1"
                         x:Name="m_Button"
@@ -143,7 +147,7 @@
                             <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsSelected,
-                                                               ElementName=m_Root}"
+                                                               ElementName=m_SelectableWorkRoot}"
                                              Value="True"
                                              >
                                     <!--<Setter Property="Background" Value="#012A3C" />-->

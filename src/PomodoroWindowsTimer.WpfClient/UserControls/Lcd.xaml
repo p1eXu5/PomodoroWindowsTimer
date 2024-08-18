@@ -52,20 +52,34 @@
                             DataContext="{Binding}"
                             />
 
-            <materialDesign:ColorZone HorizontalAlignment="Stretch"
+            <materialDesign:ColorZone x:Name="m_ColorZone"
+                                      HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch"
                                       materialDesign:ThemeAssist.Theme="Inherit"
                                       Background="Transparent"
                                       >
-
-                <!--  Digit Panel  -->
-                <mainScreen:MainScreen x:Name="m_DigitPanel"
-                                       DataContext="{Binding}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
-                                       Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
-                                       />
+                <Grid HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="5*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="6*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <!--  Digit Panel  -->
+                    <mainScreen:MainScreen Grid.Row="1"
+                                           Grid.Column="1"
+                                           x:Name="m_DigitPanel"
+                                           DataContext="{Binding}"
+                                           DigitBackground="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"
+                                           Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                           />
+                </Grid>
 
             </materialDesign:ColorZone>
         </DockPanel>

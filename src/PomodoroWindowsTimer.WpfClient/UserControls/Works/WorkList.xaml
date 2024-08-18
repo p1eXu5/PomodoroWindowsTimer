@@ -49,17 +49,12 @@
                 BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
                 BorderThickness="0"
                 >
-            <!--<ScrollViewer Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                          AncestorType=Border},
-                                           Path=ActualHeight}"
-                          VerticalScrollBarVisibility="Visible"
-                          CanContentScroll="True"
-                          >-->
-
             <ItemsControl x:Name="m_WorkList"
                           Margin="0"
                           HorizontalAlignment="Stretch"
                           VerticalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          VerticalContentAlignment="Stretch"
                           ItemsSource="{Binding WorkModelList}"
                           ScrollViewer.VerticalScrollBarVisibility="Visible"
                           ScrollViewer.CanContentScroll="False"
@@ -94,7 +89,6 @@
                     </ControlTemplate>
                 </ItemsControl.Template>
             </ItemsControl>
-            <!--</ScrollViewer>-->
         </Border>
     </DockPanel>
 </UserControl>
