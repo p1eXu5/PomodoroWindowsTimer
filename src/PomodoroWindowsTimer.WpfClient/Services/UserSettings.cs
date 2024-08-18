@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.FSharp.Collections;
@@ -167,6 +168,16 @@ internal class UserSettings : IUserSettings
         {
             var lastStatisticPeriod = JsonHelpers.Serialize(value);
             Properties.Settings.Default.LastStatisticPeriod = lastStatisticPeriod;
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    [MaybeNull]
+    public string CurrentVersion
+    {
+        get => Properties.Settings.Default.CurrentVersion;
+        set {
+            Properties.Settings.Default.CurrentVersion = value;
             Properties.Settings.Default.Save();
         }
     }

@@ -7,7 +7,7 @@ open Microsoft.Extensions.Hosting
 
 open PomodoroWindowsTimer.Storage
 
-type DbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHostApplicationLifetime) =
+type TestDbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHostApplicationLifetime) =
     inherit BackgroundService()
 
     let semaphore = new SemaphoreSlim(0, 1)
@@ -26,11 +26,11 @@ type DbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHost
             if res |> Result.isError then
                 appLifetime.StopApplication()
 
-            //let! res = activeTimePointRepository.CreateTableAsync(stoppingToken)
-            //if res |> Result.isError then
-            //    appLifetime.StopApplication()
+            let! res = activeTimePointRepository.CreateTableAsync(stoppingToken)
+            if res |> Result.isError then
+                appLifetime.StopApplication()
 
-            let! res = workEventRepository.CreateTableAsync(stoppingToken)
+            let! res = workEventRepository.CreateTestTableAsync(stoppingToken)
             if res |> Result.isError then
                 appLifetime.StopApplication()
 

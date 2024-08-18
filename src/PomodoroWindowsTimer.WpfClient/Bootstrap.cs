@@ -1,17 +1,23 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Interop;
+using CliWrap;
+using CliWrap.Buffered;
 using DrugRoom.WpfClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Storage;
+using PomodoroWindowsTimer.Storage.Configuration;
 using Serilog;
 
 namespace PomodoroWindowsTimer.WpfClient;
@@ -19,6 +25,7 @@ namespace PomodoroWindowsTimer.WpfClient;
 internal class Bootstrap : IDisposable
 {
     private bool _isDisposed;
+    private bool _isInTest;
 
     protected Bootstrap()
     {
@@ -118,6 +125,42 @@ internal class Bootstrap : IDisposable
 #endif
     }
 
+    internal async Task ApplyMigrationsAsync()
+    {
+        var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+
+        var connectionString = Host.Services.GetRequiredService<IOptions<WorkDbOptions>>().Value.ConnectionString;
+        var eqInd = connectionString.IndexOf('=');
+        connectionString = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
+        if (!Path.IsPathFullyQualified(connectionString))
+        {
+            connectionString = "Data Source=" + Path.Combine(path, connectionString) + ";";
+        }
+
+        var migratorPath =
+            Path.Combine(path, "migrator", "PomodoroWindowsTimer.Migrator.exe");
+
+        if (File.Exists(migratorPath))
+        {
+            var res = await CliWrap.Cli.Wrap(migratorPath)
+                .WithArguments(["--connection", connectionString])
+                .WithWorkingDirectory(Path.Combine(path, "migrator"))
+                .WithValidation(CommandResultValidation.None)
+                .ExecuteBufferedAsync();
+            ;
+
+            var logger = GetLogger<Bootstrap>();
+            if (!String.IsNullOrWhiteSpace(res.StandardError))
+            {
+                logger.LogError(res.StandardError);
+            }
+            else
+            {
+                logger.LogInformation(res.StandardOutput);
+            }
+        }
+    }
+
     public virtual void StartElmishApp(Window mainWindow, Func<WorkStatisticWindow> workStatisticWindowFactory)
     {
         WaitDbSeeding();
@@ -126,8 +169,16 @@ internal class Bootstrap : IDisposable
 
     protected void WaitDbSeeding()
     {
-        var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
-        seederService!.Semaphore.Wait();
+        if (_isInTest)
+        {
+            var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
+            seederService!.Semaphore.Wait();
+        }
+        else
+        {
+            var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
+            seederService!.Semaphore.Wait();
+        }
     }
 
     protected virtual void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
@@ -145,6 +196,10 @@ internal class Bootstrap : IDisposable
         if (!hostBuilderCtx.Configuration.GetValue<bool>("InTest"))
         {
             services.AddErrorMessageQueue();
+        }
+        else
+        {
+            _isInTest = true;
         }
 
         services.AddElmishProgramFactory();

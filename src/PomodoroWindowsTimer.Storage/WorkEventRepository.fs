@@ -31,6 +31,21 @@ module internal WorkEventRepository =
                 , {Table.Columns.work_id} INTEGER NOT NULL
                 , {Table.Columns.event_json} TEXT NOT NULL
                 , {Table.Columns.created_at} INTEGER NOT NULL
+
+                , FOREIGN KEY ({Table.Columns.work_id})
+                    REFERENCES {WorkTable.NAME} ({WorkTable.Columns.id})
+                    ON DELETE CASCADE 
+                    ON UPDATE NO ACTION
+            );
+            """
+
+        /// for integration tests
+        let CREATE_ACTUAL_TABLE = $"""
+            CREATE TABLE IF NOT EXISTS {Table.NAME} (
+                  {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
+                , {Table.Columns.work_id} INTEGER NOT NULL
+                , {Table.Columns.event_json} TEXT NOT NULL
+                , {Table.Columns.created_at} INTEGER NOT NULL
                 , {Table.Columns.active_time_point_id} TEXT
                 , {Table.Columns.event_name} TEXT NOT NULL
 
@@ -142,6 +157,27 @@ module internal WorkEventRepository =
             let command =
                 CommandDefinition(
                     Sql.CREATE_TABLE,
+                    cancellationToken = ct
+                )
+
+            try
+                let! _ = dbConnection.ExecuteAsync(command)
+                return ()
+            with ex ->
+                deps.Logger.FailedToCreateTable(Table.NAME, ex)
+                return! Error (ex.Format($"Failed to create table {Table.NAME}."))
+        }
+
+    let createTestTableAsync deps =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let command =
+                CommandDefinition(
+                    Sql.CREATE_ACTUAL_TABLE,
                     cancellationToken = ct
                 )
 
@@ -410,6 +446,10 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
     member _.CreateTableAsync(?cancellationToken) =
         let ct = defaultArg cancellationToken CancellationToken.None
         WorkEventRepository.createTableAsync deps ct
+
+    member internal _.CreateTestTableAsync(?cancellationToken) =
+        let ct = defaultArg cancellationToken CancellationToken.None
+        WorkEventRepository.createTestTableAsync deps ct
 
     interface IWorkEventRepository with
         member _.InsertAsync workId workEvent cancellationToken =

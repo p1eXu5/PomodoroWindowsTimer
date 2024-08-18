@@ -36,7 +36,7 @@ namespace PomodoroWindowsTimer.WpfClient
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
         }
 
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private async void Application_Startup(object sender, StartupEventArgs e)
         {
             _bootstrap = Bootstrap.Build<Bootstrap>(e.Args);
             _bootstrap.StartHost();
@@ -46,6 +46,8 @@ namespace PomodoroWindowsTimer.WpfClient
             _errorMessageQueue = _bootstrap.GetMainWindowErrorMessageQueue();
             var themeSwitcher = _bootstrap.GetThemeSwitcher();
             themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);
+
+            await _bootstrap.ApplyMigrationsAsync();
 
             _mainWindow = new MainWindow();
             _bootstrap.ShowMainWindow(_mainWindow, () => new WorkStatisticWindow());

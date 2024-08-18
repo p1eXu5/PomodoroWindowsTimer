@@ -30,6 +30,7 @@
     <Compile Include="WorkEventRepository.fs" />
     <Compile Include="ActiveTimePointRepository.fs" />
     <Compile Include="DbSeederHostedService.fs" />
+    <Compile Include="TestDbSeederHostedService.fs" />
     <Compile Include="DependencyInjectionExtensions.fs" />
   </ItemGroup>
 

@@ -163,6 +163,8 @@ let compose
     let assemblyVer =
         sprintf "Version: %i.%i.%i" ver.Major ver.Minor ver.Build
 
+    do userSettings.CurrentVersion <- assemblyVer
+
     let mainModelBindings =
         fun () ->
             MainModel.Bindings.ToList title assemblyVer workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue timePointQueue looper

@@ -53,6 +53,7 @@ type IUserSettings =
     abstract LastStatisticPeriod: DateOnlyPeriod option with get, set
     // TODO: abstract RollbackWorkStrategy: RollbackWorkStrategy with get, set
     abstract LastDayCount: int with get, set
+    abstract CurrentVersion: string with get, set
 
 
 type IThemeSwitcher =

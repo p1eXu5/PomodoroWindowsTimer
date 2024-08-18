@@ -31,5 +31,8 @@ type DependencyInjectionExtensions() =
         services.TryAddSingleton<ActiveTimePointRepository>()
         services.TryAddSingleton<IActiveTimePointRepository, ActiveTimePointRepository>()
 
-        services.AddHostedService<DbSeederHostedService>()
+        if configuration.GetValue<bool>("InTest") |> not then
+            services.AddHostedService<DbSeederHostedService>()
+        else
+            services.AddHostedService<TestDbSeederHostedService>()
 

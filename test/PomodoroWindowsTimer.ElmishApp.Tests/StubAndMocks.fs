@@ -39,6 +39,7 @@ type UserSettingsStub () =
         dict.Add("LastStatisticPeriod", Option<Work>.None)
         // TODO: dict.Add("RollbackWorkStrategy", RollbackWorkStrategy.Default)
         dict.Add("LastDayCount", 0)
+        dict.Add("CurrentVerion", null)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
@@ -51,6 +52,7 @@ type UserSettingsStub () =
         member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
         // TODO: member _.RollbackWorkStrategy with get () = dict["RollbackWorkStrategy"] :?> RollbackWorkStrategy and set v = dict["RollbackWorkStrategy"] <- v
         member _.LastDayCount with get () = dict["LastDayCount"] :?> int and set v = dict["LastDayCount"] <- v
+        member _.CurrentVersion with get () = dict["CurrentVersion"] :?> string and set v = dict["CurrentVersion"] <- v
 
 
 [<RequireQualifiedAccess>]
