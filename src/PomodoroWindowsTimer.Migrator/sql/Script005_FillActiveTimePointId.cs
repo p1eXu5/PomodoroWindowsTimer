@@ -100,7 +100,13 @@ public sealed class Script005_FillActiveTimePointId : IScript
             }
         }
 
+        if (workEventUpdateScript.Length == 0)
+        {
+            return "";
+        }
+
         string sql = atpInsertScript.Remove(atpInsertScript.Length - 3, 1).AppendLine(";").AppendLine().AppendLine(workEventUpdateScript.ToString()).ToString();
+
         return sql;
     }
 
