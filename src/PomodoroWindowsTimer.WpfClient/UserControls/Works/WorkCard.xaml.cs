@@ -30,11 +30,26 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
         public TextWrapping TitleWrapping
         {
             get { return (TextWrapping )GetValue(TitleWrappingProperty); }
+
             set { SetValue(TitleWrappingProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for WorkTitleWrapping.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleWrappingProperty =
             DependencyProperty.Register("TitleWrapping", typeof(TextWrapping ), typeof(WorkCard), new PropertyMetadata(TextWrapping.NoWrap));
+
+
+
+        public Thickness TitleMargin
+        {
+            get { return (Thickness)GetValue(TitleMarginProperty); }
+            set { SetValue(TitleMarginProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TitleMargin.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TitleMarginProperty =
+            DependencyProperty.Register("TitleMargin", typeof(Thickness), typeof(WorkCard), new PropertyMetadata(new Thickness(0)));
+
+
     }
 }

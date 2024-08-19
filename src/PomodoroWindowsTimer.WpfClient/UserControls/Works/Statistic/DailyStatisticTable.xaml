@@ -290,7 +290,7 @@
                                                 materialDesign:ButtonAssist.CornerRadius="0"
                                                 >
                                             <Button.CommandParameter>
-                                                <works:AddWorkTime />
+                                                <works:AddWorkTimeDialog />
                                             </Button.CommandParameter>
                                             <Behaviors:Interaction.Behaviors>
                                                 <behaviors:DialogEventHandlerBehavior CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,

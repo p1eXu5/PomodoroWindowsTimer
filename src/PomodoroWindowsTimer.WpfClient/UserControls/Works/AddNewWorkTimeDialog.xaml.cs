@@ -18,9 +18,9 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
     /// <summary>
     /// Interaction logic for AddNewWorkTime.xaml
     /// </summary>
-    public partial class AddNewWorkTime : UserControl
+    public partial class AddNewWorkTimeDialog : UserControl
     {
-        public AddNewWorkTime()
+        public AddNewWorkTimeDialog()
         {
             InitializeComponent();
         }

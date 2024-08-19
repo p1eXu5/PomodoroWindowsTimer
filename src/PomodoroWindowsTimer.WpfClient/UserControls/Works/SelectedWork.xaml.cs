@@ -43,13 +43,13 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
 
         private void m_Root_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (m_TitleTextBlock.TextWrapping == TextWrapping.Wrap)
+            if (m_WorkCard.TitleWrapping == TextWrapping.Wrap)
             {
-                m_TitleTextBlock.TextWrapping = TextWrapping.NoWrap;
+                m_WorkCard.TitleWrapping = TextWrapping.NoWrap;
             }
             else
             {
-                m_TitleTextBlock.TextWrapping = TextWrapping.Wrap;
+                m_WorkCard.TitleWrapping = TextWrapping.Wrap;
             }
         }
     }

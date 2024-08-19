@@ -1,0 +1,49 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    >
+    <Style x:Key="st_WorkCardWrapperBorder"
+           TargetType="Border"
+           >
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="Background" Value="#030C10" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected,
+                                           ElementName=m_Root}"
+                         Value="True"
+                         >
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="st_WorkEditButton"
+           TargetType="Button"
+           BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
+           >
+        <Setter Property="ToolTip" Value="Edit" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Light}" />
+        <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualHeight}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected,
+                                           ElementName=m_Root}"
+                         Value="True"
+                         >
+                <!--<Setter Property="Background" Value="#012A3C" />-->
+                <Setter Property="BorderThickness" Value="1,0,0,0" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+            </DataTrigger>
+        </Style.Triggers>
+
+    </Style>
+</ResourceDictionary>

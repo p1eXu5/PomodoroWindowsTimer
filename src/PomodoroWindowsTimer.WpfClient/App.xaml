@@ -39,6 +39,7 @@
                 <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/PlaylistTimePointsV2.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/TimePointConstructor.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/Resources/DialogButtons.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClient;component/UserControls/Works/Styles.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 

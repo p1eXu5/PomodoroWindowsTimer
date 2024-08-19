@@ -41,7 +41,7 @@ public partial class AddWorkTime : UserControl
         if (parentObject == null) return null;
 
 
-        if (parentObject is FrameworkElement elem)
+        if (parentObject is FrameworkElement elem && elem.DataContext is not null)
         {
             IEnumerable<string> members = ((dynamic)elem.DataContext).GetDynamicMemberNames();
             if (members.Any(s => s.Equals("AddWorkTimeDialog", StringComparison.Ordinal)))

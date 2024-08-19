@@ -12,10 +12,13 @@
              d:DesignHeight="82"
              d:DesignWidth="300"
              Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+             Background="#030C10"
              mc:Ignorable="d"
              >
-    <materialDesign:Card VerticalAlignment="Center"
-                         Background="#030C10"
+    <materialDesign:Card Padding="10,5"
+                         VerticalAlignment="Center"
+                         Background="{Binding ElementName=m_WorkCardRoot,
+                                              Path=Background}"
                          >
         <DockPanel VerticalAlignment="Center"
                    LastChildFill="True"
@@ -29,7 +32,6 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0"
-                           Margin="10,6,0,0"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Bottom"
                            materialDesign:HintAssist.Hint="Number"
@@ -40,7 +42,6 @@
                            FontSize="11"
                            />
                 <TextBlock Grid.Column="1"
-                           Margin="0,6,5,0"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Bottom"
                            materialDesign:HintAssist.Hint="Number"
@@ -54,7 +55,8 @@
             <!--  Title  -->
             <TextBlock x:Name="m_TitleTextBlock"
                        ToolTip="{Binding Title}"
-                       Margin="10,5,5,5"
+                       Margin="{Binding ElementName=m_WorkCardRoot,
+                                        Path=TitleMargin}"
                        VerticalAlignment="Top"
                        materialDesign:HintAssist.Hint="Title"
                        Text="{Binding Title,
@@ -64,6 +66,7 @@
                                               Path=TitleWrapping}"
                        TextTrimming="CharacterEllipsis"
                        FontWeight="Light"
+                       TextAlignment="Justify"
                        />
         </DockPanel>
     </materialDesign:Card>
