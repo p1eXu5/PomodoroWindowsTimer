@@ -103,6 +103,19 @@ module internal WorkEventRepository =
             ;
             """
 
+        /// Parameters: WorkId, DateMin, DateMax.
+        let SELECT_LAST_BY_WORK_ID_BY_PERIOD = $"""
+            SELECT *
+            FROM {Table.NAME}
+            WHERE
+                {Table.Columns.work_id} = @WorkId
+                AND {Table.Columns.created_at} >= @DateMin
+                AND {Table.Columns.created_at} < @DateMax
+            ORDER BY {Table.Columns.created_at} DESC
+            LIMIT 1
+            ;
+            """
+
         /// Parameters: DateMin, DateMax.
         let SELECT_JOIN_WORK_BY_WORK_ID_BY_PERIOD = $"""
             SELECT e.*, '' AS split, w.*
@@ -320,6 +333,38 @@ module internal WorkEventRepository =
                 return! Error (ex.Format($"Failed to find work events by workId {WorkId} and by period [{period.Start} - {period.EndInclusive}]."))
         }
 
+    let findLastByWorkIdByDateAsync deps (workId: WorkId) (date: DateOnly) =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let dateMin = new DateTimeOffset(date, new TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset)
+            let dateMax = new DateTimeOffset(date.AddDays(1), new TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset)
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_LAST_BY_WORK_ID_BY_PERIOD,
+                    parameters = {|
+                        WorkId = workId
+                        DateMin = dateMin.ToUnixTimeMilliseconds()
+                        DateMax = dateMax.ToUnixTimeMilliseconds()
+                    |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! row = dbConnection.QueryFirstOrDefaultAsync<Table.Row>(command)
+                match box row with
+                | null -> return None
+                | _ ->
+                    return row |> (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json)) |> Some
+            with ex ->
+                deps.Logger.FailedToFindWorkEventsByWorkIdByDate(workId, date, ex)
+                return! Error (ex.Format($"Failed to find work events by workId {workId} and date {date}."))
+        }
+
     let toWorkEventTupleList (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
         rows
         |> Seq.map (fun (r, w) ->
@@ -339,7 +384,6 @@ module internal WorkEventRepository =
             }
         )
         |> Seq.toList
-
 
     let findAllByPeriodAsync deps (period: DateOnlyPeriod) =
         cancellableTaskResult {
@@ -468,12 +512,12 @@ type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.
             WorkEventRepository.findAllByPeriodAsync deps period cancellationToken
 
         member _.FindLastByWorkIdByDateAsync workId date cancellationToken =
-            raise (NotImplementedException())
+            WorkEventRepository.findLastByWorkIdByDateAsync deps workId date cancellationToken
 
         member _.FindByActiveTimePointIdByDateAsync timePointId timePointKind notAfter cancellationToken =
             WorkEventRepository.findByActiveTimePointIdByDateAsync deps timePointId timePointKind notAfter cancellationToken
 
-        member this.GetAsync skip take cancellationToken =
+        member _.GetAsync skip take cancellationToken =
             WorkEventRepository.getAsync deps skip take cancellationToken
 
 
