@@ -40,12 +40,14 @@
                         Padding="0"
                         VerticalAlignment="Center"
                         materialDesign:ButtonAssist.CornerRadius="0"
+                        HorizontalContentAlignment="Stretch"
                         d:Height="52"
                         Background="Transparent"
                         BorderThickness="0"
                         >
                     <local:WorkCard x:Name="m_WorkCard"
                                     DataContext="{Binding}"
+                                    
                                     />
                 </Button>
 
