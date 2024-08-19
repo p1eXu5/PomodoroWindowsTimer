@@ -35,6 +35,6 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
 
         // Using a DependencyProperty as the backing store for WorkTitleWrapping.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleWrappingProperty =
-            DependencyProperty.Register("TitleWrapping", typeof(TextWrapping ), typeof(WorkCard), new PropertyMetadata(TextWrapping.Wrap));
+            DependencyProperty.Register("TitleWrapping", typeof(TextWrapping ), typeof(WorkCard), new PropertyMetadata(TextWrapping.NoWrap));
     }
 }

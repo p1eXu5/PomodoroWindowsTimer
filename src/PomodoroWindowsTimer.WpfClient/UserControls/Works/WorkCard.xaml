@@ -9,13 +9,17 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
              MinHeight="52"
-             d:DesignHeight="52"
-             d:DesignWidth="400"
+             d:DesignHeight="82"
+             d:DesignWidth="300"
              Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
              mc:Ignorable="d"
              >
-    <materialDesign:Card Background="#030C10">
-        <DockPanel LastChildFill="True">
+    <materialDesign:Card VerticalAlignment="Center"
+                         Background="#030C10"
+                         >
+        <DockPanel VerticalAlignment="Center"
+                   LastChildFill="True"
+                   >
             <Grid DockPanel.Dock="Top"
                   HorizontalAlignment="Stretch"
                   >
