@@ -7,7 +7,7 @@
              xmlns:behaviors="clr-namespace:PomodoroWindowsTimer.WpfClient.Behaviors"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dailyStatisticModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+             xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
@@ -24,6 +24,12 @@
                     <StackPanel DockPanel.Dock="Right"
                                 Orientation="Horizontal"
                                 >
+                        <Button Command="{Binding AddWorkEventNotInListCommand}"
+                                Content="{materialDesign:PackIcon Kind=Add}"
+                                ToolTip="Refresh statistic"
+                                Margin="5,0,24,0"
+                                ToolBar.OverflowMode="AsNeeded"
+                                />
                         <Button Command="{Binding RefreshStatisticCommand}"
                                 Content="{materialDesign:PackIcon Kind=Refresh}"
                                 ToolTip="Refresh statistic"
@@ -284,7 +290,7 @@
                                                 materialDesign:ButtonAssist.CornerRadius="0"
                                                 >
                                             <Button.CommandParameter>
-                                                <local:AddWorkTime />
+                                                <works:AddWorkTime />
                                             </Button.CommandParameter>
                                             <Behaviors:Interaction.Behaviors>
                                                 <behaviors:DialogEventHandlerBehavior CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,

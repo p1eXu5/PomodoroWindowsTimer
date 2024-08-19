@@ -1,111 +1,108 @@
-﻿<UserControl
-    x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.Statistic.DailyStatisticTableList"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:dailyStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
-    xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works.Statistic"
-    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DataContext="{d:DesignInstance Type=dailyStatisticListModel:Bindings,
-                                     IsDesignTimeCreatable=False}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    mc:Ignorable="d"
-    >
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.Statistic.DailyStatisticTableList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dailyStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works.Statistic"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DataContext="{d:DesignInstance Type=dailyStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             mc:Ignorable="d"
+             >
     <DockPanel>
-        <ToolBarTray DataContext="{Binding}" DockPanel.Dock="Top">
-            <ToolBar ClipToBounds="False" Style="{StaticResource MaterialDesignToolBar}">
-                <CheckBox
-                    x:Name="m_ByDayCheckBox"
-                    Margin="8,3,16,3"
-                    Content="By Day"
-                    IsChecked="{Binding IsByDay}"
-                    />
-                <Border
-                    VerticalAlignment="Center"
-                    Background="#333333"
-                    BorderBrush="#555555"
-                    BorderThickness="1"
-                    >
-                    <DatePicker
-                        Width="150"
-                        Height="25"
-                        Padding="5,0"
-                        VerticalContentAlignment="Center"
-                        materialDesign:HintAssist.Hint="Start Date"
-                        BorderThickness="0"
-                        SelectedDate="{Binding StartDate, Converter={StaticResource conv_DateOnlyToDateTime}}"
-                        />
+        <ToolBarTray DockPanel.Dock="Top"
+                     DataContext="{Binding}"
+                     >
+            <ToolBar Style="{StaticResource MaterialDesignToolBar}"
+                     ClipToBounds="False"
+                     >
+                <CheckBox x:Name="m_ByDayCheckBox"
+                          Content="By Day"
+                          Margin="8,3,16,3"
+                          IsChecked="{Binding IsByDay}"
+                          />
+                <Border VerticalAlignment="Center"
+                        Background="#333333"
+                        BorderBrush="#555555"
+                        BorderThickness="1"
+                        >
+                    <DatePicker Width="150"
+                                Height="25"
+                                Padding="5,0"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="Start Date"
+                                BorderThickness="0"
+                                SelectedDate="{Binding StartDate,
+                                                       Converter={StaticResource conv_DateOnlyToDateTime}}"
+                                />
                 </Border>
 
 
-                <Border
-                    Margin="18,1"
-                    VerticalAlignment="Center"
-                    Background="#333333"
-                    BorderBrush="#555555"
-                    BorderThickness="1"
-                    IsEnabled="{Binding ElementName=m_ByDayCheckBox, Path=IsChecked, Converter={StaticResource conv_InverseBoolean}}"
-                    >
-                    <DatePicker
-                        Width="150"
-                        Height="25"
-                        Padding="5,0"
-                        VerticalContentAlignment="Center"
-                        materialDesign:HintAssist.Hint="End Date"
-                        BorderThickness="0"
-                        SelectedDate="{Binding EndDate, Converter={StaticResource conv_DateOnlyToDateTime}}"
-                        />
+                <Border Margin="18,1"
+                        VerticalAlignment="Center"
+                        Background="#333333"
+                        BorderBrush="#555555"
+                        BorderThickness="1"
+                        IsEnabled="{Binding ElementName=m_ByDayCheckBox,
+                                            Path=IsChecked,
+                                            Converter={StaticResource conv_InverseBoolean}}"
+                        >
+                    <DatePicker Width="150"
+                                Height="25"
+                                Padding="5,0"
+                                VerticalContentAlignment="Center"
+                                materialDesign:HintAssist.Hint="End Date"
+                                BorderThickness="0"
+                                SelectedDate="{Binding EndDate,
+                                                       Converter={StaticResource conv_DateOnlyToDateTime}}"
+                                />
                 </Border>
                 <Separator Margin="5,1" />
-                <Button
-                    Command="{Binding LoadDailyStatisticsCommand}"
-                    Content="{materialDesign:PackIcon Kind=Refresh}"
-                    ToolBar.OverflowMode="AsNeeded"
-                    ToolTip="Refresh statistic"
-                    />
+                <Button Command="{Binding LoadDailyStatisticsCommand}"
+                        Content="{materialDesign:PackIcon Kind=Refresh}"
+                        ToolTip="Refresh statistic"
+                        ToolBar.OverflowMode="AsNeeded"
+                        />
                 <Separator Margin="5,1" />
-                <Button
-                    Command="{Binding ExportToExcelCommand}"
-                    Content="{materialDesign:PackIcon Kind=Export}"
-                    ToolBar.OverflowMode="AsNeeded"
-                    ToolTip="Export statistic"
-                    />
+                <Button Command="{Binding ExportToExcelCommand}"
+                        Content="{materialDesign:PackIcon Kind=Export}"
+                        ToolTip="Export statistic"
+                        ToolBar.OverflowMode="AsNeeded"
+                        />
                 <Separator Margin="5,1" />
-                <Button
-                    Command="{Binding AllocateBreakTimeCommand}"
-                    Content="{materialDesign:PackIcon Kind=TimerCheckOutline}"
-                    ToolBar.OverflowMode="AsNeeded"
-                    ToolTip="Allocate break time between works"
-                    Visibility="{Binding CanAllocateBreakTime, Converter={StaticResource conv_BooleanToVisibility}}"
-                    />
-                <Button
-                    Command="{Binding RedoAllocateBreakTimeCommand}"
-                    Content="{materialDesign:PackIcon Kind=TimerRefreshOutline}"
-                    ToolBar.OverflowMode="AsNeeded"
-                    ToolTip="Allocate break time between works"
-                    Visibility="{Binding CanRedoAllocateBreakTime, Converter={StaticResource conv_BooleanToVisibility}}"
-                    />
+                <Button Command="{Binding AllocateBreakTimeCommand}"
+                        Content="{materialDesign:PackIcon Kind=TimerCheckOutline}"
+                        ToolTip="Allocate break time between works"
+                        ToolBar.OverflowMode="AsNeeded"
+                        Visibility="{Binding CanAllocateBreakTime,
+                                             Converter={StaticResource conv_BooleanToVisibility}}"
+                        />
+                <Button Command="{Binding RedoAllocateBreakTimeCommand}"
+                        Content="{materialDesign:PackIcon Kind=TimerRefreshOutline}"
+                        ToolTip="Allocate break time between works"
+                        ToolBar.OverflowMode="AsNeeded"
+                        Visibility="{Binding CanRedoAllocateBreakTime,
+                                             Converter={StaticResource conv_BooleanToVisibility}}"
+                        />
             </ToolBar>
         </ToolBarTray>
 
-        <materialDesign:Snackbar
-            x:Name="m_ErrorMessageQueueSnackbar"
-            HorizontalAlignment="Stretch"
-            ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
-            DockPanel.Dock="Bottom"
-            MessageQueue="{Binding ErrorMessageQueue}"
-            />
+        <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                                 x:Name="m_ErrorMessageQueueSnackbar"
+                                 HorizontalAlignment="Stretch"
+                                 ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                                 MessageQueue="{Binding ErrorMessageQueue}"
+                                 />
 
-        <ItemsControl
-            x:Name="m_WorkList"
-            Margin="0"
-            HorizontalContentAlignment="Stretch"
-            VerticalContentAlignment="Center"
-            ItemsSource="{Binding DailyStatistics}"
-            ScrollViewer.VerticalScrollBarVisibility="Visible"
-            >
+        <ItemsControl x:Name="m_WorkList"
+                      Margin="0"
+                      HorizontalContentAlignment="Stretch"
+                      VerticalContentAlignment="Center"
+                      ItemsSource="{Binding DailyStatistics}"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      >
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <local:DailyStatisticTable />
@@ -113,22 +110,23 @@
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <VirtualizingStackPanel IsVirtualizing="True" VirtualizationMode="Recycling" />
+                    <VirtualizingStackPanel IsVirtualizing="True"
+                                            VirtualizationMode="Recycling"
+                                            />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.Template>
                 <ControlTemplate TargetType="ItemsControl">
-                    <Border
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        >
-                        <ScrollViewer
-                            Padding="{TemplateBinding Padding}"
-                            CanContentScroll="False"
-                            Focusable="False"
-                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             >
+                        <ScrollViewer Padding="{TemplateBinding Padding}"
+                                      CanContentScroll="False"
+                                      Focusable="False"
+                                      VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                                      >
                             <ItemsPresenter />
                         </ScrollViewer>
                     </Border>

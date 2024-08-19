@@ -9,9 +9,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
-             MinHeight="51"
+             MinHeight="54"
              d:DesignWidth="300"
-             d:DesignHeight="70"
+             d:DesignHeight="54"
              MouseRightButtonDown="m_Root_MouseDown"
              mc:Ignorable="d"
              >
@@ -67,62 +67,12 @@
                         HorizontalContentAlignment="Left"
                         VerticalContentAlignment="Center"
                         materialDesign:ButtonAssist.CornerRadius="0"
-                        d:Height="52"
                         Background="Transparent"
                         BorderThickness="0"
                         >
-                    <StackPanel Width="{Binding ElementName=m_SelectButton,
-                                                Path=ActualWidth}"
-                                VerticalAlignment="Center"
-                                Orientation="Vertical"
-                                TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
-                                >
-                        <Grid HorizontalAlignment="Stretch">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Grid.Column="0"
-                                       Margin="10,6,0,0"
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Bottom"
-                                       materialDesign:HintAssist.Hint="Number"
-                                       Text="{Binding Number,
-                                                      Converter={StaticResource conv_NoNumberConverter},
-                                                      FallbackValue='NO NUMBER'}"
-                                       FontWeight="Normal"
-                                       FontSize="11"
-                                       />
-
-                            <TextBlock Grid.Column="1"
-                                       Margin="0,6,5,0"
-                                       HorizontalAlignment="Right"
-                                       VerticalAlignment="Bottom"
-                                       materialDesign:HintAssist.Hint="Number"
-                                       Text="{Binding LastEventCreatedAtOrUpdatedAt,
-                                                      Converter={StaticResource conv_DateTimeOffsetToShortDate},
-                                                      FallbackValue='12.02.2024'}"
-                                       FontWeight="Normal"
-                                       FontSize="11"
-                                       />
-                        </Grid>
-                        <!--  Title  -->
-                        <TextBlock Grid.Row="1"
-                                   Grid.Column="0"
-                                   x:Name="m_TitleTextBlock"
-                                   ToolTip="{Binding Title}"
-                                   Margin="10,5,5,5"
-                                   VerticalAlignment="Top"
-                                   materialDesign:HintAssist.Hint="Title"
-                                   Text="{Binding Title,
-                                                  FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
-                                   FontSize="16"
-                                   TextWrapping="NoWrap"
-                                   TextTrimming="CharacterEllipsis"
-                                   FontWeight="Light"
-                                   />
-                    </StackPanel>
+                    <local:WorkCard x:Name="m_WorkCard"
+                                    DataContext="{Binding}"
+                                    />
                 </Button>
 
                 <Button Grid.RowSpan="2"
