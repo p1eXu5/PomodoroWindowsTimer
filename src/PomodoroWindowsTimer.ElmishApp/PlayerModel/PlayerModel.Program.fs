@@ -165,8 +165,14 @@ let update
                 | _ ->
                     Cmd.none
 
-            let sendToChatBotCmd message =
-                Cmd.OfTask.attempt telegramBot.SendMessage message Msg.OnExn
+            let sendToChatBotCmd =
+                match currentWorkOpt with
+                | None ->
+                    $"It's time to {nextTp.Name}!"
+                | Some wm ->
+                    $"It's time to {nextTp.Name}! Current work is [{wm.Number}] {wm.Title}."
+                |> fun message ->
+                    Cmd.OfTask.attempt telegramBot.SendMessage message Msg.OnExn
 
             let cmd =
                 match nextTp.Kind with
@@ -204,7 +210,7 @@ let update
                 | Work when oldTp |> Option.isSome && (oldTp.Value.Kind = Kind.Work) ->
                     Cmd.batch [
                         storeStartedWorkEventOrActiveTimePointCmd
-                        sendToChatBotCmd $"It's time to {nextTp.Name}!!"
+                        sendToChatBotCmd
                     ]
 
                 | Work ->
@@ -212,7 +218,7 @@ let update
                         storeStartedWorkEventOrActiveTimePointCmd
                         switchThemeCmd timePointKind
                         restoreAllMinimizedCmd ()
-                        sendToChatBotCmd $"It's time to {nextTp.Name}!!"
+                        sendToChatBotCmd
                     ]
 
             model
