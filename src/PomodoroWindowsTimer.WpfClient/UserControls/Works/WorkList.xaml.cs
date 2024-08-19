@@ -86,15 +86,21 @@ public partial class WorkList : UserControl
         {
             e.Handled = true;
 
-            string searchText = SearchText = tb.m_Search.Text;
+            string searchText = tb.m_Search.Text;
 
-            if (String.IsNullOrEmpty(searchText))
+            if (String.IsNullOrEmpty(searchText) && DayCount == TimeSpan.Zero)
             {
                 SearchText = "";
                 ResetFilter();
                 return;
             }
 
+            if (String.Equals(SearchText, searchText, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            SearchText = searchText;
             SetFilter();
         }
     }
