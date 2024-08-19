@@ -84,7 +84,10 @@
                                       BorderBrush="{TemplateBinding BorderBrush}"
                                       Background="{TemplateBinding Background}"
                                       >
-                            <ItemsPresenter />
+                            <ItemsPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
+                                            />
                         </ScrollViewer>
                     </ControlTemplate>
                 </ItemsControl.Template>
