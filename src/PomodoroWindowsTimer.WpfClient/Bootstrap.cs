@@ -131,10 +131,10 @@ internal class Bootstrap : IDisposable
 
         var connectionString = Host.Services.GetRequiredService<IOptions<WorkDbOptions>>().Value.ConnectionString;
         var eqInd = connectionString.IndexOf('=');
-        connectionString = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
-        if (!Path.IsPathFullyQualified(connectionString))
+        var dbFilePath = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
+        if (!Path.IsPathFullyQualified(dbFilePath))
         {
-            connectionString = "Data Source=" + Path.Combine(path, connectionString) + ";";
+            connectionString = "Data Source=" + Path.Combine(path, dbFilePath) + ";";
         }
 
         var migratorPath =
