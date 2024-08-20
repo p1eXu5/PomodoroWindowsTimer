@@ -85,9 +85,13 @@ type Bindings(
         |> Binding.cmd (fun m ->
             match m.Player.ActiveTimePoint, m.CurrentWork with
             | Some tp, None ->
-                Msg.SendToChatBot $"It's time to {tp.Name}!"
+                Msg.SendToChatBot $"It's time to {tp.Name}!!"
             | Some tp, Some wm ->
-                Msg.SendToChatBot $"It's time to {tp.Name}! Current work is [{wm.Work.Number}] {wm.Work.Title}."
+                Msg.SendToChatBot (
+                $"""It's time to {tp.Name}!!
+                
+Current work is [{wm.Work.Number}] {wm.Work.Title}."""
+                )
             | _ ->
                 Msg.SendToChatBot $"It's time!!"
         )
