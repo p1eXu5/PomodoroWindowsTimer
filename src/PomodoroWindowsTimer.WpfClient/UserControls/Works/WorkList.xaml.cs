@@ -26,7 +26,7 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
         {
             InitializeComponent();
 
-            // ((INotifyCollectionChanged)m_WorkList.Items).CollectionChanged += WorkList_CollectionChanged;
+            ((INotifyCollectionChanged)m_WorkList.Items).CollectionChanged += WorkList_CollectionChanged;
         }
 
         private void WorkList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
