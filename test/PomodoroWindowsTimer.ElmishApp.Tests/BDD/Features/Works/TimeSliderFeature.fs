@@ -217,6 +217,8 @@ module TimeSliderFeature =
             do! When.``User sets work time as rollback`` work2.Id
             do! When.``User applies dialog settings`` ()
 
+            do! When.``Spent 2.5 ticks`` ()
+
             do! Then.``Dialog has been closed`` ()
             
             do! Then.``Work events in db exist`` work1.Id [

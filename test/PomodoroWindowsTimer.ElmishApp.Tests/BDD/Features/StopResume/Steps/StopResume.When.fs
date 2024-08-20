@@ -60,6 +60,7 @@ let ``User sets work time as rollback`` (workId: WorkId) =
     }
     |> Scenario.log $"When.``{nameof ``User sets work time as rollback``} for {workId} work``"
 
+/// Dispatches `RollbackWorkListModel.Msg.ApplyAndClose`.
 let ``User applies dialog settings`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
