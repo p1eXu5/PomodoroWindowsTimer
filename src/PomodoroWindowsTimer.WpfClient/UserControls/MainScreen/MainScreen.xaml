@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.MainScreen.MainScreen"
-             x:Name="m_Root"
+             x:Name="m_MainScreenRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -26,13 +26,13 @@
                                DataContext="{Binding CurrentWork}"
                                MinHeight="54"
                                Visibility="{Binding DataContext.IsCurrentWorkSet,
-                                                    ElementName=m_Root,
+                                                    ElementName=m_MainScreenRoot,
                                                     Converter={StaticResource conv_BooleanToVisibilityHidden}}"
                                />
         <local:Timer DataContext="{Binding Player}"
-                     Foreground="{Binding ElementName=m_Root,
+                     Foreground="{Binding ElementName=m_MainScreenRoot,
                                           Path=Foreground}"
-                     DigitBackground="{Binding ElementName=m_Root,
+                     DigitBackground="{Binding ElementName=m_MainScreenRoot,
                                                Path=DigitBackground}"
                      />
     </DockPanel>

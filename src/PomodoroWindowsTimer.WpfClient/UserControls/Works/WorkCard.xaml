@@ -24,8 +24,8 @@
                    LastChildFill="True"
                    >
             <Grid DockPanel.Dock="Top"
-                  HorizontalAlignment="Stretch"
                   Margin="0,0,0,5"
+                  HorizontalAlignment="Stretch"
                   >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -56,6 +56,8 @@
             <!--  Title  -->
             <TextBlock x:Name="m_TitleTextBlock"
                        ToolTip="{Binding Title}"
+                       Height="{Binding ElementName=m_WorkCardRoot,
+                                        Path=TitleHeight}"
                        Margin="{Binding ElementName=m_WorkCardRoot,
                                         Path=TitleMargin}"
                        VerticalAlignment="Top"

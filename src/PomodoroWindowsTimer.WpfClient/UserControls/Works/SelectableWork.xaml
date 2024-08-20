@@ -9,7 +9,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
+             Height="Auto"
              MinHeight="54"
+             VerticalAlignment="Center"
              d:DesignWidth="300"
              d:DesignHeight="54"
              MouseRightButtonDown="m_Root_MouseDown"
@@ -19,13 +21,17 @@
         <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
     </UserControl.Resources>
 
-    <Border VerticalAlignment="Center"
+    <Border Height="Auto"
+            VerticalAlignment="Center"
             BorderThickness="0,1,0,1"
             BorderBrush="Black"
             SnapsToDevicePixels="True"
             >
-        <Border Style="{StaticResource st_WorkCardWrapperBorder}">
-            <Grid Margin="0"
+        <Border Style="{StaticResource st_WorkCardWrapperBorder}"
+                Height="Auto"
+                >
+            <Grid Height="Auto"
+                  Margin="0"
                   VerticalAlignment="Center"
                   >
                 <Grid.ColumnDefinitions>
@@ -39,15 +45,14 @@
                         Margin="0"
                         Padding="0"
                         VerticalAlignment="Center"
-                        materialDesign:ButtonAssist.CornerRadius="0"
                         HorizontalContentAlignment="Stretch"
+                        materialDesign:ButtonAssist.CornerRadius="0"
                         d:Height="52"
                         Background="Transparent"
                         BorderThickness="0"
                         >
                     <local:WorkCard x:Name="m_WorkCard"
                                     DataContext="{Binding}"
-                                    
                                     />
                 </Button>
 
@@ -55,6 +60,8 @@
                         Command="{Binding EditCommand}"
                         Content="{materialDesign:PackIcon Pencil}"
                         Style="{StaticResource st_WorkEditButton}"
+                        Height="{Binding ElementName=m_SelectButton,
+                                         Path=ActualHeight}"
                         />
             </Grid>
         </Border>

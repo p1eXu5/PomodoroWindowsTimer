@@ -12,8 +12,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected,
-                                           ElementName=m_Root}"
+            <DataTrigger Binding="{Binding IsSelected}"
                          Value="True"
                          >
                 <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
@@ -33,10 +32,9 @@
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Light}" />
-        <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualHeight}" />
+        
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected,
-                                           ElementName=m_Root}"
+            <DataTrigger Binding="{Binding IsSelected}"
                          Value="True"
                          >
                 <!--<Setter Property="Background" Value="#012A3C" />-->

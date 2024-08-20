@@ -31,9 +31,11 @@
                             />
 
             <Button Grid.Column="1"
-                    Content="{materialDesign:PackIcon Pencil}"
                     Command="{Binding EditCommand}"
+                    Content="{materialDesign:PackIcon Pencil}"
                     Style="{StaticResource st_WorkEditButton}"
+                    Height="{Binding ElementName=m_WorkCard,
+                                     Path=ActualHeight}"
                     />
         </Grid>
     </Border>

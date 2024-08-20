@@ -42,7 +42,7 @@
         <!--  time points generator  -->
 
         <materialDesign:DrawerHost.RightDrawerContent>
-            <works:WorkSelector DataContext="{Binding WorkSelector}" />
+            <works:WorksDrawer DataContext="{Binding WorkSelector}" />
         </materialDesign:DrawerHost.RightDrawerContent>
 
         <DockPanel Margin="10,0,10,0"

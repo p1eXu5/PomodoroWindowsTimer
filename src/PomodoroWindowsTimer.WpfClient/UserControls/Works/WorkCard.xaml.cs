@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +27,10 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
             InitializeComponent();
         }
 
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+        }
 
 
         public TextWrapping TitleWrapping
@@ -36,8 +42,19 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
 
         // Using a DependencyProperty as the backing store for WorkTitleWrapping.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TitleWrappingProperty =
-            DependencyProperty.Register("TitleWrapping", typeof(TextWrapping ), typeof(WorkCard), new PropertyMetadata(TextWrapping.NoWrap));
-
+            DependencyProperty.Register(
+                "TitleWrapping",
+                typeof(TextWrapping ),
+                typeof(WorkCard),
+                new FrameworkPropertyMetadata(
+                    TextWrapping.NoWrap,
+                    FrameworkPropertyMetadataOptions.AffectsMeasure
+                    | FrameworkPropertyMetadataOptions.AffectsArrange
+                    | FrameworkPropertyMetadataOptions.AffectsParentMeasure
+                    | FrameworkPropertyMetadataOptions.AffectsParentArrange
+                    | FrameworkPropertyMetadataOptions.AffectsRender
+                )
+            );
 
 
         public Thickness TitleMargin
@@ -50,6 +67,15 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
         public static readonly DependencyProperty TitleMarginProperty =
             DependencyProperty.Register("TitleMargin", typeof(Thickness), typeof(WorkCard), new PropertyMetadata(new Thickness(0)));
 
+        public double TitleHeight
+        {
+            get { return (double)GetValue(TitleHeightProperty); }
+            set { SetValue(TitleHeightProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for TitleHeight.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TitleHeightProperty =
+            DependencyProperty.Register("TitleHeight", typeof(double), typeof(WorkCard), new PropertyMetadata(Double.NaN));
 
     }
 }
