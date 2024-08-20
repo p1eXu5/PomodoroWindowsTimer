@@ -24,7 +24,9 @@ open Elmish.Extensions
 open PomodoroWindowsTimer
 open System.Threading
 
-
+/// Check MainModel.CurrentWork. Asserts it Number and Title.
+///
+/// Returns MainModel.CurrentWork if it set.
 let ``Current Work has been set to`` (expectedCurrentWork: Work) =
     scenario {
         let! (sut: ISut) = Scenario.getState

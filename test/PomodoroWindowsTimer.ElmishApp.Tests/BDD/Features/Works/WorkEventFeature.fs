@@ -303,7 +303,7 @@ module WorkEventFeature =
     let ``UC5-15: Current Work set -> Playing -> new Work is created and selected -> adds events`` () =
         scenario {
             let timePoints = [ workTP 10.0<sec>; breakTP ``3 sec`` ]
-            let! _ =
+            let! work1 =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
@@ -318,16 +318,19 @@ module WorkEventFeature =
             do! When.``CreatingWork SetNumber msg has been dispatched with`` work2.Number
             do! When.``CreatingWork SetTitle msg has been dispatched with`` work2.Title
             do! When.``CreatingWorkModel CreateWork msg has been dispatched`` ()
+
             do! When.``WorkList sub model has been shown`` 2<times>
             do! When.``WorkSelector drawer is closing`` ()
+            do! When.``Spent 2.5 ticks`` ()
 
             do! Then.``MainModel WorkSelector becomes None`` ()
-            let! _ = Then.``Current Work has been set to`` work2
-            do! Then.``Work events in db exist`` 1UL [ // first newly created work Id
+            let! work2 = Then.``Current Work has been set to`` work2
+
+            do! Then.``Work events in db exist`` work1.Id [ // first newly created work Id
                 <@@ WorkEvent.WorkStarted @@>
                 <@@ WorkEvent.Stopped @@>
             ]
-            do! Then.``Work events in db exist`` 2UL [ // first newly created work Id
+            do! Then.``Work events in db exist`` work2.Id [ // first newly created work Id
                 <@@ WorkEvent.WorkStarted @@>
             ]
         }
