@@ -19,7 +19,7 @@
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       HorizontalContentAlignment="Stretch"
-                      VerticalContentAlignment="Center"
+                      VerticalContentAlignment="Top"
                       ItemsSource="{Binding WorkModelList}"
                       ScrollViewer.VerticalScrollBarVisibility="Visible"
                       ScrollViewer.CanContentScroll="False"

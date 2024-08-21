@@ -6,9 +6,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:dailyStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+        xmlns:DailyStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
         xmlns:workStatistic="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works.Statistic"
-        d:DataContext="{d:DesignInstance Type=dailyStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
+        d:DataContext="{d:DesignInstance Type=DailyStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
         Title="WorkStatisticWindow"
         Style="{StaticResource MaterialDesignWindow}"
         Width="1600"
@@ -18,29 +18,30 @@
         Background="#1E1E1E"
         mc:Ignorable="d"
         >
-    <Behaviors:Interaction.Triggers>
-        <Behaviors:EventTrigger EventName="Closing"
-                                SourceObject="{Binding ElementName=m_WorkStatisticWindowRoot}"
-                                >
-            <Behaviors:InvokeCommandAction Command="{Binding CloseCommand}" />
-        </Behaviors:EventTrigger>
-    </Behaviors:Interaction.Triggers>
-    <materialDesign:DialogHost x:Name="m_WorkStatisticWindowDialogHost"
-                               CloseOnClickAway="True"
-                               DialogTheme="Inherit"
-                               Identifier="WorkStatisticWindowDialogHost"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
-                                                              Path=MessageQueue}"
-                               >
-        <DockPanel>
-            <materialDesign:Snackbar DockPanel.Dock="Bottom"
-                                     x:Name="m_ErrorMessageQueueSnackbar"
-                                     HorizontalAlignment="Stretch"
-                                     ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
-                                     MessageQueue="{Binding ErrorMessageQueue}"
-                                     />
+  <Behaviors:Interaction.Triggers>
+    <Behaviors:EventTrigger EventName="Closing"
+                            SourceObject="{Binding ElementName=m_WorkStatisticWindowRoot}"
+                            >
+      <Behaviors:InvokeCommandAction Command="{Binding CloseCommand}" />
+    </Behaviors:EventTrigger>
+  </Behaviors:Interaction.Triggers>
 
-            <workStatistic:DailyStatisticTableList />
-        </DockPanel>
-    </materialDesign:DialogHost>
+  <materialDesign:DialogHost x:Name="m_WorkStatisticWindowDialogHost"
+                             CloseOnClickAway="True"
+                             DialogTheme="Inherit"
+                             Identifier="WorkStatisticWindowDialogHost"
+                             SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
+                                                            Path=MessageQueue}"
+                             >
+    <DockPanel>
+      <materialDesign:Snackbar DockPanel.Dock="Bottom"
+                               x:Name="m_ErrorMessageQueueSnackbar"
+                               HorizontalAlignment="Stretch"
+                               ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                               MessageQueue="{Binding ErrorMessageQueue}"
+                               />
+
+      <workStatistic:DailyStatisticTableList />
+    </DockPanel>
+  </materialDesign:DialogHost>
 </Window>
