@@ -23,9 +23,19 @@ module WorkEventSpentTimeProjectorTests =
     let private ct = CancellationToken.None
     let private work = Work.generate ()
 
+    let fromMin (v: int) = TimeSpan.FromMinutes(v)
+
     let diff (endTime: string) (startTime: string) =
         TimeOnly.ParseExact(endTime, "HH:mm", null) - TimeOnly.ParseExact(startTime, "HH:mm", null)
         |> fun ts -> ts.TotalSeconds * 1.0<sec>
+
+    let mockWorkEventRepo kind notAfter workEventLists =
+        let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
+        let _ = 
+            (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
+                .Returns(workEventLists |> Ok)
+        mockWorkEventRepo
+
 
     [<Test>]
     let ``01: Start-stop work events test`` () =
@@ -40,10 +50,7 @@ module WorkEventSpentTimeProjectorTests =
             let notAfter = DateTimeOffset(date, TimeOnly(12, 5, 0), TimeSpan.Zero)
             let diff = diff "12:05" "12:00"
 
-            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
-            let _ = 
-                (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
-                    .Returns(workEventLists |> Ok)
+            let mockWorkEventRepo = mockWorkEventRepo kind notAfter workEventLists
 
             let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
 
@@ -63,16 +70,13 @@ module WorkEventSpentTimeProjectorTests =
         taskResult {
             let workEventLists =
                 [
-                    work, WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(10.0)) None
+                    work, WorkEvent.createWorkIncreasedWith date "12:10" (fromMin 10) None
                 ]
             let kind = Kind.Work
             let notAfter = DateTimeOffset(date, TimeOnly(12, 10, 0), TimeSpan.Zero)
             let diff = diff "12:10" "12:00"
 
-            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
-            let _ = 
-                (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
-                    .Returns(workEventLists |> Ok)
+            let mockWorkEventRepo = mockWorkEventRepo kind notAfter workEventLists
 
             let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
 
@@ -94,7 +98,7 @@ module WorkEventSpentTimeProjectorTests =
                 [
                     work, WorkEvent.generateWorkStartedWith date "12:00"
                     work, WorkEvent.generateStoppedWith date "12:05"
-                    work, WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(5.0)) None
+                    work, WorkEvent.createWorkIncreasedWith date "12:10" (fromMin 5) None
                     work, WorkEvent.generateWorkStartedWith date "12:11"
                     work, WorkEvent.generateStoppedWith date "12:16"
                 ]
@@ -103,10 +107,7 @@ module WorkEventSpentTimeProjectorTests =
             let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
             let diff = (diff "12:05" "12:00") + (diff "12:16" "12:11")
 
-            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
-            let _ = 
-                (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
-                    .Returns(workEventLists |> Ok)
+            let mockWorkEventRepo = mockWorkEventRepo kind notAfter workEventLists
 
             let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
 
@@ -128,7 +129,7 @@ module WorkEventSpentTimeProjectorTests =
                 [
                     work, WorkEvent.generateWorkStartedWith date "12:00"
                     work, WorkEvent.generateStoppedWith date "12:05"
-                    work, WorkEvent.createWorkIncreasedWith date "12:10" (TimeSpan.FromMinutes(5.0)) None
+                    work, WorkEvent.createWorkIncreasedWith date "12:10" (fromMin 5) None
                     work, WorkEvent.generateWorkStartedWith date "12:11"
                     work, WorkEvent.generateStoppedWith date "12:16"
                 ]
@@ -137,10 +138,7 @@ module WorkEventSpentTimeProjectorTests =
             let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
             let diff = (diff "12:16" "12:00")
 
-            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
-            let _ = 
-                (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
-                    .Returns(workEventLists |> Ok)
+            let mockWorkEventRepo = mockWorkEventRepo kind notAfter workEventLists
 
             let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
 
@@ -162,7 +160,7 @@ module WorkEventSpentTimeProjectorTests =
                 [
                     work, WorkEvent.generateWorkStartedWith date "12:00"
                     work, WorkEvent.generateStoppedWith date "12:05"
-                    work, WorkEvent.createWorkReducedWith date "12:06" (TimeSpan.FromMinutes(5.0)) None
+                    work, WorkEvent.createWorkReducedWith date "12:06" (fromMin 5) None
 
                     work, WorkEvent.generateWorkStartedWith date "12:11"
                     work, WorkEvent.generateStoppedWith date "12:16"
@@ -172,10 +170,7 @@ module WorkEventSpentTimeProjectorTests =
             let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
             let diff = (diff "12:05" "12:00") + (diff "12:16" "12:11")
 
-            let mockWorkEventRepo = Substitute.For<IWorkEventRepository>()
-            let _ = 
-                (mockWorkEventRepo.FindByActiveTimePointIdByDateAsync timePointId kind notAfter ct)
-                    .Returns(workEventLists |> Ok)
+            let mockWorkEventRepo = mockWorkEventRepo kind notAfter workEventLists
 
             let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
 
@@ -185,11 +180,32 @@ module WorkEventSpentTimeProjectorTests =
                     SpentTime = TimeSpan.FromMinutes(5.0)
                 }
             ])
-
-            return ()
         }
         |> TaskResult.runTest
 
+    [<Test>]
+    let ``07: Single increase event, diff is less, returns diff`` () =
+        taskResult {
+            let workEventLists =
+                [
+                    work, WorkEvent.createWorkIncreasedWithNoTimePoint date "12:10" (fromMin 10)
+                ]
+                |> List.rev
+            let kind = Kind.Work
+            let notAfter = DateTimeOffset(date, TimeOnly(12, 16, 0), TimeSpan.Zero)
+            let diff = (diff "12:10" "12:05")
 
+            let mockWorkEventRepo = mockWorkEventRepo kind notAfter workEventLists
+
+            let! res = WorkEventSpentTimeProjector.workSpentTimeListTask mockWorkEventRepo timePointId kind notAfter diff ct
+
+            %res.Should().Be([
+                {
+                    Work = work
+                    SpentTime = TimeSpan.FromMinutes(5.0)
+                }
+            ])
+        }
+        |> TaskResult.runTest
 
 

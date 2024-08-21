@@ -12,12 +12,17 @@ let rec internal projectSpentTime (lastWorkEvent: Work * WorkEvent) (workEvents:
         match lastWorkEvent with
         | lastWork, WorkEvent.WorkIncreased (value = v)
         | lastWork, WorkEvent.BreakIncreased (value = v) ->
+            let spentTime =
+                if v > remainingTime then
+                    remainingTime
+                else
+                    v
             let workSpentTime = 
                 match res |> Map.tryFind lastWork.Id with
                 | None ->
-                    { Work = lastWork; SpentTime = v }
+                    { Work = lastWork; SpentTime = spentTime }
                 | Some workSpentTime ->
-                    { workSpentTime with SpentTime = workSpentTime.SpentTime + v }
+                    { workSpentTime with SpentTime = workSpentTime.SpentTime + spentTime }
 
             res |> Map.add lastWork.Id workSpentTime
 
@@ -39,7 +44,13 @@ let rec internal projectSpentTime (lastWorkEvent: Work * WorkEvent) (workEvents:
         match lastWorkEvent, ev with
         | (lastWork, WorkEvent.Stopped endDt), WorkEvent.WorkStarted (createdAt = startDt)
         | (lastWork, WorkEvent.Stopped endDt), WorkEvent.BreakStarted (createdAt = startDt) when work.Id = lastWork.Id ->
-            let spentTime = endDt - startDt
+            let spentTime =
+                let diff = (endDt - startDt)
+                if diff > remainingTime then
+                    remainingTime
+                else
+                    diff
+
             let workSpentTime = 
                 match res |> Map.tryFind work.Id with
                 | None ->

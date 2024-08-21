@@ -241,6 +241,9 @@ module WorkEvent =
     let generateWorkIncreasedWith (date: DateOnly) (timeStr: string) =
         WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)), None)
 
+    let createWorkIncreasedWithNoTimePoint (date: DateOnly) (timeStr: string) (time: TimeSpan) =
+        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, time, None)
+
     let createWorkIncreasedWith (date: DateOnly) (timeStr: string) (time: TimeSpan) (timePointId: TimePointId option) =
         WorkEvent.WorkIncreased (generateCreatedAt date timeStr, time, timePointId)
 
