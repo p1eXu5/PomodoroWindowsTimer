@@ -14,6 +14,11 @@ internal sealed class TimeSpanToMnemonicStringConverterS : IValueConverter
             double totalMinutes = Math.Abs(ts.TotalMinutes);
             int hours = (int)(totalMinutes / 60.0);
             int minutes = (int)(Math.Ceiling(totalMinutes - hours * 60));
+            if (minutes == 60)
+            {
+                minutes -= 60;
+                hours += 1;
+            }
             char sign = ts < TimeSpan.Zero ? '-' : '+';
 
             return $"{sign}{hours,2:#0}h {minutes:00}m";

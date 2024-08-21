@@ -17,6 +17,8 @@
     <Compile Include="WorkEventDetailsModel\WorkEventDetailsModel.fs" />
     <Compile Include="WorkEventModel\WorkEventModel.fs" />
     <Compile Include="WorkEventListModel\WorkEventListModel.fs" />
+    <Compile Include="WorkEventListModel\WorkEventListModel.Program.fs" />
+    <Compile Include="WorkEventListModel\WorkEventListModel.Bindings.fs" />
     <Compile Include="WorkModel\WorkModel.fs" />
     <Compile Include="WorkModel\WorkModel.Program.fs" />
     <Compile Include="WorkModel\WorkModel.Bindings.fs" />
