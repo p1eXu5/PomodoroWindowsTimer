@@ -22,6 +22,7 @@ module WorkListModel =
         | UnselectWork
         | SetLastDayCount of string
         | LoadLastDayCount
+        | Close
         | OnExn of exn
 
     module MsgWith =
@@ -38,6 +39,9 @@ module WorkListModel =
                 model.Works |> AsyncDeferred.chooseRetrievedResultWithin res cts
             | _ -> None
  
+
+    // intent --------------------------
+
     [<RequireQualifiedAccess; Struct>]
     type Intent =
         | None
@@ -45,6 +49,7 @@ module WorkListModel =
         | Select
         | Unselect
         | Edit of workModel: WorkModel * selectedWorkId: uint64 option
+        | CloseDialogRequested
 
     [<AutoOpen>]
     module Intent =
@@ -62,6 +67,8 @@ module WorkListModel =
         let withUnselectIntent (model, cmd) =
             (model, cmd, Intent.Unselect)
 
+    // init -------------------------
+
     open Elmish
 
     let init selectedWorkId =
@@ -72,6 +79,8 @@ module WorkListModel =
         }
         , Cmd.ofMsg (AsyncOperation.startUnit Msg.LoadWorkList)
 
+
+    // accessors --------------------
 
     let withSelectedWorkId id (model: WorkListModel) =
         { model with SelectedWorkId = id }

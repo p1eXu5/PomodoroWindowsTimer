@@ -39,6 +39,9 @@
     <Compile Include="WorkSelectorModel\WorkSelectorModel.fs" />
     <Compile Include="WorkSelectorModel\WorkSelectorModel.Program.fs" />
     <Compile Include="WorkSelectorModel\WorkSelectorModel.Bindings.fs" />
+    <Compile Include="StatisticMainModel\StatisticMainModel.fs" />
+    <Compile Include="StatisticMainModel\StatisticMainModel.Program.fs" />
+    <Compile Include="StatisticMainModel\StatisticMainModel.Bindings.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Program.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Bindings.fs" />

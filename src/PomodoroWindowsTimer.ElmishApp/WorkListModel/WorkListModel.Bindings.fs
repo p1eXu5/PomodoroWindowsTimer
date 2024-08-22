@@ -1,6 +1,5 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.WorkListModel
 
-
 open Elmish.WPF
 open Elmish.Extensions
 
@@ -35,6 +34,9 @@ type Bindings() =
                 : WorkModel list
             )
             |> Binding.mapMsg Msg.WorkModelMsg
+
+    member val WorkListDeff : Binding =
+        nameof __.WorkListDeff |> Binding.oneWay _.Works
 
     member val SelectedWorkModel : Binding =
         nameof __.SelectedWorkModel

@@ -133,6 +133,15 @@ let compose
         let updateWorkSelectorModel =
             WorkSelectorModel.Program.update updateWorkListModel updateCreatingWorkModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
 
+        let initStatisticMainModel () =
+            StatisticMainModel.init userSettings timeProvider
+
+        let updateStatisticMainModel =
+            StatisticMainModel.Program.update
+                updateDailyStatisticListModel
+                updateWorkListModel
+                (loggerFactory.CreateLogger<StatisticMainModel>())
+
         let updatePlayerModel =
             PlayerModel.Program.update
                 looper
@@ -152,8 +161,8 @@ let compose
             updateWorkModel
             updateAppDialogModel
             updateWorkSelectorModel
-            initDailyStatisticListModel
-            updateDailyStatisticListModel
+            initStatisticMainModel
+            updateStatisticMainModel
             updatePlayerModel
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())

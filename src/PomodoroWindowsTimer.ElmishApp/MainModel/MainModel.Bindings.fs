@@ -129,15 +129,15 @@ Current work is [{wm.Work.Number}] {wm.Work.Title}."""
         nameof __.IsWorkSelectorLoaded |> Binding.twoWay (_.WorkSelector >> Option.isSome, Msg.SetIsWorkSelectorLoaded)
 
     member val IsWorkStatisticShown : Binding =
-        nameof __.IsWorkStatisticShown |> Binding.twoWay (_.DailyStatisticList >> Option.isSome, Msg.SetIsWorkStatisticShown)
+        nameof __.IsWorkStatisticShown |> Binding.twoWay (_.StatisticMainModel >> Option.isSome, Msg.SetIsWorkStatisticShown)
 
     member val WorkStatisticWindow : Binding =
         nameof __.WorkStatisticWindow
             |> Binding.subModelWin (
-                (_.DailyStatisticList >> WindowState.ofOption),
+                (_.StatisticMainModel >> WindowState.ofOption),
                 snd,
-                Msg.DailyStatisticListModelMsg,
-                (fun () -> DailyStatisticListModel.Bindings.ToList(dialogErrorMessageQueue)),
+                Msg.StatisticMainModelMsg,
+                (fun () -> StatisticMainModel.Bindings.ToList(dialogErrorMessageQueue)),
                 (fun _ _ -> workStatisticWindowFactory.Invoke()),
                 isModal = false
             )
@@ -148,43 +148,5 @@ Current work is [{wm.Work.Number}] {wm.Work.Title}."""
             |> Binding.mapModel _.Player
             |> Binding.mapMsg Msg.PlayerModelMsg
 
-(*
-let bindings title assemblyVersion errorMessageQueue : Binding<MainModel, Msg> list =
-    [
-        // "BotSettingsModel"
-        //     |> Binding.SubModel.opt BotSettingsModel.Bindings.bindings
-        //     |> Binding.mapModel _.BotSettingsModel
-        //     |> Binding.mapMsg MainModel.Msg.BotSettingsMsg
-        // 
-        // "TimePointsGeneratorModel"
-        //     |> Binding.SubModel.opt TimePointsGeneratorModel.Bindings.bindings
-        //     |> Binding.mapModel _.TimePointsGeneratorModel
-        //     |> Binding.mapMsg MainModel.Msg.TimePointsGeneratorMsg
-        // 
-        // "HasTimePointsGenerator" |> Binding.twoWay (_.TimePointsGeneratorModel >> Option.isSome, Msg.EraseTimePointsGeneratorModel)
-
-        // "LoadTimePointsGeneratorCommand"
-        //     |> Binding.cmdIf (fun model ->
-        //         match model.TimePointsGeneratorModel with
-        //         | None -> Msg.InitializeTimePointsGeneratorModel |> Some
-        //         | Some _ -> None
-        //     )
-
-        // "TryStoreAndSetTimePointsCommand"
-        //     |> Binding.cmdIf (fun m ->
-        //         m.TimePointsGeneratorModel
-        //         |> Option.bind (fun tpModel ->
-        //             if not tpModel.IsPatternWrong then
-        //                 Msg.LoadTimePoints (tpModel.TimePoints |> List.map _.TimePoint) |> Some
-        //             else
-        //                 None
-        //         )
-        //     )
-
-        // "IsDialogOpened" |> Binding.oneWay (_.BotSettingsModel >> Option.isSome)
-
-        // "LoadBotSettingsModelCommand" |> Binding.cmd Msg.LoadBotSettingsModel
-    ]
-*)
 
 

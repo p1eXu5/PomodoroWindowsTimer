@@ -26,7 +26,7 @@ type MainModel =
         CurrentWork: WorkModel option
 
         /// Statistic window
-        DailyStatisticList: DailyStatisticListModel option
+        StatisticMainModel: StatisticMainModel option
 
         AppDialog: AppDialogModel
     }
@@ -80,7 +80,7 @@ module MainModel =
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
 
         | SetIsWorkStatisticShown of bool
-        | DailyStatisticListModelMsg of DailyStatisticListModel.Msg
+        | StatisticMainModelMsg of StatisticMainModel.Msg
         
         | OnError of string
         | OnExn of exn
@@ -102,10 +102,12 @@ module MainModel =
                 (smsg, sm) |> Some
             | _ -> None
 
-        let (|WorkStatisticListModelMsg|_|) (model: MainModel) (msg: Msg) =
-            match msg, model.DailyStatisticList with
-            | Msg.DailyStatisticListModelMsg msg, Some m ->
-                (msg, m) |> Some
+        let (|StatisticMainModelMsg|_|) (model: MainModel) (msg: Msg) =
+            match model.StatisticMainModel with
+            | Some sm ->
+                match msg with
+                | Msg.StatisticMainModelMsg smsg -> (smsg, sm) |> Some
+                | _ -> None
             | _ -> None
 
     //    let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
@@ -136,7 +138,7 @@ module MainModel =
             //BotSettingsModel = None
             //TimePointsGeneratorModel = None
 
-            DailyStatisticList = None
+            StatisticMainModel = None
 
             AppDialog = AppDialogModel.NoDialog
         }
@@ -165,7 +167,7 @@ module MainModel =
          { model with IsTimePointsShown = v }
 
     let withDailyStatisticList workStatisticListModel (model: MainModel) =
-        { model with DailyStatisticList = workStatisticListModel }
+        { model with StatisticMainModel = workStatisticListModel }
 
     let withPlayerModel playerModel (model: MainModel) =
         { model with Player = playerModel }

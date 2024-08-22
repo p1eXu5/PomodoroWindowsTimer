@@ -1,0 +1,93 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkTable"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:PomodoroWindowsTimer.WpfClient.Behaviors"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
+             xmlns:WorkListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             d:DataContext="{d:DesignInstance Type=WorkListModel:Bindings, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             mc:Ignorable="d"
+             >
+    <Border>
+        <Grid HorizontalAlignment="Stretch">
+            <DataGrid x:Name="m_StatisticTable"
+                      HorizontalAlignment="Stretch"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      HeadersVisibility="All"
+                      IsReadOnly="False"
+                      ItemsSource="{Binding WorkModelList}"
+                      SelectionMode="Extended"
+                      SelectionUnit="CellOrRowHeader"
+                      >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Number}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Number"
+                                        IsReadOnly="True"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding Title}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Title"
+                                        IsReadOnly="True"
+                                        />
+
+                    <DataGridTextColumn Binding="{Binding LastEventCreatedAt}"
+                                        ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                                        Header="Last event created at"
+                                        IsReadOnly="True"
+                                        SortDirection="Descending"
+                                        />
+
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="0" />
+                            </Style>
+                        </DataGridTemplateColumn.CellStyle>
+
+                        <!-- TODO: add edit work dialog to StatisticWindow dialog host
+
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
+                                Content="Log Time"
+                                Style="{StaticResource MaterialDesignFlatLightButton}"
+                                Margin="0"
+                                materialDesign:ButtonAssist.CornerRadius="0"
+                                >
+                                    <Button.CommandParameter>
+                                        <local:EditableWork />
+                                    </Button.CommandParameter>
+                                    <Behaviors:Interaction.Behaviors>
+                                        <behaviors:DialogEventHandlerBehavior CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                                             AncestorType=Window},
+                                                                                              Path=DataContext.UnloadEditableWorkModelCommand}"
+                                                                      LoadDialogModelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                                                      AncestorType=UserControl},
+                                                                                                       Path=DataContext.LoadEditableWorkModelCommand}"
+                                                                      LoadDialogModelCommandParameter="{Binding WorkId}"
+                                                                      OkCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                                                         AncestorType=Window},
+                                                                                          Path=DataContext.UnloadEditableWorkModelCommand}"
+                                                                      />
+                                    </Behaviors:Interaction.Behaviors>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>-->
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <shared:Spinner Visibility="{Binding WorkListDeff, Converter={StaticResource conv_AsyncDeferredToVisicbility}}" />
+        </Grid>
+
+    </Border>
+</UserControl>

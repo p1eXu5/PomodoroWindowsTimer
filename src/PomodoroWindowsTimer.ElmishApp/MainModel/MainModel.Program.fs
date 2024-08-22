@@ -64,7 +64,7 @@ let update
     updateAppDialogModel
     updateWorkSelectorModel
     initWorkStatisticListModel
-    updateDailyStatisticListModel
+    updateStatisticMainModel
     updatePlayerModel
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
@@ -231,19 +231,19 @@ let update
         if v then
             let (m, cmd) = initWorkStatisticListModel ()
             model |> MainModel.withDailyStatisticList (m |> Some)
-            , Cmd.map Msg.DailyStatisticListModelMsg cmd
+            , Cmd.map Msg.StatisticMainModelMsg cmd
         else
             model |> MainModel.withDailyStatisticList None
             , Cmd.none
 
 
-    | MsgWith.WorkStatisticListModelMsg model (smsg, sm) ->
-        let (m, cmd, intent) = updateDailyStatisticListModel smsg sm
+    | MsgWith.StatisticMainModelMsg model (smsg, sm) ->
+        let (m, cmd, intent) = updateStatisticMainModel smsg sm
         match intent with
-        | DailyStatisticListModel.Intent.None ->
+        | StatisticMainModel.Intent.None ->
             model |> MainModel.withDailyStatisticList (m |> Some)
-            , Cmd.map Msg.DailyStatisticListModelMsg cmd
-        | DailyStatisticListModel.Intent.CloseDialogRequested ->
+            , Cmd.map Msg.StatisticMainModelMsg cmd
+        | StatisticMainModel.Intent.CloseWindow ->
             model |> MainModel.withDailyStatisticList None
             , Cmd.none
 
