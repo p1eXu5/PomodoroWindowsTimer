@@ -168,9 +168,11 @@ let update
             let sendToChatBotCmd =
                 match currentWorkOpt with
                 | None ->
-                    $"It's time to {nextTp.Name}!"
+                    $"It's time to {nextTp.Name}!!"
                 | Some wm ->
-                    $"It's time to {nextTp.Name}! Current work is [{wm.Number}] {wm.Title}."
+                    $"""It's time to {nextTp.Name}!!
+                    
+Current work is [{wm.Number}] {wm.Title}."""
                 |> fun message ->
                     Cmd.OfTask.attempt telegramBot.SendMessage message Msg.OnExn
 
