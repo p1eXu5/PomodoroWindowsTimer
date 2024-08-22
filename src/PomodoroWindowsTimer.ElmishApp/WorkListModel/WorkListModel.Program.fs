@@ -114,6 +114,7 @@ let update (userSettings: IUserSettings) (workRepo: IWorkRepository) (logger: IL
         model |> withLastDayCount userSettings.LastDayCount |> withCmdNone |> withNoIntent
 
     | Msg.OnExn ex ->
+        logger.LogError(ex, "Exception has been thrown in WorkListModel Program.")
         errorMessageQueue.EnqueueError ex.Message
         model |> withCmdNone |> withNoIntent
 

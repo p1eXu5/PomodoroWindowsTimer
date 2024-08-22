@@ -12,81 +12,81 @@
              Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
-  <UserControl.Resources>
-    <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
-  </UserControl.Resources>
-  <StackPanel Margin="10"
-              VerticalAlignment="Top"
-              Orientation="Vertical"
-              >
-
-    <TextBlock HorizontalAlignment="Center"
-               FontSize="20"
-               Text="SKIP OR APPLY TIME"
-               TextAlignment="Center"
-               TextWrapping="Wrap"
-               />
-    <TextBlock Margin="10,24,10,0"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Bottom"
-               materialDesign:HintAssist.Hint="Number"
-               Text="{Binding Number,
-                              Converter={StaticResource conv_NoNumberConverter},
-                              FallbackValue='NO NUMBER'}"
-               FontWeight="Normal"
-               FontSize="11"
-               />
-    <TextBlock ToolTip="{Binding Title}"
-               Margin="10,5"
-               VerticalAlignment="Top"
-               materialDesign:HintAssist.Hint="Title"
-               FontSize="16"
-               FontWeight="Normal"
-               Text="{Binding Title,
-                              FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
-               TextTrimming="CharacterEllipsis"
-               TextWrapping="Wrap"
-               />
-    <TextBlock Margin="0,20"
-               HorizontalAlignment="Center"
-               FontSize="20"
-               Text="{Binding Difference,
-                              Converter={StaticResource conv_TimeSpanToMinutes},
-                              FallbackValue='20 mimutes'}"
-               TextAlignment="Center"
-               TextWrapping="Wrap"
-               />
-    <StackPanel HorizontalAlignment="Center"
-                Orientation="Horizontal"
+    <UserControl.Resources>
+        <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
+    </UserControl.Resources>
+    <StackPanel Margin="10"
+                VerticalAlignment="Top"
+                Orientation="Vertical"
                 >
-      <Button DockPanel.Dock="Bottom"
-              Command="{Binding AsBreakCommand}"
-              Content="AS BREAK"
-              Style="{StaticResource PomodoroDialogButton}"
-              Visibility="{Binding IsBreakKind,
-                                   Converter={StaticResource conv_BooleanToVisibility}}"
-              />
 
-      <Button DockPanel.Dock="Bottom"
-              Command="{Binding AsWorkCommand}"
-              Content="AS WORK"
-              Style="{StaticResource PomodoroDialogButton}"
-              Visibility="{Binding IsWorkKind,
-                                   Converter={StaticResource conv_BooleanToVisibility}}"
-              />
+        <TextBlock HorizontalAlignment="Center"
+                   FontSize="20"
+                   Text="SKIP OR APPLY TIME"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"
+                   />
+        <TextBlock Margin="10,24,10,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   materialDesign:HintAssist.Hint="Number"
+                   Text="{Binding Number,
+                                  Converter={StaticResource conv_NoNumberConverter},
+                                  FallbackValue='NO NUMBER'}"
+                   FontWeight="Normal"
+                   FontSize="11"
+                   />
+        <TextBlock ToolTip="{Binding Title}"
+                   Margin="10,5"
+                   VerticalAlignment="Top"
+                   materialDesign:HintAssist.Hint="Title"
+                   FontSize="16"
+                   FontWeight="Normal"
+                   Text="{Binding Title,
+                                  FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                   TextTrimming="CharacterEllipsis"
+                   TextWrapping="Wrap"
+                   />
+        <TextBlock Margin="0,20"
+                   HorizontalAlignment="Center"
+                   FontSize="20"
+                   Text="{Binding Difference,
+                                  Converter={StaticResource conv_TimeSpanToMinutes},
+                                  FallbackValue='20 mimutes'}"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"
+                   />
+        <StackPanel HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding ApplyAsBreakAndCloseCommand}"
+                    Content="AS BREAK"
+                    Style="{StaticResource PomodoroDialogButton}"
+                    Visibility="{Binding IsBreakKind,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    />
 
-      <Button DockPanel.Dock="Bottom"
-              Command="{Binding CloseCommand}"
-              Content="SKIP"
-              Style="{StaticResource PomodoroDialogButton}"
-              />
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding ApplyAsWorkAndCloseCommand}"
+                    Content="AS WORK"
+                    Style="{StaticResource PomodoroDialogButton}"
+                    Visibility="{Binding IsWorkKind,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    />
+
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding CloseCommand}"
+                    Content="SKIP"
+                    Style="{StaticResource PomodoroDialogButton}"
+                    />
+        </StackPanel>
+
+        <CheckBox Content="Remember my choice"
+                  Margin="0,10,0,0"
+                  HorizontalAlignment="Center"
+                  IsChecked="{Binding RememberChoice}"
+                  Visibility="Collapsed"
+                  />
     </StackPanel>
-
-    <CheckBox Content="Remember my choice"
-              Margin="0,10,0,0"
-              HorizontalAlignment="Center"
-              IsChecked="{Binding RememberChoice}"
-              Visibility="Collapsed"
-              />
-  </StackPanel>
 </UserControl>

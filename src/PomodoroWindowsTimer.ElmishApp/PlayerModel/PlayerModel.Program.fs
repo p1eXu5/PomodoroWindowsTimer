@@ -402,10 +402,12 @@ let update
             *)
 
     | Msg.OnError err ->
+        logger.LogError err
         errorMessageQueue.EnqueueError err
         model, Cmd.none, Intent.None
 
     | Msg.OnExn ex ->
+        logger.LogError(ex, "Exception has been thrown in PlayerModel Program.")
         errorMessageQueue.EnqueueError ex.Message
         model |> withCmdNone |> withNoIntent
 

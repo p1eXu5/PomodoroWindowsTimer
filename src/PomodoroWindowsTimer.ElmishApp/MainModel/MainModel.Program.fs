@@ -260,6 +260,7 @@ let update
     // --------------------
 
     | Msg.OnExn ex ->
+        logger.LogError(ex, "Exception has been thrown in MainModel Program.")
         errorMessageQueue.EnqueueError ex.Message
         model, Cmd.none
 

@@ -29,6 +29,7 @@
                                 ToolTip="Refresh statistic"
                                 Margin="5,0,24,0"
                                 ToolBar.OverflowMode="AsNeeded"
+                                Visibility="Collapsed"
                                 />
                         <Button Command="{Binding RefreshStatisticCommand}"
                                 Content="{materialDesign:PackIcon Kind=Refresh}"
