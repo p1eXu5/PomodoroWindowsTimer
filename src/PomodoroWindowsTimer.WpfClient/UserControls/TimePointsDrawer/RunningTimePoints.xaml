@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+             xmlns:TimePointListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.TimePointListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=TimePointListModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d"

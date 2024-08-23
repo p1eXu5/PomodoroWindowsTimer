@@ -18,6 +18,7 @@
             BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
             >
         <Grid>
+            <!--  background kind string  -->
             <TextBlock Margin="10,0,85,0"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
@@ -29,6 +30,7 @@
                        FontWeight="Bold"
                        Foreground="#33444444"
                        />
+            
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />

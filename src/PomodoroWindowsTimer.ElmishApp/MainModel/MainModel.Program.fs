@@ -122,7 +122,7 @@ let update
             |> chain (
                 withUpdatedTimePointListModel
                     TimePointListModel.Program.update
-                    (TimePointListModel.Msg.SetActiveTimePointId (args.NewActiveTimePoint.Id |> Some))
+                    (TimePointListModel.Msg.SetActiveTimePointId (args.NewActiveTimePoint.OriginalId |> Some))
             )
 
     // --------------------
