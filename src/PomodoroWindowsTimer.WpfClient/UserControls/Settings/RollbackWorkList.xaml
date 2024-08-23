@@ -6,8 +6,8 @@
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:rollbackWorkListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.RollbackWorkListModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             d:DataContext="{d:DesignInstance Type=rollbackWorkListModel:Bindings, IsDesignTimeCreatable=False}"
+             xmlns:RollbackWorkListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.RollbackWorkListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=RollbackWorkListModel:Bindings, IsDesignTimeCreatable=False}"
              Height="Auto"
              MaxWidth="600"
              Background="{DynamicResource PrimaryHueDarkBrush}"
@@ -15,48 +15,48 @@
              mc:Ignorable="d"
              >
 
-  <DockPanel Margin="10"
-             VerticalAlignment="Top"
-             LastChildFill="True"
-             >
+    <DockPanel Margin="10"
+               VerticalAlignment="Top"
+               LastChildFill="True"
+               >
 
-    <TextBlock DockPanel.Dock="Top"
-               HorizontalAlignment="Center"
-               FontSize="20"
-               Text="ROLLBACK TIME"
-               TextAlignment="Center"
-               TextWrapping="Wrap"
-               />
+        <TextBlock DockPanel.Dock="Top"
+                   HorizontalAlignment="Center"
+                   FontSize="20"
+                   Text="ROLLBACK TIME"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"
+                   />
 
-    <StackPanel DockPanel.Dock="Bottom"
-                HorizontalAlignment="Center"
-                Orientation="Horizontal"
-                >
-      <Button DockPanel.Dock="Bottom"
-              Command="{Binding ApplyAndCloseCommand}"
-              Content="APPLY"
-              Style="{StaticResource PomodoroDialogButton}"
-              IsDefault="True"
-              />
-      <Button DockPanel.Dock="Bottom"
-              Command="{Binding CloseCommand}"
-              Content="CANCEL"
-              Style="{StaticResource PomodoroDialogButton}"
-              IsCancel="True"
-              />
-    </StackPanel>
+        <StackPanel DockPanel.Dock="Bottom"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding ApplyAndCloseCommand}"
+                    Content="APPLY"
+                    Style="{StaticResource PomodoroDialogButton}"
+                    IsDefault="True"
+                    />
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding CloseCommand}"
+                    Content="CANCEL"
+                    Style="{StaticResource PomodoroDialogButton}"
+                    IsCancel="True"
+                    />
+        </StackPanel>
 
-    <ListBox MaxHeight="500"
-             materialDesign:ListBoxItemAssist.ShowSelection="False"
-             ItemsSource="{Binding RollbackWorkModels}"
-             >
-      <ListBox.ItemTemplate>
-        <DataTemplate>
-          <local:WorkRollbackStrategySelector />
-        </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
+        <ListBox MaxHeight="500"
+                 materialDesign:ListBoxItemAssist.ShowSelection="False"
+                 ItemsSource="{Binding RollbackWorkModels}"
+                 >
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:WorkRollbackStrategySelector />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
-  </DockPanel>
+    </DockPanel>
 </UserControl>
 

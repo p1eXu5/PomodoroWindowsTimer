@@ -24,8 +24,8 @@ type Bindings() =
             (Bindings.Instance())
             props
 
-    member val AppplyAndCloseCommand : Binding =
-        nameof __.AppplyAndCloseCommand |> Binding.cmd Msg.ApplyAndClose
+    member val ApplyAndCloseCommand : Binding =
+        nameof __.ApplyAndCloseCommand |> Binding.cmd Msg.ApplyAndClose
 
     member val CloseCommand : Binding =
         nameof __.CloseCommand |> Binding.cmd Msg.Close
