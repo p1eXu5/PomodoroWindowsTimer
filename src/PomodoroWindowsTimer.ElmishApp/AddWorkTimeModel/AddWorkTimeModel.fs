@@ -85,6 +85,9 @@ type Bindings() =
     member val Title : Binding =
         nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
 
+    member val LastEventCreatedAtOrUpdatedAt : Binding =
+        nameof __.LastEventCreatedAtOrUpdatedAt |> Binding.oneWay (fun m -> m.Work |> _.LastEventCreatedAt |> Option.defaultValue m.Work.UpdatedAt)
+
     member val Date : Binding =
         nameof __.Date |> Binding.twoWay (_.Date, Msg.SetDate)
 

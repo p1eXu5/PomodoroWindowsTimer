@@ -1,15 +1,14 @@
 ﻿module rec PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps.When
 
-open System
+open Elmish.Extensions
+
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.MainModel
+
 open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
-open System.ComponentModel
-open Elmish.Extensions
 
 
 let ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =

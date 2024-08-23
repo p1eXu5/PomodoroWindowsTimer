@@ -5,16 +5,21 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:AddWorkTimeModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AddWorkTimeModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             d:DataContext="{d:DesignInstance Type=AddWorkTimeModel:Bindings, IsDesignTimeCreatable=False}"
+             xmlns:DailyStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=DailyStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
              Width="300"
              Height="332"
+             Loaded="SetDataContextToDailyStatistics"
              Background="{DynamicResource PrimaryHueDarkBrush}"
              Foreground="{DynamicResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <StackPanel>
-        <local:AddWorkTime DataContext="{Binding}" />
+        <!--  DataContext is set in code behind  -->
+        <local:AddWorkTime x:Name="m_AddWorkTime"
+                           DataContext="{Binding AddWorkTimeDialog}"
+                           />
+
         <StackPanel Margin="0,0,0,10"
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"

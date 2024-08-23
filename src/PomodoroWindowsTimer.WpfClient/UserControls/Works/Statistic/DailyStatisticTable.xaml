@@ -24,13 +24,13 @@
                     <StackPanel DockPanel.Dock="Right"
                                 Orientation="Horizontal"
                                 >
-                        <Button Command="{Binding AddWorkEventNotInListCommand}"
+                        <!--<Button Command="{Binding AddWorkEventNotInListCommand}"
                                 Content="{materialDesign:PackIcon Kind=Add}"
                                 ToolTip="Refresh statistic"
                                 Margin="5,0,24,0"
                                 ToolBar.OverflowMode="AsNeeded"
                                 Visibility="Collapsed"
-                                />
+                                />-->
                         <Button Command="{Binding RefreshStatisticCommand}"
                                 Content="{materialDesign:PackIcon Kind=Refresh}"
                                 ToolTip="Refresh statistic"
@@ -295,14 +295,17 @@
                                             </Button.CommandParameter>
                                             <Behaviors:Interaction.Behaviors>
                                                 <behaviors:DialogEventHandlerBehavior CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                                                             AncestorType=Window},
+                                                                                                                                             AncestorType=UserControl,
+                                                                                                                                             AncestorLevel=2},
                                                                                                               Path=DataContext.UnloadAddWorkTimeModelCommand}"
                                                                                       LoadDialogModelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                                                                      AncestorType=UserControl},
+                                                                                                                                                      AncestorType=UserControl,
+                                                                                                                                                      AncestorLevel=1},
                                                                                                                        Path=DataContext.LoadAddWorkTimeModelCommand}"
                                                                                       LoadDialogModelCommandParameter="{Binding WorkId}"
                                                                                       OkCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                                                         AncestorType=Window},
+                                                                                                                                         AncestorType=UserControl,
+                                                                                                                                         AncestorLevel=2},
                                                                                                           Path=DataContext.AddWorkTimeOffsetCommand}"
                                                                                       />
                                             </Behaviors:Interaction.Behaviors>
@@ -330,10 +333,12 @@
                                             </Button.CommandParameter>
                                             <Behaviors:Interaction.Behaviors>
                                                 <behaviors:DialogEventHandlerBehavior CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                                                             AncestorType=Window},
+                                                                                                                                             AncestorType=UserControl,
+                                                                                                                                             AncestorLevel=2},
                                                                                                               Path=DataContext.UnloadWorkEventListModelCommand}"
                                                                                       LoadDialogModelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                                                                      AncestorType=UserControl},
+                                                                                                                                                      AncestorType=UserControl,
+                                                                                                                                                      AncestorLevel=1},
                                                                                                                        Path=DataContext.LoadWorkEventListModelCommand}"
                                                                                       LoadDialogModelCommandParameter="{Binding WorkId}"
                                                                                       />

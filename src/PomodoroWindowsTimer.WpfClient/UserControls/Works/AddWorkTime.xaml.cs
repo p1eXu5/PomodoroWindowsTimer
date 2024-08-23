@@ -24,37 +24,6 @@ public partial class AddWorkTime : UserControl
         InitializeComponent();
     }
 
-    private void m_AddWorkTimeRoot_Loaded(object sender, RoutedEventArgs e)
-    {
-        var parentFrameworkElement = FindParentFrameworkElement(this);
-        if (parentFrameworkElement != null)
-        {
-            this.DataContext = ((dynamic)parentFrameworkElement.DataContext).AddWorkTimeDialog;
-        }
-    }
-    private FrameworkElement? FindParentFrameworkElement(DependencyObject child)
-    {
-        // Get the parent item
-        DependencyObject parentObject = VisualTreeHelper.GetParent(child);
-
-        // We've reached the end of the tree
-        if (parentObject == null) return null;
-
-
-        if (parentObject is FrameworkElement elem && elem.DataContext is not null)
-        {
-            IEnumerable<string> members = ((dynamic)elem.DataContext).GetDynamicMemberNames();
-            if (members.Any(s => s.Equals("AddWorkTimeDialog", StringComparison.Ordinal)))
-            {
-                return elem;
-            }
-            return FindParentFrameworkElement(parentObject);
-        }
-        else
-        {
-            // Use recursion to proceed with the next level
-            return FindParentFrameworkElement(parentObject);
-        }
-    }
+    
 }
 

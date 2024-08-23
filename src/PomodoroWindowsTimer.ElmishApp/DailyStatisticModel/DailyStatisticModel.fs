@@ -11,7 +11,6 @@ type DailyStatisticModel =
         WorkStatistics: AsyncDeferred<WorkStatisticModel list>
         ExportToExcelState: AsyncDeferred<unit>
         AddWorkTime: AddWorkTimeModel option
-        WorkEvents: WorkEventListModel option
         AllocateBreakTimeState: AsyncDeferred<unit>
         AllocatedBreaks: (WorkId * TimeSpan) list
     }
@@ -145,7 +144,6 @@ module DailyStatisticModel =
             WorkStatistics = workStatistics |> AsyncDeferred.Retrieved
             ExportToExcelState = AsyncDeferred.NotRequested
             AddWorkTime = None
-            WorkEvents = None
             AllocateBreakTimeState = AsyncDeferred.NotRequested
             AllocatedBreaks = List.empty
         }
@@ -221,9 +219,6 @@ module DailyStatisticModel =
     let withAddWorkTimeModel addWorkTimeModel (model: DailyStatisticModel) =
         { model with AddWorkTime = addWorkTimeModel }
     
-    let withWorkEventListModel workEventListModel (model: DailyStatisticModel) =
-        { model with WorkEvents = workEventListModel }
-
     let canAllocateBreakTime (model: DailyStatisticModel) =
         match model.WorkStatistics, model.AllocateBreakTimeState with
         | AsyncDeferred.Retrieved l, AsyncDeferred.NotRequested ->

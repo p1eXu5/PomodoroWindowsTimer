@@ -32,7 +32,7 @@
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Light}" />
-        
+
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsSelected}"
                          Value="True"

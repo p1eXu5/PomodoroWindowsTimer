@@ -75,6 +75,20 @@ module MainModel =
                         )
                     )
 
+        module StatisticMainModel =
+            module DailyStatisticList =
+                let ``Is finish of LoadDailyStatistics`` (msg: MainModel.Msg) =
+                    match msg with
+                    | MainModel.Msg.StatisticMainModelMsg statMsg ->
+                        match statMsg with
+                        | StatisticMainModel.Msg.DailyStatisticListModelMsg dailyListMsg ->
+                            match dailyListMsg with
+                            | DailyStatisticListModel.Msg.LoadDailyStatistics (AsyncOperation.Finish _) -> true
+                            | _ -> false
+                        | _ -> false
+                    | _ -> false
+
+
     module MsgWith =
         ()
 
