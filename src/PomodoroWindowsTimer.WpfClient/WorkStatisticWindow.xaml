@@ -43,7 +43,9 @@
 
             <TabControl SelectedIndex="{Binding SelectedTabInd, Mode=OneWayToSource}">
                 <TabItem Header="Statistics">
-                    <workStatistic:DailyStatisticTableList DataContext="{Binding DailyStatistics}" />
+                    <workStatistic:DailyStatisticTableList DataContext="{Binding DailyStatistics}"
+                                                           Margin="5,0,0,0"
+                                                           />
                 </TabItem>
                 <TabItem Header="Works">
                     <!--
@@ -52,7 +54,9 @@
                         1. Try to create simple list box for works
                         2. Try to create simple list view for works
                     -->
-                    <works:WorkTable DataContext="{Binding WorkList}" />
+                    <works:WorkTable DataContext="{Binding WorkList}"
+                                     Margin="5"
+                                     />
                 </TabItem>
             </TabControl>
         </DockPanel>
