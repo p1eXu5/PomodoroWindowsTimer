@@ -28,26 +28,6 @@ public partial class WorkSelector : UserControl
         DateTimeOffset? lastEventCreatedAt;
         DateTimeOffset updatedAt;
 
-        if (searchText != "" && dayCount > TimeSpan.Zero )
-        {
-            string number = ((dynamic)o).Number;
-            string title = ((dynamic)o).Title;
-            lastEventCreatedAt = ((dynamic)o).LastEventCreatedAt;
-            updatedAt = ((dynamic)o).UpdatedAt;
-
-            return
-                (
-                    number.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                    || title.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                )
-                && (
-                    (lastEventCreatedAt.HasValue && (now - lastEventCreatedAt.Value <= dayCount))
-                    ||
-                    (now - updatedAt <= dayCount)
-                )
-                ;
-        }
-
         if (searchText != "")
         {
             string number = ((dynamic)o).Number;
@@ -59,7 +39,6 @@ public partial class WorkSelector : UserControl
                     || title.Contains(searchText, StringComparison.OrdinalIgnoreCase)
                 );
         }
-
 
         lastEventCreatedAt = ((dynamic)o).LastEventCreatedAt;
         updatedAt = ((dynamic)o).UpdatedAt;
@@ -111,10 +90,14 @@ public partial class WorkSelector : UserControl
 
             string countStr = tb.m_Count.Text;
 
-            if (String.IsNullOrEmpty(countStr) || !Int32.TryParse(countStr, out var count) || count < 0)
+            if (String.IsNullOrEmpty(countStr) || !Int32.TryParse(countStr, out int count) || count < 0)
             {
-                DayCount = TimeSpan.Zero;
-                ResetFilter();
+                if (DayCount != TimeSpan.Zero && String.IsNullOrEmpty(SearchText))
+                {
+                    DayCount = TimeSpan.Zero;
+                    ResetFilter();
+                }
+
                 return;
             }
 
