@@ -17,7 +17,9 @@
     <UserControl.Resources>
         <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
     </UserControl.Resources>
-    <Border Style="{StaticResource st_WorkCardWrapperBorder}">
+    <Border x:Name="m_SelectedWorkBorder"
+            Style="{StaticResource st_WorkCardWrapperBorder}"
+            >
         <Grid Margin="0"
               VerticalAlignment="Center"
               >
@@ -28,9 +30,11 @@
 
             <local:WorkCard Grid.Column="0"
                             x:Name="m_WorkCard"
+                            Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
                             />
 
             <Button Grid.Column="1"
+                    x:Name="m_SelectedWorkEditButton"
                     Command="{Binding EditCommand}"
                     Content="{materialDesign:PackIcon Pencil}"
                     Style="{StaticResource st_WorkEditButton}"

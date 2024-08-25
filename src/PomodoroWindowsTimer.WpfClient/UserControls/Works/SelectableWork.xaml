@@ -19,6 +19,7 @@
              >
     <UserControl.Resources>
         <conv:NoNumberConverter x:Key="conv_NoNumberConverter" />
+        <local:IsWorkSelectedMultiConverter x:Key="conv_IsWorkSelected" />
     </UserControl.Resources>
 
     <Border Height="Auto"
@@ -27,9 +28,28 @@
             BorderBrush="Black"
             SnapsToDevicePixels="True"
             >
-        <Border Style="{StaticResource st_WorkCardWrapperBorder}"
+        <Border x:Name="m_SelectableWorkInnerBorder"
                 Height="Auto"
                 >
+            <Border.Style>
+                <Style TargetType="Border"
+                       BasedOn="{StaticResource st_WorkCardWrapperBorder}"
+                       >
+                    <Style.Triggers>
+                        <DataTrigger Value="True">
+                            <DataTrigger.Binding>
+                                <MultiBinding Converter="{StaticResource conv_IsWorkSelected}">
+                                    <Binding Path="Id" />
+                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
+                                             Path="DataContext.SelectedWorkId"
+                                             />
+                                </MultiBinding>
+                            </DataTrigger.Binding>
+                            <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
             <Grid Height="Auto"
                   Margin="0"
                   VerticalAlignment="Center"
@@ -53,16 +73,40 @@
                         >
                     <local:WorkCard x:Name="m_WorkCard"
                                     DataContext="{Binding}"
+                                    Foreground="{Binding ElementName=m_SelectableWorkInnerBorder,
+                                                         Path=(TextElement.Foreground)}"
                                     />
                 </Button>
 
                 <Button Grid.Column="1"
+                        x:Name="m_SelectableWorkEditButton"
                         Command="{Binding EditCommand}"
                         Content="{materialDesign:PackIcon Pencil}"
-                        Style="{StaticResource st_WorkEditButton}"
                         Height="{Binding ElementName=m_SelectButton,
                                          Path=ActualHeight}"
-                        />
+                        >
+                    <Button.Style>
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource st_WorkEditButton}"
+                               >
+                            <Style.Triggers>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource conv_IsWorkSelected}">
+                                            <Binding Path="Id" />
+                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
+                                                     Path="DataContext.SelectedWorkId"
+                                                     />
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+                                    <!--<Setter Property="Background" Value="#012A3C" />-->
+                                    <Setter Property="BorderThickness" Value="1,0,0,0" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </Grid>
         </Border>
     </Border>
