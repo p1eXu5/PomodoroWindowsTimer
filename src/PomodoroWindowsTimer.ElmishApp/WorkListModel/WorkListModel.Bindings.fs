@@ -56,4 +56,7 @@ type Bindings() =
     member val LastDayCount : Binding =
         nameof __.LastDayCount |> Binding.twoWay (lastDayCountText, Msg.SetLastDayCount)
 
+    member val SelectedWorkId : Binding =
+        nameof __.SelectedWorkId |> Binding.oneWayOpt _.SelectedWorkId
+
 

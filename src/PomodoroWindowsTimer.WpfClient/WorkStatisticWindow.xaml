@@ -54,7 +54,8 @@
                         1. Try to create simple list box for works
                         2. Try to create simple list view for works
                     -->
-                    <works:WorkTable DataContext="{Binding WorkList}"
+                    <works:WorkTable x:Name="m_WorkTable"
+                                     DataContext="{Binding WorkList}"
                                      Margin="5"
                                      />
                 </TabItem>

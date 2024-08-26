@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
                     >
     <Style x:Key="st_WorkCardWrapperBorder"
            TargetType="Border"
@@ -10,14 +11,7 @@
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="Background" Value="#030C10" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected}"
-                         Value="True"
-                         >
-                <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-            </DataTrigger>
-        </Style.Triggers>
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
     </Style>
 
     <Style x:Key="st_WorkEditButton"
@@ -32,16 +26,5 @@
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Light}" />
-
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected}"
-                         Value="True"
-                         >
-                <!--<Setter Property="Background" Value="#012A3C" />-->
-                <Setter Property="BorderThickness" Value="1,0,0,0" />
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-            </DataTrigger>
-        </Style.Triggers>
-
     </Style>
 </ResourceDictionary>
