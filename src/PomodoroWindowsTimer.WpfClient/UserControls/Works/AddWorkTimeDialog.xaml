@@ -15,7 +15,7 @@
              mc:Ignorable="d"
              >
     <StackPanel>
-        <!--  DataContext is set in code behind  -->
+        <!--  DataContext is set in code behind, see SetDataContextToDailyStatistics  -->
         <local:AddWorkTime x:Name="m_AddWorkTime"
                            DataContext="{Binding AddWorkTimeDialog}"
                            />

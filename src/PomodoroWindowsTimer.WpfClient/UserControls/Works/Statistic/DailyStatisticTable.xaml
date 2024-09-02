@@ -210,6 +210,14 @@
                 </Grid>
 
                 <Grid HorizontalAlignment="Stretch">
+                    <Grid.Resources>
+                        <Style x:Key="st_WrapText"
+                               TargetType="{x:Type TextBlock}"
+                               BasedOn="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                               >
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                        </Style>
+                    </Grid.Resources>
                     <DataGrid x:Name="m_StatisticTable"
                               HorizontalAlignment="Left"
                               AutoGenerateColumns="False"
@@ -233,8 +241,9 @@
                                                 IsReadOnly="True"
                                                 />
 
-                            <DataGridTextColumn Binding="{Binding WorkTitle}"
-                                                ElementStyle="{StaticResource MaterialDesignDataGridTextColumnStyle}"
+                            <DataGridTextColumn Width="500"
+                                                Binding="{Binding WorkTitle}"
+                                                ElementStyle="{StaticResource st_WrapText}"
                                                 Header="Title"
                                                 IsReadOnly="True"
                                                 />
@@ -329,7 +338,7 @@
                                                 materialDesign:ButtonAssist.CornerRadius="0"
                                                 >
                                             <Button.CommandParameter>
-                                                <workEvents:WorkEventList />
+                                                <workEvents:WorkEventListDialog />
                                             </Button.CommandParameter>
                                             <Behaviors:Interaction.Behaviors>
                                                 <behaviors:DialogEventHandlerBehavior CancelCommand="{Binding RelativeSource={RelativeSource Mode=FindAncestor,

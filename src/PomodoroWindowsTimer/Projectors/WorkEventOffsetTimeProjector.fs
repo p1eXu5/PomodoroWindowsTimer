@@ -74,7 +74,8 @@ let internal projectOffsets (workEvents: WorkEvent list) =
 let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint64) (period: DateOnlyPeriod) ct =
     task {
         let! res = workEventRepo.FindByWorkIdByPeriodAsync workId period ct
-        return res |> Result.map projectOffsets
+        let offsets = res |> Result.map projectOffsets
+        return offsets
     }
 
 let projectByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
