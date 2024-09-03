@@ -9,8 +9,7 @@
              d:DataContext="{d:DesignInstance Type=botSettingsModel:Bindings, IsDesignTimeCreatable=False}"
              Width="450"
              Height="200"
-             Background="{DynamicResource PrimaryHueDarkBrush}"
-             Foreground="{DynamicResource MaterialDesignBody}"
+             Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <StackPanel Margin="10"

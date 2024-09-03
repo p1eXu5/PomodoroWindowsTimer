@@ -12,7 +12,7 @@
              HorizontalAlignment="Center"
              d:DesignHeight="180"
              d:DesignWidth="320"
-             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <UserControl.Resources>
@@ -25,7 +25,6 @@
         <!--  header  -->
         <Border DockPanel.Dock="Top"
                 x:Name="m_TimePointsHeader"
-                BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
                 BorderThickness="0,0,0,1"
                 >
             <Grid DockPanel.Dock="Bottom"

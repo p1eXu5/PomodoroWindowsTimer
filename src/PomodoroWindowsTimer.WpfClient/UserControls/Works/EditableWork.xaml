@@ -8,70 +8,70 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              d:DesignHeight="450"
              d:DesignWidth="400"
-             Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+             Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
              mc:Ignorable="d"
              >
-  <DockPanel Margin="50,10"
-             LastChildFill="False"
-             >
-    <TextBlock DockPanel.Dock="Top"
-               Margin="0,20,0,0"
-               Text="{Binding ElementName=m_EditableWorkRoot,
-                              Path=Title,
-                              FallbackValue='TITLE'}"
-               TextAlignment="Center"
-               Foreground="#AAAAAA"
-               />
-    <TextBox DockPanel.Dock="Top"
-             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-             Margin="0,20,0,20"
-             materialDesign:HintAssist.Hint="Number"
-             Text="{Binding EditNumber,
-                            UpdateSourceTrigger=PropertyChanged}"
-             />
-    <Border DockPanel.Dock="Top">
-      <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-               MinHeight="100"
-               VerticalAlignment="Stretch"
-               materialDesign:HintAssist.Hint="Title"
-               Text="{Binding EditTitle,
-                              UpdateSourceTrigger=PropertyChanged}"
-               AcceptsReturn="True"
-               TextWrapping="Wrap"
-               VerticalScrollBarVisibility="Auto"
-               />
-    </Border>
-    <Grid DockPanel.Dock="Top"
-          Margin="0,60,0,10"
-          HorizontalAlignment="Stretch"
-          >
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="20" />
-        <ColumnDefinition Width="*" />
-      </Grid.ColumnDefinitions>
-      <Button DockPanel.Dock="Left"
-              Grid.Column="0"
-              Command="{Binding ElementName=m_EditableWorkRoot,
-                                Path=OkCommand}"
-              Content="{Binding ElementName=m_EditableWorkRoot,
-                                Path=OkCommandContent,
-                                FallbackValue='OK'}"
-              ToolTip="Create Work"
-              Style="{StaticResource MaterialDesignRaisedSecondaryLightButton}"
+    <DockPanel Margin="50,10"
+               LastChildFill="False"
+               >
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="0,20,0,0"
+                   Text="{Binding ElementName=m_EditableWorkRoot,
+                                  Path=Title,
+                                  FallbackValue='TITLE'}"
+                   TextAlignment="Center"
+                   Foreground="#AAAAAA"
+                   />
+        <TextBox DockPanel.Dock="Top"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Margin="0,20,0,20"
+                 materialDesign:HintAssist.Hint="Number"
+                 Text="{Binding EditNumber,
+                                UpdateSourceTrigger=PropertyChanged}"
+                 />
+        <Border DockPanel.Dock="Top">
+            <TextBox Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     MinHeight="100"
+                     VerticalAlignment="Stretch"
+                     materialDesign:HintAssist.Hint="Title"
+                     Text="{Binding EditTitle,
+                                    UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     />
+        </Border>
+        <Grid DockPanel.Dock="Top"
+              Margin="0,60,0,10"
               HorizontalAlignment="Stretch"
-              IsDefault="True"
-              />
-      <Button DockPanel.Dock="Right"
-              Grid.Column="2"
-              Command="{Binding ElementName=m_EditableWorkRoot,
-                                Path=CancelCommand}"
-              Content="CANCEL"
-              ToolTip="Cancel"
-              Style="{StaticResource MaterialDesignRaisedLightButton}"
-              HorizontalAlignment="Stretch"
-              IsCancel="True"
-              />
-    </Grid>
-  </DockPanel>
+              >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="20" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button DockPanel.Dock="Left"
+                    Grid.Column="0"
+                    Command="{Binding ElementName=m_EditableWorkRoot,
+                                      Path=OkCommand}"
+                    Content="{Binding ElementName=m_EditableWorkRoot,
+                                      Path=OkCommandContent,
+                                      FallbackValue='OK'}"
+                    ToolTip="Create Work"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryLightButton}"
+                    HorizontalAlignment="Stretch"
+                    IsDefault="True"
+                    />
+            <Button DockPanel.Dock="Right"
+                    Grid.Column="2"
+                    Command="{Binding ElementName=m_EditableWorkRoot,
+                                      Path=CancelCommand}"
+                    Content="CANCEL"
+                    ToolTip="Cancel"
+                    Style="{StaticResource MaterialDesignRaisedLightButton}"
+                    HorizontalAlignment="Stretch"
+                    IsCancel="True"
+                    />
+        </Grid>
+    </DockPanel>
 </UserControl>

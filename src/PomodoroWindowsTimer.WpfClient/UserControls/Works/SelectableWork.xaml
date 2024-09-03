@@ -45,7 +45,7 @@
                                              />
                                 </MultiBinding>
                             </DataTrigger.Binding>
-                            <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                            <Setter Property="TextElement.Foreground" Value="{StaticResource MaterialDesign.Brush.Foreground}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -101,7 +101,7 @@
                                     </DataTrigger.Binding>
                                     <!--<Setter Property="Background" Value="#012A3C" />-->
                                     <Setter Property="BorderThickness" Value="1,0,0,0" />
-                                    <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
+                                    <Setter Property="Foreground" Value="{StaticResource MaterialDesign.Brush.Foreground}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>

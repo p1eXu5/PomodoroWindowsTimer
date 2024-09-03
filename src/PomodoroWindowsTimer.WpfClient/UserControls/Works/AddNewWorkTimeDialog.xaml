@@ -7,8 +7,7 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              d:DesignHeight="450"
              d:DesignWidth="683"
-             Background="{DynamicResource PrimaryHueDarkBrush}"
-             Foreground="{DynamicResource MaterialDesignBody}"
+             Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <Grid>

@@ -8,8 +8,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="300"
              Height="280"
-             Background="{DynamicResource PrimaryHueDarkBrush}"
-             Foreground="{DynamicResource MaterialDesignBody}"
+             Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <StackPanel Margin="20,20,20,0"

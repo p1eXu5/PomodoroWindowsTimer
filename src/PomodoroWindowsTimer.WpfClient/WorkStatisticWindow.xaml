@@ -15,7 +15,7 @@
         Width="1600"
         Height="800"
         ResizeMode="CanResize"
-        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         Background="#1E1E1E"
         mc:Ignorable="d"
         >

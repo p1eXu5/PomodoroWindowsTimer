@@ -24,8 +24,8 @@
            BasedOn="{StaticResource st_TimePointBaseV2}"
            >
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding TimeSpan}" />
-        <Setter Property="ButtonForeground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
-        <Setter Property="NameForeground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+        <Setter Property="ButtonForeground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
+        <Setter Property="NameForeground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
         <Setter Property="PlayStopCommand" Value="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
         <Setter Property="PlayStopCommandParameter" Value="{Binding Id}" />
     </Style>

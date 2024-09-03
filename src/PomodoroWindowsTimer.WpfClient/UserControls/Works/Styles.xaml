@@ -10,8 +10,8 @@
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="Background" Value="#030C10" />
-        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Foreground}" />
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+        <Setter Property="BorderBrush" Value="{StaticResource MaterialDesign.Brush.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
     </Style>
 
     <Style x:Key="st_WorkEditButton"
@@ -24,7 +24,6 @@
         <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1,0,0,0" />
-        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesign.Brush.Light}" />
+        <Setter Property="Foreground" Value="{StaticResource MaterialDesign.Brush.Primary.Light}" />
     </Style>
 </ResourceDictionary>

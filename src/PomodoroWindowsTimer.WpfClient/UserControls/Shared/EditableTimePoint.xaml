@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Shared.EditableTimePoint"
+             x:Name="m_EditableTimePointContainer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
@@ -6,7 +7,6 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             x:Name="m_EditableTimePointContainer"
              Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
                                                             AncestorType=ItemsControl},
                              Path=ActualWidth}"
@@ -14,13 +14,11 @@
              Padding="0,0,0,0"
              d:DesignHeight="56"
              d:DesignWidth="280"
-             Background="{DynamicResource MaterialDesignToolBarBackground}"
-             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             Background="{StaticResource MaterialDesignToolBarBackground}"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
-    <Border BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
-            BorderThickness="0,0,1,1"
-            >
+    <Border BorderThickness="0,0,1,1">
         <DockPanel LastChildFill="True">
             <!--<Border DockPanel.Dock="Left"
                         Width="10"
@@ -53,12 +51,12 @@
                         BorderBrush="#3D3D3D"
                         BorderThickness="0,1,0,0"
                         >
-                    <TextBox Padding="8,0"
+                    <TextBox Style="{StaticResource MaterialDesignTextBox}"
+                             Padding="8,0"
                              VerticalAlignment="Stretch"
                              VerticalContentAlignment="Center"
-                             Background="{DynamicResource MaterialDesignDarkBackground}"
+                             Background="{StaticResource MaterialDesignDarkBackground}"
                              FontSize="16"
-                             Style="{StaticResource MaterialDesignTextBox}"
                              Text="{Binding Path=(local:TimePointAssistant.TimePointName),
                                             ElementName=m_EditableTimePointContainer,
                                             FallbackValue=Time point name}"
@@ -68,7 +66,7 @@
                 <!--  time span  -->
                 <Border Grid.Row="0"
                         Grid.Column="2"
-                        Background="{DynamicResource MaterialDesignDarkBackground}"
+                        Background="{StaticResource MaterialDesignDarkBackground}"
                         BorderBrush="#3D3D3D"
                         BorderThickness="0,1,0,0"
                         >
@@ -100,10 +98,10 @@
                                                                   FallbackValue=White}"
                                              Kind="CircleSmall"
                                              />
-                    <TextBlock VerticalAlignment="Center"
+                    <TextBlock Style="{StaticResource MaterialDesignButtonTextBlock}"
+                               VerticalAlignment="Center"
                                FontSize="10"
-                               Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"
-                               Style="{StaticResource MaterialDesignButtonTextBlock}"
+                               Foreground="{StaticResource MaterialDesign.Brush.Primary.Light}"
                                >
                         <Run Text="{Binding Path=(local:TimePointAssistant.TimePointKind), ElementName=m_EditableTimePointContainer, Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}" />
                         <Run Text="(" /><Run Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias), ElementName=m_EditableTimePointContainer, FallbackValue=?}" /><Run Text=")" />
@@ -113,12 +111,12 @@
                 <!--  EDIT button  -->
                 <Button Grid.Row="1"
                         Grid.Column="1"
+                        Content="EDIT"
+                        Style="{StaticResource MaterialDesignFlatButton}"
                         Margin="0,0,0,0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Content="EDIT"
                         IsEnabled="False"
-                        Style="{StaticResource MaterialDesignFlatButton}"
                         Visibility="Hidden"
                         />
             </Grid>

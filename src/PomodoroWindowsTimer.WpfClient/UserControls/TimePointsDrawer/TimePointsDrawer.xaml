@@ -10,7 +10,7 @@
              HorizontalAlignment="Stretch"
              d:DesignHeight="250"
              d:DesignWidth="300"
-             TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <!--  content  -->

@@ -24,7 +24,7 @@
         Icon="pomodoro-technique.ico"
         TextElement.FontSize="13"
         TextElement.FontWeight="Regular"
-        TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+        TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource br_Base}"
         mc:Ignorable="d"

@@ -10,8 +10,7 @@
              d:DataContext="{d:DesignInstance Type=RollbackWorkListModel:Bindings, IsDesignTimeCreatable=False}"
              Height="Auto"
              MaxWidth="600"
-             Background="{DynamicResource PrimaryHueDarkBrush}"
-             Foreground="{DynamicResource MaterialDesignBody}"
+             Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
 

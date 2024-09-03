@@ -28,7 +28,7 @@
                        TextAlignment="Center"
                        Visibility="{Binding Path=HasSelectedWork,
                                             Converter={StaticResource conv_InverseBooleanToVisibility}}"
-                       Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
+                       Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
                        />
             <materialDesign:PopupBox Grid.Row="0"
                                      Grid.Column="1"
@@ -36,7 +36,7 @@
                                      Padding="0"
                                      PlacementMode="BottomAndAlignRightEdges"
                                      StaysOpen="False"
-                                     Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
                                      >
                 <Button Command="{Binding CreateWorkCommand}"
                         Content="Create New"

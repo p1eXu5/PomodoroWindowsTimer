@@ -11,7 +11,7 @@
              MinHeight="52"
              d:DesignHeight="82"
              d:DesignWidth="300"
-             Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+             Foreground="{StaticResource MaterialDesign.Brush.Primary}"
              Background="#030C10"
              mc:Ignorable="d"
              >

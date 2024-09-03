@@ -23,8 +23,6 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
                                BorderThickness="0"
-                               BottomDrawerBackground="{DynamicResource MaterialDesign.Brush.Secondary.Light}"
-                               BottomDrawerCornerRadius="20 20 0 0"
                                IsLeftDrawerOpen="{Binding IsTimePointsShown}"
                                IsRightDrawerOpen="{Binding IsWorkSelectorLoaded}"
                                LeftDrawerBackground="Transparent"

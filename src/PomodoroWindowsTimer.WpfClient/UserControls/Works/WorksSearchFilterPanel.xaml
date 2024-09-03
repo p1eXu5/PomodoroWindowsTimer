@@ -27,7 +27,7 @@
         <Grid Grid.Column="0">
             <materialDesign:PackIcon VerticalAlignment="Center"
                                      Kind="Magnify"
-                                     Foreground="{DynamicResource MaterialDesign.Brush.Primary}"
+                                     Foreground="{StaticResource MaterialDesign.Brush.Primary}"
                                      />
             <TextBox x:Name="m_Search"
                      MinWidth="230"

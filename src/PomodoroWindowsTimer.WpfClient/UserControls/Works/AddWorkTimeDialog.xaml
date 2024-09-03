@@ -10,8 +10,7 @@
              Width="300"
              Height="332"
              Loaded="SetDataContextToDailyStatistics"
-             Background="{DynamicResource PrimaryHueDarkBrush}"
-             Foreground="{DynamicResource MaterialDesignBody}"
+             Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <StackPanel>

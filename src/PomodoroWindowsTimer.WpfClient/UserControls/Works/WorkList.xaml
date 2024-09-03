@@ -11,7 +11,7 @@
              mc:Ignorable="d"
              >
     <Border Margin="0,0,0,1"
-            BorderBrush="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
+            BorderBrush="{StaticResource MaterialDesign.Brush.Primary.Dark}"
             BorderThickness="0"
             >
         <ItemsControl x:Name="m_WorkList"

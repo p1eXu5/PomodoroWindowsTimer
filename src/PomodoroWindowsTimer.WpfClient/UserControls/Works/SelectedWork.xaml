@@ -30,7 +30,7 @@
 
             <local:WorkCard Grid.Column="0"
                             x:Name="m_WorkCard"
-                            Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                            Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
                             />
 
             <Button Grid.Column="1"

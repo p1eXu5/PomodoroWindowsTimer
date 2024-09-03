@@ -27,13 +27,13 @@
                    >
                 <Setter Property="DockPanel.Dock" Value="Left" />
                 <Setter Property="HorizontalAlignment" Value="Left" />
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                <Setter Property="Foreground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
                 <Style.Triggers>
                     <Trigger Property="IsChecked" Value="True">
                         <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary}" />
                     </Trigger>
                     <Trigger Property="IsChecked" Value="False">
-                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary}" />
+                        <Setter Property="Foreground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -56,7 +56,7 @@
                    VerticalAlignment="Center"
                    Text="{Binding AssemblyVersion,
                                   FallbackValue=v 1.0.1.0}"
-                   Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
+                   Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
                    />
         <!--  running time points  -->
         <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"

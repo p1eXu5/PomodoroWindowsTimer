@@ -30,7 +30,7 @@
                        Margin="0,16,0,10"
                        Text="SELECTED WORK"
                        TextAlignment="Center"
-                       Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}"
+                       Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
                        />
             <!--  selected work popup menu  -->
             <materialDesign:PopupBox Grid.Row="0"
@@ -39,7 +39,7 @@
                                      Padding="0"
                                      PlacementMode="BottomAndAlignRightEdges"
                                      StaysOpen="False"
-                                     Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
                                      >
                 <StackPanel Orientation="Vertical">
                     <Button Command="{Binding CreateWorkCommand}"
