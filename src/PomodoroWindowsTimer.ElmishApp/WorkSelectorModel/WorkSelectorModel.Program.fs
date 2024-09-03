@@ -16,6 +16,7 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
         let (sm, cmd, intent) = updateWorkListModel smsg sm
 
         match intent with
+        | WorkListModel.Intent.CloseDialogRequested
         | WorkListModel.Intent.None ->
             model |> withWorkListModel sm
             , Cmd.map Msg.WorkListModelMsg cmd
