@@ -1,5 +1,5 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkSelector"
-             x:Name="m_Root"
+             x:Name="m_WorkSelectorRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:WorkListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkListModel;assembly=PomodoroWindowsTimer.ElmishApp"

@@ -10,11 +10,12 @@
              xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
              Height="Auto"
-             MinHeight="54"
+             Padding="0,1"
              VerticalAlignment="Center"
              d:DesignWidth="300"
              d:DesignHeight="54"
              MouseRightButtonDown="m_Root_MouseDown"
+             Foreground="{StaticResource MaterialDesign.Brush.Primary}"
              mc:Ignorable="d"
              >
     <UserControl.Resources>
@@ -22,92 +23,75 @@
         <local:IsWorkSelectedMultiConverter x:Key="conv_IsWorkSelected" />
     </UserControl.Resources>
 
-    <Border Height="Auto"
-            VerticalAlignment="Center"
-            BorderThickness="0,1,0,1"
-            BorderBrush="Black"
-            SnapsToDevicePixels="True"
-            >
-        <Border x:Name="m_SelectableWorkInnerBorder"
-                Height="Auto"
-                >
-            <Border.Style>
-                <Style TargetType="Border"
-                       BasedOn="{StaticResource st_WorkCardWrapperBorder}"
-                       >
-                    <Style.Triggers>
-                        <DataTrigger Value="True">
-                            <DataTrigger.Binding>
-                                <MultiBinding Converter="{StaticResource conv_IsWorkSelected}">
-                                    <Binding Path="Id" />
-                                    <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
-                                             Path="DataContext.SelectedWorkId"
-                                             />
-                                </MultiBinding>
-                            </DataTrigger.Binding>
-                            <Setter Property="TextElement.Foreground" Value="{StaticResource MaterialDesign.Brush.Foreground}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Border.Style>
-            <Grid Height="Auto"
-                  Margin="0"
-                  VerticalAlignment="Center"
-                  >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="50" />
-                </Grid.ColumnDefinitions>
-                <!--  with Auto height button is not appearing correctly  -->
-                <Button x:Name="m_SelectButton"
-                        Command="{Binding SelectCommand}"
-                        Height="Auto"
-                        Margin="0"
-                        Padding="0"
-                        VerticalAlignment="Center"
-                        HorizontalContentAlignment="Stretch"
-                        materialDesign:ButtonAssist.CornerRadius="0"
-                        d:Height="52"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        >
-                    <local:WorkCard x:Name="m_WorkCard"
-                                    DataContext="{Binding}"
-                                    Foreground="{Binding ElementName=m_SelectableWorkInnerBorder,
-                                                         Path=(TextElement.Foreground)}"
-                                    />
-                </Button>
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource conv_IsWorkSelected}">
+                            <Binding Path="Id" />
+                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
+                                     Path="DataContext.SelectedWorkId"
+                                     />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Foreground" Value="{StaticResource MaterialDesign.Brush.Foreground}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
 
-                <Button Grid.Column="1"
-                        x:Name="m_SelectableWorkEditButton"
-                        Command="{Binding EditCommand}"
-                        Content="{materialDesign:PackIcon Pencil}"
-                        Height="{Binding ElementName=m_SelectButton,
-                                         Path=ActualHeight}"
-                        >
-                    <Button.Style>
-                        <Style TargetType="Button"
-                               BasedOn="{StaticResource st_WorkEditButton}"
-                               >
-                            <Style.Triggers>
-                                <DataTrigger Value="True">
-                                    <DataTrigger.Binding>
-                                        <MultiBinding Converter="{StaticResource conv_IsWorkSelected}">
-                                            <Binding Path="Id" />
-                                            <Binding RelativeSource="{RelativeSource AncestorType=ItemsControl}"
-                                                     Path="DataContext.SelectedWorkId"
-                                                     />
-                                        </MultiBinding>
-                                    </DataTrigger.Binding>
-                                    <!--<Setter Property="Background" Value="#012A3C" />-->
-                                    <Setter Property="BorderThickness" Value="1,0,0,0" />
-                                    <Setter Property="Foreground" Value="{StaticResource MaterialDesign.Brush.Foreground}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+    <Grid x:Name="m_Grid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="50" />
+        </Grid.ColumnDefinitions>
+
+        <Button Grid.Column="0"
+                x:Name="m_SelectButton"
+                Command="{Binding SelectCommand}"
+                Height="Auto"
+                Margin="0"
+                Padding="0"
+                VerticalAlignment="Center"
+                HorizontalContentAlignment="Stretch"
+                materialDesign:ButtonAssist.CornerRadius="0"
+                d:Height="52"
+                Background="Transparent"
+                BorderThickness="0"
+                >
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Rectangle Grid.Column="0"
+                           Width="1"
+                           VerticalAlignment="Stretch"
+                           Fill="{Binding ElementName=m_SelectableWorkRoot,
+                                          Path=Foreground}"
+                           />
+                <local:WorkCard Grid.Column="1"
+                                x:Name="m_WorkCard"
+                                DataContext="{Binding}"
+                                VerticalAlignment="Center"
+                                Foreground="{Binding ElementName=m_SelectableWorkRoot,
+                                                     Path=Foreground}"
+                                />
             </Grid>
-        </Border>
-    </Border>
+        </Button>
+
+        <Button Grid.Column="1"
+                x:Name="m_SelectableWorkEditButton"
+                Command="{Binding EditCommand}"
+                Content="{materialDesign:PackIcon Pencil}"
+                Style="{StaticResource st_WorkEditButton}"
+                Height="{Binding ElementName=m_SelectButton,
+                                 Path=ActualHeight}"
+                Foreground="{Binding ElementName=m_SelectableWorkRoot,
+                                     Path=Foreground}"
+                BorderBrush="{Binding ElementName=m_SelectableWorkRoot,
+                                      Path=Foreground}"
+                />
+    </Grid>
 </UserControl>

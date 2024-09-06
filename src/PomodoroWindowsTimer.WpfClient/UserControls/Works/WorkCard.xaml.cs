@@ -48,11 +48,7 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
                 typeof(WorkCard),
                 new FrameworkPropertyMetadata(
                     TextWrapping.NoWrap,
-                    FrameworkPropertyMetadataOptions.AffectsMeasure
-                    | FrameworkPropertyMetadataOptions.AffectsArrange
-                    | FrameworkPropertyMetadataOptions.AffectsParentMeasure
-                    | FrameworkPropertyMetadataOptions.AffectsParentArrange
-                    | FrameworkPropertyMetadataOptions.AffectsRender
+                    FrameworkPropertyMetadataOptions.None
                 )
             );
 

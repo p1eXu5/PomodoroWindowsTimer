@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Height="Auto"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -14,8 +15,8 @@
                               >
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
