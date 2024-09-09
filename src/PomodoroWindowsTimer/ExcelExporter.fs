@@ -30,7 +30,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                     match rows with
                     | [] ->
                         if value <> TimeSpan.Zero then
-                            Error $"Have no excel rows to reduce time on {value}"
+                            // Error $"Have no excel rows to reduce time on {value}"
+                            res |> List.rev |> Ok
                         else
                             res |> List.rev |> Ok
                     | (ExcelRow.WorkExcelRow head) :: [] ->
@@ -89,7 +90,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                 let rec running (value: TimeSpan) (rows: ExcelRow list) res =
                     match rows with
                     | [] ->
-                        if value <> TimeSpan.Zero then Error $"Have no excel rows to increase time on {value}"
+                        if value <> TimeSpan.Zero then
+                            Error $"Have no excel rows to increase time on {value}"
                         else
                             res |> List.rev |> Ok
 
@@ -273,7 +275,6 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
 
 let export (excelBook: IExcelBook) (gluingThreshold: TimeSpan) (fileName: string) (workEvents: WorkEventList list) =
     result {
-        let! sheet = excelBook.Create fileName
         let! dailyRows =
             workEvents
             |> WorkEventList.List.groupByDay
@@ -284,6 +285,7 @@ let export (excelBook: IExcelBook) (gluingThreshold: TimeSpan) (fileName: string
             )
             |> List.sequenceResultM
 
+        let! sheet = excelBook.Create fileName
         let! startRow = sheet.AddHeaders ()
 
         let addRows startRow t =
