@@ -7,8 +7,6 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:DailyStatisticListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DailyStatisticListModel;assembly=PomodoroWindowsTimer.ElmishApp"
              d:DataContext="{d:DesignInstance Type=DailyStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
-             Width="300"
-             Height="332"
              Loaded="SetDataContextToDailyStatistics"
              Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"

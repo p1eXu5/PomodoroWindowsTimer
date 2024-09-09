@@ -6,8 +6,10 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:AddWorkTimeModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.AddWorkTimeModel;assembly=PomodoroWindowsTimer.ElmishApp"
+             d:DataContext="{d:DesignInstance Type=AddWorkTimeModel:Bindings, IsDesignTimeCreatable=False}"
              Width="300"
-             Height="280"
+             Height="420"
              Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
@@ -38,20 +40,51 @@
                                    SelectedTime="{Binding TimeOffset,
                                                           Converter={StaticResource conv_TimeSpanToDateTime}}"
                                    />
-        <StackPanel Margin="0,20"
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    >
-            <RadioButton Content="Increase"
-                         Style="{StaticResource MaterialDesignLightRadioButton}"
-                         IsChecked="{Binding IsIncrease}"
-                         />
-            <RadioButton Content="Reduce"
-                         Style="{StaticResource MaterialDesignLightRadioButton}"
-                         Margin="20,0,0,0"
-                         IsChecked="{Binding IsReduce}"
-                         />
-        </StackPanel>
+        <GroupBox Margin="0,40,0,0"
+                  materialDesign:ColorZoneAssist.Mode="Custom"
+                  materialDesign:ColorZoneAssist.Background="#111111"
+                  materialDesign:ColorZoneAssist.Foreground="{StaticResource MaterialDesignBody}"
+                  Header="Operation"
+                  >
+            <StackPanel HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        >
+                <RadioButton Content="Increase"
+                             Style="{StaticResource MaterialDesignLightRadioButton}"
+                             Width="80"
+                             IsChecked="{Binding IsIncrease}"
+                             />
+                <RadioButton Content="Reduce"
+                             Style="{StaticResource MaterialDesignLightRadioButton}"
+                             Width="80"
+                             Margin="20,0,0,0"
+                             IsChecked="{Binding IsReduce}"
+                             />
+            </StackPanel>
+
+        </GroupBox>
+        <GroupBox Margin="0,20"
+                  materialDesign:ColorZoneAssist.Mode="Custom"
+                  materialDesign:ColorZoneAssist.Background="#111111"
+                  materialDesign:ColorZoneAssist.Foreground="{StaticResource MaterialDesignBody}"
+                  Header="Event Kind"
+                  >
+            <StackPanel HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        >
+                <RadioButton Content="Work"
+                             Style="{StaticResource MaterialDesignLightRadioButton}"
+                             Width="80"
+                             IsChecked="{Binding AsWork}"
+                             />
+                <RadioButton Content="Break"
+                             Style="{StaticResource MaterialDesignLightRadioButton}"
+                             Width="80"
+                             Margin="20,0,0,0"
+                             IsChecked="{Binding AsBreak}"
+                             />
+            </StackPanel>
+        </GroupBox>
 
     </StackPanel>
 </UserControl>

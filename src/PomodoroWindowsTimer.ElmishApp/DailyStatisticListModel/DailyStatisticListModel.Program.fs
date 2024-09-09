@@ -17,7 +17,7 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.DailyStatisticListModel
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
+let private storeIncreasedEventTask (workEventRepository: IWorkEventRepository) increasedEventCtor (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
     task {
         let! lastEvent = workEventRepository.FindLastByWorkIdByDateAsync workId date CancellationToken.None
 
@@ -25,7 +25,7 @@ let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventReposito
         | Ok (Some ev) ->
             let time = ev |> WorkEvent.createdAt |> fun dt-> dt.AddMilliseconds(1) 
             let workEvent =
-                WorkEvent.WorkIncreased (time, offset, None)
+                increasedEventCtor (time, offset, None)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
@@ -38,7 +38,7 @@ let private storeWorkIncreasedEventTask (workEventRepository: IWorkEventReposito
             raise (InvalidOperationException(err))
     }
 
-let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
+let private storeReducedEventTask (workEventRepository: IWorkEventRepository) reducedEventCtor (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
     task {
         let! lastEvent = workEventRepository.FindLastByWorkIdByDateAsync workId date CancellationToken.None
 
@@ -46,7 +46,7 @@ let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository
         | Ok (Some ev) ->
             let time = ev |> WorkEvent.createdAt |> fun dt-> dt.AddMilliseconds(1) 
             let workEvent =
-                WorkEvent.WorkReduced (time, offset, None)
+                reducedEventCtor (time, offset, None)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 
@@ -58,6 +58,81 @@ let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository
         | Error err ->
             raise (InvalidOperationException(err))
     }
+
+let internal addWorkTimeOffset (workEventRepo: IWorkEventRepository) model am =
+    let storeWorkIncreasedEventTask = storeIncreasedEventTask workEventRepo WorkEvent.WorkIncreased
+    let storeWorkReducedEventTask = storeReducedEventTask workEventRepo WorkEvent.WorkReduced
+
+    let storeBreakIncreasedEventTask = storeIncreasedEventTask workEventRepo WorkEvent.BreakIncreased
+    let storeBreakReducedEventTask = storeReducedEventTask workEventRepo WorkEvent.BreakReduced
+
+    let withOffset updateStatisticf model =
+        match model.DailyStatistics with
+        | AsyncDeferred.Retrieved l ->
+            l
+            |> List.mapFirst
+                (_.Day >> (=) am.Date)
+                (fun dailyStat ->
+                    match dailyStat.WorkStatistics with
+                    | AsyncDeferred.Retrieved l ->
+                        l
+                        |> List.mapFirst
+                            (_.Work >> _.Id >> (=) am.Work.Id)
+                            (fun workStat ->
+                                { workStat with
+                                    Statistic = workStat.Statistic |> Option.map updateStatisticf
+                                }
+                            )
+                        |> AsyncDeferred.Retrieved
+                        |> flip DailyStatisticModel.withStatistics dailyStat
+                    | _ ->
+                        dailyStat
+                )
+            |> AsyncDeferred.Retrieved
+            |> flip withDailyStatistics model
+        | _ ->
+            model
+
+    if am.TimeOffset <> TimeSpan.Zero then
+        if am.IsWork then
+            let withOffset op model = model |> withOffset (fun s -> { s with WorkTime = op s.WorkTime am.TimeOffset })
+
+            if am.IsReduce then
+                // model with reduced work time
+                (
+                    model |> withOffset (-) |> withAddWorkTimeModel None
+                    , Cmd.OfTask.attempt (storeWorkReducedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
+                    , Intent.None
+                )
+            
+            else
+                // model with increased work time
+                (
+                    model |> withOffset (+) |> withAddWorkTimeModel None
+                    , Cmd.OfTask.attempt (storeWorkIncreasedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
+                    , Intent.None
+                )
+        else
+            let withOffset op model = model |> withOffset (fun s -> { s with BreakTime = op s.BreakTime am.TimeOffset })
+
+            if am.IsReduce then
+                // model with reduced work time
+                (
+                    model |> withOffset (-) |> withAddWorkTimeModel None
+                    , Cmd.OfTask.attempt (storeBreakReducedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
+                    , Intent.None
+                )
+            
+            else
+                // model with increased work time
+                (
+                    model |> withOffset (+) |> withAddWorkTimeModel None
+                    , Cmd.OfTask.attempt (storeBreakIncreasedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
+                    , Intent.None
+                )
+    else
+        model |> withAddWorkTimeModel None |> withCmdNone |> withNoIntent
+
 
 let update
     (userSettings: IUserSettings)
@@ -69,12 +144,6 @@ let update
     updateWorkEventListModel
     msg model
     =
-    let storeWorkIncreasedEventTask =
-        storeWorkIncreasedEventTask workEventRepo
-
-    let storeWorkReducedEventTask =
-        storeWorkReducedEventTask workEventRepo
-
     match msg with
     // -------------------------- period
     | Msg.SetStartDate startDate when model.StartDate <> startDate ->
@@ -152,52 +221,7 @@ let update
         let addWorkTimeModel = AddWorkTimeModel.Program.update amsg am
         model |> withAddWorkTimeModel (addWorkTimeModel |> Some) |> withCmdNone |> withNoIntent
 
-    | MsgWith.AddWorkTimeOffset model am ->
-        if am.TimeOffset <> TimeSpan.Zero then
-            let withOffset op model =
-                match model.DailyStatistics with
-                | AsyncDeferred.Retrieved l ->
-                    l
-                    |> List.mapFirst
-                        (_.Day >> (=) am.Date)
-                        (fun dailyStat ->
-                            match dailyStat.WorkStatistics with
-                            | AsyncDeferred.Retrieved l ->
-                                l
-                                |> List.mapFirst
-                                    (_.Work >> _.Id >> (=) am.Work.Id)
-                                    (fun workStat ->
-                                        { workStat with
-                                            Statistic = workStat.Statistic |> Option.map (fun s -> { s with WorkTime = op s.WorkTime am.TimeOffset })
-                                        }
-                                    )
-                                |> AsyncDeferred.Retrieved
-                                |> flip DailyStatisticModel.withStatistics dailyStat
-                            | _ ->
-                                dailyStat
-                        )
-                    |> AsyncDeferred.Retrieved
-                    |> flip withDailyStatistics model
-                | _ ->
-                    model
-
-            if am.IsReduce then
-                // model with reduced work time
-                (
-                    model |> withOffset (-) |> withAddWorkTimeModel None
-                    , Cmd.OfTask.attempt (storeWorkReducedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
-                    , Intent.None
-                )
-            
-            else
-                // model with increased work time
-                (
-                    model |> withOffset (+) |> withAddWorkTimeModel None
-                    , Cmd.OfTask.attempt (storeWorkIncreasedEventTask am.Work.Id am.Date) am.TimeOffset Msg.EnqueueExn
-                    , Intent.None
-                )
-        else
-            model |> withAddWorkTimeModel None |> withCmdNone |> withNoIntent
+    | MsgWith.AddWorkTimeOffset model am -> addWorkTimeOffset workEventRepo model am
 
     // -------------------------- WorkEventListDialog
     | MsgWith.LoadWorkEventListModel model (day, work) ->

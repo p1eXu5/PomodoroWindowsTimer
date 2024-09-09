@@ -59,9 +59,9 @@ module WorkEventStore =
             | Error err -> raise (InvalidOperationException(err))
         }
 
-    let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64, time: DateTimeOffset, offset: TimeSpan, atpId: TimePointId option) =
+    let private storeWorkReducedEventTask (workEventRepository: IWorkEventRepository) (workId: uint64, createdAt: DateTimeOffset, offset: TimeSpan, atpId: TimePointId option) =
         task {
-            let workEvent = WorkEvent.WorkReduced (time, offset, atpId)
+            let workEvent = WorkEvent.WorkReduced (createdAt, offset, atpId)
 
             let! res = workEventRepository.InsertAsync workId workEvent CancellationToken.None
 

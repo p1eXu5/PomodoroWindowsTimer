@@ -9,6 +9,7 @@ type AddWorkTimeModel =
         Date: DateOnly
         TimeOffset: TimeSpan
         IsReduce: bool
+        IsWork: bool
     }
 
 
@@ -18,6 +19,7 @@ module AddWorkTimeModel =
         | SetTimeOffset of TimeSpan
         | SetDate of DateOnly
         | SetIsReduce of bool
+        | SetIsWork of bool
 
 
     let init work date =
@@ -26,6 +28,7 @@ module AddWorkTimeModel =
             Date = date
             TimeOffset = TimeSpan.Zero
             IsReduce = false
+            IsWork = true
         }
 
     let withTimeOffset v (model: AddWorkTimeModel) =
@@ -36,6 +39,9 @@ module AddWorkTimeModel =
 
     let withIsReduce v (model: AddWorkTimeModel) =
         { model with IsReduce = v }
+
+    let withIsWork v (model: AddWorkTimeModel) =
+        { model with IsWork = v }
 
 
 namespace PomodoroWindowsTimer.ElmishApp.AddWorkTimeModel
@@ -58,9 +64,9 @@ module Program =
             model |> withDate v
         | Msg.SetIsReduce v ->
             model |> withIsReduce v
+        | Msg.SetIsWork v ->
+            model |> withIsWork v
 
-
-open Elmish.Extensions
 
 type private Binding = Binding<AddWorkTimeModel, AddWorkTimeModel.Msg>
 
@@ -99,3 +105,9 @@ type Bindings() =
 
     member val IsIncrease : Binding =
         nameof __.IsIncrease |> Binding.twoWay (_.IsReduce >> not, not >> Msg.SetIsReduce)
+
+    member val AsWork : Binding =
+        nameof __.AsWork |> Binding.twoWay (_.IsWork, Msg.SetIsWork)
+
+    member val AsBreak : Binding =
+        nameof __.AsBreak |> Binding.twoWay (_.IsWork >> not, not >> Msg.SetIsWork)
