@@ -10,52 +10,52 @@
              d:DesignWidth="800"
              mc:Ignorable="d"
              >
-    <Border Margin="0,0,0,1"
-            BorderBrush="{StaticResource MaterialDesign.Brush.Primary.Dark}"
-            BorderThickness="0"
-            >
-        <ItemsControl x:Name="m_WorkList"
-                      Margin="0"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      HorizontalContentAlignment="Stretch"
-                      VerticalContentAlignment="Top"
-                      ItemsSource="{Binding WorkModelList}"
-                      ScrollViewer.VerticalScrollBarVisibility="Visible"
-                      ScrollViewer.CanContentScroll="False"
-                      >
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <local:SelectableWork />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel IsVirtualizing="True"
-                                            VirtualizationMode="Standard"
-                                            />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.Template>
-                <ControlTemplate TargetType="ItemsControl">
-                    <!--
-                        CanContentScroll="True" produces bug, scroll position is unstable, timer is wriggle
-                    -->
-                    <ScrollViewer Padding="{TemplateBinding Padding}"
-                                  CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
-                                  Focusable="False"
-                                  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
-                                  BorderThickness="{TemplateBinding BorderThickness}"
-                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                  Background="{TemplateBinding Background}"
-                                  >
-                        <ItemsPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                        SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
-                                        />
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ItemsControl.Template>
-        </ItemsControl>
-    </Border>
+  <Border Margin="0,0,0,1"
+          BorderBrush="{StaticResource MaterialDesign.Brush.Primary.Dark}"
+          BorderThickness="0"
+          >
+    <ItemsControl x:Name="m_WorkList"
+                  Margin="0"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  HorizontalContentAlignment="Stretch"
+                  VerticalContentAlignment="Top"
+                  ItemsSource="{Binding WorkModelList}"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ScrollViewer.CanContentScroll="False"
+                  >
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <local:SelectableWork />
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel IsVirtualizing="True"
+                                  VirtualizationMode="Standard"
+                                  />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.Template>
+        <ControlTemplate TargetType="ItemsControl">
+          <!--
+            CanContentScroll="True" produces bug, scroll position is unstable, timer is wriggle
+          -->
+          <ScrollViewer Padding="{TemplateBinding Padding}"
+                        CanContentScroll="{TemplateBinding ScrollViewer.CanContentScroll}"
+                        Focusable="False"
+                        VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        Background="{TemplateBinding Background}"
+                        >
+            <ItemsPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                            SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
+                            />
+          </ScrollViewer>
+        </ControlTemplate>
+      </ItemsControl.Template>
+    </ItemsControl>
+  </Border>
 </UserControl>

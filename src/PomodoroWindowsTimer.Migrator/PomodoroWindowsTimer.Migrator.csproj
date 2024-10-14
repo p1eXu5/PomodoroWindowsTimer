@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <Configurations>Debug;Release;Personal</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -15,6 +16,10 @@
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <OutputPath>..\PomodoroWindowsTimer.WpfClient\bin\Release\net8.0-windows\migrator</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Personal'">
+    <OutputPath>..\PomodoroWindowsTimer.WpfClient\bin\Personal\net8.0-windows\migrator</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
