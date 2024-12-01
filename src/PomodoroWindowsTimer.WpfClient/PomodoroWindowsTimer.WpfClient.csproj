@@ -28,7 +28,6 @@
 
   <ItemGroup>
     <None Remove="appsettings.json" />
-    <None Remove="appsettings.Production.json" />
     <None Remove="Resources\base_texture.png" />
     <None Remove="Resources\gloss_texture.png" />
     <None Remove="Resources\metalArtboard-50.png" />
