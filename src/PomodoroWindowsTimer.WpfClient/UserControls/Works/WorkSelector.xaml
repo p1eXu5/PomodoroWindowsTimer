@@ -10,7 +10,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              d:DataContext="{d:DesignInstance Type=WorkListModel:Bindings, IsDesignTimeCreatable=False}"
              d:DesignHeight="300"
-             d:DesignWidth="300"
+             d:DesignWidth="480"
              mc:Ignorable="d"
              >
     <DockPanel Grid.IsSharedSizeScope="True"
@@ -36,7 +36,9 @@
                                       x:Name="m_WorksSearchFilterPanel"
                                       DataContext="{Binding}"
                                       Margin="0,10,18,10"
+                                      HorizontalAlignment="Stretch"
                                       VerticalAlignment="Top"
+                                      HorizontalContentAlignment="Stretch"
                                       SearchTextChanged="WorksSearchFilterPanel_TextChanged"
                                       CountChanged="WorksSearchFilterPanel_CountChanged"
                                       />

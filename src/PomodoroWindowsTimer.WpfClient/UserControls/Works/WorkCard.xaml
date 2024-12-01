@@ -15,62 +15,62 @@
              Background="#030C10"
              mc:Ignorable="d"
              >
-  <materialDesign:Card Padding="10,5"
-                       VerticalAlignment="Center"
-                       Background="{Binding ElementName=m_WorkCardRoot,
-                                            Path=Background}"
-                       >
-    <DockPanel VerticalAlignment="Center"
-               LastChildFill="True"
-               >
-      <Grid DockPanel.Dock="Top"
-            Margin="0,0,0,5"
-            HorizontalAlignment="Stretch"
-            >
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition />
-          <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+    <materialDesign:Card Padding="10,5"
+                         VerticalAlignment="Center"
+                         Background="{Binding ElementName=m_WorkCardRoot,
+                                              Path=Background}"
+                         >
+        <DockPanel VerticalAlignment="Center"
+                   LastChildFill="True"
+                   >
+            <Grid DockPanel.Dock="Top"
+                  Margin="0,0,0,5"
+                  HorizontalAlignment="Stretch"
+                  >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Column="0"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Bottom"
-                   materialDesign:HintAssist.Hint="Number"
-                   Text="{Binding Number,
-                                  Converter={StaticResource conv_NoNumberConverter},
-                                  FallbackValue='NO NUMBER'}"
-                   FontWeight="Normal"
-                   FontSize="11"
-                   />
-        <TextBlock Grid.Column="1"
-                   HorizontalAlignment="Right"
-                   VerticalAlignment="Bottom"
-                   materialDesign:HintAssist.Hint="Number"
-                   Text="{Binding LastEventCreatedAtOrUpdatedAt,
-                                  Converter={StaticResource conv_DateTimeOffsetToShortDate},
-                                  FallbackValue='12.02.2024'}"
-                   FontWeight="Normal"
-                   FontSize="11"
-                   />
-      </Grid>
-      <!--  Title  -->
-      <TextBlock x:Name="m_TitleTextBlock"
-                 ToolTip="{Binding Title}"
-                 Height="{Binding ElementName=m_WorkCardRoot,
-                                  Path=TitleHeight}"
-                 Margin="{Binding ElementName=m_WorkCardRoot,
-                                  Path=TitleMargin}"
-                 VerticalAlignment="Top"
-                 materialDesign:HintAssist.Hint="Title"
-                 Text="{Binding Title,
-                                FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
-                 FontSize="16"
-                 TextWrapping="{Binding ElementName=m_WorkCardRoot,
-                                        Path=TitleWrapping}"
-                 TextTrimming="CharacterEllipsis"
-                 FontWeight="Light"
-                 TextAlignment="Justify"
-                 />
-    </DockPanel>
-  </materialDesign:Card>
+                <TextBlock Grid.Column="0"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Bottom"
+                           materialDesign:HintAssist.Hint="Number"
+                           Text="{Binding Number,
+                                          Converter={StaticResource conv_NoNumberConverter},
+                                          FallbackValue='NO NUMBER'}"
+                           FontWeight="Normal"
+                           FontSize="11"
+                           />
+                <TextBlock Grid.Column="1"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           materialDesign:HintAssist.Hint="Number"
+                           Text="{Binding LastEventCreatedAtOrUpdatedAt,
+                                          Converter={StaticResource conv_DateTimeOffsetToShortDate},
+                                          FallbackValue='12.02.2024'}"
+                           FontWeight="Normal"
+                           FontSize="11"
+                           />
+            </Grid>
+            <!--  Title  -->
+            <TextBlock x:Name="m_TitleTextBlock"
+                       ToolTip="{Binding Title}"
+                       Height="{Binding ElementName=m_WorkCardRoot,
+                                        Path=TitleHeight}"
+                       Margin="{Binding ElementName=m_WorkCardRoot,
+                                        Path=TitleMargin}"
+                       VerticalAlignment="Top"
+                       materialDesign:HintAssist.Hint="Title"
+                       Text="{Binding Title,
+                                      FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                       FontSize="16"
+                       TextWrapping="{Binding ElementName=m_WorkCardRoot,
+                                              Path=TitleWrapping}"
+                       TextTrimming="CharacterEllipsis"
+                       FontWeight="Light"
+                       TextAlignment="Justify"
+                       />
+        </DockPanel>
+    </materialDesign:Card>
 </UserControl>

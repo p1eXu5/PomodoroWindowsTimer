@@ -10,9 +10,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
              d:DataContext="{d:DesignInstance Type=WorkSelectorModel:Bindings, IsDesignTimeCreatable=False}"
-             Width="300"
+             MinWidth="350"
              d:DesignHeight="300"
-             d:DesignWidth="300"
+             d:DesignWidth="350"
              d:Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
              mc:Ignorable="d"
              >
