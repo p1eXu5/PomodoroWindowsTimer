@@ -64,9 +64,9 @@
                       Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding IsTimePointsShown}"
                       />
-        <!--  time points generator open button  -->
+        <!--  work selector  -->
         <ToggleButton Content="{materialDesign:PackIcon TimerCogOutline}"
-                      ToolTip="Generator"
+                      ToolTip="Work Selector"
                       Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding IsWorkSelectorLoaded}"
                       />
@@ -84,14 +84,6 @@
                     <TranslateTransform X="2" Y="1" />
                 </TransformGroup>
             </Button.RenderTransform>
-            <!--<Button.CommandParameter>
-                <settings:BotSettings />
-            </Button.CommandParameter>
-            <Behaviors:Interaction.Behaviors>
-                <behaviors:DialogEventHandlerBehavior LoadDialogModelCommand="{Binding OpenBotSettingsDialogCommand}"
-                                                      CancelCommand="{Binding UnloadDialogModelCommand}"
-                                                      />
-            </Behaviors:Interaction.Behaviors>-->
         </Button>
 
         <!--  work statistic open dialog button  -->
@@ -129,6 +121,17 @@
                 </TransformGroup>
             </ToggleButton.RenderTransform>
         </ToggleButton>
+
+        <!--  datgabase settings open dialog button  -->
+        <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
+                DataContext="{Binding AppDialog}"
+                Command="{Binding OpenDatabaseSettingsDialogCommand}"
+                Content="{materialDesign:PackIcon CogOutline}"
+                ToolTip="Database settings"
+                Style="{StaticResource st_MenuButton}"
+                Visibility="{Binding ShowOpenDatabaseSettingsDialogCommand,
+                                     Converter={StaticResource conv_BooleanToVisibility}}"
+                />
 
         <!--  save time points button  -->
         <!--

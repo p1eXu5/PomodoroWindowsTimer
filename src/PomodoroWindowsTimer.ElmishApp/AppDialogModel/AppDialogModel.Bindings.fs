@@ -45,6 +45,28 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     // -------------------------------------------------
 
+    member val ShowOpenDatabaseSettingsDialogCommand : Binding =
+        nameof __.ShowOpenDatabaseSettingsDialogCommand
+#if DEBUG
+            |> Binding.oneWay (fun _ -> true)
+#else
+            |> Binding.oneWay (fun _ -> false)
+#endif
+
+#if DEBUG
+    member val OpenDatabaseSettingsDialogCommand : Binding =
+        nameof __.OpenDatabaseSettingsDialogCommand
+            |> Binding.cmdIf (function AppDialogModel.NoDialog -> Msg.LoadDatabaseSettingsDialogModel |> Some | _ -> None)
+#endif
+
+    member val DatabaseSettingsDialog : Binding =
+        nameof __.DatabaseSettingsDialog
+            |> Binding.SubModel.opt (DatabaseSettingsModel.Bindings.ToList)
+            |> Binding.mapModel (tryDatabaseSettingsModel)
+            |> Binding.mapMsg (Msg.DatabaseSettingsModelMsg)
+
+    // -------------------------------------------------
+
     member val RollbackWorkDialog : Binding =
         nameof __.RollbackWorkDialog
             |> Binding.SubModel.opt (RollbackWorkModel.Bindings.ToList)

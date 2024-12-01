@@ -8,7 +8,6 @@ open Microsoft.Extensions.Options
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open PomodoroWindowsTimer.Storage.Configuration
 
 module internal WorkEventRepository =
 
@@ -477,7 +476,7 @@ module internal WorkEventRepository =
         }
 
 
-type WorkEventRepository(options: IOptions<WorkDbOptions>, timeProvider: System.TimeProvider, logger: ILogger<WorkEventRepository>) =
+type WorkEventRepository(options: IDatabaseSettings, timeProvider: System.TimeProvider, logger: ILogger<WorkEventRepository>) =
 
     let getDbConnection = RepositoryBase.openDbConnection options logger
     let deps : WorkEventRepository.Deps =

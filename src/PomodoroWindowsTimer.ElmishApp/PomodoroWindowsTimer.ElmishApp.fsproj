@@ -47,6 +47,9 @@
     <Compile Include="BotSettingsModel\BotSettingsModel.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Program.fs" />
     <Compile Include="BotSettingsModel\BotSettingsModel.Bindings.fs" />
+    <Compile Include="DatabaseSettingsModel\DatabaseSettingsModel.fs" />
+    <Compile Include="DatabaseSettingsModel\DatabaseSettingsModel.Program.fs" />
+    <Compile Include="DatabaseSettingsModel\DatabaseSettingsModel.Bindings.fs" />
     <Compile Include="RollbackWorkModel\RollbackWorkModel.fs" />
     <Compile Include="RollbackWorkModel\RollbackWorkModel.Program.fs" />
     <Compile Include="RollbackWorkModel\RollbackWorkModel.Bindings.fs" />

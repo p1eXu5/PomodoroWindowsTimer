@@ -87,7 +87,7 @@ namespace PomodoroWindowsTimer.WpfClient
         private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             _logger?.LogError(e.Exception, "Dispatcher unhandled exception.");
-            _errorMessageQueue.EnqueueError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+            _errorMessageQueue?.EnqueueError(e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
             e.Handled = false;
         }
 
@@ -95,14 +95,14 @@ namespace PomodoroWindowsTimer.WpfClient
         {
             _logger?.LogError("Current domain unhandled exception. {ExceptionObject}", e.ExceptionObject);
             string errorMessage = e.ExceptionObject.ToString() + Environment.NewLine;
-            _errorMessageQueue.EnqueueError(errorMessage);
+            _errorMessageQueue?.EnqueueError(errorMessage);
         }
 
         private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
             _logger?.LogError(e.Exception, "Unobserved task exception.");
             string errorMessage = e.Exception.InnerExceptions.First().Message + Environment.NewLine + e.Exception.GetType();
-            _errorMessageQueue.EnqueueError(errorMessage);
+            _errorMessageQueue?.EnqueueError(errorMessage);
         }
     }
 }

@@ -26,7 +26,7 @@ type LooperStub (activeTimePoint: ActiveTimePoint option) =
          member _.GetActiveTimePoint() = activeTimePoint
 
 
-type UserSettingsStub () =
+type UserSettingsStub (connectionString: string) =
     let dict = Dictionary<string, obj>()
 
     do
@@ -37,9 +37,9 @@ type UserSettingsStub () =
         dict.Add("TimePointSettings", Option<string>.None)
         dict.Add("CurrentWork", Option<Work>.None)
         dict.Add("LastStatisticPeriod", Option<Work>.None)
-        // TODO: dict.Add("RollbackWorkStrategy", RollbackWorkStrategy.Default)
         dict.Add("LastDayCount", 0)
         dict.Add("CurrentVerion", null)
+        dict.Add("DatabaseFilePath", connectionString)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
@@ -50,9 +50,12 @@ type UserSettingsStub () =
         member _.DisableSkipBreak with get () = dict["DisableSkipBreak"] :?> bool and set v = dict["DisableSkipBreak"] <- v
         member _.CurrentWork with get () = dict["CurrentWork"] :?> Work option and set v = dict["CurrentWork"] <- v
         member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
-        // TODO: member _.RollbackWorkStrategy with get () = dict["RollbackWorkStrategy"] :?> RollbackWorkStrategy and set v = dict["RollbackWorkStrategy"] <- v
         member _.LastDayCount with get () = dict["LastDayCount"] :?> int and set v = dict["LastDayCount"] <- v
         member _.CurrentVersion with get () = dict["CurrentVersion"] :?> string and set v = dict["CurrentVersion"] <- v
+
+    interface IDatabaseSettings with
+        member _.DatabaseFilePath with get () = dict["DatabaseFilePath"] :?> string and set v = dict["DatabaseFilePath"] <- v
+        
 
 
 [<RequireQualifiedAccess>]

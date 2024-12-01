@@ -72,6 +72,12 @@ let compose
         let updateBotSettingsModel =
             BotSettingsModel.Program.update userSettings
 
+        let initDatabaseSettingsModel () =
+            DatabaseSettingsModel.init userSettings
+
+        let updateDatabaseSettingsModel =
+            DatabaseSettingsModel.Program.update userSettings
+
         let initTimePointGeneratorModel () =
             TimePointsGeneratorModel.init timePointPrototypeStore patternStore
 
@@ -118,6 +124,8 @@ let compose
                 mainErrorMessageQueue
                 initBotSettingsModel
                 updateBotSettingsModel
+                initDatabaseSettingsModel
+                updateDatabaseSettingsModel
                 updateRollbackWorkModel
                 updateRollbackWorkListModel
 

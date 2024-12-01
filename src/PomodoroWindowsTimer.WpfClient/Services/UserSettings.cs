@@ -2,10 +2,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
-using PomodoroWindowsTimer.ElmishApp;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.Storage.Configuration;
 using PomodoroWindowsTimer.Types;
 using PomodoroWindowsTimer.WpfClient.Extensions;
 
@@ -18,10 +19,12 @@ internal class UserSettings : IUserSettings
     public const string MY_CHAT_ID_KEY = "MyChatId";
 
     private readonly IConfigurationSection _botSection;
+    private readonly WorkDbOptions _workDbOptions;
 
-    public UserSettings(IConfigurationSection botSection)
+    public UserSettings(IConfigurationSection botSection, IOptions<WorkDbOptions> workDbOptions)
     {
         _botSection = botSection;
+        _workDbOptions = workDbOptions.Value;
     }
 
     public bool DisableSkipBreak
@@ -55,8 +58,9 @@ internal class UserSettings : IUserSettings
     }
     public FSharpList<string> Patterns
     {
-        get {
-            var patterns = Properties.Settings.Default.Patterns;
+        get
+        {
+            StringCollection? patterns = Properties.Settings.Default.Patterns;
             if (patterns is null)
             {
                 return FSharpList<string>.Empty;
@@ -65,7 +69,8 @@ internal class UserSettings : IUserSettings
             return SeqModule.ToList<string>(patterns.Cast<string>());
         }
 
-        set {
+        set
+        {
             StringCollection coll = new StringCollection();
 
             foreach (string item in value)
@@ -82,7 +87,7 @@ internal class UserSettings : IUserSettings
     {
         get
         {
-            var botToken = Properties.Settings.Default.BotToken;
+            string? botToken = Properties.Settings.Default.BotToken;
             if (string.IsNullOrWhiteSpace(botToken))
             {
                 botToken = _botSection?.GetSection(BOT_TOKEN_KEY)?.Value;
@@ -97,10 +102,12 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+
     public FSharpOption<string> MyChatId
     {
-        get {
-            var myChatId = Properties.Settings.Default.MyChatId;
+        get
+        {
+            string? myChatId = Properties.Settings.Default.MyChatId;
             if (string.IsNullOrWhiteSpace(myChatId))
             {
                 myChatId = _botSection?.GetSection(MY_CHAT_ID_KEY)?.Value;
@@ -110,7 +117,8 @@ internal class UserSettings : IUserSettings
             return myChatId.ToFSharpOption();
         }
 
-        set {
+        set
+        {
             Properties.Settings.Default.MyChatId = value.FromFSharpOption();
             Properties.Settings.Default.Save();
         }
@@ -118,15 +126,17 @@ internal class UserSettings : IUserSettings
 
     public FSharpOption<Work> CurrentWork
     {
-        get {
-            var currentWork = Properties.Settings.Default.CurrentWork;
+        get
+        {
+            string currentWork = Properties.Settings.Default.CurrentWork;
             if (string.IsNullOrWhiteSpace(currentWork))
             {
                 return FSharpOption<Work>.None;
             }
 
-            try { 
-                var work = JsonHelpers.Deserialize<Work>(currentWork);
+            try
+            {
+                Work work = JsonHelpers.Deserialize<Work>(currentWork);
                 return FSharpOption<Work>.Some(work);
             }
             catch
@@ -137,7 +147,7 @@ internal class UserSettings : IUserSettings
         }
         set
         {
-            var currentWork = JsonHelpers.Serialize(value);
+            string currentWork = JsonHelpers.Serialize(value);
             Properties.Settings.Default.CurrentWork = currentWork;
             Properties.Settings.Default.Save();
         }
@@ -147,7 +157,7 @@ internal class UserSettings : IUserSettings
     {
         get
         {
-            var lastStatisticPeriod = Properties.Settings.Default.LastStatisticPeriod;
+            string lastStatisticPeriod = Properties.Settings.Default.LastStatisticPeriod;
             if (string.IsNullOrWhiteSpace(lastStatisticPeriod))
             {
                 return FSharpOption<DateOnlyPeriod>.None;
@@ -155,7 +165,7 @@ internal class UserSettings : IUserSettings
 
             try
             {
-                var period = JsonHelpers.Deserialize<DateOnlyPeriod>(lastStatisticPeriod);
+                DateOnlyPeriod period = JsonHelpers.Deserialize<DateOnlyPeriod>(lastStatisticPeriod);
                 return FSharpOption<DateOnlyPeriod>.Some(period);
             }
             catch
@@ -166,8 +176,28 @@ internal class UserSettings : IUserSettings
         }
         set
         {
-            var lastStatisticPeriod = JsonHelpers.Serialize(value);
+            string lastStatisticPeriod = JsonHelpers.Serialize(value);
             Properties.Settings.Default.LastStatisticPeriod = lastStatisticPeriod;
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    public string DatabaseFilePath
+    {
+        get
+        {
+            string databaseFilePath = Properties.Settings.Default.DatabaseFilePath;
+            if (string.IsNullOrWhiteSpace(databaseFilePath))
+            {
+                databaseFilePath = _workDbOptions.ConnectionString;
+                Properties.Settings.Default.DatabaseFilePath = databaseFilePath;
+            }
+
+            return databaseFilePath;
+        }
+        set
+        {
+            Properties.Settings.Default.DatabaseFilePath = value;
             Properties.Settings.Default.Save();
         }
     }
@@ -176,7 +206,8 @@ internal class UserSettings : IUserSettings
     public string CurrentVersion
     {
         get => Properties.Settings.Default.CurrentVersion;
-        set {
+        set
+        {
             Properties.Settings.Default.CurrentVersion = value;
             Properties.Settings.Default.Save();
         }

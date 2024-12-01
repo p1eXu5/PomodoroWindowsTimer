@@ -72,6 +72,10 @@
         <settings:BotSettings DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.BotSettingsDialog}" />
     </DataTemplate>
 
+    <DataTemplate x:Key="dt_DatabaseSettingsDialog">
+        <settings:DatabaseSettings DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.DatabaseSettingsDialog}" />
+    </DataTemplate>
+
     <DataTemplate x:Key="dt_RollbackWorkDialog">
         <settings:RollbackWork DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.RollbackWorkDialog}" />
     </DataTemplate>

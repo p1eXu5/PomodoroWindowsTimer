@@ -85,3 +85,8 @@ type IExcelBook =
         abstract Save: excelSheet: IExcelSheet -> Result<unit, string>
     end
 
+type IDatabaseSettings =
+    interface
+        abstract DatabaseFilePath : string with get, set
+    end
+

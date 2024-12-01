@@ -14,6 +14,9 @@ using PomodoroWindowsTimer.TimePointQueue;
 using System.Windows.Interop;
 using PomodoroWindowsTimer.Exporter.Excel;
 using PomodoroWindowsTimer.ElmishApp;
+using Org.BouncyCastle.Utilities.Collections;
+using PomodoroWindowsTimer.Storage.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace DrugRoom.WpfClient;
 
@@ -65,7 +68,18 @@ internal static class DependencyInjectionExtensions
     /// </summary>
     /// <param name="services"></param>
     public static void AddUserSettings(this IServiceCollection services, IConfiguration configuration)
-        => services.TryAddSingleton<IUserSettings>(new UserSettings(configuration.GetSection("BotConfiguration")));
+    {
+        services.TryAddSingleton<IUserSettings>(sp =>
+            new UserSettings(
+                configuration.GetSection("BotConfiguration"),
+                sp.GetRequiredService<IOptions<WorkDbOptions>>()
+            )
+        );
+
+        services.TryAddSingleton<IDatabaseSettings>(sp =>
+            sp.GetRequiredService<IUserSettings>()
+        );
+    }
 
     public static void AddErrorMessageQueue(this IServiceCollection services)
     {

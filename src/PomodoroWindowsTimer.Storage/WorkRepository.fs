@@ -7,7 +7,6 @@ open Microsoft.Extensions.Options
 open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open PomodoroWindowsTimer.Storage.Configuration
 open System.Threading
 
 module internal WorkRepository =
@@ -304,7 +303,7 @@ module internal WorkRepository =
                 return! Error (ex.Format($"Failed to delete work {work.Id}."))
         }
 
-type WorkRepository(options: IOptions<WorkDbOptions>, timeProvider: System.TimeProvider, logger: ILogger<WorkRepository>) =
+type WorkRepository(options: IDatabaseSettings, timeProvider: System.TimeProvider, logger: ILogger<WorkRepository>) =
 
     let getDbConnection = RepositoryBase.openDbConnection options logger
     let deps : WorkRepository.Deps =

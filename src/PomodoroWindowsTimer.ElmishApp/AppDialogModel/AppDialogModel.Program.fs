@@ -18,6 +18,14 @@ let private ofBotSettingsIntent botSettingsModel intent =
     | BotSettingsModel.Intent.CloseDialogRequested ->
         AppDialogModel.NoDialog |> withCmdNone
 
+let private ofDatabaseSettingsIntent databaseSettingsModel intent =
+    match intent with
+    | DatabaseSettingsModel.Intent.None ->
+        databaseSettingsModel |> AppDialogModel.DatabaseSettings |> withCmdNone
+
+    | DatabaseSettingsModel.Intent.CloseDialogRequested ->
+        AppDialogModel.NoDialog |> withCmdNone
+
 
 let private rollbackWorkIntentCmd (workEventStore: WorkEventStore) rollbackWorkModel =
     match rollbackWorkModel.RollbackStrategy with
@@ -88,6 +96,8 @@ let update
     (errorMessageQueue: IErrorMessageQueue)
     initBotSettingsModel
     updateBotSettingsModel
+    initDatabaseSettingsModel
+    updateDatabaseSettingsModel
     updateRollbackWorkModel
     updateRollbackWorkListModel
     (msg: AppDialogModel.Msg) (model: AppDialogModel)
@@ -99,6 +109,14 @@ let update
 
     | MsgWith.BotSettingsModelMsg model (bmsg, bm) ->
         updateBotSettingsModel bmsg bm ||> ofBotSettingsIntent
+
+    // ------------------------------------
+    | Msg.LoadDatabaseSettingsDialogModel ->
+        initDatabaseSettingsModel () |> AppDialogModel.DatabaseSettings
+        , Cmd.none
+
+    | MsgWith.DatabaseSettingsModelMsg model (bmsg, bm) ->
+        updateDatabaseSettingsModel bmsg bm ||> ofDatabaseSettingsIntent
 
     // ------------------------------------
     | Msg.LoadRollbackWorkDialogModel (workSpentTime, kind, atpId, time) ->

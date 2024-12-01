@@ -42,15 +42,16 @@ let internal getConnectionString dbFileName =
         connectionStrings[dbFileName]
 
 
-let internal workDbOptions dbFileName =
-    { new IOptions<WorkDbOptions> with
-        member _.Value : WorkDbOptions = 
-            { ConnectionString=getConnectionString dbFileName }
+let internal databaseSettings dbFileName =
+    { new IDatabaseSettings with
+        member _.DatabaseFilePath
+            with get() = getConnectionString dbFileName
+            and set _ = ()
     }
 
 let internal workRepository dbFileName =
     new WorkRepository(
-        workDbOptions dbFileName,
+        databaseSettings dbFileName,
         System.TimeProvider.System,
         TestLogger<WorkRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
     )
@@ -58,7 +59,7 @@ let internal workRepository dbFileName =
     
 let internal workEventRepository dbFileName =
     new WorkEventRepository(
-        workDbOptions dbFileName,
+        databaseSettings dbFileName,
         System.TimeProvider.System,
         TestLogger<WorkEventRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
     )
@@ -66,7 +67,7 @@ let internal workEventRepository dbFileName =
 
 let internal activeTimePointRepository dbFileName =
     new ActiveTimePointRepository(
-        workDbOptions dbFileName,
+        databaseSettings dbFileName,
         System.TimeProvider.System,
         TestLogger<ActiveTimePointRepository>(TestContextWriters.Default)
     )

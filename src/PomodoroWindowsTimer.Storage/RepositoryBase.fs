@@ -7,15 +7,15 @@ open Microsoft.Extensions.Logging
 open Microsoft.Data.Sqlite
 open IcedTasks
 
-open PomodoroWindowsTimer.Storage.Configuration
 open System.Data
 open System.Data.Common
+open PomodoroWindowsTimer.Abstractions
 
 type OpenDbConnection = CancellableTask<Result<DbConnection, string>>
 
-let openDbConnection (options: IOptions<WorkDbOptions>) (logger: ILogger) : OpenDbConnection =
+let openDbConnection (options: IDatabaseSettings) (logger: ILogger) : OpenDbConnection =
         cancellableTask {
-            let dbConnection = new SqliteConnection(options.Value.ConnectionString)
+            let dbConnection = new SqliteConnection(options.DatabaseFilePath)
             try
                 do! dbConnection.OpenAsync
                 return dbConnection :> DbConnection |> Ok

@@ -15,6 +15,11 @@ public sealed class MainDialogContentTemplateSelector : DataTemplateSelector
                 return element.FindResource("dt_BotSettingsDialog") as DataTemplate;
             }
 
+            if (appDialogId.IsDatabaseSettingsDialogId)
+            {
+                return element.FindResource("dt_DatabaseSettingsDialog") as DataTemplate;
+            }
+
             if (appDialogId.IsRollbackWorkDialogId)
             {
                 return element.FindResource("dt_RollbackWorkDialog") as DataTemplate;

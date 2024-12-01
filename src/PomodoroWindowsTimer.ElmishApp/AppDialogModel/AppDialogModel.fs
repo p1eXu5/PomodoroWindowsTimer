@@ -11,6 +11,7 @@ open PomodoroWindowsTimer.ElmishApp
 type AppDialogModel =
     | NoDialog
     | BotSettings of BotSettingsModel
+    | DatabaseSettings of DatabaseSettingsModel
     | RollbackWork of RollbackWorkModel
     | RollbackWorkList of RollbackWorkListModel
     | SkipOrApplyMissingTime of RollbackWorkModel
@@ -30,6 +31,9 @@ module AppDialogModel =
         | LoadBotSettingsDialogModel
         | BotSettingsModelMsg of BotSettingsModel.Msg
 
+        | LoadDatabaseSettingsDialogModel
+        | DatabaseSettingsModelMsg of DatabaseSettingsModel.Msg
+
         | LoadRollbackWorkDialogModel of WorkSpentTime * Kind * TimePointId * DateTimeOffset
         | RollbackWorkModelMsg of RollbackWorkModel.Msg
 
@@ -48,6 +52,12 @@ module AppDialogModel =
         let (|BotSettingsModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
             match msg, model with
             | Msg.BotSettingsModelMsg msg, AppDialogModel.BotSettings m ->
+                (msg, m) |> Some
+            | _ -> None
+
+        let (|DatabaseSettingsModelMsg|_|) (model: AppDialogModel) (msg: Msg) =
+            match msg, model with
+            | Msg.DatabaseSettingsModelMsg msg, AppDialogModel.DatabaseSettings m ->
                 (msg, m) |> Some
             | _ -> None
 
@@ -73,6 +83,7 @@ module AppDialogModel =
     [<RequireQualifiedAccess>]
     type AppDialogId =
         | BotSettingsDialogId
+        | DatabaseSettingsDialogId
         | TimePointsGeneratorDialogId
         | WorkStatisticsDialogId
         | RollbackWorkDialogId
@@ -82,6 +93,7 @@ module AppDialogModel =
     let appDialogId = function
         | AppDialogModel.NoDialog -> None
         | AppDialogModel.BotSettings _ -> AppDialogId.BotSettingsDialogId |> Some
+        | AppDialogModel.DatabaseSettings _ -> AppDialogId.DatabaseSettingsDialogId |> Some
         | AppDialogModel.RollbackWork _ -> AppDialogId.RollbackWorkDialogId |> Some
         | AppDialogModel.RollbackWorkList _ -> AppDialogId.RollbackWorkListDialogId |> Some
         | AppDialogModel.SkipOrApplyMissingTime _ -> AppDialogId.SkipOrApplyMissingTimeDialogId |> Some
@@ -89,6 +101,11 @@ module AppDialogModel =
     let tryBotSettingsModel (model: AppDialogModel) =
         match model with
         | AppDialogModel.BotSettings m -> m |> Some
+        | _ -> None
+
+    let tryDatabaseSettingsModel (model: AppDialogModel) =
+        match model with
+        | AppDialogModel.DatabaseSettings m -> m |> Some
         | _ -> None
 
     let tryRollbackWorkModel (model: AppDialogModel) =

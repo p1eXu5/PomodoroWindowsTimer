@@ -210,7 +210,7 @@ module internal ActiveTimePointRepository =
         }
 
 
-type ActiveTimePointRepository(options: IOptions<WorkDbOptions>, timeProvider: System.TimeProvider, logger: ILogger<ActiveTimePointRepository>) =
+type ActiveTimePointRepository(options: IDatabaseSettings, timeProvider: System.TimeProvider, logger: ILogger<ActiveTimePointRepository>) =
 
     let getDbConnection = RepositoryBase.openDbConnection options logger
     let deps : ActiveTimePointRepository.Deps =

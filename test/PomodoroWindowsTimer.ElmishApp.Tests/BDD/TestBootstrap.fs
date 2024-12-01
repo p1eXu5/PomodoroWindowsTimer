@@ -69,11 +69,11 @@ type TestBootstrap () =
             )
             |> ignore
 
-        services
-            .AddSingleton<IUserSettings>(new UserSettingsStub()) |> ignore
+        let userSettingsStub = new UserSettingsStub(connectionString)
+        services.AddSingleton<IUserSettings>(userSettingsStub) |> ignore
+        services.AddSingleton<IDatabaseSettings>(userSettingsStub) |> ignore
 
-        services
-            .AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
+        services.AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
 
         services
             .AddSingleton<IWindowsMinimizer>(fun _ ->

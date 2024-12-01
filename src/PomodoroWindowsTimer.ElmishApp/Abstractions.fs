@@ -3,6 +3,7 @@
 open System
 open System.Threading
 open System.Threading.Tasks
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 
@@ -50,6 +51,7 @@ type IUserSettings =
     inherit ITimePointSettings
     inherit IDisableSkipBreakSettings
     inherit ICurrentWorkItemSettings
+    inherit IDatabaseSettings
     abstract LastStatisticPeriod: DateOnlyPeriod option with get, set
     // TODO: abstract RollbackWorkStrategy: RollbackWorkStrategy with get, set
     abstract LastDayCount: int with get, set
