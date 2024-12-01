@@ -18,3 +18,6 @@ module Option =
         match s1, s2 with
         | Some s1, Some s2 -> s1 |> String.equalOrigin s2
         | _ -> false
+
+module DateTimeOffset =
+    let [<Literal>] defaultFormat = "dd.MM.yyyy HH:mm:ss.fffff zzz"

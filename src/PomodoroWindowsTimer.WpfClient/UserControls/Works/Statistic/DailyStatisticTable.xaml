@@ -43,6 +43,16 @@
                                 Margin="5,0"
                                 ToolBar.OverflowMode="AsNeeded"
                                 />
+
+                        <Button Command="{Binding ExportEventsCommand}"
+                                Content="{materialDesign:PackIcon Kind=DatabaseExportOutline}"
+                                ToolTip="Export events"
+                                Margin="5,0"
+                                ToolBar.OverflowMode="AsNeeded"
+                                Visibility="{Binding ShowExportEvents,
+                                                     Converter={StaticResource conv_BooleanToVisibility}}"
+                                />
+
                         <Button Command="{Binding AllocateBreakTimeCommand}"
                                 Content="{materialDesign:PackIcon Kind=TimerCheckOutline}"
                                 ToolTip="Allocate break time between works"

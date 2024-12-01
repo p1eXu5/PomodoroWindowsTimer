@@ -246,7 +246,7 @@ let update
     // -------------------------- export excel report
     | MsgWith.``Start of ExportToExcel`` model (deff, cts) ->
         let period = model |> period
-        let exportTask = ExcelReport.exportToExcelTask workEventRepo excelBook
+        let exportTask = WorkEvents.exportToExcelTask workEventRepo excelBook
         model |> withExportToExcelState deff
         , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportToExcel cts)
         , Intent.None

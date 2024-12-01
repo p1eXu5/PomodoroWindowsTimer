@@ -2,6 +2,7 @@
 
 open System
 open System.Diagnostics
+open PomodoroWindowsTimer
 
 type [<Measure>] ms
 type [<Measure>] sec
@@ -347,6 +348,17 @@ module WorkEvent =
         | WorkEvent.WorkReduced _ -> true
         | _ -> false
 
+    open Helpers.DateTimeOffset
+
+    let toString (workEvent: WorkEvent) =
+        match workEvent with
+        | WorkEvent.WorkStarted (d, n, tpId) -> $"WorkEvent.{nameof WorkEvent.WorkStarted} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture), \"{n}\", Guid.Parse(\"{tpId.ToString()}\"))"
+        | WorkEvent.BreakStarted (d, n, tpId) -> $"WorkEvent.{nameof WorkEvent.BreakStarted} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture), \"{n}\", Guid.Parse(\"{tpId.ToString()}\"))"
+        | WorkEvent.WorkReduced (d, v, tpId) -> $"WorkEvent.{nameof WorkEvent.WorkReduced} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture), TimeSpan.FromMilliseconds({v.Milliseconds}), Guid.Parse(\"{tpId.ToString()}\"))"
+        | WorkEvent.WorkIncreased (d, v, tpId) -> $"WorkEvent.{nameof WorkEvent.WorkIncreased} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture), TimeSpan.FromMilliseconds({v.Milliseconds}), Guid.Parse(\"{tpId.ToString()}\"))"
+        | WorkEvent.BreakReduced (d, v, tpId) -> $"WorkEvent.{nameof WorkEvent.BreakReduced} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture), TimeSpan.FromMilliseconds({v.Milliseconds}), Guid.Parse(\"{tpId.ToString()}\"))"
+        | WorkEvent.BreakIncreased (d, v, tpId) -> $"WorkEvent.{nameof WorkEvent.BreakIncreased} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture), TimeSpan.FromMilliseconds({v.Milliseconds}), Guid.Parse(\"{tpId.ToString()}\"))"
+        | WorkEvent.Stopped d -> $"WorkEvent.{nameof WorkEvent.Stopped} (DateTimeOffset.ParseExact(\"{d.ToString(defaultFormat)}\", defaultFormat, CultureInfo.InvariantCulture))"
 
 module WorkEventList =
     module List =

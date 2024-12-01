@@ -100,7 +100,7 @@ let update
             }
             : DateOnlyPeriod
 
-        let exportTask = ExcelReport.exportToExcelTask workEventRepo excelBook
+        let exportTask = WorkEvents.exportToExcelTask workEventRepo excelBook
         model |> withExportToExcelState deff
         , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportToExcel cts)
         , Intent.None
@@ -113,6 +113,30 @@ let update
             do errorMessageQueue.EnqueueError err
             logger.LogError(err)
             model |> withExportToExcelState AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
+
+    // -------------------------- export events
+    | MsgWith.``Start of ExportEvents`` model (deff, cts) ->
+        let period =
+            {
+                Start = model.Day
+                EndInclusive = model.Day
+            }
+            : DateOnlyPeriod
+
+        let exportTask = WorkEvents.exportEventsToFileTask workEventRepo
+        model |> withExportEventsState deff
+        , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportEvents cts)
+        , Intent.None
+
+    | MsgWith.``Finish of ExportEvents`` model res ->
+        match res with
+        | Ok deff ->
+            model |> withExportEventsState deff |> withCmdNone |> withNoIntent
+        | Error err ->
+            do errorMessageQueue.EnqueueError err
+            logger.LogError(err)
+            model |> withExportEventsState AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
+
 
     // -------------------------- allocate break
     | MsgWith.``Start of AllocateBreakTime`` model (l, overall, deff, cts) ->

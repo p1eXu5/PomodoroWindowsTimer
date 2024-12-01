@@ -10,6 +10,7 @@ type DailyStatisticModel =
         Day: DateOnly
         WorkStatistics: AsyncDeferred<WorkStatisticModel list>
         ExportToExcelState: AsyncDeferred<unit>
+        ExportEventsState: AsyncDeferred<unit>
         AddWorkTime: AddWorkTimeModel option
         AllocateBreakTimeState: AsyncDeferred<unit>
         AllocatedBreaks: (WorkId * TimeSpan) list
@@ -21,6 +22,7 @@ module DailyStatisticModel =
     type Msg =
         | LoadStatistics of AsyncOperation<unit, Result<WorkStatistic list, string>>
         | ExportToExcel of AsyncOperation<unit, Result<unit, string>>
+        | ExportEvents of AsyncOperation<unit, Result<unit, string>>
         | WorkStatisticMsg of workId: uint64 * WorkStatisticModel.Msg
         | RequestAddWorkTimeDialog of workId: uint64
         | RequestWorkEventListDialog of workId: uint64
@@ -91,6 +93,21 @@ module DailyStatisticModel =
                 |> Option.map (Result.map fst)
             | _ -> None
 
+        // -------------------------- export events
+        let (|``Start of ExportEvents``|_|) (model: DailyStatisticModel) (msg: Msg) =
+            match msg with
+            | Msg.ExportEvents (AsyncOperation.Start _) ->
+                model.ExportEventsState |> AsyncDeferred.forceInProgressWithCancellation |> Some
+            | _ -> None
+
+        let (|``Finish of ExportEvents``|_|) (model: DailyStatisticModel) (msg: Msg) =
+            match msg with
+            | Msg.ExportEvents (AsyncOperation.Finish (res, cts)) ->
+                model.ExportEventsState
+                |> AsyncDeferred.chooseRetrievedResultWithin res cts
+                |> Option.map (Result.map fst)
+            | _ -> None
+
         // ------------------------- break time alloc
         let (|``Start of AllocateBreakTime``|_|) (model: DailyStatisticModel) (msg: Msg) =
             match msg, model.WorkStatistics, model.AllocateBreakTimeState with
@@ -143,6 +160,7 @@ module DailyStatisticModel =
             Day = dailyStatistic.Date
             WorkStatistics = workStatistics |> AsyncDeferred.Retrieved
             ExportToExcelState = AsyncDeferred.NotRequested
+            ExportEventsState = AsyncDeferred.NotRequested
             AddWorkTime = None
             AllocateBreakTimeState = AsyncDeferred.NotRequested
             AllocatedBreaks = List.empty
@@ -156,6 +174,9 @@ module DailyStatisticModel =
 
     let withExportToExcelState deff (model: DailyStatisticModel) =
         { model with ExportToExcelState = deff }
+
+    let withExportEventsState deff (model: DailyStatisticModel) =
+        { model with ExportEventsState = deff }
 
     let withAllocateBreakTimeState deff (model: DailyStatisticModel) =
         { model with AllocateBreakTimeState = deff }

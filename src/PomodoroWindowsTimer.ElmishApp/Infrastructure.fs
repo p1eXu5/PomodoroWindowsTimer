@@ -122,7 +122,7 @@ module TelegramBot =
         }
 
 
-module ExcelReport =
+module WorkEvents =
 
     open Microsoft.Win32
 
@@ -141,6 +141,27 @@ module ExcelReport =
                     return
                         events
                         |> Result.bind (ExcelExporter.export excelBook (TimeSpan.FromMinutes(5)) fd.FileName)
+                }
+        else
+            fun _ _ ->
+                task {
+                    return Ok ()
+                }
+
+
+    let exportEventsToFileTask (workEventRepo: IWorkEventRepository) =
+        let fd = SaveFileDialog()
+        fd.Filter <- "Markdown files (*.fs)|*.fs|All files (*.*)|*.*"
+        let result = fd.ShowDialog()
+        if result.HasValue && result.Value then
+            fun period ct ->
+                task {
+                    let! eventsRes = workEventRepo.FindAllByPeriodAsync period ct
+                    match eventsRes with
+                    | Ok events ->
+                        return! EventExporter.export fd.FileName events
+                    | Error err ->
+                        return Result.Error err
                 }
         else
             fun _ _ ->

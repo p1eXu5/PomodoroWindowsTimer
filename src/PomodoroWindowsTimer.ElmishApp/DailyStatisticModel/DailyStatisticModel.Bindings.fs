@@ -100,6 +100,22 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
                 | _ -> AsyncOperation.startUnit Msg.ExportToExcel |> Some
             )
 
+    member val ShowExportEvents : Binding =
+        nameof __.ShowExportEvents
+#if DEBUG
+            |> Binding.oneWay (fun _ -> true)
+#else
+            |> Binding.oneWay (fun _ -> false)
+#endif
+
+    member val ExportEventsCommand : Binding =
+        nameof __.ExportEventsCommand
+            |> Binding.cmdIf (fun m ->
+                match m.ExportEventsState with
+                | AsyncDeferred.InProgress _ -> None
+                | _ -> AsyncOperation.startUnit Msg.ExportEvents |> Some
+            )
+
     member val AllocateBreakTimeCommand : Binding =
         nameof __.AllocateBreakTimeCommand
             |> Binding.cmdIf (fun m ->

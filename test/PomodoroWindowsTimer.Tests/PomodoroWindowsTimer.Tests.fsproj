@@ -14,6 +14,7 @@
     <Compile Include="Projectors\WorkEventProjectorTests.fs" />
     <Compile Include="Projectors\WorkEventSpentTimeProjectorTests.fs" />
     <Compile Include="ExcelExporterTests.fs" />
+    <Compile Include="test24102024.fs" />
     <Compile Include="TimePointQueueTests.fs" />
     <Compile Include="LooperTests.fs" />
     <Compile Include="ParserTests.fs" />
