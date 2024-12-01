@@ -115,6 +115,8 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                 else
                     running value rows []
 
+
+
             // ----------------
 
 
@@ -135,7 +137,19 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                         , curr
                     )
                     |> Ok
-                    
+
+                // hack: need to cover event generation
+                | WorkEvent.WorkStarted (currCt, _, _), WorkEvent.WorkStarted (lastCt, _, _)
+                | WorkEvent.WorkStarted (currCt, _, _), WorkEvent.BreakStarted (lastCt, _, _)
+                | WorkEvent.BreakStarted (currCt, _, _), WorkEvent.WorkStarted (lastCt, _, _)
+                | WorkEvent.BreakStarted (currCt, _, _), WorkEvent.BreakStarted (lastCt, _, _) when currWork.Id <> lastWork.Id ->
+                    let (head, tail) = rows |> List.head, rows |> List.tail
+                    (
+                        (head |> ExcelRow.addTime (currCt - lastCt)) :: tail
+                        , curr
+                    )
+                    |> Ok
+
                 | WorkEvent.WorkStarted (currCt, _, _), WorkEvent.Stopped (lastCt)
                 | WorkEvent.BreakStarted (currCt, _, _), WorkEvent.Stopped (lastCt) ->
                     let diff = currCt - lastCt
