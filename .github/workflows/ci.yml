@@ -52,7 +52,7 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Generate appsettings.<env>.json
+    - name: Generate appsettings.Production.json
       run: |
         cp src/PomodoroWindowsTimer.WpfClient/appsettings.Production.template.json src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
 
