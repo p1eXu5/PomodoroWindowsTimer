@@ -48,6 +48,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "PomodoroWindowsTimer.Storag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PomodoroWindowsTimer.Migrator", "src\PomodoroWindowsTimer.Migrator\PomodoroWindowsTimer.Migrator.csproj", "{99D0C7BE-CC16-424F-A928-A896088E76DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.GitHubClient", "src\PomodoroWindowsTimer.GitHubClient\PomodoroWindowsTimer.GitHubClient.csproj", "{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,12 @@ Global
 		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Personal|Any CPU.Build.0 = Personal|Any CPU
 		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99D0C7BE-CC16-424F-A928-A896088E76DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}.Personal|Any CPU.ActiveCfg = Debug|Any CPU
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}.Personal|Any CPU.Build.0 = Debug|Any CPU
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -140,6 +148,7 @@ Global
 		{AD2A9CDD-A5BE-4D9B-BCD3-5EF538CF2EE0} = {A27FA8E1-2727-4FF9-8698-01526ADDD01C}
 		{C57EC492-3405-4E54-A210-F8B2A7377BC9} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 		{99D0C7BE-CC16-424F-A928-A896088E76DD} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
+		{1124FC7A-88B4-4053-A0A9-1AC3B9C4280A} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FEFD379F-4D9B-4063-82CF-15AF19AF2B11}
