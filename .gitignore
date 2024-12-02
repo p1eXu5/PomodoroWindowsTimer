@@ -488,3 +488,4 @@ $RECYCLE.BIN/
 /src/PomodoroWindowsTimer.WpfClient/Properties/launchSettings.json
 /src/PomodoroWindowsTimer.Migrator/Properties/launchSettings.json
 /src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.template.json
+/branch_version.sh
