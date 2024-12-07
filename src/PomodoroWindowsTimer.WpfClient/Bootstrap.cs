@@ -129,7 +129,7 @@ internal class Bootstrap : IDisposable
     {
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
-        var connectionString = Host.Services.GetRequiredService<IOptions<WorkDbOptions>>().Value.ConnectionString;
+        var connectionString = Host.Services.GetRequiredService<IUserSettings>().DatabaseFilePath;
         var eqInd = connectionString.IndexOf('=');
         var dbFilePath = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
         if (!Path.IsPathFullyQualified(dbFilePath))
@@ -142,7 +142,7 @@ internal class Bootstrap : IDisposable
 
         if (File.Exists(migratorPath))
         {
-            var res = await CliWrap.Cli.Wrap(migratorPath)
+            var res = await Cli.Wrap(migratorPath)
                 .WithArguments(["--connection", connectionString])
                 .WithWorkingDirectory(Path.Combine(path, "migrator"))
                 .WithValidation(CommandResultValidation.None)
