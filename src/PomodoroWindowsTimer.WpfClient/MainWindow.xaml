@@ -22,7 +22,6 @@
         Height="520"
         MinWidth="800"
         MinHeight="595"
-        Icon="pomodoro-technique.ico"
         TextElement.FontSize="13"
         TextElement.FontWeight="Regular"
         TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
