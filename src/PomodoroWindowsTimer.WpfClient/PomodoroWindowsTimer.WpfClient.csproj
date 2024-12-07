@@ -9,6 +9,7 @@
     <ApplicationIcon>pomodoro-technique.ico</ApplicationIcon>
     
     <Title>Pomodoro Windows Timer</Title>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
 
     <Version>3.1.0</Version>
     <AssemblyVersion>3.1</AssemblyVersion>
@@ -20,9 +21,13 @@
     <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
     <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
     <Configurations>Debug;Release;Personal</Configurations>
-    <AssemblyName>Pwt</AssemblyName>
   </PropertyGroup>
 
+  <Target Name="Rename" AfterTargets="AfterBuild">
+    <Move SourceFiles="$(OUTDIR)\$(MSBuildProjectName).exe" DestinationFiles="$(OUTDIR)\Pwt.exe" />
+    <Message Text="Renamed executable file." Importance="high" />
+  </Target>
+  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
     <Optimize>True</Optimize>
   </PropertyGroup>
