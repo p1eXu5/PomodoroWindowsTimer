@@ -47,13 +47,14 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val ShowOpenDatabaseSettingsDialogCommand : Binding =
         nameof __.ShowOpenDatabaseSettingsDialogCommand
-#if DEBUG
-            |> Binding.oneWay (fun _ -> true)
-#else
+#if RELEASE
             |> Binding.oneWay (fun _ -> false)
+#else
+            |> Binding.oneWay (fun _ -> true)
 #endif
 
-#if DEBUG
+#if RELEASE
+#else
     member val OpenDatabaseSettingsDialogCommand : Binding =
         nameof __.OpenDatabaseSettingsDialogCommand
             |> Binding.cmdIf (function AppDialogModel.NoDialog -> Msg.LoadDatabaseSettingsDialogModel |> Some | _ -> None)

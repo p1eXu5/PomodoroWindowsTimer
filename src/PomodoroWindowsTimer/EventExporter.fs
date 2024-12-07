@@ -40,7 +40,7 @@ let export (fileName: string) (workEvents: WorkEventList list) =
             do! sw.WriteLineAsync($"    let private ``5 min threshold`` = TimeSpan.FromMinutes(5)")
             do! sw.WriteLineAsync("")
             let mutable j = 1
-            for (work, start, events) in workEvents do
+            for (work, _, events) in workEvents do
                 do! sw.WriteLineAsync($"    [<Test>]")
                 do! sw.WriteLineAsync($"    let Work{i}_{j}Test () =")
                 do! sw.WriteLineAsync($"        let work{i}_{j} =")
@@ -85,7 +85,7 @@ let export (fileName: string) (workEvents: WorkEventList list) =
             do! sw.WriteLineAsync($"    [<Test>]")
             do! sw.WriteLineAsync($"    let AllDay{day.Day}{day.Month}{day.Year}Test () =")
             let mutable j = 1
-            for (work, start, events) in workEvents do
+            for (work, _, events) in workEvents do
                 do! sw.WriteLineAsync($"        let work{i}_{j} =")
                 do! sw.WriteLineAsync("            {")
                 do! sw.WriteLineAsync($"                Id = uint64 {work.Id.ToString()}")
@@ -111,7 +111,7 @@ let export (fileName: string) (workEvents: WorkEventList list) =
             j <- 1
             do! sw.WriteLineAsync("        let workEventOffsetTimes =")
             do! sw.WriteLineAsync("            [")
-            for (work, start, events) in workEvents do
+            for _ in workEvents do
                 do! sw.WriteLineAsync("            {")
                 do! sw.WriteLineAsync($"                Work = work{i}_{j}")
                 do! sw.WriteLineAsync($"                Events = events{i}_{j}")

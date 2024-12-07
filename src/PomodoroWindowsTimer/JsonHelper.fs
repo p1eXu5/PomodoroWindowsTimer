@@ -42,7 +42,8 @@ type JsonHelpers() =
         options.DefaultIgnoreCondition <- JsonIgnoreCondition.WhenWritingNull
         options.Converters.Add(JsonStringEnumConverter())
         options.Encoder <- JsonHelpers.GetJavaScriptEncoder()
-#if DEBUG
+#if RELEASE
+#else
         options.WriteIndented <- true
 #endif
         JsonFSharpOptions.Default()
