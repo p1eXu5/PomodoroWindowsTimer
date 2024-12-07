@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <Version>3.1.0</Version>
+    <AssemblyVersion>3.1</AssemblyVersion>
+    <FileVersion>3.1.0.0</FileVersion>
+    
+    <Authors>p1eXu5</Authors>
+    <Description>Pomodoro Windows Timer controls.</Description>
+    <Copyright>2024 Vladimir Likhatskiy</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>pomodorowindowstimer;pomodoro;windows;timer;wpf;control</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\base_texture.png" />
+    <Resource Include="Resources\gloss_texture.png" />
+  </ItemGroup>
+
+</Project>

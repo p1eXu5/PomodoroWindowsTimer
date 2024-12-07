@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    >
+
+    <BitmapImage x:Key="{x:Static local:PwtImages.ImgBaseKey}"
+                 PresentationOptions:Freeze="True"
+                 UriSource="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Resources/base_texture.png"
+                 />
+
+    <ImageBrush x:Key="{x:Static local:PwtBrushes.BrBaseKey}"
+                TileMode="FlipXY"
+                Viewport="0,0,256,256"
+                ViewportUnits="Absolute"
+                >
+        <ImageBrush.ImageSource>
+            <DrawingImage>
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <ImageDrawing ImageSource="{DynamicResource {x:Static local:PwtImages.ImgBaseKey}}"
+                                      Rect="0,0,256,256"
+                                      />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+        </ImageBrush.ImageSource>
+    </ImageBrush>
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/GlossBaseRect.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/GlossRect.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Lcd.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

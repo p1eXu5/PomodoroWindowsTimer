@@ -1,0 +1,7 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
+                    >
+    <local:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
+    <local:ActualWidthToTopRightPointConverter x:Key="conv_ActualWidthToTopRightPoint" />
+</ResourceDictionary>
