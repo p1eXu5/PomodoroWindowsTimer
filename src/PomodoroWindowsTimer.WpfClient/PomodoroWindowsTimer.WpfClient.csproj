@@ -10,7 +10,7 @@
     
     <Title>Pomodoro Windows Timer</Title>
 
-    <Version>$(VersionPrefix)</Version>
+    <Version>3.1.0</Version>
     <AssemblyVersion>3.1</AssemblyVersion>
     <FileVersion>3.1.0.0</FileVersion>
     
@@ -20,6 +20,7 @@
     <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
     <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
     <Configurations>Debug;Release;Personal</Configurations>
+    <AssemblyName>Pwt</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
@@ -32,12 +33,9 @@
     <None Remove="Resources\gloss_texture.png" />
     <None Remove="Resources\metalArtboard-50.png" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="pomodoro-technique.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -61,20 +59,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CliWrap" Version="3.6.6" />
+    <PackageReference Include="CliWrap" Version="3.6.7" />
     <PackageReference Include="MaterialDesignThemes" Version="5.1.1-ci718" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="p1eXu5.Wpf.DigitPanel" Version="1.0.2" />
     
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
+
     <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
 
@@ -82,6 +81,7 @@
     <ProjectReference Include="..\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer.Exporter.Excel\PomodoroWindowsTimer.Exporter.Excel.csproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Wpf\PomodoroWindowsTimer.Wpf.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -99,6 +99,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="pomodoro-technique.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

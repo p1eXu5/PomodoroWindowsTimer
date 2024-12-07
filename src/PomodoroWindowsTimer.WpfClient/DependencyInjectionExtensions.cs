@@ -3,20 +3,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using PomodoroWindowsTimer.Abstractions;
+using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer;
-using PomodoroWindowsTimer.Types;
+using PomodoroWindowsTimer.Abstractions;
+using PomodoroWindowsTimer.ElmishApp;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Infrastructure;
+using PomodoroWindowsTimer.Exporter.Excel;
+using PomodoroWindowsTimer.Storage.Configuration;
+using PomodoroWindowsTimer.TimePointQueue;
 using PomodoroWindowsTimer.WpfClient;
 using PomodoroWindowsTimer.WpfClient.Services;
-using PomodoroWindowsTimer.TimePointQueue;
-using System.Windows.Interop;
-using PomodoroWindowsTimer.Exporter.Excel;
-using PomodoroWindowsTimer.ElmishApp;
-using Org.BouncyCastle.Utilities.Collections;
-using PomodoroWindowsTimer.Storage.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace DrugRoom.WpfClient;
 
@@ -28,31 +25,31 @@ internal static class DependencyInjectionExtensions
     public static void AddTimePointQueue(this IServiceCollection services)
         => services.TryAddSingleton<ITimePointQueue>(sp =>
         {
-            var logger = sp.GetRequiredService<ILogger<TimePointQueue>>();
+            ILogger<TimePointQueue> logger = sp.GetRequiredService<ILogger<TimePointQueue>>();
             return new TimePointQueue(logger);
         });
 
     public static void AddLooper(this IServiceCollection services)
         => services.TryAddSingleton<ILooper>(sp =>
         {
-            var timePointQueue = sp.GetRequiredService<ITimePointQueue>();
-            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
-            var logger = sp.GetRequiredService<ILogger<Looper.Looper>>();
+            ITimePointQueue timePointQueue = sp.GetRequiredService<ITimePointQueue>();
+            TimeProvider timeProvider = sp.GetRequiredService<System.TimeProvider>();
+            ILogger<Looper.Looper> logger = sp.GetRequiredService<ILogger<Looper.Looper>>();
             return
-                new Looper.Looper(timePointQueue, timeProvider, PomodoroWindowsTimer.ElmishApp.Program.tickMilliseconds, logger, default);
+                new Looper.Looper(timePointQueue, timeProvider, Program.tickMilliseconds, logger, default);
         });
 
     public static void AddTelegramBot(this IServiceCollection services)
         => services.TryAddSingleton(sp =>
         {
-            var userSettings = sp.GetRequiredService<IUserSettings>();
+            IUserSettings userSettings = sp.GetRequiredService<IUserSettings>();
             return TelegramBot.init(userSettings);
         });
 
     public static void AddWindowsMinimizer(this IServiceCollection services)
         => services.TryAddSingleton<IWindowsMinimizer>(sp =>
         {
-            var timeProvider = sp.GetRequiredService<System.TimeProvider>();
+            TimeProvider timeProvider = sp.GetRequiredService<System.TimeProvider>();
 #if DEBUG
             return new StabWindowsMinimizer();
 #else
@@ -85,7 +82,7 @@ internal static class DependencyInjectionExtensions
     {
         Func<IServiceProvider, object?, IErrorMessageQueue> errorMessageQueueFactory = (sp, key) =>
         {
-            var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+            ILoggerFactory loggerFactory = sp.GetRequiredService<ILoggerFactory>();
             Microsoft.Extensions.Logging.ILogger logger;
 
             if (key is string skey)

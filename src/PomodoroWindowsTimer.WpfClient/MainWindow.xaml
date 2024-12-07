@@ -6,6 +6,7 @@
         xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
+        xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
         xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -26,12 +27,10 @@
         TextElement.FontWeight="Regular"
         TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource br_Base}"
+        Background="{DynamicResource {x:Static pwt:PwtBrushes.BrBaseKey}}"
         mc:Ignorable="d"
         >
     <Window.Resources>
-        <conv:ActualWidthToTopRightPointConverter x:Key="conv_ActualWidthToTopRightPoint" />
-        <conv:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
         <sel:MainDialogContentTemplateSelector x:Key="set_MainDialogContentTemplate" />
     </Window.Resources>
 
@@ -52,49 +51,7 @@
                                     Path=DataContext}"
               >
             <!--  gloss rect  -->
-            <Rectangle Width="{Binding ElementName=m_Root,
-                                       Path=ActualWidth}"
-                       Height="{Binding ElementName=m_Root,
-                                        Path=ActualHeight}"
-                       Opacity="0.7"
-                       >
-                <Rectangle.OpacityMask>
-                    <RadialGradientBrush Center="{Binding ElementName=m_Root,
-                                                          Path=ActualWidth,
-                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
-                                         GradientOrigin="{Binding ElementName=m_Root,
-                                                                  Path=ActualWidth,
-                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
-                                         MappingMode="Absolute"
-                                         RadiusX="500"
-                                         RadiusY="500"
-                                         SpreadMethod="Pad"
-                                         >
-                        <RadialGradientBrush.GradientStops>
-                            <GradientStop Offset="0" Color="#FF000000" />
-                            <GradientStop Offset="1" Color="#00000000" />
-                        </RadialGradientBrush.GradientStops>
-                    </RadialGradientBrush>
-                </Rectangle.OpacityMask>
-                <Rectangle.Fill>
-                    <ImageBrush TileMode="FlipXY"
-                                Viewport="0,0,256,256"
-                                ViewportUnits="Absolute"
-                                >
-                        <ImageBrush.ImageSource>
-                            <DrawingImage>
-                                <DrawingImage.Drawing>
-                                    <DrawingGroup>
-                                        <ImageDrawing ImageSource="{StaticResource img_Gloss}"
-                                                      Rect="0,0,256,256"
-                                                      />
-                                    </DrawingGroup>
-                                </DrawingImage.Drawing>
-                            </DrawingImage>
-                        </ImageBrush.ImageSource>
-                    </ImageBrush>
-                </Rectangle.Fill>
-            </Rectangle>
+            <pwt:GlossBaseRect />
 
             <DockPanel>
                 <materialDesign:Snackbar DockPanel.Dock="Bottom"
@@ -110,83 +67,9 @@
                                              />
 
                 <!--  LCD container  -->
-                <Grid MinWidth="700"
-                      MinHeight="420"
-                      Margin="40,30,40,0"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      >
-                    <Border x:Name="m_BlackPane"
-                            BorderThickness="0"
-                            CornerRadius="4"
-                            Background="Black"
-                            >
-                        <Grid>
-                            <Grid Margin="1">
-                                <!--  LCD  -->
-                                <userControls:Lcd DataContext="{Binding}" />
-
-                                <Border BorderBrush="#0A0A0A"
-                                        BorderThickness="0,1,1,0"
-                                        CornerRadius="4"
-                                        />
-                                <Border BorderBrush="#000000"
-                                        BorderThickness="1,0,0,1"
-                                        CornerRadius="4"
-                                        />
-                            </Grid>
-
-                            <Border x:Name="m_OuterBottomLeftShadowBorder"
-                                    BorderBrush="#101010"
-                                    BorderThickness="1,0,0,1"
-                                    CornerRadius="4"
-                                    />
-
-                            <Rectangle x:Name="m_GlossRect"
-                                       IsHitTestVisible="False"
-                                       Opacity="0.13"
-                                       RadiusX="4"
-                                       RadiusY="4"
-                                       >
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1.3">
-                                        <LinearGradientBrush.GradientStops>
-                                            <GradientStop Offset="0.38" Color="#00FFFFFF" />
-                                            <GradientStop Offset="0.4" Color="#FFFFFFFF" />
-                                            <GradientStop Offset="0.7" Color="#FFFFFFFF" />
-                                            <GradientStop Offset="0.72" Color="#00FFFFFF" />
-                                        </LinearGradientBrush.GradientStops>
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                                <Rectangle.OpacityMask>
-                                    <RadialGradientBrush Center="{Binding ElementName=m_Root,
-                                                                          Path=ActualWidth,
-                                                                          Converter={StaticResource conv_ActualWidthToCenterPoint}}"
-                                                         GradientOrigin="{Binding ElementName=m_Root,
-                                                                                  Path=ActualWidth,
-                                                                                  Converter={StaticResource conv_ActualWidthToTopRightPoint}}"
-                                                         MappingMode="Absolute"
-                                                         RadiusX="500"
-                                                         RadiusY="500"
-                                                         SpreadMethod="Pad"
-                                                         >
-                                        <RadialGradientBrush.GradientStops>
-                                            <GradientStop Offset="0" Color="#FF000000" />
-                                            <GradientStop Offset="1" Color="#00000000" />
-                                        </RadialGradientBrush.GradientStops>
-                                    </RadialGradientBrush>
-                                </Rectangle.OpacityMask>
-                            </Rectangle>
-
-                            <Border x:Name="m_OuterTopRightShadowBorder"
-                                    BorderBrush="#0A0A0A"
-                                    BorderThickness="0,1,1,0"
-                                    CornerRadius="4"
-                                    />
-                        </Grid>
-                    </Border>
-                </Grid>
-
+                <pwt:Lcd Margin="40,30,40,0">
+                    <userControls:Lcd DataContext="{Binding}" />
+                </pwt:Lcd>
             </DockPanel>
         </Grid>
     </materialDesign:DialogHost>

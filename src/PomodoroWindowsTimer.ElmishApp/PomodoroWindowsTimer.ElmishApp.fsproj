@@ -88,6 +88,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Pwt" />
     <InternalsVisibleTo Include="PomodoroWindowsTimer.WpfClient" />
     <InternalsVisibleTo Include="PomodoroWindowsTimer.ElmishApp.Tests" />
   </ItemGroup>
