@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.Wpf.Demo.GlossRectSample"
+             x:Name="m_GlossRectSampleRoot"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf.Demo"
+             xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
+             d:DesignHeight="1024"
+             d:DesignWidth="1024"
+             mc:Ignorable="d"
+             >
+    <UserControl.Background>
+        <RadialGradientBrush Center="512, 512"
+                             GradientOrigin="1524,-500"
+                             RadiusX="1500"
+                             RadiusY="1500"
+                             SpreadMethod="Pad"
+                             MappingMode="Absolute"
+                             >
+            <GradientStop Offset="0" Color="Red" />
+            <GradientStop Offset="0.4" Color="Red" />
+            <GradientStop Offset="0.5" Color="#000000FF" />
+        </RadialGradientBrush>
+    </UserControl.Background>
+
+    <Grid>
+        <pwt:GlossOnBase />
+        <!--<pwt:GlossRect BaseRectWidth="{Binding ElementName=m_GlossRectSampleRoot, Path=ActualWidth}" />-->
+        <Rectangle Width="500"
+                   Height="500"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   >
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="512, 512"
+                                     GradientOrigin="1524,-500"
+                                     RadiusX="1500"
+                                     RadiusY="1500"
+                                     SpreadMethod="Pad"
+                                     MappingMode="Absolute"
+                                     >
+                    <GradientStop Offset="0" Color="Red" />
+                    <GradientStop Offset="0.4" Color="Red" />
+                    <GradientStop Offset="0.5" Color="#000000FF" />
+                    <RadialGradientBrush.
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+    </Grid>
+
+</UserControl>
