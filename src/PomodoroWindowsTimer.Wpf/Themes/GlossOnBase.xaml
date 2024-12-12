@@ -5,79 +5,46 @@
                     >
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Converters.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Brushes.xaml" />
     </ResourceDictionary.MergedDictionaries>
-
-    <BitmapImage x:Key="{x:Static local:PwtImages.ImgGlossKey}"
-                 PresentationOptions:Freeze="True"
-                 UriSource="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Resources/gloss_texture.png"
-                 />
 
     <Style TargetType="{x:Type local:GlossOnBase}">
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
+        <Setter Property="BaseFill" Value="{DynamicResource {x:Static local:PwtBrushes.BaseTextureKey}}" />
+        <Setter Property="GlossFill" Value="{DynamicResource {x:Static local:PwtBrushes.GlossTextureKey}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:GlossOnBase}">
-                    <Rectangle Width="{TemplateBinding Width}"
-                               Height="{TemplateBinding Height}"
-                               Opacity="0.7"
-                               >
-                        <Rectangle.OpacityMask>
-                            <RadialGradientBrush MappingMode="Absolute"
-                                                 RadiusX="500"
-                                                 RadiusY="500"
-                                                 SpreadMethod="Pad"
-                                                 >
-                                <!--  Shift Center from top-right corner to center of Rectangle  -->
-                                <RadialGradientBrush.Center>
-                                    <MultiBinding Converter="{StaticResource conv_ActualWidthToCenterPoint}">
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:GlossOnBase,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualWidth"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:GlossOnBase,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualHeight"
-                                                 />
-                                    </MultiBinding>
-                                </RadialGradientBrush.Center>
-                                <RadialGradientBrush.GradientOrigin>
-                                    <MultiBinding Converter="{StaticResource conv_ActualWidthToOriginPoint}">
+                    <Grid Width="{TemplateBinding Width}"
+                          Height="{TemplateBinding Height}"
+                          HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                          Background="{TemplateBinding BaseFill}"
+                          >
+                        <!--  Gloss Rectangle  -->
+                        <Rectangle Fill="{TemplateBinding GlossFill}"
+                                   OpacityMask="{TemplateBinding GlossOpacityMask}"
+                                   />
 
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:GlossOnBase,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualWidth"
-                                                 />
-                                    </MultiBinding>
-                                </RadialGradientBrush.GradientOrigin>
-                                <RadialGradientBrush.GradientStops>
-                                    <GradientStop Offset="0" Color="#FF000000" />
-                                    <GradientStop Offset="1" Color="#00000000" />
-                                </RadialGradientBrush.GradientStops>
-                            </RadialGradientBrush>
-                        </Rectangle.OpacityMask>
-                        <Rectangle.Fill>
-                            <ImageBrush TileMode="FlipXY"
-                                        Viewport="0,0,256,256"
-                                        ViewportUnits="Absolute"
-                                        >
-                                <ImageBrush.ImageSource>
-                                    <DrawingImage>
-                                        <DrawingImage.Drawing>
-                                            <DrawingGroup>
-                                                <ImageDrawing ImageSource="{DynamicResource {x:Static local:PwtImages.ImgGlossKey}}"
-                                                              Rect="0,0,256,256"
-                                                              />
-                                            </DrawingGroup>
-                                        </DrawingImage.Drawing>
-                                    </DrawingImage>
-                                </ImageBrush.ImageSource>
-                            </ImageBrush>
-                        </Rectangle.Fill>
-                    </Rectangle>
+                        <!--  LCD  -->
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
+                                          Margin="{TemplateBinding Control.Padding}"
+                                          HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
+                                          ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
+                                          ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
+                                          SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
+                                          />
+
+                        <!--  Gloss Rectangle  -->
+                        <Rectangle Fill="{TemplateBinding BeamFill}"
+                                   OpacityMask="{TemplateBinding GlossOpacityMask}"
+                                   IsHitTestVisible="False"
+                                   Visibility="{TemplateBinding BeamVisibility}"
+                                   Opacity="0.2"
+                                   />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -7,61 +7,10 @@
         xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf.Demo"
         xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
         Title="MainWindow"
-        Width="800"
-        Height="400"
-        pwt:GlossAssistant.BaseWidth="{Binding RelativeSource={RelativeSource Mode=Self},
-                                               Path=ActualWidth}"
-        pwt:GlossAssistant.BaseHeight="{Binding RelativeSource={RelativeSource Mode=Self},
-                                                Path=ActualHeight}"
-        Background="{DynamicResource {x:Static pwt:PwtBrushes.BrBaseKey}}"
+        Width="1024"
+        Height="1024"
+        Background="Black"
         mc:Ignorable="d"
         >
-    <Grid>
-        <pwt:GlossOnBase />
-
-        <Grid Margin="0"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Stretch"
-              >
-            <!--<pwt:Lcd Width="400"
-                     Height="200"
-                     HorizontalContentAlignment="Center"
-                     VerticalContentAlignment="Center"
-                     BaseWidth="{Binding ElementName=m_Root,
-                                         Path=ActualWidth}"
-                     TextElement.Foreground="AliceBlue"
-                     >
-                <TextBlock>Lsd</TextBlock>
-            </pwt:Lcd>-->
-
-            <pwt:Lcd>
-                <TextBlock>Button</TextBlock>
-            </pwt:Lcd>
-
-            <pwt:Lcd Width="400"
-                     Height="200"
-                     Background="#330000"
-                     Visibility="Visible"
-                     >
-                <TextBlock>Button</TextBlock>
-            </pwt:Lcd>
-            <!--<Rectangle Width="100"
-                       Height="36"
-                       >
-                <Rectangle.Fill>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1.3">
-                        <LinearGradientBrush.GradientStops>
-                            <GradientStop Offset="0.38" Color="#00FFFFFF" />
-                            <GradientStop Offset="0.4" Color="#FFFFFFFF" />
-                            <GradientStop Offset="0.7" Color="#FFFFFFFF" />
-                            <GradientStop Offset="0.72" Color="#00FFFFFF" />
-                        </LinearGradientBrush.GradientStops>
-                        <LinearGradientBrush.Transform>
-                            <ScaleTransform ScaleX="2" ScaleY="4" CenterX="50" CenterY="18" />
-                        </LinearGradientBrush.Transform>
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>-->
-        </Grid>
-    </Grid>
+    <pwt:GlossOnBase BeamVisibility="Visible" />
 </Window>

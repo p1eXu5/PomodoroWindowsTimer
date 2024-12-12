@@ -6,9 +6,9 @@ namespace PomodoroWindowsTimer.Wpf.Demo;
 /// <summary>
 /// Interaction logic for GlossRect.xaml
 /// </summary>
-public partial class GlossRectSample : UserControl
+public partial class RadialBrushSample : UserControl
 {
-    public GlossRectSample()
+    public RadialBrushSample()
     {
         InitializeComponent();
     }

@@ -2,9 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:conv="clr-namespace:PomodoroWindowsTimer.Wpf.Converters"
                     >
+    <conv:ActualSizeToCenterPointConverter x:Key="conv_ActualSizeToCenterPoint" />
+    <conv:ActualSizeToOuterTopRightPointConverter x:Key="conv_ActualSizeToOuterTopRightPoint" />
     <conv:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
+    <conv:ActualWidthToEndPointConverter x:Key="conv_ActualWidthToEndPoint" />
     <conv:ActualWidthToOriginPointConverter x:Key="conv_ActualWidthToOriginPoint" />
     <conv:DividerConverter x:Key="conv_Divider" />
+    <conv:MaxDividerConverter x:Key="conv_MaxDivider" />
     <conv:ScaleConverter x:Key="conv_Scale" />
     <conv:MultiWidthToGradientStopsConverter x:Key="conv_MultiWidthToGradientStops" />
 </ResourceDictionary>

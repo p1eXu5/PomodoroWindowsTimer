@@ -1,0 +1,54 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    >
+    <!--  base_texture.png  -->
+    <BitmapImage x:Key="{x:Static local:PwtImages.BaseTextureKey}"
+                 UriSource="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Resources/base_texture.png"
+                 />
+
+    <ImageBrush x:Key="{x:Static local:PwtBrushes.BaseTextureKey}"
+                TileMode="FlipXY"
+                Viewport="0,0,256,256"
+                ViewportUnits="Absolute"
+                >
+        <ImageBrush.ImageSource>
+            <DrawingImage>
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <ImageDrawing ImageSource="{DynamicResource {x:Static local:PwtImages.BaseTextureKey}}"
+                                      Rect="0,0,256,256"
+                                      />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+        </ImageBrush.ImageSource>
+    </ImageBrush>
+
+    <!--  gloss_texture.png  -->
+    <BitmapImage x:Key="{x:Static local:PwtImages.GlossTextureKey}"
+                 UriSource="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Resources/gloss_texture.png"
+                 />
+
+    <ImageBrush x:Key="{x:Static local:PwtBrushes.GlossTextureKey}"
+                TileMode="FlipXY"
+                Viewport="0,0,256,256"
+                ViewportUnits="Absolute"
+                >
+        <ImageBrush.ImageSource>
+            <DrawingImage>
+                <DrawingImage.Drawing>
+                    <DrawingGroup>
+                        <ImageDrawing ImageSource="{DynamicResource {x:Static local:PwtImages.GlossTextureKey}}"
+                                      Rect="0,0,256,256"
+                                      />
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+        </ImageBrush.ImageSource>
+    </ImageBrush>
+
+    <!--  radial gloss brush  -->
+
+</ResourceDictionary>

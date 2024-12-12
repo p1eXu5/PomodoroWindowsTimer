@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.Wpf.Demo.LinearBrushSample"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf.Demo"
+             d:DesignHeight="800"
+             d:DesignWidth="1024"
+             mc:Ignorable="d"
+             >
+    <Rectangle>
+        <Rectangle.Fill>
+            <LinearGradientBrush SpreadMethod="Pad" MappingMode="Absolute" StartPoint="0,0" EndPoint="1024,0">
+                <GradientStop Offset="0.32" Color="#00FFFFFF" />
+                <GradientStop Offset="0.34" Color="#FFFF0000" />
+                <GradientStop Offset="0.80" Color="#FFFF0000" />
+                <GradientStop Offset="0.82" Color="#00FFFFFF" />
+                <LinearGradientBrush.Transform>
+                    <TransformGroup>
+                        <RotateTransform Angle="40" CenterX="512" CenterY="400" />
+                    </TransformGroup>
+                </LinearGradientBrush.Transform>
+
+            </LinearGradientBrush>
+        </Rectangle.Fill>
+        <!--<Rectangle.OpacityMask>
+            <RadialGradientBrush Center="512, 512"
+                                 GradientOrigin="1524,-500"
+                                 RadiusX="1500"
+                                 RadiusY="1500"
+                                 SpreadMethod="Pad"
+                                 MappingMode="Absolute"
+                                 >
+                <GradientStop Offset="0" Color="Red" />
+                <GradientStop Offset="0.4" Color="Red" />
+                <GradientStop Offset="0.5" Color="#000000FF" />
+            </RadialGradientBrush>
+        </Rectangle.OpacityMask>-->
+    </Rectangle>
+</UserControl>
