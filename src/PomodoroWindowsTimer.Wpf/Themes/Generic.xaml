@@ -6,8 +6,8 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/GlossOnBase.xaml" />
-        <!--<ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Beam.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Lcd.xaml" />-->
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Beam.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Lcd.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

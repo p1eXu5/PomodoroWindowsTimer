@@ -3,6 +3,7 @@ using System.Windows.Controls;
 
 namespace PomodoroWindowsTimer.Wpf;
 
+[TemplatePart(Name = "PART_Beam", Type = typeof(Beam))]
 public class Lcd : ContentControl
 {
     static Lcd()
@@ -40,6 +41,26 @@ public class Lcd : ContentControl
             "CornerRadius",
             typeof(CornerRadius),
             typeof(Lcd),
-            new PropertyMetadata(new CornerRadius())
+            new FrameworkPropertyMetadata(
+                new CornerRadius(),
+                FrameworkPropertyMetadataOptions.AffectsRender)
         );
+
+
+
+    public double BeamOpacity
+    {
+        get { return (double)GetValue(BeamOpacityProperty); }
+        set { SetValue(BeamOpacityProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for BeamOpacity.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty BeamOpacityProperty =
+        DependencyProperty.Register(
+            "BeamOpacity",
+            typeof(double),
+            typeof(Lcd),
+            new FrameworkPropertyMetadata(1.0, FrameworkPropertyMetadataOptions.AffectsRender));
+
+
 }

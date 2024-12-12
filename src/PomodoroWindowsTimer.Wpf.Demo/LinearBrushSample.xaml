@@ -10,14 +10,21 @@
              >
     <Rectangle>
         <Rectangle.Fill>
-            <LinearGradientBrush SpreadMethod="Pad" MappingMode="Absolute" StartPoint="0,0" EndPoint="1024,0">
+            <LinearGradientBrush SpreadMethod="Pad"
+                                 MappingMode="Absolute"
+                                 StartPoint="0,0"
+                                 EndPoint="1024,0"
+                                 >
                 <GradientStop Offset="0.32" Color="#00FFFFFF" />
                 <GradientStop Offset="0.34" Color="#FFFF0000" />
                 <GradientStop Offset="0.80" Color="#FFFF0000" />
                 <GradientStop Offset="0.82" Color="#00FFFFFF" />
                 <LinearGradientBrush.Transform>
                     <TransformGroup>
-                        <RotateTransform Angle="40" CenterX="512" CenterY="400" />
+                        <RotateTransform Angle="40"
+                                         CenterX="512"
+                                         CenterY="400"
+                                         />
                     </TransformGroup>
                 </LinearGradientBrush.Transform>
 

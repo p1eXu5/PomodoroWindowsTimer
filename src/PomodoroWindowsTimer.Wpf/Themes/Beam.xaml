@@ -19,201 +19,21 @@
     <Style TargetType="{x:Type local:Beam}">
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
-        <Setter Property="Opacity" Value="0.35" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Opacity" Value="0.2" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Beam}">
-                    <Rectangle Width="{TemplateBinding Width}"
+                    <Rectangle x:Name="PART_Rectangle"
+                               Width="{TemplateBinding Width}"
                                Height="{TemplateBinding Height}"
+                               HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                               VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                IsHitTestVisible="False"
                                Opacity="{TemplateBinding Opacity}"
-                               RadiusX="4"
-                               RadiusY="4"
-                               >
-                        <Rectangle.Fill>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <LinearGradientBrush.GradientStops>
-                                    <MultiBinding Converter="{StaticResource conv_MultiWidthToGradientStops}"
-                                                  ConverterParameter="{StaticResource a_GradientStops}"
-                                                  >
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="(local:GlossAssistant.BaseWidth)"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualWidth"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="(local:GlossAssistant.OffsetX)"
-                                                 />
-                                    </MultiBinding>
-                                    <!--<GradientStop Offset="0.38" Color="#00FFFFFF" />
-                                    <GradientStop Offset="0.4" Color="#FFFFFFFF" />
-                                    <GradientStop Offset="0.7" Color="#FFFFFFFF" />
-                                    <GradientStop Offset="0.72" Color="#00FFFFFF" />-->
-                                </LinearGradientBrush.GradientStops>
-
-                                <LinearGradientBrush.Transform>
-                                    <TransformGroup>
-                                        <RotateTransform Angle="40"
-                                                         CenterX="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                          AncestorType=local:Beam,
-                                                                                                          AncestorLevel=1},
-                                                                           Path=ActualWidth,
-                                                                           Converter={StaticResource conv_Divider},
-                                                                           ConverterParameter=2}"
-                                                         CenterY="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                          AncestorType=local:Beam,
-                                                                                                          AncestorLevel=1},
-                                                                           Path=ActualHeight,
-                                                                           Converter={StaticResource conv_Divider},
-                                                                           ConverterParameter=2}"
-                                                         />
-                                        <!--<ScaleTransform CenterX="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                         AncestorType=local:Beam,
-                                                                                                         AncestorLevel=1},
-                                                                          Path=ActualWidth,
-                                                                          Converter={StaticResource conv_Divider},
-                                                                          ConverterParameter=2}"
-                                                        CenterY="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                         AncestorType=local:Beam,
-                                                                                                         AncestorLevel=1},
-                                                                          Path=ActualHeight,
-                                                                          Converter={StaticResource conv_Divider},
-                                                                          ConverterParameter=2}"
-                                                        >
-                                            <ScaleTransform.ScaleX>
-                                                <MultiBinding Converter="{StaticResource conv_Scale}">
-                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                             AncestorType=local:Beam,
-                                                                                             AncestorLevel=1}"
-                                                             Path="(local:GlossAssistant.BaseWidth)"
-                                                             />
-                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                             AncestorType=local:Beam,
-                                                                                             AncestorLevel=1}"
-                                                             Path="ActualWidth"
-                                                             />
-                                                </MultiBinding>
-                                            </ScaleTransform.ScaleX>
-                                            <ScaleTransform.ScaleY>
-                                                <MultiBinding Converter="{StaticResource conv_Scale}">
-                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                             AncestorType=local:Beam,
-                                                                                             AncestorLevel=1}"
-                                                             Path="(local:GlossAssistant.BaseHeight)"
-                                                             />
-                                                    <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                             AncestorType=local:Beam,
-                                                                                             AncestorLevel=1}"
-                                                             Path="ActualHeight"
-                                                             />
-                                                </MultiBinding>
-                                            </ScaleTransform.ScaleY>
-                                        </ScaleTransform>
-                                        <TranslateTransform X="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                       AncestorType=local:Beam,
-                                                                                                       AncestorLevel=1},
-                                                                        Path=(local:GlossAssistant.OffsetX)}"
-                                                            Y="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                       AncestorType=local:Beam,
-                                                                                                       AncestorLevel=1},
-                                                                        Path=(local:GlossAssistant.OffsetY)}"
-                                                            />-->
-                                    </TransformGroup>
-                                </LinearGradientBrush.Transform>
-                            </LinearGradientBrush>
-                        </Rectangle.Fill>
-                        <!--<Rectangle.OpacityMask>
-                            <RadialGradientBrush MappingMode="Absolute"
-                                                 RadiusX="500"
-                                                 RadiusY="500"
-                                                 SpreadMethod="Pad"
-                                                 >
-                                <RadialGradientBrush.Center>
-                                    <MultiBinding Converter="{StaticResource conv_ActualWidthToCenterPoint}">
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="(local:GlossAssistant.BaseWidth)"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="(local:GlossAssistant.BaseHeight)"
-                                                 />
-                        -->
-                        <!--<Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualWidth"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualHeight"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="OffsetWidth"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="OffsetHeight"
-                                                 />-->
-                        <!--
-                                    </MultiBinding>
-                                </RadialGradientBrush.Center>
-                                <RadialGradientBrush.GradientOrigin>
-                                    <MultiBinding Converter="{StaticResource conv_ActualWidthToOriginPoint}">
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="(local:GlossAssistant.BaseWidth)"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="(local:GlossAssistant.BaseHeight)"
-                                                 />
-                        -->
-                        <!--<Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualWidth"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="ActualHeight"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="OffsetWidth"
-                                                 />
-                                        <Binding RelativeSource="{RelativeSource Mode=FindAncestor,
-                                                                                 AncestorType=local:Beam,
-                                                                                 AncestorLevel=1}"
-                                                 Path="OffsetHeight"
-                                                 />-->
-                        <!--
-                                    </MultiBinding>
-                                </RadialGradientBrush.GradientOrigin>
-                                <RadialGradientBrush.GradientStops>
-                                    <GradientStop Offset="0" Color="#FF000000" />
-                                    <GradientStop Offset="1" Color="#00000000" />
-                                </RadialGradientBrush.GradientStops>
-                            </RadialGradientBrush>
-                        </Rectangle.OpacityMask>-->
-                    </Rectangle>
+                               />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

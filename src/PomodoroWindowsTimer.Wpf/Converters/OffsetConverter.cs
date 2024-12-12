@@ -1,19 +1,17 @@
 ﻿using System.Globalization;
-using System.Windows;
 using System.Windows.Data;
+using System.Windows;
 
 namespace PomodoroWindowsTimer.Wpf.Converters;
 
-/// <summary>
-/// Gets parent measurement and child measurement and returns relation.
-/// </summary>
-public sealed class ScaleConverter : IMultiValueConverter
+public sealed class OffsetConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (values?.Length == 2 && values[0] is double baseMeasurement && values[1] is double actualMeasurement && actualMeasurement > 0)
+        if (values?.Length == 2 && values[0] is double baseMeasurement && values[1] is double actualMeasurement && parameter is double offsetRel)
         {
-            return baseMeasurement / actualMeasurement;
+            double offset = baseMeasurement * offsetRel;
+            return ((baseMeasurement - actualMeasurement) / 2.0) - offset;
         }
 
         return DependencyProperty.UnsetValue;
