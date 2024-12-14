@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
+                    xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                    >
+    <Style TargetType="{x:Type local:GlossOnBase}">
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="BaseFill" Value="{DynamicResource {x:Static local:PwtBrushes.BaseTextureKey}}" />
+        <Setter Property="GlossFill" Value="{DynamicResource {x:Static local:PwtBrushes.GlossTextureKey}}" />
+        <Setter Property="BeamOpacity" Value="0.2" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:GlossOnBase}">
+                    <Grid Width="{TemplateBinding Width}"
+                          Height="{TemplateBinding Height}"
+                          HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                          VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                          Background="{TemplateBinding BaseFill}"
+                          >
+                        <!--  Gloss Rectangle  -->
+                        <Rectangle Fill="{TemplateBinding GlossFill}"
+                                   OpacityMask="{TemplateBinding GlossOpacityMask}"
+                                   />
+
+                        <!--  LCD  -->
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
+                                          Margin="{TemplateBinding Control.Padding}"
+                                          ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
+                                          ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
+                                          SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
+                                          />
+
+                        <!--  Beam Rectangle  -->
+                        <Rectangle Fill="{TemplateBinding BeamFill}"
+                                   OpacityMask="{TemplateBinding GlossOpacityMask}"
+                                   IsHitTestVisible="False"
+                                   Visibility="{TemplateBinding BeamVisibility}"
+                                   Opacity="{TemplateBinding BeamOpacity}"
+                                   />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

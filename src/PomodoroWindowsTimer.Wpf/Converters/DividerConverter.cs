@@ -2,15 +2,15 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace PomodoroWindowsTimer.Wpf;
+namespace PomodoroWindowsTimer.Wpf.Converters;
 
-public sealed class ActualWidthToCenterPointConverter : IValueConverter
+public sealed class DividerConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is double actualWidth)
+        if (value is double v && parameter is double d && d > 0)
         {
-            return new Point(actualWidth - 250.0, 250);
+            return v / d;
         }
 
         return DependencyProperty.UnsetValue;

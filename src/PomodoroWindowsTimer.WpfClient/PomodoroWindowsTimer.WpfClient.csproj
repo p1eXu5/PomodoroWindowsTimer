@@ -21,6 +21,7 @@
     <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
     <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
     <Configurations>Debug;Release;Personal</Configurations>
+    <StartupObject>PomodoroWindowsTimer.WpfClient.App</StartupObject>
   </PropertyGroup>
 
   <Target Name="Rename" AfterTargets="AfterBuild">

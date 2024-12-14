@@ -26,7 +26,7 @@
         TextElement.FontWeight="Regular"
         TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource {x:Static pwt:PwtBrushes.BrBaseKey}}"
+        Background="Black"
         mc:Ignorable="d"
         >
     <Window.Resources>
@@ -45,14 +45,11 @@
                                CloseOnClickAway="False"
                                >
 
-        <Grid d:DataContext="{d:DesignInstance Type=mainModel:Bindings}"
-              DataContext="{Binding ElementName=m_Root,
-                                    Path=DataContext}"
-              >
-            <!--  gloss rect  -->
-            <pwt:GlossBaseRect />
-
-            <DockPanel>
+        <pwt:GlossOnBase>
+            <DockPanel d:DataContext="{d:DesignInstance Type=mainModel:Bindings}"
+                       DataContext="{Binding ElementName=m_Root,
+                                             Path=DataContext}"
+                       >
                 <materialDesign:Snackbar DockPanel.Dock="Bottom"
                                          x:Name="m_ErrorMessageQueueSnackbar"
                                          HorizontalAlignment="Stretch"
@@ -70,6 +67,6 @@
                     <userControls:Lcd DataContext="{Binding}" />
                 </pwt:Lcd>
             </DockPanel>
-        </Grid>
+        </pwt:GlossOnBase>
     </materialDesign:DialogHost>
 </Window>

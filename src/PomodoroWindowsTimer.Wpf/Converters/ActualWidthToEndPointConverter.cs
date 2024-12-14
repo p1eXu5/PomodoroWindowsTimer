@@ -1,19 +1,16 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
-namespace PomodoroWindowsTimer.Wpf;
+namespace PomodoroWindowsTimer.Wpf.Converters;
 
-public sealed class ActualWidthToTopRightPointConverter : IValueConverter
+public sealed class ActualWidthToEndPointConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is double actualWidth)
         {
-            var offset = parameter is double ? (double)parameter : 0.0;
-
-            return new Point(actualWidth + offset, offset);
+            return new Point(actualWidth, 0);
         }
 
         return DependencyProperty.UnsetValue;
