@@ -1,0 +1,41 @@
+﻿<Application x:Class="PomodoroWindowsTimer.WpfClientInstaller.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClientInstaller"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             Exit="Application_Exit"
+             Startup="Application_Startup"
+             StartupUri="MainWindow.xaml"
+             >
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <!--  for IntelliSense, must be placed before BundledTheme  -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.BlueGrey.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.Lime.xaml" />
+
+                <materialDesign:CustomColorTheme BaseTheme="Dark"
+                                                 PrimaryColor="LightSteelBlue"
+                                                 SecondaryColor="Lime"
+                                                 >
+                    <materialDesign:CustomColorTheme.ColorAdjustment>
+                        <materialDesign:ColorAdjustment Colors="All"
+                                                        Contrast="Medium"
+                                                        DesiredContrastRatio="3.0"
+                                                        />
+                    </materialDesign:CustomColorTheme.ColorAdjustment>
+                </materialDesign:CustomColorTheme>
+
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Flipper.xaml" />
+
+                <!--  local  -->
+                <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.WpfClientInstaller;component/Resources/Defaults.xaml" />
+
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PomodoroWindowsTimer.GitHubClient;
-internal class GitHubClientBootstrap
+namespace PomodoroWindowsTimer.WpfClientInstaller.ViewModels;
+internal class MainViewModel
 {
 }

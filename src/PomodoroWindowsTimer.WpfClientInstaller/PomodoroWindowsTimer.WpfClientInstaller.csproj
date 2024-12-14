@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+
+    <ApplicationIcon>pomodoro-technique.ico</ApplicationIcon>
+
+    <Title>Pomodoro Windows Timer Installer</Title>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+
+    <Copyright>2024 Vladimir Likhatskiy</Copyright>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/p1eXu5/PomodoroWindowsTimer</RepositoryUrl>
+    <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
+    <Configurations>Debug;Release;Personal</Configurations>
+    <StartupObject>PomodoroWindowsTimer.WpfClientInstaller.App</StartupObject>
+  </PropertyGroup>
+
+  <Target Name="Rename" AfterTargets="AfterBuild">
+    <Move SourceFiles="$(OUTDIR)\$(MSBuildProjectName).exe" DestinationFiles="$(OUTDIR)\PwtInstaller.exe" />
+    <Message Text="Renamed executable file." Importance="high" />
+  </Target>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.1.1-ci718" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
+
+    <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\PomodoroWindowsTimer.Installer\PomodoroWindowsTimer.Installer.csproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Wpf\PomodoroWindowsTimer.Wpf.csproj" />
+  </ItemGroup>
+
+</Project>
