@@ -3,7 +3,9 @@
                     xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
                     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     >
+    <!--  ================  -->
     <!--  base_texture.png  -->
+    <!--  ================  -->
     <BitmapImage x:Key="{x:Static local:PwtImages.BaseTextureKey}"
                  UriSource="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Resources/base_texture.png"
                  />
@@ -26,7 +28,9 @@
         </ImageBrush.ImageSource>
     </ImageBrush>
 
+    <!--  =================  -->
     <!--  gloss_texture.png  -->
+    <!--  =================  -->
     <BitmapImage x:Key="{x:Static local:PwtImages.GlossTextureKey}"
                  UriSource="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Resources/gloss_texture.png"
                  />
@@ -48,7 +52,5 @@
             </DrawingImage>
         </ImageBrush.ImageSource>
     </ImageBrush>
-
-    <!--  radial gloss brush  -->
 
 </ResourceDictionary>

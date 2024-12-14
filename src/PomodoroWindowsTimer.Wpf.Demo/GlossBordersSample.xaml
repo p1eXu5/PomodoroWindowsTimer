@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.Wpf.Demo.GlossBordersSample"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf.Demo"
+             xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             Background="Black"
+             mc:Ignorable="d"
+             >
+    <pwt:GlossOnBase Padding="40"
+                     HorizontalContentAlignment="Center"
+                     BeamVisibility="Visible"
+                     >
+        <Border x:Name="PART_BlackPane"
+                Width="100"
+                Height="40"
+                BorderThickness="0"
+                Background="Black"
+                CornerRadius="4"
+                >
+            <Grid>
+                <Grid Margin="1">
+                    <!--  LCD  -->
+                    <TextBlock Margin="2"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="#00FF00"
+                               FontSize="14"
+                               >
+                        LCD
+                    </TextBlock>
+
+                    <Border x:Name="PART_InnerTopRightBorder"
+                            BorderBrush="#0A330A"
+                            BorderThickness="0,1,1,0"
+                            CornerRadius="4"
+                            />
+
+                    <Border x:Name="PART_InnerLeftBottomBorder"
+                            BorderBrush="#002200"
+                            BorderThickness="1,0,0,1"
+                            CornerRadius="4"
+                            />
+                </Grid>
+
+                <Border x:Name="PART_OuterLeftBottomBorder"
+                        BorderBrush="#009900"
+                        BorderThickness="1,0,0,1"
+                        CornerRadius="4"
+                        />
+
+                <pwt:Beam />
+
+
+                <Border x:Name="PART_OuterTopRightBorder"
+                        BorderBrush="#009900"
+                        BorderThickness="0,1,1,0"
+                        CornerRadius="4"
+                        />
+            </Grid>
+        </Border>
+    </pwt:GlossOnBase>
+</UserControl>

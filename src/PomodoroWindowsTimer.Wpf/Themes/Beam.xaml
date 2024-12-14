@@ -3,26 +3,13 @@
                     xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
                     >
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Converters.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
-    <x:Array x:Key="a_GradientStops"
-             Type="{x:Type GradientStop}"
-             >
-        <GradientStop Offset="0.38" Color="#00FFFFFF" />
-        <GradientStop Offset="0.4" Color="#FFFFFFFF" />
-        <GradientStop Offset="0.7" Color="#FFFFFFFF" />
-        <GradientStop Offset="0.72" Color="#00FFFFFF" />
-    </x:Array>
-
     <Style TargetType="{x:Type local:Beam}">
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="CornerRadius" Value="4" />
-        <Setter Property="Opacity" Value="0.2" />
+        <Setter Property="Opacity" Value="0.25" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Beam}">

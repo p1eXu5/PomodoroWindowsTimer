@@ -245,4 +245,18 @@ public class GlossOnBase : ContentControl
                 (Brush?)null,
                 FrameworkPropertyMetadataOptions.AffectsRender
             ));
+
+    public double BeamOpacity
+    {
+        get { return (double)GetValue(BeamOpacityProperty); }
+        set { SetValue(BeamOpacityProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for BeamOpacity.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty BeamOpacityProperty =
+        DependencyProperty.Register(
+            "BeamOpacity",
+            typeof(double),
+            typeof(GlossOnBase),
+            new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
 }

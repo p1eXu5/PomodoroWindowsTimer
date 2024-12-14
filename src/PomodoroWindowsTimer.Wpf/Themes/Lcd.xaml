@@ -8,12 +8,12 @@
         <Setter Property="Height" Value="Auto" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="CornerRadius" Value="4" />
         <Setter Property="Background" Value="Black" />
         <Setter Property="Foreground" Value="White" />
-        <Setter Property="BeamOpacity" Value="0.2" />
+        <Setter Property="BeamOpacity" Value="0.25" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:Lcd}">
@@ -40,18 +40,20 @@
                                                   SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
                                                   />
 
-                                <Border BorderBrush="#0A0A0A"
+                                <Border x:Name="PART_InnerTopRightBorder"
+                                        BorderBrush="#151515"
                                         BorderThickness="0,1,1,0"
                                         CornerRadius="{TemplateBinding CornerRadius}"
                                         />
-                                <Border BorderBrush="#000000"
+                                <Border x:Name="PART_InnerLeftBottomBorder"
+                                        BorderBrush="#000000"
                                         BorderThickness="1,0,0,1"
                                         CornerRadius="{TemplateBinding CornerRadius}"
                                         />
                             </Grid>
 
-                            <Border x:Name="PART_OuterBottomLeftShadowBorder"
-                                    BorderBrush="#101010"
+                            <Border x:Name="PART_OuterLeftBottomBorder"
+                                    BorderBrush="#151515"
                                     BorderThickness="1,0,0,1"
                                     CornerRadius="{TemplateBinding CornerRadius}"
                                     />
@@ -61,8 +63,9 @@
                                         Opacity="{TemplateBinding BeamOpacity}"
                                         />
 
-                            <Border x:Name="PART_OuterTopRightShadowBorder"
-                                    BorderBrush="#0A0A0A"
+                            <!--  Does not accept beam  -->
+                            <Border x:Name="PART_OuterTopRightBorder"
+                                    BorderBrush="#050505"
                                     BorderThickness="0,1,1,0"
                                     CornerRadius="{TemplateBinding CornerRadius}"
                                     />

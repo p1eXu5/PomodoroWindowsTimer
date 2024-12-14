@@ -5,9 +5,11 @@
                     >
 
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Converters.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Brushes.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/GlossOnBase.xaml" />
-        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Beam.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Lcd.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Beam.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

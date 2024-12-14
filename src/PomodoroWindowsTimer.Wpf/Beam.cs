@@ -11,7 +11,7 @@ namespace PomodoroWindowsTimer.Wpf;
 [TemplatePart(Name = "PART_Rectangle", Type = typeof(Rectangle))]
 public class Beam : Control
 {
-    private Rectangle _rectangle = default!;
+    private Rectangle? _rectangle;
 
     static Beam()
     {
@@ -46,7 +46,6 @@ public class Beam : Control
         SetRectangleRadiuses(
             this, 
             new DependencyPropertyChangedEventArgs(CornerRadiusProperty, this.CornerRadius, this.CornerRadius));
-
     }
 
     private void SetBeamFillBrush(GlossOnBase glossOnBase)
