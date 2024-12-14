@@ -43,9 +43,7 @@ public class Beam : Control
         _rectangle = (Rectangle)this.GetTemplateChild("PART_Rectangle");
         ArgumentNullException.ThrowIfNull(_rectangle);
 
-        SetRectangleRadiuses(
-            this, 
-            new DependencyPropertyChangedEventArgs(CornerRadiusProperty, this.CornerRadius, this.CornerRadius));
+        SetRectangleRadiusXY(this, this.CornerRadius);
     }
 
     private void SetBeamFillBrush(GlossOnBase glossOnBase)
@@ -174,15 +172,12 @@ public class Beam : Control
             return;
         }
 
-        if (e.NewValue is CornerRadius cornerRadius)
-        {
-            beam._rectangle.RadiusX = cornerRadius.TopLeft;
-            beam._rectangle.RadiusY = cornerRadius.TopLeft;
-        }
-        else
-        {
-            beam._rectangle.RadiusX = 0;
-            beam._rectangle.RadiusY = 0;
-        }
+        SetRectangleRadiusXY(beam, (CornerRadius)e.NewValue);
+    }
+
+    private static void SetRectangleRadiusXY(Beam beam, CornerRadius cornerRadius)
+    {
+        beam._rectangle!.RadiusX = cornerRadius.TopLeft;
+        beam._rectangle.RadiusY = cornerRadius.TopLeft;
     }
 }
