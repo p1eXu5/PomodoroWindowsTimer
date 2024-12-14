@@ -1,7 +1,9 @@
 {
   "profiles": {
-    "PomodoroWindowsTimer.WpfClient": {
-      "commandName": "Project"
+    "Debug": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows\\Pwt.exe",
+      "workingDirectory": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows"
     }
   }
 }
