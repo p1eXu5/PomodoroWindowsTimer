@@ -22,30 +22,43 @@ public class Lcd : ContentControl
     private static Color _darkEdge = Color.FromRgb(0x03, 0x03, 0x03);
     private static double _darkEdgeBrightness = CalculateBrightness(_darkEdge);
 
+    /// <summary>
+    /// Light edge brush.
+    /// </summary>
+    private static readonly SolidColorBrush _defaultInnerTopRightBorderBrush;
     private Border? _innerTopRightBorder;
-    private static readonly Brush _defaultInnerTopRightBorderBrush;
 
+    /// <summary>
+    /// Dark edge brush.
+    /// </summary>
+    private static readonly SolidColorBrush _defaultInnerLeftBottomBorderBrush;
     private Border? _innerLeftBottomBorder;
-    private static readonly Brush _defaultInnerLeftBottomBorderBrush;
 
+    /// <summary>
+    /// Light edge brush.
+    /// </summary>
+    private static readonly SolidColorBrush _defaultOuterLeftBottomBorderBrush;
     private Border? _outerLeftBottomBorder;
-    private static readonly Brush _defaultOuterLeftBottomBorderBrush;
 
+    /// <summary>
+    /// Middle edge brush.
+    /// </summary>
+    private static readonly SolidColorBrush _defaultOuterTopRightBorderBrush;
     private Border? _outerTopRightBorder;
-    private static readonly Brush _defaultOuterTopRightBorderBrush;
 
     static Lcd()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(Lcd), new FrameworkPropertyMetadata(typeof(Lcd)));
 
         var lightEdgeBrush = GetSolidColorBrush(_lightEdge);
+
         _defaultInnerTopRightBorderBrush = lightEdgeBrush;
         _defaultInnerLeftBottomBorderBrush = GetSolidColorBrush(_darkEdge);
         _defaultOuterLeftBottomBorderBrush = lightEdgeBrush;
         _defaultOuterTopRightBorderBrush = GetSolidColorBrush(_middleEdge);
     }
 
-    private static Brush GetSolidColorBrush(Color color)
+    private static SolidColorBrush GetSolidColorBrush(Color color)
     {
         var brush = new SolidColorBrush(color);
         brush.Freeze();
@@ -220,6 +233,8 @@ public class Lcd : ContentControl
         lcd._innerLeftBottomBorder!.BorderBrush = GetSolidColorBrush(darkEdge);
         lcd._outerLeftBottomBorder!.BorderBrush = lightEdgeBrush;
         lcd._outerTopRightBorder!.BorderBrush = GetSolidColorBrush(middleEdge);
+
+        lcd.HighLightBrush = lightEdgeBrush;
     }
 
     private static void SetDefaultTintLight(Lcd lcd)
@@ -232,6 +247,8 @@ public class Lcd : ContentControl
             lcd._innerLeftBottomBorder!.BorderBrush = _defaultInnerLeftBottomBorderBrush;
             lcd._outerLeftBottomBorder!.BorderBrush = _defaultOuterLeftBottomBorderBrush;
             lcd._outerTopRightBorder!.BorderBrush = _defaultOuterTopRightBorderBrush;
+
+            lcd.HighLightBrush = _defaultInnerTopRightBorderBrush;
         }
         else
         {
@@ -245,8 +262,52 @@ public class Lcd : ContentControl
             lcd._innerLeftBottomBorder!.BorderBrush = GetSolidColorBrush(darkEdge);
             lcd._outerLeftBottomBorder!.BorderBrush = lightEdgeBrush;
             lcd._outerTopRightBorder!.BorderBrush = GetSolidColorBrush(middleEdge);
+
+            lcd.HighLightBrush = lightEdgeBrush;
         }
     }
 
     #endregion
+
+
+
+    public Brush? TintLightBrush
+    {
+        get { return (Brush?)GetValue(TintLightBrushProperty); }
+        set { SetValue(TintLightBrushProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for TintLightBrush.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty TintLightBrushProperty =
+        DependencyProperty.Register(
+            "TintLightBrush",
+            typeof(Brush),
+            typeof(Lcd),
+            new FrameworkPropertyMetadata((Brush?)null, FrameworkPropertyMetadataOptions.AffectsRender, OnTintLightBrushChanged));
+
+    private static void OnTintLightBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is Lcd lcd)
+        {
+            lcd.TintLightColor =
+                e.NewValue is SolidColorBrush brush ? brush.Color : null;
+        }
+    }
+
+
+
+    public Brush HighLightBrush
+    {
+        get { return (Brush)GetValue(HighLightBrushProperty); }
+        set { SetValue(HighLightBrushProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for HighLightBrush.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty HighLightBrushProperty =
+        DependencyProperty.Register(
+            "HighLightBrush", 
+            typeof(Brush), 
+            typeof(Lcd), 
+            new PropertyMetadata(_defaultInnerTopRightBorderBrush)
+        );
 }
