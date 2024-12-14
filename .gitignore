@@ -490,3 +490,7 @@ $RECYCLE.BIN/
 /src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.template.json
 /branch_version.sh
 /src/PomodoroWindowsTimer.Wpf/README.md
+/src/PomodoroWindowsTimer.AppAgent/secrets.env
+/src/PomodoroWindowsTimer.AppAgent/set_secrets.ps1
+/src/PomodoroWindowsTimer.AppAgent/set_secrets_run.cmd
+/src/PomodoroWindowsTimer.AppAgent/set_secrets_run.sh
