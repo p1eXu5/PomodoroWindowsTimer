@@ -62,6 +62,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.AppAge
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.WpfClientInstaller", "src\PomodoroWindowsTimer.WpfClientInstaller\PomodoroWindowsTimer.WpfClientInstaller.csproj", "{89D9FBC2-D924-4E01-B445-B4CC98354597}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.Bootstrap", "PomodoroWindowsTimer.Bootstrap\PomodoroWindowsTimer.Bootstrap.csproj", "{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,12 @@ Global
 		{89D9FBC2-D924-4E01-B445-B4CC98354597}.Personal|Any CPU.Build.0 = Debug|Any CPU
 		{89D9FBC2-D924-4E01-B445-B4CC98354597}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{89D9FBC2-D924-4E01-B445-B4CC98354597}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}.Personal|Any CPU.ActiveCfg = Debug|Any CPU
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}.Personal|Any CPU.Build.0 = Debug|Any CPU
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -191,6 +199,7 @@ Global
 		{9A7F353D-617D-4B88-B00C-677D1E284D8C} = {D462028B-F273-4162-8026-56CD0C3C6308}
 		{0DE2EE5B-3AAD-6366-41B8-4DC92CE3A641} = {D462028B-F273-4162-8026-56CD0C3C6308}
 		{89D9FBC2-D924-4E01-B445-B4CC98354597} = {17BBBDCE-E6E7-41DF-A715-172AE77EF3C3}
+		{56F50F1D-3102-42E8-9DE8-09D9246B6BA7} = {D462028B-F273-4162-8026-56CD0C3C6308}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FEFD379F-4D9B-4063-82CF-15AF19AF2B11}
