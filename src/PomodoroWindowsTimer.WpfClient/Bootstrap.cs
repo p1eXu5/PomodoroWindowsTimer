@@ -15,14 +15,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.Abstractions;
+using PomodoroWindowsTimer.Bootstrap;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Storage;
 using PomodoroWindowsTimer.Storage.Configuration;
 using Serilog;
+using Serilog.Formatting.Compact;
 
 namespace PomodoroWindowsTimer.WpfClient;
 
-internal class Bootstrap : IDisposable
+internal class Bootstrap : BootstrapBase
 {
     private bool _isDisposed;
     private bool _isInTest;
@@ -31,98 +33,19 @@ internal class Bootstrap : IDisposable
     {
     }
 
-    # region =========== IDisposable implementation
-    void IDisposable.Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
 
-    protected virtual void Dispose(bool disposing)
+    internal void WaitDbSeeding()
     {
-        if (!_isDisposed)
+        if (_isInTest)
         {
-            if (disposing)
-            {
-                Host.Dispose();
-            }
-
-            _isDisposed = true;
+            var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
+            seederService!.Semaphore.Wait();
         }
-    }
-    #endregion
-
-    /// <summary>
-    /// Adds configuration, registers services (<see cref="RegisterServices(IServiceCollection, IConfiguration)"/>)
-    /// if <see cref="Bootstrap"/> instance has not been created. 
-    /// </summary>
-    public static TBootstrap Build<TBootstrap>(params string[] args)
-        where TBootstrap : Bootstrap
-    {
-        TBootstrap bootstrap = CreateBootstrapInstance<TBootstrap>();
-
-        IHostBuilder hostBuilder = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args);
-
-        hostBuilder.UseConsoleLifetime(opts =>
+        else
         {
-            opts.SuppressStatusMessages = true;
-        });
-        
-        hostBuilder.ConfigureServices((ctx, services) => {
-            bootstrap.PreConfigureServices(ctx, services);
-            bootstrap.ConfigureServices(ctx, services);
-        });
-
-        hostBuilder.ConfigureLogging(bootstrap.ConfigureLogging);
-
-        bootstrap.PostConfigureHost(hostBuilder);
-
-        IHost host = hostBuilder.Build();
-        bootstrap.Host = host;
-
-        return bootstrap;
-    }
-
-    private static TBootstrap CreateBootstrapInstance<TBootstrap>()
-    {
-        var parameterlessCtor =
-            typeof(TBootstrap)
-                .GetConstructor(
-                    System.Reflection.BindingFlags.Instance
-                    | System.Reflection.BindingFlags.NonPublic
-                    | System.Reflection.BindingFlags.Public,
-                    Array.Empty<Type>()
-                );
-
-        if (parameterlessCtor is null)
-        {
-            throw new ArgumentException("TBootstrap type has no parameterless constructor.");
+            var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
+            seederService!.Semaphore.Wait();
         }
-
-        return (TBootstrap)parameterlessCtor.Invoke(null);
-    }
-
-    public IHost Host { get; private set; } = default!;
-
-    public void StartHost()
-    {
-        Host.Start();
-    }
-
-    public Task StopHostAsync() => Host.StopAsync();
-
-    public void ShowMainWindow(Window window, Func<WorkStatisticWindow> workStatisticWindowFactory)
-    {
-        var elmishProgramFactory = GetElmishProgramFactory();
-        elmishProgramFactory.RunElmishProgram(window, workStatisticWindowFactory);
-        window.Show();
-
-#if DEBUG
-#else
-        var mainWindowPtr = new WindowInteropHelper(window).Handle;
-        elmishProgramFactory.WindowsMinimizer.AppWindowPtr = mainWindowPtr;
-#endif
     }
 
     internal async Task ApplyMigrationsAsync()
@@ -161,28 +84,52 @@ internal class Bootstrap : IDisposable
         }
     }
 
-    public virtual void StartElmishApp(Window mainWindow, Func<WorkStatisticWindow> workStatisticWindowFactory)
+    public void ShowMainWindow(Window window, Func<WorkStatisticWindow> workStatisticWindowFactory)
     {
-        WaitDbSeeding();
-        GetElmishProgramFactory().RunElmishProgram(mainWindow, workStatisticWindowFactory);
+        var elmishProgramFactory = GetElmishProgramFactory();
+        elmishProgramFactory.RunElmishProgram(window, workStatisticWindowFactory);
+        window.Show();
+
+#if DEBUG
+#else
+        var mainWindowPtr = new WindowInteropHelper(window).Handle;
+        elmishProgramFactory.WindowsMinimizer.AppWindowPtr = mainWindowPtr;
+#endif
     }
 
-    protected void WaitDbSeeding()
-    {
-        if (_isInTest)
-        {
-            var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
-            seederService!.Semaphore.Wait();
-        }
-        else
-        {
-            var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
-            seederService!.Semaphore.Wait();
-        }
-    }
 
-    protected virtual void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
+    #region ServiceProvider_accessors
+
+    internal IErrorMessageQueue GetMainWindowErrorMessageQueue()
+        => Host.Services.GetRequiredKeyedService<IErrorMessageQueue>("main");
+
+    internal IThemeSwitcher GetThemeSwitcher()
+        => Host.Services.GetRequiredService<IThemeSwitcher>();
+
+    internal ILooper GetLooper()
+        => Host.Services.GetRequiredService<ILooper>();
+
+    internal IWorkEventRepository GetWorkEventRepository()
+        => Host.Services.GetRequiredService<IWorkEventRepository>();
+
+    internal TimeProvider GetTimerProvider()
+        => Host.Services.GetRequiredService<System.TimeProvider>();
+
+    internal IUserSettings GetUserSettings()
+        => Host.Services.GetRequiredService<IUserSettings>();
+
+    internal ILogger<T> GetLogger<T>()
+        => Host.Services.GetRequiredService<ILogger<T>>();
+
+    protected ElmishProgramFactory GetElmishProgramFactory()
+        => Host.Services.GetRequiredService<ElmishProgramFactory>();
+
+    #endregion
+
+    protected override void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
     {
+        base.ConfigureServices(hostBuilderCtx, services);
+
         services.AddTimeProvider();
         services.AddTimePointQueue();
         services.AddLooper();
@@ -197,44 +144,38 @@ internal class Bootstrap : IDisposable
         {
             services.AddErrorMessageQueue();
         }
-        else
-        {
-            _isInTest = true;
-        }
 
         services.AddElmishProgramFactory();
     }
 
-
-    internal IErrorMessageQueue GetMainWindowErrorMessageQueue()
-        => Host.Services.GetRequiredKeyedService<IErrorMessageQueue>("main");
-
-    protected ElmishProgramFactory GetElmishProgramFactory()
-        => Host.Services.GetRequiredService<ElmishProgramFactory>();
-
-    internal IThemeSwitcher GetThemeSwitcher()
-        => Host.Services.GetRequiredService<IThemeSwitcher>();
-
-    internal ILooper GetLooper()
-        => Host.Services.GetRequiredService<ILooper>();
-
-    internal IWorkEventRepository GetWorkEventRepository()
-        => Host.Services.GetRequiredService<IWorkEventRepository>();
-
-    internal System.TimeProvider GetTimerProvider()
-        => Host.Services.GetRequiredService<System.TimeProvider>();
-
-    internal IUserSettings GetUserSettings()
-        => Host.Services.GetRequiredService<IUserSettings>();
-
-    internal ILogger<T> GetLogger<T>()
-        => Host.Services.GetRequiredService<ILogger<T>>();
-
-    protected virtual void PreConfigureServices(HostBuilderContext hostBuilder, IServiceCollection services)
-    { }
-
     protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
-    { }
+    {
+        // Clear default logging providers
+        loggingBuilder.ClearProviders();
+
+        // Configure Serilog
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
+            .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Error)
+            .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Error)
+            .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Error)
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .Enrich.WithThreadId()
+            .Destructure.ToMaximumDepth(4)
+            .Destructure.ToMaximumStringLength(100)
+            .Destructure.ToMaximumCollectionCount(10)
+            .WriteTo.File(
+                new CompactJsonFormatter(),
+                "_logs/log.txt",
+                rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        // Add Serilog to the logging builder
+        loggingBuilder.AddSerilog();
+    }
 
     protected virtual void PostConfigureHost(IHostBuilder hostBuilder)
     {
