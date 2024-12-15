@@ -43,6 +43,7 @@ namespace PomodoroWindowsTimer.WpfClient
             var themeSwitcher = _bootstrap.GetThemeSwitcher();
             themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);
 
+            _bootstrap.WaitDbSeeding();
             await _bootstrap.ApplyMigrationsAsync();
 
             _mainWindow = new MainWindow();
