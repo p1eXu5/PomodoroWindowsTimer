@@ -4,13 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using PomodoroWindowsTimer.ElmishApp.Abstractions;
-using Microsoft.Extensions.Configuration;
-using PomodoroWindowsTimer.ElmishApp.Models;
-using Microsoft.FSharp.Core;
-using PomodoroWindowsTimer.Types;
-using PomodoroWindowsTimer.WpfClient.Properties;
 using Microsoft.Extensions.Logging;
+using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.Types;
 
 namespace PomodoroWindowsTimer.WpfClient
 {
