@@ -475,22 +475,20 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-/docs/colors.psd
-/src/CycleBell.WpfClient/appsettings.json
-/src/PomodoroWindowsTimer.WpfClient/appsettings.json
-/src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.json
+
+# Solution files
 /NuGet.Config
-/images/228017.png
-/images
-/src/PomodoroWindowsTimer.WpfClient/appsettings.Development.json
 /docs
-/src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
-/src/PomodoroWindowsTimer.WpfClient/Properties/launchSettings.json
-/src/PomodoroWindowsTimer.Migrator/Properties/launchSettings.json
-/src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.template.json
+/images/228017.png
+/images/metal*
+/utils/secrets/
 /branch_version.sh
+
+/src/PomodoroWindowsTimer.WpfClient/appsettings.json
+/src/PomodoroWindowsTimer.WpfClient/appsettings.Development.json
+/src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.json
+/src/PomodoroWindowsTimer.WpfClient/appsettings.Personal.template.json
+/src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
+
 /src/PomodoroWindowsTimer.Wpf/README.md
-/src/PomodoroWindowsTimer.AppAgent/secrets.env
-/src/PomodoroWindowsTimer.AppAgent/set_secrets.ps1
-/src/PomodoroWindowsTimer.AppAgent/set_secrets_run.cmd
-/src/PomodoroWindowsTimer.AppAgent/set_secrets_run.sh
+
