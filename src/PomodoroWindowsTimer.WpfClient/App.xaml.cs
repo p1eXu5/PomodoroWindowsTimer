@@ -39,6 +39,8 @@ namespace PomodoroWindowsTimer.WpfClient
 
             _logger = _bootstrap.GetLogger<App>();
 
+            _logger.LogInformation("Boostrapped.");
+
             _errorMessageQueue = _bootstrap.GetMainWindowErrorMessageQueue();
             var themeSwitcher = _bootstrap.GetThemeSwitcher();
             themeSwitcher.SwitchTheme(ElmishApp.TimePointKind.Work);

@@ -1,14 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:conv="clr-namespace:PomodoroWindowsTimer.Wpf.Converters"
+                    xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
                     >
-    <conv:ActualSizeToCenterPointConverter x:Key="conv_ActualSizeToCenterPoint" />
-    <conv:ActualSizeToOuterTopRightPointConverter x:Key="conv_ActualSizeToOuterTopRightPoint" />
-    <conv:ActualWidthToCenterPointConverter x:Key="conv_ActualWidthToCenterPoint" />
-    <conv:ActualWidthToEndPointConverter x:Key="conv_ActualWidthToEndPoint" />
-    <conv:ActualWidthToOriginPointConverter x:Key="conv_ActualWidthToOriginPoint" />
-    <conv:DividerConverter x:Key="conv_Divider" />
-    <conv:MaxDividerConverter x:Key="conv_MaxDivider" />
-    <conv:ScaleConverter x:Key="conv_Scale" />
-    <conv:MultiWidthToGradientStopsConverter x:Key="conv_MultiWidthToGradientStops" />
+    <conv:ActualSizeToCenterPointConverter x:Key="{x:Static local:PwtConverters.ActualSizeToCenterPointKey}" />
+    <conv:ActualSizeToOuterTopRightPointConverter x:Key="{x:Static local:PwtConverters.ActualSizeToOuterTopRightPointKey}" />
+    <conv:ActualWidthToCenterPointConverter x:Key="{x:Static local:PwtConverters.ActualWidthToCenterPointKey}" />
+    <conv:ActualWidthToEndPointConverter x:Key="{x:Static local:PwtConverters.ActualWidthToEndPointKey}" />
+    <conv:ActualWidthToOriginPointConverter x:Key="{x:Static local:PwtConverters.ActualWidthToOriginPointKey}" />
+    <conv:DividerConverter x:Key="{x:Static local:PwtConverters.DividerKey}" />
+    <conv:MaxDividerConverter x:Key="{x:Static local:PwtConverters.MaxDividerKey}" />
+    <conv:ScaleConverter x:Key="{x:Static local:PwtConverters.ScaleKey}" />
+    <conv:MultiWidthToGradientStopsConverter x:Key="{x:Static local:PwtConverters.MultiWidthToGradientStopsKey}" />
 </ResourceDictionary>

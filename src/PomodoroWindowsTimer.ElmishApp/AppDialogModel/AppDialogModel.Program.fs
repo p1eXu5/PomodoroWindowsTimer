@@ -8,6 +8,7 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.AppDialogModel
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
 
 
 let private ofBotSettingsIntent botSettingsModel intent =

@@ -1,6 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Models
 
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Abstractions
 
 type StatisticMainModel =
     {

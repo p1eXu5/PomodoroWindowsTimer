@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Interop;
 using CliWrap;
 using CliWrap.Buffered;
 using DrugRoom.WpfClient;
@@ -13,30 +10,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.Bootstrap;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Storage;
-using PomodoroWindowsTimer.Storage.Configuration;
-using Serilog;
-using Serilog.Formatting.Compact;
 
 namespace PomodoroWindowsTimer.WpfClient;
 
 internal class Bootstrap : BootstrapBase
 {
-    private bool _isDisposed;
-    private bool _isInTest;
-
-    protected Bootstrap()
-    {
-    }
-
+    #region public_methods
 
     internal void WaitDbSeeding()
     {
-        if (_isInTest)
+        if (IsInTest)
         {
             var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
             seederService!.Semaphore.Wait();
@@ -97,8 +84,9 @@ internal class Bootstrap : BootstrapBase
 #endif
     }
 
+    #endregion
 
-    #region ServiceProvider_accessors
+    #region service_accessors
 
     internal IErrorMessageQueue GetMainWindowErrorMessageQueue()
         => Host.Services.GetRequiredKeyedService<IErrorMessageQueue>("main");
@@ -112,9 +100,6 @@ internal class Bootstrap : BootstrapBase
     internal IWorkEventRepository GetWorkEventRepository()
         => Host.Services.GetRequiredService<IWorkEventRepository>();
 
-    internal TimeProvider GetTimerProvider()
-        => Host.Services.GetRequiredService<System.TimeProvider>();
-
     internal IUserSettings GetUserSettings()
         => Host.Services.GetRequiredService<IUserSettings>();
 
@@ -125,6 +110,8 @@ internal class Bootstrap : BootstrapBase
         => Host.Services.GetRequiredService<ElmishProgramFactory>();
 
     #endregion
+
+    #region overrides
 
     protected override void ConfigureServices(HostBuilderContext hostBuilderCtx, IServiceCollection services)
     {
@@ -148,40 +135,5 @@ internal class Bootstrap : BootstrapBase
         services.AddElmishProgramFactory();
     }
 
-    protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
-    {
-        // Clear default logging providers
-        loggingBuilder.ClearProviders();
-
-        // Configure Serilog
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
-            .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Error)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Error)
-            .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Error)
-            .Enrich.FromLogContext()
-            .Enrich.WithMachineName()
-            .Enrich.WithThreadId()
-            .Destructure.ToMaximumDepth(4)
-            .Destructure.ToMaximumStringLength(100)
-            .Destructure.ToMaximumCollectionCount(10)
-            .WriteTo.File(
-                new CompactJsonFormatter(),
-                "_logs/log.txt",
-                rollingInterval: RollingInterval.Day)
-            .CreateLogger();
-
-        // Add Serilog to the logging builder
-        loggingBuilder.AddSerilog();
-    }
-
-    protected virtual void PostConfigureHost(IHostBuilder hostBuilder)
-    {
-        hostBuilder
-            .UseSerilog((context, conf) =>
-                conf.ReadFrom.Configuration(context.Configuration)
-            );
-    }
+    #endregion
 }

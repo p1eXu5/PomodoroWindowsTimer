@@ -22,14 +22,7 @@ type DependencyInjectionExtensions() =
             .ValidateOnStart()
             |> ignore
 
-        services.TryAddSingleton<WorkRepository>()
-        services.TryAddSingleton<IWorkRepository, WorkRepository>()
-
-        services.TryAddSingleton<WorkEventRepository>()
-        services.TryAddSingleton<IWorkEventRepository, WorkEventRepository>()
-
-        services.TryAddSingleton<ActiveTimePointRepository>()
-        services.TryAddSingleton<IActiveTimePointRepository, ActiveTimePointRepository>()
+        services.TryAddSingleton<IRepositoryFactory, RepositoryFactory>()
 
         if configuration.GetValue<bool>("InTest") |> not then
             services.AddHostedService<DbSeederHostedService>()

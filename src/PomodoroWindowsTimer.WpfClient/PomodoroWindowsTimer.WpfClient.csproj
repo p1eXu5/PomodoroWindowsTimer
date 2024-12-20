@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
@@ -22,6 +21,15 @@
     <PackageTags>productivity;timer;wpf;pomodoro;pomodoro-timer-for-windows</PackageTags>
     <Configurations>Debug;Release;Personal</Configurations>
     <StartupObject>PomodoroWindowsTimer.WpfClient.App</StartupObject>
+    <UserSecretsId>87c803de-18b6-47f7-9c20-8dbb2adf3057</UserSecretsId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
+    <OutputType>WinExe</OutputType>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <Target Name="Rename" AfterTargets="AfterBuild">
@@ -34,16 +42,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.json" />
     <None Remove="Resources\base_texture.png" />
     <None Remove="Resources\gloss_texture.png" />
     <None Remove="Resources\metalArtboard-50.png" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
@@ -58,33 +59,15 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <Content Include="appsettings.Development.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="CliWrap" Version="3.6.7" />
     <PackageReference Include="MaterialDesignThemes" Version="5.1.1-ci718" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="p1eXu5.Wpf.DigitPanel" Version="1.0.2" />
-    
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.0" />
-
-    <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PomodoroWindowsTimer.Bootstrap\PomodoroWindowsTimer.Bootstrap.csproj" />
+    <ProjectReference Include="..\PomodoroWindowsTimer.Bootstrap\PomodoroWindowsTimer.Bootstrap.csproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer.ElmishApp\PomodoroWindowsTimer.ElmishApp.fsproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer.Exporter.Excel\PomodoroWindowsTimer.Exporter.Excel.csproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer.Storage\PomodoroWindowsTimer.Storage.fsproj" />
@@ -106,6 +89,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
     <None Update="pomodoro-technique.ico">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>

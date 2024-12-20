@@ -3,6 +3,7 @@
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.BotSettingsModel
+open PomodoroWindowsTimer.Abstractions
 
 
 let update (botConfiguration: IBotSettings) msg model =

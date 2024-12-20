@@ -5,6 +5,7 @@ open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer
+open PomodoroWindowsTimer.Abstractions
 
 
 

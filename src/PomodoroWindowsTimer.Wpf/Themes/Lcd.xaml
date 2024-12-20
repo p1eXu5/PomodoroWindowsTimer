@@ -24,19 +24,19 @@
                             MinHeight="{TemplateBinding MinHeight}"
                             HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                             VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                            Background="{TemplateBinding Background}"
                             BorderThickness="0"
                             CornerRadius="{TemplateBinding CornerRadius}"
-                            Background="{TemplateBinding Background}"
                             >
                         <Grid>
                             <Grid Margin="1">
                                 <!--  LCD  -->
-                                <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
-                                                  Margin="{TemplateBinding Control.Padding}"
+                                <ContentPresenter Margin="{TemplateBinding Control.Padding}"
                                                   HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
-                                                  ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
+                                                  Content="{TemplateBinding ContentControl.Content}"
                                                   ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
+                                                  ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
                                                   SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
                                                   />
 

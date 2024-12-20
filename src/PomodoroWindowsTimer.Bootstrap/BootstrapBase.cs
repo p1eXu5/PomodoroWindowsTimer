@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Formatting.Compact;
+using Serilog.Templates;
 
 namespace PomodoroWindowsTimer.Bootstrap;
 
@@ -90,13 +91,13 @@ public abstract class BootstrapBase : IDisposable
             opts.SuppressStatusMessages = true;
         });
 
+        hostBuilder.ConfigureLogging(bootstrap.ConfigureLogging);
+
         hostBuilder.ConfigureServices((ctx, services) =>
         {
             bootstrap.PreConfigureServices(ctx, services);
             bootstrap.ConfigureServices(ctx, services);
         });
-
-        hostBuilder.ConfigureLogging(bootstrap.ConfigureLogging);
 
         bootstrap.PostConfigureHost(hostBuilder);
 
@@ -115,7 +116,7 @@ public abstract class BootstrapBase : IDisposable
 
     #endregion
 
-    #region ServiceProvider_accessors
+    #region service_accessors
 
     public TimeProvider GetTimerProvider()
        => Host.Services.GetRequiredService<System.TimeProvider>();
@@ -155,33 +156,55 @@ public abstract class BootstrapBase : IDisposable
     /// Does nothind.
     /// </summary>
     /// <param name="loggingBuilder"></param>
-    protected virtual void ConfigureLogging(ILoggingBuilder loggingBuilder)
+    protected virtual void ConfigureLogging(HostBuilderContext hostBuilderContext, ILoggingBuilder loggingBuilder)
     {
-        // Clear default logging providers
-        loggingBuilder.ClearProviders();
-
         // Configure Serilog
-        Log.Logger = new LoggerConfiguration()
+        var cfg = new LoggerConfiguration()
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
-            .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Error)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Error)
-            .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Error)
+            .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Verbose)
+            .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Verbose)
+            .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Verbose)
             .Enrich.FromLogContext()
             .Enrich.WithMachineName()
             .Enrich.WithThreadId()
             .Destructure.ToMaximumDepth(4)
             .Destructure.ToMaximumStringLength(100)
             .Destructure.ToMaximumCollectionCount(10)
-            .WriteTo.File(
-                new CompactJsonFormatter(),
-                "_logs/log.txt",
-                rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+            ;
+
+        if (!hostBuilderContext.HostingEnvironment.IsDevelopment())
+        {
+            cfg = cfg
+                .WriteTo.File(
+                    new CompactJsonFormatter(),
+                    "_logs/log.txt",
+                    rollingInterval: RollingInterval.Day);
+        }
+        else
+        {
+            string template = "{@t:yyyy-MM-dd HH:mm:ss} [{@l:u3}] {Coalesce(SourceContext, '<none>')}: {Method}\n    {@m}\n{@x}\n";
+
+            cfg = cfg
+                .WriteTo.Console(
+                    formatter: new ExpressionTemplate(
+                        template,
+                        theme: Serilog.Templates.Themes.TemplateTheme.Code
+                    )
+                )
+                .WriteTo.Debug(
+                    formatter: new ExpressionTemplate(
+                        template,
+                        theme: Serilog.Templates.Themes.TemplateTheme.Code
+                    )
+                );
+        }
+
+        Log.Logger = cfg.CreateLogger();
 
         // Add Serilog to the logging builder
-        loggingBuilder.AddSerilog();
+        loggingBuilder.AddSerilog(Log.Logger, dispose: true);
     }
 
     /// <summary>
@@ -190,10 +213,6 @@ public abstract class BootstrapBase : IDisposable
     /// <param name="hostBuilder"></param>
     protected virtual void PostConfigureHost(IHostBuilder hostBuilder)
     {
-        hostBuilder
-            .UseSerilog((context, conf) =>
-                conf.ReadFrom.Configuration(context.Configuration)
-            );
     }
 
     #endregion

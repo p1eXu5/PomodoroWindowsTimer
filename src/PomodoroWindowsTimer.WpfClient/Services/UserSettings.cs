@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
-using PomodoroWindowsTimer.ElmishApp.Abstractions;
+using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.Storage.Configuration;
 using PomodoroWindowsTimer.Types;
 using PomodoroWindowsTimer.WpfClient.Extensions;

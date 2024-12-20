@@ -16,21 +16,9 @@ type DbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: IHost
 
     override _.ExecuteAsync(stoppingToken: CancellationToken) =
         task {
-            let workRepository = serviceProvider.GetRequiredService<WorkRepository>()
-            let workEventRepository = serviceProvider.GetRequiredService<WorkEventRepository>()
-            let activeTimePointRepository = serviceProvider.GetRequiredService<ActiveTimePointRepository>()
+            let dbSeader = serviceProvider.GetRequiredService<DbSeeder>()
 
-            do LastEventCreatedAtHandler.Register()
-
-            let! res = workRepository.CreateTableAsync(stoppingToken)
-            if res |> Result.isError then
-                appLifetime.StopApplication()
-
-            //let! res = activeTimePointRepository.CreateTableAsync(stoppingToken)
-            //if res |> Result.isError then
-            //    appLifetime.StopApplication()
-
-            let! res = workEventRepository.CreateTableAsync(stoppingToken)
+            let! res = dbSeader.SeedDatabaseAsync(stoppingToken)
             if res |> Result.isError then
                 appLifetime.StopApplication()
 

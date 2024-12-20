@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using PomodoroWindowsTimer.Wpf.Extensions;
 using Color = System.Windows.Media.Color;
 
 namespace PomodoroWindowsTimer.Wpf;
@@ -14,13 +15,13 @@ namespace PomodoroWindowsTimer.Wpf;
 public class Lcd : ContentControl
 {
     private static Color _lightEdge = Color.FromRgb(0x15, 0x15, 0x15);
-    private static double _lightEdgeBrightness = CalculateBrightness(_lightEdge);
+    private static double _lightEdgeBrightness = _lightEdge.CalculateBrightness();
 
     private static Color _middleEdge = Color.FromRgb(0x6, 0x6, 0x6);
-    private static double _middleEdgeBrightness = CalculateBrightness(_middleEdge);
+    private static double _middleEdgeBrightness = _middleEdge.CalculateBrightness();
 
     private static Color _darkEdge = Color.FromRgb(0x03, 0x03, 0x03);
-    private static double _darkEdgeBrightness = CalculateBrightness(_darkEdge);
+    private static double _darkEdgeBrightness = _darkEdge.CalculateBrightness();
 
     /// <summary>
     /// Light edge brush.
@@ -65,25 +66,6 @@ public class Lcd : ContentControl
 
         return brush;
     }
-
-    private static double CalculateBrightness(Color color)
-        => 0.299 * color.R + 0.587 * color.G + 0.114 * color.B;
-
-    private static Color AdjustToBrightness(Color color, double targetBrightness, double multiplier = 1.0)
-    {
-        double currentBrightness = CalculateBrightness(color);
-        double brightnessRatio = targetBrightness / currentBrightness;
-
-        var r = Clamp((int)(color.R * brightnessRatio * multiplier));
-        var g = Clamp((int)(color.G * brightnessRatio * multiplier));
-        var b = Clamp((int)(color.B * brightnessRatio * multiplier));
-
-        return Color.FromRgb(r, g, b);
-    }
-
-    private static byte Clamp(int value)
-        => (byte)Math.Clamp(value, 0, 0xFF);
-
 
     public override void OnApplyTemplate()
     {
@@ -223,9 +205,9 @@ public class Lcd : ContentControl
     {
         var multiplier = lcd.Brightness;
 
-        var lightEdge = AdjustToBrightness(tintColor, _lightEdgeBrightness, multiplier);
-        var middleEdge = AdjustToBrightness(tintColor, _middleEdgeBrightness, multiplier);
-        var darkEdge = AdjustToBrightness(tintColor, _darkEdgeBrightness, multiplier);
+        var lightEdge = tintColor.AdjustToBrightness(_lightEdgeBrightness, multiplier);
+        var middleEdge = tintColor.AdjustToBrightness(_middleEdgeBrightness, multiplier);
+        var darkEdge = tintColor.AdjustToBrightness(_darkEdgeBrightness, multiplier);
 
         var lightEdgeBrush = GetSolidColorBrush(lightEdge);
 
@@ -252,9 +234,9 @@ public class Lcd : ContentControl
         }
         else
         {
-            var lightEdge = AdjustToBrightness(_lightEdge, _lightEdgeBrightness, multiplier);
-            var middleEdge = AdjustToBrightness(_middleEdge, _middleEdgeBrightness, multiplier);
-            var darkEdge = AdjustToBrightness(_darkEdge, _darkEdgeBrightness, multiplier);
+            var lightEdge = _lightEdge.AdjustToBrightness(_lightEdgeBrightness, multiplier);
+            var middleEdge = _middleEdge.AdjustToBrightness(_middleEdgeBrightness, multiplier);
+            var darkEdge = _darkEdge.AdjustToBrightness(_darkEdgeBrightness, multiplier);
 
             var lightEdgeBrush = GetSolidColorBrush(lightEdge);
 
@@ -268,7 +250,6 @@ public class Lcd : ContentControl
     }
 
     #endregion
-
 
 
     public Brush? TintLightBrush
@@ -293,7 +274,6 @@ public class Lcd : ContentControl
                 e.NewValue is SolidColorBrush brush ? brush.Color : null;
         }
     }
-
 
 
     public Brush HighLightBrush

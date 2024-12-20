@@ -27,26 +27,34 @@ public class Beam : Control
     private void Beam_LayoutUpdated(object? sender, EventArgs e)
     {
         LayoutUpdated -= Beam_LayoutUpdated;
+
+        if (_rectangle is null)
+        {
+            return;
+        }
+
         GlossOnBase? glossOnBase = this.FindParent<GlossOnBase>();
         if (glossOnBase == null)
         {
             return;
         }
 
-        SetBeamFillBrush(glossOnBase);
+        SetBeamFillBrush(glossOnBase, _rectangle);
     }
 
     public override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
-        _rectangle = (Rectangle)this.GetTemplateChild("PART_Rectangle");
-        ArgumentNullException.ThrowIfNull(_rectangle);
+        _rectangle = GetTemplateChild("PART_Rectangle") as Rectangle;
 
-        SetRectangleRadiusXY(this, this.CornerRadius);
+        if (_rectangle is not null)
+        {
+            SetRectangleRadiusXY(_rectangle, CornerRadius);
+        }
     }
 
-    private void SetBeamFillBrush(GlossOnBase glossOnBase)
+    private void SetBeamFillBrush(GlossOnBase glossOnBase, Rectangle beamRectangle)
     {
         var visualBrushRectangle = new Rectangle();
 
@@ -145,7 +153,7 @@ public class Beam : Control
 
         visualBrush.Transform = transformGroup;
 
-        _rectangle.Fill = visualBrush;
+        beamRectangle.Fill = visualBrush;
     }
 
     public CornerRadius CornerRadius
@@ -172,12 +180,12 @@ public class Beam : Control
             return;
         }
 
-        SetRectangleRadiusXY(beam, (CornerRadius)e.NewValue);
+        SetRectangleRadiusXY(beam._rectangle, (CornerRadius)e.NewValue);
     }
 
-    private static void SetRectangleRadiusXY(Beam beam, CornerRadius cornerRadius)
+    private static void SetRectangleRadiusXY(Rectangle beamRectangle, CornerRadius cornerRadius)
     {
-        beam._rectangle!.RadiusX = cornerRadius.TopLeft;
-        beam._rectangle.RadiusY = cornerRadius.TopLeft;
+        beamRectangle.RadiusX = cornerRadius.TopLeft;
+        beamRectangle.RadiusY = cornerRadius.TopLeft;
     }
 }

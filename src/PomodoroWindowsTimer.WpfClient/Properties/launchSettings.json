@@ -3,7 +3,10 @@
     "Debug": {
       "commandName": "Executable",
       "executablePath": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows\\Pwt.exe",
-      "workingDirectory": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows"
+      "workingDirectory": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows",
+      "environmentVariables": {
+        "WorkDb__ConnectionString": "Data Source=work.db;"
+      }
     }
   }
 }

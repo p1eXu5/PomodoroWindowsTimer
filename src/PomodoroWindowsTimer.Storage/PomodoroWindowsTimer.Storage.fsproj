@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
+    <PackageReference Include="CliWrap" Version="3.6.7" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,9 @@
     <Compile Include="WorkRepository.fs" />
     <Compile Include="WorkEventRepository.fs" />
     <Compile Include="ActiveTimePointRepository.fs" />
+    <Compile Include="RepositoryFactory.fs" />
+    <Compile Include="DbSeeder.fs" />
+    <Compile Include="DbMigrator.fs" />
     <Compile Include="DbSeederHostedService.fs" />
     <Compile Include="TestDbSeederHostedService.fs" />
     <Compile Include="DependencyInjectionExtensions.fs" />

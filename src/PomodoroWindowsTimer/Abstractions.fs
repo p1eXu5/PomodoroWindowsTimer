@@ -71,6 +71,13 @@ type IActiveTimePointRepository =
         abstract ReadAllAsync: cancellationToken: CancellationToken -> Task<Result<ActiveTimePoint list, string>>
     end
 
+type IRepositoryFactory =
+    interface
+        abstract GetWorkRepository: unit -> IWorkRepository
+        abstract GetWorkEventRepository: unit -> IWorkEventRepository
+        abstract GetActiveTimePointRepository: unit -> IActiveTimePointRepository
+    end
+
 type StartRow = int
 
 type IExcelSheet =
@@ -89,4 +96,52 @@ type IDatabaseSettings =
     interface
         abstract DatabaseFilePath : string with get, set
     end
+
+
+type IBotSettings =
+    interface
+        abstract BotToken : string option with get, set
+        abstract MyChatId : string option with get, set
+    end
+
+type IPatternSettings =
+    interface
+        abstract Patterns : Pattern list with get, set
+    end
+
+type ITimePointPrototypesSettings =
+    interface
+        abstract TimePointPrototypesSettings : string option with get, set
+    end
+
+type ITimePointSettings =
+    interface
+        abstract TimePointSettings : string option with get, set
+    end
+
+type IDisableSkipBreakSettings =
+    interface
+        abstract DisableSkipBreak : bool with get, set
+    end
+
+type ICurrentWorkItemSettings =
+    interface
+        abstract CurrentWork : Work option with get, set
+    end
+
+type IUserSettings =
+    inherit IBotSettings
+    inherit IPatternSettings
+    inherit ITimePointPrototypesSettings
+    inherit ITimePointSettings
+    inherit IDisableSkipBreakSettings
+    inherit ICurrentWorkItemSettings
+    inherit IDatabaseSettings
+    abstract LastStatisticPeriod: DateOnlyPeriod option with get, set
+    // TODO: abstract RollbackWorkStrategy: RollbackWorkStrategy with get, set
+    abstract LastDayCount: int with get, set
+    abstract CurrentVersion: string with get, set
+
+type ITelegramBot =
+    abstract SendMessage: string -> Task<unit>
 

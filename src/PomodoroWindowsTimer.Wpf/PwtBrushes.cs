@@ -12,4 +12,10 @@ public static class PwtBrushes
 
     public static ComponentResourceKey RadialGlossKey => new ComponentResourceKey(
         typeof(PwtBrushes), "br_RadialGloss");
+
+    public static ComponentResourceKey SpinnerFilledKey => new ComponentResourceKey(
+        typeof(PwtBrushes), "br_SpinnerFilled");
+
+    public static ComponentResourceKey SpinnerUnfilledKey => new ComponentResourceKey(
+        typeof(PwtBrushes), "br_SpinnerUnfilled");
 }

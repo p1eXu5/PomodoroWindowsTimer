@@ -1,0 +1,31 @@
+﻿<Window x:Class="PomodoroWindowsTimer.WpfClient.StartupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
+        Title="StartupWindow"
+        Width="400"
+        Height="150"
+        Background="Black"
+        ResizeMode="NoResize"
+        TextElement.FontSize="13"
+        TextElement.FontWeight="Regular"
+        TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+        Topmost="True"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        mc:Ignorable="d"
+        >
+    <pwt:GlossOnBase BeamOpacity="0.15"
+                     BeamVisibility="Visible"
+                     >
+        <Grid>
+            <pwt:BlackMirrorSpinner LabelVisibility="Visible"
+                                    Radius="30"
+                                    Text="Loading Pomodoro Windows Timer ..."
+                                    />
+        </Grid>
+    </pwt:GlossOnBase>
+</Window>

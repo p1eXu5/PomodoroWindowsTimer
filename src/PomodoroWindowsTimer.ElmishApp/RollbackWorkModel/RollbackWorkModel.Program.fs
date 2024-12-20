@@ -4,6 +4,7 @@ open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.RollbackWorkModel
 open PomodoroWindowsTimer.ElmishApp.Abstractions
+open PomodoroWindowsTimer.Abstractions
 
 
 let update (userSettings: IUserSettings) msg model =
