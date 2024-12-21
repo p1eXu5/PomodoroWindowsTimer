@@ -5,9 +5,10 @@
         xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
+        xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
         Title="StartupWindow"
-        Width="400"
-        Height="150"
+        Width="498"
+        Height="200"
         Background="Black"
         ResizeMode="NoResize"
         TextElement.FontSize="13"
@@ -15,17 +16,24 @@
         TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         Topmost="True"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None"
+        WindowStyle="ToolWindow"
+        Closing="Window_Closing"
         mc:Ignorable="d"
         >
     <pwt:GlossOnBase BeamOpacity="0.15"
                      BeamVisibility="Visible"
                      >
-        <Grid>
-            <pwt:BlackMirrorSpinner LabelVisibility="Visible"
+        <Grid Margin="10">
+            <pwt:BlackMirrorSpinner x:Name="m_Spinner"
+                                    LabelVisibility="Visible"
                                     Radius="30"
                                     Text="Loading Pomodoro Windows Timer ..."
                                     />
+
+            <shared:DatabaseSelector x:Name="m_DatabaseSelector"
+                                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+                                     Visibility="Collapsed"
+                                     />
         </Grid>
     </pwt:GlossOnBase>
 </Window>
