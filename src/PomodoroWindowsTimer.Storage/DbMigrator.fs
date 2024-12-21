@@ -2,14 +2,24 @@
 
 open System
 open System.IO
-open PomodoroWindowsTimer.Abstractions
-open Microsoft.Extensions.Logging
+open System.Reflection
+open System.Threading.Tasks
+
 open CliWrap
 open CliWrap.Buffered
-open System.Reflection
+open Microsoft.Extensions.Logging
 
+open PomodoroWindowsTimer.Abstractions
+
+/// <summary>
+/// Runs migrator.
+/// </summary>
 type DbMigrator(userSettings: IDatabaseSettings, logger: ILogger<DbMigrator>) =
-    member _.ApplyMigrationsAsync() =
+
+    /// <summary>
+    /// Runs migrator.
+    /// </summary>
+    member _.ApplyMigrationsAsync() : Task =
         task {
             let path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
 
@@ -42,4 +52,8 @@ type DbMigrator(userSettings: IDatabaseSettings, logger: ILogger<DbMigrator>) =
             else
                 logger.LogError("Migrator has not been found!")
         }
+
+    interface IDbMigrator with
+        member this.ApplyMigrationsAsync () : Task = 
+            this.ApplyMigrationsAsync()
 

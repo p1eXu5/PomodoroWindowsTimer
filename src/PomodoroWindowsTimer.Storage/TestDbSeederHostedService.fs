@@ -21,8 +21,6 @@ type TestDbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: I
             let workEventRepository = serviceProvider.GetRequiredService<WorkEventRepository>()
             let activeTimePointRepository = serviceProvider.GetRequiredService<ActiveTimePointRepository>()
 
-            do LastEventCreatedAtHandler.Register()
-
             let! res = workRepository.CreateTableAsync(stoppingToken)
             if res |> Result.isError then
                 appLifetime.StopApplication()

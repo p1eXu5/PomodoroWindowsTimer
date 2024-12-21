@@ -13,7 +13,7 @@ type DependencyInjectionExtensions() =
     
     [<Extension>]
     static member AddWorkEventStorage(services: IServiceCollection,  configuration: IConfiguration) =
-        LastEventCreatedAtHandler.Register()
+        SqlMapper.LastEventCreatedAtHandler.Register()
 
         services
             .AddOptions<WorkDbOptions>()
@@ -23,9 +23,11 @@ type DependencyInjectionExtensions() =
             |> ignore
 
         services.TryAddSingleton<IRepositoryFactory, RepositoryFactory>()
+        services.TryAddSingleton<IDbSeeder, DbSeeder>()
+        services.TryAddSingleton<IDbMigrator, DbMigrator>()
 
-        if configuration.GetValue<bool>("InTest") |> not then
-            services.AddHostedService<DbSeederHostedService>()
-        else
-            services.AddHostedService<TestDbSeederHostedService>()
+        // if configuration.GetValue<bool>("InTest") |> not then
+        //     services.AddHostedService<DbSeederHostedService>()
+        // else
+        //     services.AddHostedService<TestDbSeederHostedService>()
 
