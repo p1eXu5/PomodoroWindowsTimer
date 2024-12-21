@@ -10,7 +10,11 @@
   <ItemGroup>
     <Compile Include="Helpers.fs" />
     <Compile Include="Types.fs" />
-    <Compile Include="Abstractions.fs" />
+    <Compile Include="Abstractions\Core.fs" />
+    <Compile Include="Abstractions\Database.fs" />
+    <Compile Include="Abstractions\TelegramBot.fs" />
+    <Compile Include="Abstractions\Excel.fs" />
+    <Compile Include="Abstractions\UserSettings.fs" />
     <Compile Include="JsonHelper.fs" />
     <Compile Include="Projectors\WorkEventProjector.fs" />
     <Compile Include="Projectors\WorkEventOffsetTimeProjector.fs" />

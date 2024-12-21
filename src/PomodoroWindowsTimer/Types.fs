@@ -171,6 +171,8 @@ type WorkSpentTime =
         SpentTime: TimeSpan
     }
 
+type StartRow = int
+
 // ------------------------------- modules
 
 module DateOnlyPeriod =

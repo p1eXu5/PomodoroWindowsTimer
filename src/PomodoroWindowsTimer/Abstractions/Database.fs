@@ -5,31 +5,11 @@ open System.Threading
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 
-type ITimePointQueue =
-    inherit IDisposable
-    abstract AddMany : TimePoint seq -> unit
-    abstract Start : unit -> unit
-    abstract TryGetNext : unit -> TimePoint option
-    abstract Reload : TimePoint list -> unit
-    abstract TryPick : unit -> TimePoint option
-    abstract ScrollTo : Guid -> unit
-    abstract TryFind : TimePointId -> TimePoint option
-
-type ILooper =
+type IDatabaseSettings =
     interface
-        inherit IDisposable
-        abstract Start : unit -> unit
-        abstract Stop : unit -> unit
-        abstract Next : unit -> unit
-        abstract Shift : float<sec> -> unit
-        abstract ShiftAck : float<sec> -> unit
-        abstract Resume : unit -> unit
-        abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
-        /// Tryes to pick TimePoint from queue, if it present
-        /// emits TimePointStarted event and sets ActiveTimePoint.
-        abstract PreloadTimePoint : unit -> unit
-        abstract GetActiveTimePoint : unit -> ActiveTimePoint option
+        abstract DatabaseFilePath : string with get, set
     end
+
 
 type IWorkRepository =
     interface
@@ -78,70 +58,13 @@ type IRepositoryFactory =
         abstract GetActiveTimePointRepository: unit -> IActiveTimePointRepository
     end
 
-type StartRow = int
 
-type IExcelSheet =
+type IDbSeeder =
     interface
-        abstract AddHeaders: unit -> Result<StartRow, string>
-        abstract AddRows: date: DateOnly -> startTime: TimeOnly -> rows: ExcelRow seq -> StartRow -> Result<StartRow, string>
+        abstract SeedDatabaseAsync: CancellationToken -> Task<Result<unit, string>>
     end
 
-type IExcelBook =
+type IDbMigrator =
     interface
-        abstract Create: filePath: string -> Result<IExcelSheet, string>
-        abstract Save: excelSheet: IExcelSheet -> Result<unit, string>
+        abstract ApplyMigrationsAsync: unit -> Task
     end
-
-type IDatabaseSettings =
-    interface
-        abstract DatabaseFilePath : string with get, set
-    end
-
-
-type IBotSettings =
-    interface
-        abstract BotToken : string option with get, set
-        abstract MyChatId : string option with get, set
-    end
-
-type IPatternSettings =
-    interface
-        abstract Patterns : Pattern list with get, set
-    end
-
-type ITimePointPrototypesSettings =
-    interface
-        abstract TimePointPrototypesSettings : string option with get, set
-    end
-
-type ITimePointSettings =
-    interface
-        abstract TimePointSettings : string option with get, set
-    end
-
-type IDisableSkipBreakSettings =
-    interface
-        abstract DisableSkipBreak : bool with get, set
-    end
-
-type ICurrentWorkItemSettings =
-    interface
-        abstract CurrentWork : Work option with get, set
-    end
-
-type IUserSettings =
-    inherit IBotSettings
-    inherit IPatternSettings
-    inherit ITimePointPrototypesSettings
-    inherit ITimePointSettings
-    inherit IDisableSkipBreakSettings
-    inherit ICurrentWorkItemSettings
-    inherit IDatabaseSettings
-    abstract LastStatisticPeriod: DateOnlyPeriod option with get, set
-    // TODO: abstract RollbackWorkStrategy: RollbackWorkStrategy with get, set
-    abstract LastDayCount: int with get, set
-    abstract CurrentVersion: string with get, set
-
-type ITelegramBot =
-    abstract SendMessage: string -> Task<unit>
-

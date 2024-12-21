@@ -329,7 +329,9 @@ type Looper(
         if _isDisposed then ()
         else
             if isDisposing then
-                timer.Dispose()
+                if timer <> null then
+                    timer.Dispose()
+
                 agent.Post(Stop)
                 notifierAgent.Post(() |> Choice2Of2)
                 (agent :> IDisposable).Dispose()
