@@ -11,33 +11,28 @@ open FsToolkit.ErrorHandling
 open Faqt
 open Faqt.Operators
 
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.Storage
 open PomodoroWindowsTimer.Testing.Fakers
-open PomodoroWindowsTimer.Types
 
 
 [<Category("DB. ActiveTimePoint")>]
 module ActiveTimePointRepositoryTests =
-    let private dbFileName = "active_time_point_test.db"
+    let private dbFileName = $"active_time_point_test_{Guid.NewGuid()}.db"
 
-    let private workRepository () = TestDb.workRepository dbFileName
-    let private workEventRepository () = TestDb.workEventRepository dbFileName
-    let private activeTimePointRepository () = TestDb.activeTimePointRepository dbFileName
+    let mutable _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
+
+    let private workRepository () = _repositoryFactory.GetWorkRepository ()
+    let private workEventRepository () = _repositoryFactory.GetWorkEventRepository ()
+    let private activeTimePointRepository () = _repositoryFactory.GetActiveTimePointRepository ()
 
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
-
-            match! activeTimePointRepository () :?> ActiveTimePointRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
-
-            match! workEventRepository () :?> WorkEventRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
+            _repositoryFactory <- repositoryFactory dbFileName
+            do! seedDataBase _repositoryFactory
+            do applyMigrations dbFileName
         }
 
     [<OneTimeTearDown>]

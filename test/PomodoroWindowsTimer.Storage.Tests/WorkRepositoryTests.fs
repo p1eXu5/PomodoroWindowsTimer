@@ -2,47 +2,35 @@ namespace PomodoroWindowsTimer.Storage.Tests
 
 open System
 open System.IO
-open Microsoft.Extensions.Options
 
 open NUnit.Framework
 open FsUnit.TopLevelOperators
 open FsUnitTyped.TopLevelOperators
-open p1eXu5.AspNetCore.Testing.Logging
-open p1eXu5.FSharp.Testing.ShouldExtensions
 open FsToolkit.ErrorHandling
+open p1eXu5.FSharp.Testing.ShouldExtensions
 
-open PomodoroWindowsTimer.Storage
-open PomodoroWindowsTimer.Storage.Configuration
-open PomodoroWindowsTimer.Testing.Fakers
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.Testing.Fakers
 
 
 [<Category("DB. Work")>]
 module WorkRepositoryTests =
 
-    let private dbFileName = "work_test.db"
+    let private dbFileName = $"work_test_{Guid.NewGuid()}.db"
 
-    let private workRepository () = TestDb.workRepository dbFileName
-    let private workEventRepository () = TestDb.workEventRepository dbFileName
-    let private activeTimePointRepository () = TestDb.activeTimePointRepository dbFileName
+    let mutable _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
+
+    let private workRepository () = _repositoryFactory.GetWorkRepository ()
+    let private workEventRepository () = _repositoryFactory.GetWorkEventRepository ()
+    let private activeTimePointRepository () = _repositoryFactory.GetActiveTimePointRepository ()
 
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            LastEventCreatedAtHandler.Register()
-
-            match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
-
-            match! activeTimePointRepository () :?> ActiveTimePointRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
-
-            match! workEventRepository () :?> WorkEventRepository |> _.CreateActualTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
+            _repositoryFactory <- repositoryFactory dbFileName
+            do! seedDataBase _repositoryFactory
+            do applyMigrations dbFileName
         }
 
     [<OneTimeTearDown>]
@@ -52,6 +40,10 @@ module WorkRepositoryTests =
             if File.Exists(dataSource) then
                 File.Delete(dataSource)
         }
+
+    [<SetUp>]
+    let SetWriters () =
+        tcw.SetWriters(TestContext.Progress, TestContext.Out)
 
     [<Test>]
     let ``01: InsertAsync -> by default -> inserts work row`` () =

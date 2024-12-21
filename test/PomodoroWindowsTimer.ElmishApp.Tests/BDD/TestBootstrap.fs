@@ -33,6 +33,8 @@ type TestBootstrap () =
 
     member _.MockRepository with get() = mockRepository
     
+    member _.ServiceProvider with get() = base.Host.Services
+
     member val MockWindowsMinimizer : IWindowsMinimizer = NSubstitute.Substitute.For<IWindowsMinimizer>() with get
 
     override _.Dispose(disposing: bool) =
@@ -88,7 +90,7 @@ type TestBootstrap () =
             |> ignore
         ()
 
-    override _.ConfigureLogging(loggingBuilder: ILoggingBuilder) =
+    override _.ConfigureLogging(_: HostBuilderContext, loggingBuilder: ILoggingBuilder) =
         loggingBuilder.SetMinimumLevel(LogLevel.Error) |> ignore
 
     override _.PostConfigureHost(builder: IHostBuilder) =

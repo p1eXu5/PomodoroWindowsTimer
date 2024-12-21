@@ -17,23 +17,24 @@ type TestDbSeederHostedService(serviceProvider: IServiceProvider, appLifetime: I
 
     override _.ExecuteAsync(stoppingToken: CancellationToken) =
         task {
-            let workRepository = serviceProvider.GetRequiredService<WorkRepository>()
-            let workEventRepository = serviceProvider.GetRequiredService<WorkEventRepository>()
-            let activeTimePointRepository = serviceProvider.GetRequiredService<ActiveTimePointRepository>()
-
-            let! res = workRepository.CreateTableAsync(stoppingToken)
-            if res |> Result.isError then
-                appLifetime.StopApplication()
-
-            let! res = activeTimePointRepository.CreateTableAsync(stoppingToken)
-            if res |> Result.isError then
-                appLifetime.StopApplication()
-
-            let! res = workEventRepository.CreateActualTableAsync(stoppingToken)
-            if res |> Result.isError then
-                appLifetime.StopApplication()
-
-            let _ = semaphore.Release()
+            raise (NotSupportedException());
+            // let workRepository = serviceProvider.GetRequiredService<WorkRepository>()
+            // let workEventRepository = serviceProvider.GetRequiredService<WorkEventRepository>()
+            // let activeTimePointRepository = serviceProvider.GetRequiredService<ActiveTimePointRepository>()
+            // 
+            // let! res = workRepository.CreateTableAsync(stoppingToken)
+            // if res |> Result.isError then
+            //     appLifetime.StopApplication()
+            // 
+            // let! res = activeTimePointRepository.CreateTableAsync(stoppingToken)
+            // if res |> Result.isError then
+            //     appLifetime.StopApplication()
+            // 
+            // let! res = workEventRepository.CreateActualTableAsync(stoppingToken)
+            // if res |> Result.isError then
+            //     appLifetime.StopApplication()
+            // 
+            // let _ = semaphore.Release()
             return ()
         }
 

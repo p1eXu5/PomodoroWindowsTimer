@@ -14,12 +14,13 @@ open Faqt.Operators
 open PomodoroWindowsTimer.Storage
 open PomodoroWindowsTimer.Testing.Fakers
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
 
 
 [<Category("DB. WorkEvent")>]
 module WorkEventRepositoryTests =
 
-    let private dbFileName = "work_event_test.db"
+    let private dbFileName = $"work_event_test_{Guid.NewGuid()}.db"
 
     let mutable private workId1 = Unchecked.defaultof<uint64>
     let mutable private work1 = Unchecked.defaultof<Work>
@@ -29,9 +30,11 @@ module WorkEventRepositoryTests =
     let mutable private atpId1 = Unchecked.defaultof<TimePointId>
     let mutable private atpId2 = Unchecked.defaultof<TimePointId>
 
-    let private workRepository () = TestDb.workRepository dbFileName
-    let private workEventRepository () = TestDb.workEventRepository dbFileName
-    let private activeTimePointRepository () = TestDb.activeTimePointRepository dbFileName
+    let mutable _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
+
+    let private workRepository () = _repositoryFactory.GetWorkRepository ()
+    let private workEventRepository () = _repositoryFactory.GetWorkEventRepository ()
+    let private activeTimePointRepository () = _repositoryFactory.GetActiveTimePointRepository ()
 
     let private createWork () =
         task {
@@ -58,17 +61,9 @@ module WorkEventRepositoryTests =
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            match! workRepository () :?> WorkRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
-
-            match! activeTimePointRepository () :?> ActiveTimePointRepository |> _.CreateTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
-
-            match! workEventRepository () :?> WorkEventRepository |> _.CreateActualTableAsync(ct) with
-            | Ok _ -> ()
-            | Error err -> raise (InvalidOperationException(err))
+            _repositoryFactory <- repositoryFactory dbFileName
+            do! seedDataBase _repositoryFactory
+            do applyMigrations dbFileName
 
             let! res = createWork ()
             match res with

@@ -11,4 +11,10 @@ type WorkDbOptions =
     }
     with
         static member SectionName = "WorkDb"
+        member this.DbFilePath =
+            let eqInd = this.ConnectionString.IndexOf('=')
+            if eqInd >= 0 then
+                this.ConnectionString.Substring(eqInd + 1, this.ConnectionString.Length - eqInd - 2)
+            else
+                this.ConnectionString
 

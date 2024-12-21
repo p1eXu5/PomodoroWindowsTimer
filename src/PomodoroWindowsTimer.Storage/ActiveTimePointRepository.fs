@@ -23,17 +23,17 @@ module internal ActiveTimePointRepository =
     module Table = PomodoroWindowsTimer.Storage.Tables.ActiveTimePoint
 
     module Sql =
-        let CREATE_TABLE = $"""
-            CREATE TABLE IF NOT EXISTS {Table.NAME} (
-                  {Table.Columns.id} TEXT PRIMARY KEY
-                , {Table.Columns.original_id} TEXT
-                , {Table.Columns.name} TEXT NOT NULL
-                , {Table.Columns.time_span} TEXT NOT NULL
-                , {Table.Columns.kind} TEXT NOT NULL
-                , {Table.Columns.kind_alias} TEXT NOT NULL
-                , {Table.Columns.created_at} INTEGER NOT NULL
-            );
-            """
+        //let CREATE_TABLE = $"""
+        //    CREATE TABLE IF NOT EXISTS {Table.NAME} (
+        //          {Table.Columns.id} TEXT PRIMARY KEY
+        //        , {Table.Columns.original_id} TEXT
+        //        , {Table.Columns.name} TEXT NOT NULL
+        //        , {Table.Columns.time_span} TEXT NOT NULL
+        //        , {Table.Columns.kind} TEXT NOT NULL
+        //        , {Table.Columns.kind_alias} TEXT NOT NULL
+        //        , {Table.Columns.created_at} INTEGER NOT NULL
+        //    );
+        //    """
 
         let INSERT = $"""
             INSERT INTO {Table.NAME} (
@@ -83,26 +83,26 @@ module internal ActiveTimePointRepository =
             Logger: ILogger
         }
 
-    let createTableAsync deps =
-        cancellableTaskResult {
-            let! (dbConnection: DbConnection) = deps.OpenDbConnection
-            use _ = dbConnection
+    //let createTableAsync deps =
+    //    cancellableTaskResult {
+    //        let! (dbConnection: DbConnection) = deps.OpenDbConnection
+    //        use _ = dbConnection
 
-            let! ct = CancellableTask.getCancellationToken ()
+    //        let! ct = CancellableTask.getCancellationToken ()
 
-            let command =
-                CommandDefinition(
-                    Sql.CREATE_TABLE,
-                    cancellationToken = ct
-                )
+    //        let command =
+    //            CommandDefinition(
+    //                Sql.CREATE_TABLE,
+    //                cancellationToken = ct
+    //            )
 
-            try
-                let! _ = dbConnection.ExecuteAsync(command)
-                return ()
-            with ex ->
-                deps.Logger.FailedToCreateTable(Table.NAME, ex)
-                return! Error (ex.Format($"Failed to create table {Table.NAME}."))
-        }
+    //        try
+    //            let! _ = dbConnection.ExecuteAsync(command)
+    //            return ()
+    //        with ex ->
+    //            deps.Logger.FailedToCreateTable(Table.NAME, ex)
+    //            return! Error (ex.Format($"Failed to create table {Table.NAME}."))
+    //    }
 
     let insertAsync deps (activeTimePoint: ActiveTimePoint) =
         cancellableTaskResult {
@@ -220,9 +220,9 @@ type ActiveTimePointRepository(options: IDatabaseSettings, timeProvider: System.
             Logger = logger
         }
 
-    member _.CreateTableAsync(?cancellationToken) =
-        let ct = defaultArg cancellationToken CancellationToken.None
-        ActiveTimePointRepository.createTableAsync deps ct
+    //member _.CreateTableAsync(?cancellationToken) =
+    //    let ct = defaultArg cancellationToken CancellationToken.None
+    //    ActiveTimePointRepository.createTableAsync deps ct
 
     member _.FindByIdAsync activeTimePointId cancellationToken =
         ActiveTimePointRepository.findByIdAsync deps activeTimePointId cancellationToken

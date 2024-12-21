@@ -66,5 +66,6 @@ type IDbSeeder =
 
 type IDbMigrator =
     interface
-        abstract ApplyMigrationsAsync: unit -> Task
+        abstract ApplyMigrations: dbFilePath: string -> Result<Unit, string>
+        abstract ApplyMigrationsAsync: dbFilePath: string -> cancellationToken: CancellationToken -> Task<Result<Unit, string>>
     end

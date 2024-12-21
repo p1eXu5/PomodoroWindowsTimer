@@ -1,18 +1,18 @@
-﻿using System.Reflection;
-using DbUp;
-using DbUp.Extensions.Logging;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using p1eXu5.CliBootstrap;
 using p1eXu5.CliBootstrap.CommandLineParser;
+using PomodoroWindowsTimer.Abstractions;
 
 namespace PomodoroWindowsTimer.Migrator;
 
 internal sealed class OptionsHandler : IOptionsHandler
 {
+    private readonly IDbMigrator _dbMigrator;
     private readonly ILogger<DbUp.Engine.UpgradeEngine> _logger;
 
-    public OptionsHandler(ILogger<DbUp.Engine.UpgradeEngine> logger)
+    public OptionsHandler(IDbMigrator dbMigrator, ILogger<DbUp.Engine.UpgradeEngine> logger)
     {
+        _dbMigrator = dbMigrator;
         _logger = logger;
     }
 
@@ -22,19 +22,11 @@ internal sealed class OptionsHandler : IOptionsHandler
     {
         if (successParsingResult is SuccessParsingResult.Success<PwtMigratorOptions> success)
         {
-            _logger.LogInformation("Strarting migration...");
+            _logger.LogInformation("Starting migration...");
 
-            var upgrader =
-                DeployChanges.To
-                    .SQLiteDatabase(success.Options.ConnectionString)
-                    .WithScriptsAndCodeEmbeddedInAssembly(Assembly.GetExecutingAssembly())
-                    .AddLogger(_logger)
-                    .WithTransaction()
-                    .Build();
+            var result = _dbMigrator.ApplyMigrations(success.Options.ConnectionString);
 
-            var result = upgrader.PerformUpgrade();
-
-            if (!result.Successful)
+            if (result.IsError)
             {
                 Environment.Exit(-1);
             }

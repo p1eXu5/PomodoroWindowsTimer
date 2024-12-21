@@ -10,6 +10,7 @@
         Width="498"
         Height="200"
         Background="Black"
+        Closing="Window_Closing"
         ResizeMode="NoResize"
         TextElement.FontSize="13"
         TextElement.FontWeight="Regular"
@@ -17,7 +18,6 @@
         Topmost="True"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow"
-        Closing="Window_Closing"
         mc:Ignorable="d"
         >
     <pwt:GlossOnBase BeamOpacity="0.15"

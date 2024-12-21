@@ -23,16 +23,16 @@ module internal WorkRepository =
     module WorkEventTable = PomodoroWindowsTimer.Storage.Tables.WorkEvent
 
     module Sql =
-        let CREATE_TABLE = $"""
+        let CREATE_INIT_TABLE = $"""
             CREATE TABLE IF NOT EXISTS {Table.NAME} (
-                      {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
-                    , {Table.Columns.number} TEXT NOT NULL
-                    , {Table.Columns.title} TEXT NOT NULL
-                    , {Table.Columns.created_at} INTEGER NOT NULL
-                    , {Table.Columns.updated_at} INTEGER NOT NULL
+                    {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
+                , {Table.Columns.number} TEXT NOT NULL
+                , {Table.Columns.title} TEXT NOT NULL
+                , {Table.Columns.created_at} INTEGER NOT NULL
+                , {Table.Columns.updated_at} INTEGER NOT NULL
 
-                    , CONSTRAINT title_number_uct UNIQUE({Table.Columns.number}, {Table.Columns.title}) ON CONFLICT FAIL
-                );
+                , CONSTRAINT title_number_uct UNIQUE({Table.Columns.number}, {Table.Columns.title}) ON CONFLICT FAIL
+            );
             """
 
         /// Parameters: WorkNumber, WorkTitle, WorkCreatedAt
@@ -123,12 +123,14 @@ module internal WorkRepository =
 
             let command =
                 CommandDefinition(
-                    Sql.CREATE_TABLE,
+                    Sql.CREATE_INIT_TABLE,
                     cancellationToken = ct
                 )
 
             try
                 let! _ = dbConnection.ExecuteAsync(command)
+                do! dbConnection.CloseAsync()
+                deps.Logger.TableCreated(Table.NAME)
                 return ()
             with ex ->
                 deps.Logger.FailedToCreateTable(Table.NAME, ex)

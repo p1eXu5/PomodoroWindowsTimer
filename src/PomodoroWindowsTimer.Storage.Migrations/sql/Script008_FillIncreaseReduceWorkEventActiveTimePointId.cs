@@ -8,7 +8,7 @@ using DbUp.Engine;
 using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.Types;
 
-namespace PomodoroWindowsTimer.Migrator.sql;
+namespace PomodoroWindowsTimer.Storage.Migrations.sql;
 internal class Script008_FillIncreaseReduceWorkEventActiveTimePointId : IScript
 {
     public string ProvideScript(Func<IDbCommand> dbCommandFactory)

@@ -24,7 +24,7 @@ type DependencyInjectionExtensions() =
 
         services.TryAddSingleton<IRepositoryFactory, RepositoryFactory>()
         services.TryAddSingleton<IDbSeeder, DbSeeder>()
-        services.TryAddSingleton<IDbMigrator, DbMigrator>()
+        services.TryAddSingleton<IDbMigrator, PomodoroWindowsTimer.Storage.Migrations.DbMigrator>()
 
         // if configuration.GetValue<bool>("InTest") |> not then
         //     services.AddHostedService<DbSeederHostedService>()

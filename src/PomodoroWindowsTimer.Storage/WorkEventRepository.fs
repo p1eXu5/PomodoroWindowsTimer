@@ -24,7 +24,8 @@ module internal WorkEventRepository =
     module ActiveTimePointTable = PomodoroWindowsTimer.Storage.Tables.ActiveTimePoint
 
     module Sql =
-        let CREATE_TABLE = $"""
+        /// DO NOT CHANGE!!!
+        let CREATE_INIT_TABLE = $"""
             CREATE TABLE IF NOT EXISTS {Table.NAME} (
                   {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
                 , {Table.Columns.work_id} INTEGER NOT NULL
@@ -38,27 +39,27 @@ module internal WorkEventRepository =
             );
             """
 
-        /// for integration tests
-        let CREATE_ACTUAL_TABLE = $"""
-            CREATE TABLE IF NOT EXISTS {Table.NAME} (
-                  {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
-                , {Table.Columns.work_id} INTEGER NOT NULL
-                , {Table.Columns.event_json} TEXT NOT NULL
-                , {Table.Columns.created_at} INTEGER NOT NULL
-                , {Table.Columns.active_time_point_id} TEXT
-                , {Table.Columns.event_name} TEXT NOT NULL
+        ///// for integration tests
+        //let CREATE_ACTUAL_TABLE = $"""
+        //    CREATE TABLE IF NOT EXISTS {Table.NAME} (
+        //          {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
+        //        , {Table.Columns.work_id} INTEGER NOT NULL
+        //        , {Table.Columns.event_json} TEXT NOT NULL
+        //        , {Table.Columns.created_at} INTEGER NOT NULL
+        //        , {Table.Columns.active_time_point_id} TEXT
+        //        , {Table.Columns.event_name} TEXT NOT NULL
 
-                , FOREIGN KEY ({Table.Columns.work_id})
-                    REFERENCES {WorkTable.NAME} ({WorkTable.Columns.id})
-                    ON DELETE CASCADE 
-                    ON UPDATE NO ACTION
+        //        , FOREIGN KEY ({Table.Columns.work_id})
+        //            REFERENCES {WorkTable.NAME} ({WorkTable.Columns.id})
+        //            ON DELETE CASCADE 
+        //            ON UPDATE NO ACTION
 
-                , FOREIGN KEY ({Table.Columns.active_time_point_id})
-                    REFERENCES {ActiveTimePointTable.NAME} ({ActiveTimePointTable.Columns.id})
-                    ON DELETE SET NULL 
-                    ON UPDATE NO ACTION
-            );
-            """
+        //        , FOREIGN KEY ({Table.Columns.active_time_point_id})
+        //            REFERENCES {ActiveTimePointTable.NAME} ({ActiveTimePointTable.Columns.id})
+        //            ON DELETE SET NULL 
+        //            ON UPDATE NO ACTION
+        //    );
+        //    """
 
         /// Parameters: WorkId, EventJson, CreatedAt, @ActiveTimePointId, @EventName.
         let INSERT = $"""
@@ -168,38 +169,40 @@ module internal WorkEventRepository =
 
             let command =
                 CommandDefinition(
-                    Sql.CREATE_TABLE,
+                    Sql.CREATE_INIT_TABLE,
                     cancellationToken = ct
                 )
 
             try
                 let! _ = dbConnection.ExecuteAsync(command)
+                do! dbConnection.CloseAsync()
+                deps.Logger.TableCreated(Table.NAME)
                 return ()
             with ex ->
                 deps.Logger.FailedToCreateTable(Table.NAME, ex)
                 return! Error (ex.Format($"Failed to create table {Table.NAME}."))
         }
 
-    let createTestTableAsync deps =
-        cancellableTaskResult {
-            let! (dbConnection: DbConnection) = deps.GetDbConnection
-            use _ = dbConnection
+    //let createTestTableAsync deps =
+    //    cancellableTaskResult {
+    //        let! (dbConnection: DbConnection) = deps.GetDbConnection
+    //        use _ = dbConnection
 
-            let! ct = CancellableTask.getCancellationToken ()
+    //        let! ct = CancellableTask.getCancellationToken ()
 
-            let command =
-                CommandDefinition(
-                    Sql.CREATE_ACTUAL_TABLE,
-                    cancellationToken = ct
-                )
+    //        let command =
+    //            CommandDefinition(
+    //                Sql.CREATE_ACTUAL_TABLE,
+    //                cancellationToken = ct
+    //            )
 
-            try
-                let! _ = dbConnection.ExecuteAsync(command)
-                return ()
-            with ex ->
-                deps.Logger.FailedToCreateTable(Table.NAME, ex)
-                return! Error (ex.Format($"Failed to create table {Table.NAME}."))
-        }
+    //        try
+    //            let! _ = dbConnection.ExecuteAsync(command)
+    //            return ()
+    //        with ex ->
+    //            deps.Logger.FailedToCreateTable(Table.NAME, ex)
+    //            return! Error (ex.Format($"Failed to create table {Table.NAME}."))
+    //    }
 
     let insertAsync deps workId workEvent =
         cancellableTaskResult {
@@ -490,9 +493,9 @@ type internal WorkEventRepository(options: IDatabaseSettings, timeProvider: Syst
         let ct = defaultArg cancellationToken CancellationToken.None
         WorkEventRepository.createTableAsync deps ct
 
-    member internal _.CreateActualTableAsync(?cancellationToken) =
-        let ct = defaultArg cancellationToken CancellationToken.None
-        WorkEventRepository.createTestTableAsync deps ct
+    //member internal _.CreateActualTableAsync(?cancellationToken) =
+    //    let ct = defaultArg cancellationToken CancellationToken.None
+    //    WorkEventRepository.createTestTableAsync deps ct
 
     interface IWorkEventRepository with
         member _.InsertAsync workId workEvent cancellationToken =

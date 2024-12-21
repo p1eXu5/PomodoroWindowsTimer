@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="sql\Script010_AddOriginIdToDummyActiveTimePoint.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="sql\Script001_CreateActiveTimePointTable.sql" />
+    <EmbeddedResource Include="sql\Script002_CreateDummyActiveTimePoint.sql" />
+    <EmbeddedResource Include="sql\Script003_CreateActiveTimePointIdColumn.sql" />
+    <EmbeddedResource Include="sql\Script004_CreateActiveTimePointIdIndex.sql" />
+    <EmbeddedResource Include="sql\Script006_AddEventNameColumn.sql" />
+    <EmbeddedResource Include="sql\Script007_MakeWorkEventEventNameNotNull.sql" />
+    <EmbeddedResource Include="sql\Script009_TrimWorkNumberAndTitle.sql" />
+    <EmbeddedResource Include="sql\Script010_AddOriginIdToDummyActiveTimePoint.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dbup-sqlite" Version="5.0.40" />
+    <PackageReference Include="DbUp.Extensions.Microsoft.Logging" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.8" />
+  </ItemGroup>
+
+  <!-- dbup-sqlite 5.0.40 vulnerabilities -->
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
+  </ItemGroup>
+  
+</Project>

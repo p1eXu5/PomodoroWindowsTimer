@@ -32,13 +32,14 @@
     <Compile Include="ActiveTimePointRepository.fs" />
     <Compile Include="RepositoryFactory.fs" />
     <Compile Include="DbSeeder.fs" />
-    <Compile Include="DbMigrator.fs" />
+    <Compile Include="CliDbMigrator.fs" />
     <Compile Include="DbSeederHostedService.fs" />
     <Compile Include="TestDbSeederHostedService.fs" />
     <Compile Include="DependencyInjectionExtensions.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PomodoroWindowsTimer.Storage.Migrations\PomodoroWindowsTimer.Storage.Migrations.csproj" />
     <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
   </ItemGroup>
 

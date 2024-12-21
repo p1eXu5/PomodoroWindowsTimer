@@ -10,16 +10,17 @@ open CliWrap.Buffered
 open Microsoft.Extensions.Logging
 
 open PomodoroWindowsTimer.Abstractions
+open System.Threading
 
 /// <summary>
 /// Runs migrator.
 /// </summary>
-type DbMigrator(userSettings: IDatabaseSettings, logger: ILogger<DbMigrator>) =
+type CliDbMigrator(userSettings: IDatabaseSettings, logger: ILogger<CliDbMigrator>) =
 
     /// <summary>
     /// Runs migrator.
     /// </summary>
-    member _.ApplyMigrationsAsync() : Task =
+    member _.ApplyMigrationsAsync(cancellationToken: CancellationToken) : Task<Result<unit, string>> =
         task {
             let path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
 
@@ -43,17 +44,25 @@ type DbMigrator(userSettings: IDatabaseSettings, logger: ILogger<DbMigrator>) =
                         .WithArguments([| "--connection"; connectionString |])
                         .WithWorkingDirectory(Path.Combine(path, "migrator"))
                         .WithValidation(CommandResultValidation.None)
-                        .ExecuteBufferedAsync()
+                        .ExecuteBufferedAsync(cancellationToken)
 
                 if not <| String.IsNullOrWhiteSpace(res.StandardError) then
                     logger.LogError(res.StandardError)
+                    return Error (res.StandardError)
                 else
                     logger.LogInformation(res.StandardOutput)
+                    return Ok ()
             else
                 logger.LogError("Migrator has not been found!")
+                return Error "Migrator has not been found!"
         }
 
     interface IDbMigrator with
-        member this.ApplyMigrationsAsync () : Task = 
-            this.ApplyMigrationsAsync()
+        member this.ApplyMigrations (dbFilePath: string) : Result<unit, string> = 
+            this.ApplyMigrationsAsync(CancellationToken.None)
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+
+        member this.ApplyMigrationsAsync _ ct : Task<Result<unit, string>> = 
+            this.ApplyMigrationsAsync(ct)
 

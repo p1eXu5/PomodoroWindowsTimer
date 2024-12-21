@@ -20,8 +20,12 @@ open PomodoroWindowsTimer.Storage.Configuration
 open PomodoroWindowsTimer.Testing.Fakers
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.Storage.Migrations
+open System
 
 let ct = CancellationToken.None
+
+let tcw = TestContextWriters.Default
 
 let internal dataSource dbFileName =
     Path.Combine(
@@ -53,7 +57,7 @@ let internal workRepository dbFileName =
     new WorkRepository(
         databaseSettings dbFileName,
         System.TimeProvider.System,
-        TestLogger<WorkRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
+        TestLogger<WorkRepository>(tcw)
     )
     :> IWorkRepository
     
@@ -61,7 +65,7 @@ let internal workEventRepository dbFileName =
     new WorkEventRepository(
         databaseSettings dbFileName,
         System.TimeProvider.System,
-        TestLogger<WorkEventRepository>(TestContextWriters.DefaultWith(TestContext.Progress, TestContext.Out))
+        TestLogger<WorkEventRepository>(tcw)
     )
     :> IWorkEventRepository
 
@@ -69,6 +73,36 @@ let internal activeTimePointRepository dbFileName =
     new ActiveTimePointRepository(
         databaseSettings dbFileName,
         System.TimeProvider.System,
-        TestLogger<ActiveTimePointRepository>(TestContextWriters.Default)
+        TestLogger<ActiveTimePointRepository>(tcw)
     )
     :> IActiveTimePointRepository
+
+let internal repositoryFactory dbFileName =
+    RepositoryFactory(
+        databaseSettings dbFileName,
+        System.TimeProvider.System,
+        TestLoggerFactory.CreateWith(TestContext.Progress, TestContext.Out)
+    )
+
+let internal seedDataBase (repositoryFactory: IRepositoryFactory) =
+    task {
+        let seeder = DbSeeder(repositoryFactory, TestLogger<DbSeeder>(TestContextWriters.Default))
+        match! seeder.SeedDatabaseAsync(CancellationToken.None) with
+        | Ok _ -> return ()
+        | Error err ->
+            raise (InvalidOperationException(err))
+    }
+
+let internal applyMigrations dbFileName =
+    let migrator = DbMigrator(
+        TestLogger<DbUp.Engine.UpgradeEngine>(tcw),
+        TestLogger<DbMigrator>(tcw)
+    )
+
+    match migrator.ApplyMigrations (dataSource dbFileName) with
+    | Ok () -> ()
+    | Error err ->
+        raise (InvalidOperationException(err))
+
+
+SqlMapper.LastEventCreatedAtHandler.Register()

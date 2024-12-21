@@ -1,14 +1,15 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.DatabaseSettings"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:DatabaseSettingsModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DatabaseSettingsModel;assembly=PomodoroWindowsTimer.ElmishApp"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:DatabaseSettingsModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.DatabaseSettingsModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             d:DataContext="{d:DesignInstance Type=DatabaseSettingsModel:Bindings, IsDesignTimeCreatable=False}"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Width="450"
              Height="200"
+             d:DataContext="{d:DesignInstance Type=DatabaseSettingsModel:Bindings,
+                                              IsDesignTimeCreatable=False}"
              Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
@@ -23,10 +24,10 @@
                      Margin="0"
                      HorizontalAlignment="Center"
                      materialDesign:HintAssist.Hint="Data Source"
-                     Text="{Binding Database}"
-                     TextWrapping="Wrap"
-                     TextAlignment="Left"
                      MinLines="1"
+                     Text="{Binding Database}"
+                     TextAlignment="Left"
+                     TextWrapping="Wrap"
                      />
             <Button Command="{Binding SelectDatabaseFileCommand}"
                     Content="{materialDesign:PackIcon FolderOpenOutline}"
@@ -36,15 +37,15 @@
         <StackPanel HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     >
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding ApplyCommand}"
+            <Button Command="{Binding ApplyCommand}"
                     Content="APPLY"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroOkDialogButton}"
                     />
 
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding CancelCommand}"
+            <Button Command="{Binding CancelCommand}"
                     Content="CANCEL"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroCancelDialogButton}"
                     />
         </StackPanel>

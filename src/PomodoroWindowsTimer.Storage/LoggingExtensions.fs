@@ -6,23 +6,48 @@ open System.Runtime.CompilerServices
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer
 
+// -----------------------
+// 2 - FailedToCreateTable
+// -----------------------
 [<Extension>]
-type LoggingExtensions() =
+type FailedToCreateTable() =
+    static let failedToCreateTable = LoggerMessage.Define<string>(
+        LogLevel.Error,
+        new EventId(2, nameof FailedToCreateTable),
+        "Failed to create table `{TableName}`.")
+
+    [<Extension>]
+    static member FailedToCreateTable(logger: ILogger, tableName: string, ex: Exception) =
+        failedToCreateTable.Invoke(logger, tableName, ex)
+
+// -----------------------
+// 100 - TableCreated
+// -----------------------
+[<Extension>]
+type TableCreated() =
+    static let tableCreated = LoggerMessage.Define<string>(
+        LogLevel.Information,
+        new EventId(100, nameof TableCreated),
+        "Table `{TableName}` has been created.")
+
+    [<Extension>]
+    static member TableCreated(logger: ILogger, tableName: string) =
+        tableCreated.Invoke(logger, tableName, null)
+
+
+[<Extension>]
+type LoggingExtensions () =
 
     static let failedToOpenConnection = LoggerMessage.Define(
         LogLevel.Error,
         new EventId(1, nameof LoggingExtensions.FailedToOpenConnection),
         "Failed to open db connection.")
     
-    static let failedToCreateTable = LoggerMessage.Define<string>(
-        LogLevel.Error,
-        new EventId(2, nameof LoggingExtensions.FailedToCreateTable),
-        "Failed to create table {TableName}.")
 
     static let failedToInsert = LoggerMessage.Define<string>(
         LogLevel.Error,
         new EventId(3, nameof LoggingExtensions.FailedToInsert),
-        "Failed to insert {TableName}.")
+        "Failed to insert `{TableName}`.")
 
     static let failedToUpdateWork = LoggerMessage.Define<string>(
         LogLevel.Error,
@@ -54,13 +79,19 @@ type LoggingExtensions() =
         new EventId(6, nameof LoggingExtensions.FailedToFindByActiveTimePointIdByDate),
         "Failed to find work events by active time point id {ActiveTimePointId} and created not after {NotAfterDate}.")
 
+    
+
+
+   
+
+    
+
+    // -----------------------
+    // TableCreated
+    // -----------------------
     [<Extension>]
     static member FailedToOpenConnection(logger: ILogger, ex: Exception) =
         failedToOpenConnection.Invoke(logger, ex)
-
-    [<Extension>]
-    static member FailedToCreateTable(logger: ILogger, tableName: string, ex: Exception) =
-        failedToCreateTable.Invoke(logger, tableName, ex)
 
     [<Extension>]
     static member FailedToInsert(logger: ILogger, tableName: string, ex: Exception) =

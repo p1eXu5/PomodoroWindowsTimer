@@ -19,10 +19,12 @@ type DbSeeder(repositoryFactory: IRepositoryFactory, logger: ILogger<DbSeeder>) 
             let workRepository = repositoryFactory.GetWorkRepository() :?> WorkRepository
             let! res = workRepository.CreateTableAsync(cancellationToken)
             if res |> Result.isError then
+                res |> Result.mapError (fun err -> logger.LogError(err)) |> ignore
                 return res
             else
                 let workEventRepository = repositoryFactory.GetWorkEventRepository() :?> WorkEventRepository
                 let! res = workEventRepository.CreateTableAsync(cancellationToken)
+                res |> Result.mapError (fun err -> logger.LogError(err)) |> ignore
                 return res
         }
 

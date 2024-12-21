@@ -4,7 +4,7 @@ using System.Text;
 using DbUp.Engine;
 using PomodoroWindowsTimer.Types;
 
-namespace PomodoroWindowsTimer.Migrator.sql;
+namespace PomodoroWindowsTimer.Storage.Migrations.sql;
 
 public sealed class Script005_FillActiveTimePointId : IScript
 {
@@ -67,7 +67,7 @@ public sealed class Script005_FillActiveTimePointId : IScript
 
                         newWorkEventJson =
                             JsonHelpers.SerializeNoIndent(
-                                String.Equals(workEventJson.Case, "WorkStarted", StringComparison.Ordinal)
+                                string.Equals(workEventJson.Case, "WorkStarted", StringComparison.Ordinal)
                                     ? WorkEvent.NewWorkStarted(workEventJson.Fields.Item1, workEventJson.Fields.Item2, newAtp.Value.Id)
                                     : WorkEvent.NewBreakStarted(workEventJson.Fields.Item1, workEventJson.Fields.Item2, newAtp.Value.Id)
                             );
@@ -78,7 +78,7 @@ public sealed class Script005_FillActiveTimePointId : IScript
                     case DbActiveTimePoint.DummyDbActiveTimePoint dummyAtp:
                         newWorkEventJson =
                             JsonHelpers.SerializeNoIndent(
-                                String.Equals(workEventJson.Case, "WorkStarted", StringComparison.Ordinal)
+                                string.Equals(workEventJson.Case, "WorkStarted", StringComparison.Ordinal)
                                     ? WorkEvent.NewWorkStarted(workEventJson.Fields.Item1, workEventJson.Fields.Item2, dummyAtp.Id)
                                     : WorkEvent.NewBreakStarted(workEventJson.Fields.Item1, workEventJson.Fields.Item2, dummyAtp.Id)
                             );
@@ -89,7 +89,7 @@ public sealed class Script005_FillActiveTimePointId : IScript
                     case DbActiveTimePoint.ExistingDbActiveTimePoint existingAtp:
                         newWorkEventJson =
                             JsonHelpers.SerializeNoIndent(
-                                String.Equals(workEventJson.Case, "WorkStarted", StringComparison.Ordinal)
+                                string.Equals(workEventJson.Case, "WorkStarted", StringComparison.Ordinal)
                                     ? WorkEvent.NewWorkStarted(workEventJson.Fields.Item1, workEventJson.Fields.Item2, existingAtp.Id)
                                     : WorkEvent.NewBreakStarted(workEventJson.Fields.Item1, workEventJson.Fields.Item2, existingAtp.Id)
                             );
@@ -114,7 +114,7 @@ public sealed class Script005_FillActiveTimePointId : IScript
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(nameof(timePointName));
 
-        if (String.Equals(timePointName, _lastActiveTimePoint?.Value.Name, StringComparison.Ordinal))
+        if (string.Equals(timePointName, _lastActiveTimePoint?.Value.Name, StringComparison.Ordinal))
         {
             return new DbActiveTimePoint.ExistingDbActiveTimePoint(_lastActiveTimePoint!.Value.Id);
         }

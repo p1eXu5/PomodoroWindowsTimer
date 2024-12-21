@@ -49,8 +49,7 @@ module Sut =
                         member _.Dispatcher with get() = testDispatcher
                         member _.MainModel with get() = mainModel.Value
                         member _.MsgStack with get() = msgStack
-                        member _.ServiceProvider with get() =
-                            bootstrap.Host.Services
+                        member _.ServiceProvider with get() = bootstrap.ServiceProvider
                         member _.MockRepository with get() =
                             bootstrap.MockRepository
                     interface IScenarioContext with
@@ -73,5 +72,5 @@ module Sut =
             sut
         with ex ->
             TestContext.WriteLine(ex)
-            bootstrap.Host.StopAsync() |> Async.AwaitTask |> Async.RunSynchronously
+            bootstrap.StopHostAsync() |> Async.AwaitTask |> Async.RunSynchronously
             reraise ()
