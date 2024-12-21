@@ -42,7 +42,7 @@ let internal getConnectionString dbFileName =
         let dataSource = dbFileName |> dataSource
         if File.Exists(dataSource) then
             File.Delete(dataSource)
-        connectionStrings[dbFileName] <- $"Data Source=%s{dataSource};"
+        connectionStrings[dbFileName] <- $"Data Source=%s{dataSource};Pooling=false"
         connectionStrings[dbFileName]
 
 
@@ -78,10 +78,12 @@ let internal activeTimePointRepository dbFileName =
     :> IActiveTimePointRepository
 
 let internal repositoryFactory dbFileName =
+    let options = databaseSettings dbFileName
     RepositoryFactory(
-        databaseSettings dbFileName,
+        options,
         System.TimeProvider.System,
-        TestLoggerFactory.CreateWith(TestContext.Progress, TestContext.Out)
+        TestLoggerFactory.CreateWith(TestContext.Progress, TestContext.Out),
+        TestLogger<RepositoryFactory>(tcw)
     )
 
 let internal seedDataBase (repositoryFactory: IRepositoryFactory) =

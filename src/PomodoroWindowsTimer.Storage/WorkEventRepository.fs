@@ -175,7 +175,6 @@ module internal WorkEventRepository =
 
             try
                 let! _ = dbConnection.ExecuteAsync(command)
-                do! dbConnection.CloseAsync()
                 deps.Logger.TableCreated(Table.NAME)
                 return ()
             with ex ->

@@ -47,7 +47,7 @@ public sealed class DbMigrator : IDbMigrator
             return FSharpResult<Unit, string>.NewError(_dbFileNotExistError);
         }
 
-        var connectionString = "Data Source=" + dbFilePath;
+        var connectionString = "Data Source=" + dbFilePath + ";Pooling=false";
 
         var upgrader =
             DeployChanges.To

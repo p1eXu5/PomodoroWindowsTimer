@@ -1,13 +1,11 @@
 ﻿namespace PomodoroWindowsTimer.Storage
 
 open System
+open System.Threading
 open Microsoft.Extensions.Logging
-open Microsoft.Extensions.Options
 
-open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open System.Threading
 
 module internal WorkRepository =
 
@@ -129,7 +127,6 @@ module internal WorkRepository =
 
             try
                 let! _ = dbConnection.ExecuteAsync(command)
-                do! dbConnection.CloseAsync()
                 deps.Logger.TableCreated(Table.NAME)
                 return ()
             with ex ->

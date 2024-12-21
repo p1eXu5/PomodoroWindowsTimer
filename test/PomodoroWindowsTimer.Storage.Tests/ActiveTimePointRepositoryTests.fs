@@ -19,7 +19,7 @@ open PomodoroWindowsTimer.Testing.Fakers
 
 [<Category("DB. ActiveTimePoint")>]
 module ActiveTimePointRepositoryTests =
-    let private dbFileName = $"active_time_point_test_{Guid.NewGuid()}.db"
+    let mutable private dbFileName = Unchecked.defaultof<string>
 
     let mutable _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
 
@@ -27,21 +27,20 @@ module ActiveTimePointRepositoryTests =
     let private workEventRepository () = _repositoryFactory.GetWorkEventRepository ()
     let private activeTimePointRepository () = _repositoryFactory.GetActiveTimePointRepository ()
 
-    [<OneTimeSetUp>]
+    [<SetUp>]
     let Setup () =
         task {
+            dbFileName <- $"active_time_point_test_{Guid.NewGuid()}.db"
             _repositoryFactory <- repositoryFactory dbFileName
             do! seedDataBase _repositoryFactory
             do applyMigrations dbFileName
         }
 
-    [<OneTimeTearDown>]
+    [<TearDown>]
     let TearDown () =
-        task {
-            let dataSource = dbFileName |> dataSource
-            if File.Exists(dataSource) then
-                File.Delete(dataSource)
-        }
+        let dataSource = dbFileName |> dataSource
+        if File.Exists(dataSource) then
+            File.Delete(dataSource)
 
     [<Test>]
     let ``01: InsertAsync test`` () =

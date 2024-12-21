@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
     <Compile Include="TestDb.fs" />
+    <Compile Include="RepositoryFactoryTests.fs" />
     <Compile Include="WorkRepositoryTests.fs" />
     <Compile Include="ActiveTimePointRepositoryTests.fs" />
     <Compile Include="WorkEventRepositoryTests.fs" />

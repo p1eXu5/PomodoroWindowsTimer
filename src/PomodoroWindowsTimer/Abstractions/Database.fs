@@ -53,6 +53,7 @@ type IActiveTimePointRepository =
 
 type IRepositoryFactory =
     interface
+        abstract ReadDbTablesAsync: ?cancellationToken: CancellationToken -> Task<Result<string list, string>>
         abstract GetWorkRepository: unit -> IWorkRepository
         abstract GetWorkEventRepository: unit -> IWorkEventRepository
         abstract GetActiveTimePointRepository: unit -> IActiveTimePointRepository
