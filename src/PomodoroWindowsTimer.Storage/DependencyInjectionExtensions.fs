@@ -15,12 +15,24 @@ type DependencyInjectionExtensions() =
     static member AddWorkEventStorage(services: IServiceCollection,  configuration: IConfiguration) =
         SqlMapper.LastEventCreatedAtHandler.Register()
 
-        services
-            .AddOptions<WorkDbOptions>()
-            .Bind(configuration.GetSection(WorkDbOptions.SectionName))
-            .ValidateDataAnnotations()
-            .ValidateOnStart()
-            |> ignore
+        let workDbOptionsSection = configuration.GetSection(WorkDbOptions.SectionName)
+
+        if workDbOptionsSection.Exists() then
+            services
+                .AddOptions<WorkDbOptions>()
+                .Bind(configuration.GetSection(WorkDbOptions.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart()
+                |> ignore
+        else
+            services
+                .AddOptions<WorkDbOptions>()
+                .Configure(fun options ->
+                    options.ConnectionString <- "Data Source=work.db;"
+                )
+                .ValidateDataAnnotations()
+                .ValidateOnStart()
+                |> ignore
 
         services.TryAddSingleton<IRepositoryFactory, RepositoryFactory>()
         services.TryAddSingleton<IDbSeeder, DbSeeder>()

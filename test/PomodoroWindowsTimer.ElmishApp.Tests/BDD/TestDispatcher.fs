@@ -1,9 +1,13 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests
 
-open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.ElmishApp.Models
 
+/// <summary>
+/// Defines <see cref="TestDispatcher.DispatchRequested" /> event that triggers
+/// <c>dispatchMsgFromScenario</c> subscription.
+/// </summary>
 type TestDispatcher () =
     let timeout = ((int Program.tickMilliseconds) * 2 + ((int Program.tickMilliseconds) / 2))
 
@@ -15,14 +19,18 @@ type TestDispatcher () =
     member _.Dispatch(message: MainModel.Msg) =
        dispatchRequestedEvent.Trigger(message)
 
-    member this.DispatchWithTimeout(message: MainModel.Msg) =
+    member _.DispatchWithTimeout(message: MainModel.Msg) =
         async {
            dispatchRequestedEvent.Trigger(message)
            do! Async.Sleep timeout
         }
         |> Async.RunSynchronously
 
-     member _.WaitTimeout() =
+    /// <summary>
+    /// Waits <c>2 * tickMilliseconds + (tickMilliseconds / 2)</c> times.
+    /// </summary>
+    /// <seealso cref="Program.tickMilliseconds" />
+    member _.WaitTimeout() =
         async {
            do! Async.Sleep timeout
         }

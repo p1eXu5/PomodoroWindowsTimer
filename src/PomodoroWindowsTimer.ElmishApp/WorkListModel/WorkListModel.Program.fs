@@ -10,10 +10,12 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkListModel
+open PomodoroWindowsTimer.ElmishApp
 
-let update (userSettings: IUserSettings) (workRepo: IWorkRepository) (logger: ILogger<WorkListModel>) (errorMessageQueue: IErrorMessageQueue) updateWorkModel msg model =
+let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logger: ILogger<WorkListModel>) (errorMessageQueue: IErrorMessageQueue) updateWorkModel msg model =
     let loadWorksTask ct =
         task {
+            let workRepo = workEventStore.GetWorkRepository ()
             let! works = workRepo.ReadAllAsync ct
             return
                 works

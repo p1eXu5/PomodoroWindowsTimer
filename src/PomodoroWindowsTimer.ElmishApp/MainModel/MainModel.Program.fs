@@ -71,6 +71,11 @@ let update
     (msg: Msg)
     (model: MainModel)
     =
+    let findWorkByIdOrCreateTask work =
+        task {
+            let workRepo = cfg.WorkEventStore.GetWorkRepository ()
+            return! workRepo.FindByIdOrCreateAsync work CancellationToken.None
+        }
 
     match msg with
     // --------------------
@@ -132,7 +137,7 @@ let update
         match cfg.CurrentWorkItemSettings.CurrentWork with
         | None -> model, Cmd.none
         | Some work ->
-            model, Cmd.OfTask.perform (cfg.WorkRepository.FindByIdOrCreateAsync work) CancellationToken.None Msg.SetCurrentWorkIfNone
+            model, Cmd.OfTask.perform findWorkByIdOrCreateTask work Msg.SetCurrentWorkIfNone
 
     | Msg.SetCurrentWorkIfNone res ->
         match res with

@@ -73,7 +73,7 @@ module TimeSliderFeature =
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Work in WorkRepository and UserSettings`` ()
-            do! Given.``WorkEventStore substitution`` ()
+            // do! Given.``WorkEventStore substitution`` ()
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
@@ -86,7 +86,7 @@ module TimeSliderFeature =
             do! When.``User skips time`` ()
 
             do! Then.``Dialog has been closed`` ()
-            do! Then.``No event have been storred (with mock)`` ()
+            do! Then.``No event have been storred`` ()
         }
         |> Scenario.runTestAsync
 
@@ -97,7 +97,7 @@ module TimeSliderFeature =
             let timePoints = [ workTP ``3 sec``; breakTP ``3 sec`` ]
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Work in WorkRepository and UserSettings`` ()
-            do! Given.``WorkEventStore substitution`` ()
+            // do! Given.``WorkEventStore substitution`` ()
             do! Given.``Initialized Program`` ()
 
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
@@ -110,7 +110,7 @@ module TimeSliderFeature =
             do! When.``User applies time as work`` ()
 
             do! Then.``Dialog has been closed`` ()
-            do! Then.``WorkIncreased event has been storred (with mock)`` "CurrentWork" 1.5<sec>
+            do! Then.``WorkIncreased event has been storred`` "CurrentWork" 1.5<sec>
         }
         |> Scenario.runTestAsync
 

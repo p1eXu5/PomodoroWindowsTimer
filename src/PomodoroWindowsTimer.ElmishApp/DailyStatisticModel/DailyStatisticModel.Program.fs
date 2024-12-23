@@ -19,7 +19,7 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 let private storeWorkEventsTask
     (timeProvider: System.TimeProvider)
-    (workEventRepository: IWorkEventRepository)
+    (workEventStore: WorkEventStore)
     (date: DateOnly)
     (eventCtor: DateTimeOffset * TimeSpan -> WorkEvent)
     (breakOffsets: (WorkId * TimeSpan) list)
@@ -30,6 +30,7 @@ let private storeWorkEventsTask
             match l with
             | [] -> return Ok ()
             | (workId, offset) :: tail ->
+                let workEventRepository = workEventStore.GetWorkEventRepository ()
                 match! workEventRepository.FindLastByWorkIdByDateAsync workId date ct with
                 | Ok lastEventOpt ->
                     let time =
@@ -54,7 +55,7 @@ let private storeWorkEventsTask
 
 let update
     (timeProvider: System.TimeProvider)
-    (workEventRepo: IWorkEventRepository)
+    (workEventStore: WorkEventStore)
     (excelBook: IExcelBook)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<DailyStatisticModel>)
@@ -62,7 +63,7 @@ let update
     (model: DailyStatisticModel)
     =
     let storeWorkEventsTask =
-        storeWorkEventsTask timeProvider workEventRepo
+        storeWorkEventsTask timeProvider workEventStore
 
     match msg with
     // -------------------------- load DailyStatistics
@@ -70,7 +71,7 @@ let update
         let period = model |> period
 
         model |> withStatistics deff
-        , Cmd.OfTask.perform (WorkEventProjector.projectAllByPeriod workEventRepo period) cts.Token (AsyncOperation.finishWithin Msg.LoadStatistics cts)
+        , Cmd.OfTask.perform workEventStore.ProjectAllWorkStatisticList (period, cts.Token) (AsyncOperation.finishWithin Msg.LoadStatistics cts)
         , Intent.None
 
     | MsgWith.``Finish of LoadStatistics`` model res ->
@@ -100,7 +101,7 @@ let update
             }
             : DateOnlyPeriod
 
-        let exportTask = WorkEvents.exportToExcelTask workEventRepo excelBook
+        let exportTask = WorkEvents.exportToExcelTask workEventStore excelBook
         model |> withExportToExcelState deff
         , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportToExcel cts)
         , Intent.None
@@ -123,7 +124,7 @@ let update
             }
             : DateOnlyPeriod
 
-        let exportTask = WorkEvents.exportEventsToFileTask workEventRepo
+        let exportTask = WorkEvents.exportEventsToFileTask workEventStore
         model |> withExportEventsState deff
         , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportEvents cts)
         , Intent.None

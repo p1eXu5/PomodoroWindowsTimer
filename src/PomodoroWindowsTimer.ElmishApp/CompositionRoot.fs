@@ -4,12 +4,10 @@ open System
 open Microsoft.Extensions.Logging
 
 open Elmish
-open Telegram.Bot
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open PomodoroWindowsTimer.TimePointQueue
-open PomodoroWindowsTimer.Looper
+
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
@@ -21,9 +19,7 @@ let compose
     (workStatisticWindowFactory: System.Func<System.Windows.Window>)
     (looper: ILooper)
     (timePointQueue: ITimePointQueue)
-    (workRepository: IWorkRepository)
-    (workEventRepository: IWorkEventRepository)
-    (activeTimePointRepository: IActiveTimePointRepository)
+    (workEventStore: WorkEventStore)
     (telegramBot: ITelegramBot)
     (windowsMinimizer: IWindowsMinimizer)
     (themeSwitcher: IThemeSwitcher)
@@ -46,19 +42,17 @@ let compose
             WindowsMinimizer = windowsMinimizer
             ThemeSwitcher = themeSwitcher
             TimePointStore = TimePointStore.initialize userSettings
-            WorkRepository = workRepository
-            WorkEventRepository = workEventRepository
+            WorkEventStore = workEventStore
             TimeProvider = timeProvider
         }
 
-    let appDialogModelCfg : AppDialogModel.Cfg =
-        {
-            UserSettings = userSettings
-            WorkEventRepository = workEventRepository
-            MainErrorMessageQueue = mainErrorMessageQueue
-        }
-
-    let workEventStore = WorkEventStore.init workEventRepository activeTimePointRepository
+    // TODO: remove
+    // let appDialogModelCfg : AppDialogModel.Cfg =
+    //     {
+    //         UserSettings = userSettings
+    //         RepositoryFactory = repositoryFactory
+    //         MainErrorMessageQueue = mainErrorMessageQueue
+    //     }
 
     // init
     let initMainModel () =
@@ -85,12 +79,12 @@ let compose
             TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore dialogErrorMessageQueue
 
         let updateWorkEventListModel =
-            WorkEventListModel.Program.update workEventRepository dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkEventListModel>())
+            WorkEventListModel.Program.update workEventStore dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkEventListModel>())
 
         let updateDailyStatisticModel =
             DailyStatisticModel.Program.update
                 timeProvider
-                workEventRepository
+                workEventStore
                 excelBook
                 dialogErrorMessageQueue
                 (loggerFactory.CreateLogger<DailyStatisticModel>())
@@ -104,7 +98,7 @@ let compose
         let updateDailyStatisticListModel =
             DailyStatisticListModel.Program.update
                 userSettings
-                workEventRepository
+                workEventStore
                 excelBook
                 dialogErrorMessageQueue
                 (loggerFactory.CreateLogger<DailyStatisticListModel>())
@@ -130,13 +124,13 @@ let compose
                 updateRollbackWorkListModel
 
         let updateWorkModel =
-            WorkModel.Program.update workRepository (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue
+            WorkModel.Program.update workEventStore (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue
 
         let updateWorkListModel =
-            WorkListModel.Program.update userSettings workRepository (loggerFactory.CreateLogger<WorkListModel>()) mainErrorMessageQueue updateWorkModel
+            WorkListModel.Program.update userSettings workEventStore (loggerFactory.CreateLogger<WorkListModel>()) mainErrorMessageQueue updateWorkModel
 
         let updateCreatingWorkModel =
-            CreatingWorkModel.Program.update workRepository mainErrorMessageQueue (loggerFactory.CreateLogger<CreatingWorkModel>())
+            CreatingWorkModel.Program.update workEventStore mainErrorMessageQueue (loggerFactory.CreateLogger<CreatingWorkModel>())
 
         let updateWorkSelectorModel =
             WorkSelectorModel.Program.update updateWorkListModel updateCreatingWorkModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())

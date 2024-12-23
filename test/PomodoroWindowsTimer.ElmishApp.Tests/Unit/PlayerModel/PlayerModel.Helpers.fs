@@ -44,5 +44,23 @@ module Sut =
         }
 
     let internal init () =
-        initWithWorkEventStore (WorkEventStore.init (Substitute.For<IWorkEventRepository>()) (Substitute.For<IActiveTimePointRepository>()))
+        let mockWorkRepository = Substitute.For<IWorkRepository>()
+        let mockWorkEventRepository = Substitute.For<IWorkEventRepository>()
+        let mockActiveTimePointRepository = Substitute.For<IActiveTimePointRepository>()
+
+        let mockRepositoryFactory = Substitute.For<IRepositoryFactory>()
+
+        mockRepositoryFactory.GetWorkRepository()
+            .Returns(mockWorkRepository)
+            |> ignore
+
+        mockRepositoryFactory.GetWorkEventRepository()
+            .Returns(mockWorkEventRepository)
+            |> ignore
+
+        mockRepositoryFactory.GetActiveTimePointRepository()
+            .Returns(mockActiveTimePointRepository)
+            |> ignore
+
+        initWithWorkEventStore (WorkEventStore.init mockRepositoryFactory)
 

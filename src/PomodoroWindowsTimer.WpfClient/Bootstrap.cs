@@ -14,6 +14,7 @@ using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.Bootstrap;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Storage;
+using PomodoroWindowsTimer.ElmishApp;
 
 namespace PomodoroWindowsTimer.WpfClient;
 
@@ -21,55 +22,55 @@ internal class Bootstrap : BootstrapBase
 {
     #region public_methods
 
-    internal void WaitDbSeeding()
-    {
-        if (IsInTest)
-        {
-            var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
-            seederService!.Semaphore.Wait();
-        }
-        else
-        {
-            var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
-            seederService!.Semaphore.Wait();
-        }
-    }
+    //internal void WaitDbSeeding()
+    //{
+    //    if (IsInTest)
+    //    {
+    //        var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
+    //        seederService!.Semaphore.Wait();
+    //    }
+    //    else
+    //    {
+    //        var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
+    //        seederService!.Semaphore.Wait();
+    //    }
+    //}
 
-    internal async Task ApplyMigrationsAsync()
-    {
-        var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+    //internal async Task ApplyMigrationsAsync()
+    //{
+    //    var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
-        var connectionString = Host.Services.GetRequiredService<IUserSettings>().DatabaseFilePath;
-        var eqInd = connectionString.IndexOf('=');
-        var dbFilePath = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
-        if (!Path.IsPathFullyQualified(dbFilePath))
-        {
-            connectionString = "Data Source=" + Path.Combine(path, dbFilePath) + ";";
-        }
+    //    var connectionString = Host.Services.GetRequiredService<IUserSettings>().DatabaseFilePath;
+    //    var eqInd = connectionString.IndexOf('=');
+    //    var dbFilePath = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
+    //    if (!Path.IsPathFullyQualified(dbFilePath))
+    //    {
+    //        connectionString = "Data Source=" + Path.Combine(path, dbFilePath) + ";";
+    //    }
 
-        var migratorPath =
-            Path.Combine(path, "migrator", "PomodoroWindowsTimer.Migrator.exe");
+    //    var migratorPath =
+    //        Path.Combine(path, "migrator", "PomodoroWindowsTimer.Migrator.exe");
 
-        if (File.Exists(migratorPath))
-        {
-            var res = await Cli.Wrap(migratorPath)
-                .WithArguments(["--connection", connectionString])
-                .WithWorkingDirectory(Path.Combine(path, "migrator"))
-                .WithValidation(CommandResultValidation.None)
-                .ExecuteBufferedAsync();
-            ;
+    //    if (File.Exists(migratorPath))
+    //    {
+    //        var res = await Cli.Wrap(migratorPath)
+    //            .WithArguments(["--connection", connectionString])
+    //            .WithWorkingDirectory(Path.Combine(path, "migrator"))
+    //            .WithValidation(CommandResultValidation.None)
+    //            .ExecuteBufferedAsync();
+    //        ;
 
-            var logger = GetLogger<Bootstrap>();
-            if (!String.IsNullOrWhiteSpace(res.StandardError))
-            {
-                logger.LogError(res.StandardError);
-            }
-            else
-            {
-                logger.LogInformation(res.StandardOutput);
-            }
-        }
-    }
+    //        var logger = GetLogger<Bootstrap>();
+    //        if (!String.IsNullOrWhiteSpace(res.StandardError))
+    //        {
+    //            logger.LogError(res.StandardError);
+    //        }
+    //        else
+    //        {
+    //            logger.LogInformation(res.StandardOutput);
+    //        }
+    //    }
+    //}
 
     public void ShowMainWindow(Window window, Func<WorkStatisticWindow> workStatisticWindowFactory)
     {
@@ -126,6 +127,7 @@ internal class Bootstrap : BootstrapBase
         services.AddUserSettings(hostBuilderCtx.Configuration);
         services.AddWorkEventStorage(hostBuilderCtx.Configuration);
         services.AddExcelBook();
+        services.AddElmishAppServices();
 
         if (!hostBuilderCtx.Configuration.GetValue<bool>("InTest"))
         {

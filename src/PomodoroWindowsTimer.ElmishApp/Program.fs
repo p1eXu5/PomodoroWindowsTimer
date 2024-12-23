@@ -18,9 +18,7 @@ let internal main
     (workStatisticWindowFactory: System.Func<System.Windows.Window>)
     (looper: ILooper)
     (timePointQueue: ITimePointQueue)
-    (workRepository: IWorkRepository)
-    (workEventRepository: IWorkEventRepository)
-    (activeTimePointRepository: IActiveTimePointRepository)
+    (workEventStore: WorkEventStore)
     (telegramBot: ITelegramBot)
     (windowsMinimizer: IWindowsMinimizer)
     (themeSwitcher: IThemeSwitcher)
@@ -37,9 +35,7 @@ let internal main
             workStatisticWindowFactory
             looper
             timePointQueue
-            workRepository
-            workEventRepository
-            activeTimePointRepository
+            workEventStore
             telegramBot
             windowsMinimizer
             themeSwitcher

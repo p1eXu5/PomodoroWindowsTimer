@@ -59,7 +59,7 @@ let ``Current Work has not been set`` () =
 let ``Have no work events in db within`` (workId: uint64) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
 
         match workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously with
         | Ok workEvents ->
@@ -73,7 +73,7 @@ let ``Have no work events in db within`` (workId: uint64) =
 let ``Work events in db exist`` (workId: uint64) (eventExpr: #Quotations.Expr seq) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
 
         match workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously with
         | Ok workEvents ->
@@ -200,7 +200,7 @@ let ``Work time is greater than`` (workId: uint64) (seconds: float<sec>) =
 let ``Work time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
         let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with
@@ -219,7 +219,7 @@ let ``Work time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSecon
 let ``Break time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeconds: float<sec>) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
         let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with
@@ -237,7 +237,7 @@ let ``Break time is between`` (workId: uint64) (minSeconds: float<sec>) (maxSeco
 let ``Break time is zero`` (workId: uint64) =
     scenario {
         let! (sut: ISut) = Scenario.getState
-        let workEventRepository = sut.ServiceProvider.GetRequiredService<IWorkEventRepository>()
+        let workEventRepository = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
         let eventsRes = workEventRepository.FindByWorkIdAsync workId CancellationToken.None |> Async.AwaitTask |> Async.RunSynchronously
 
         match eventsRes with

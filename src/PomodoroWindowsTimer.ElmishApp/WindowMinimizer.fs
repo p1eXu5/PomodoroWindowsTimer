@@ -41,6 +41,7 @@ type private Msg =
     | RestoreAllMinimized
     | RestoreAppWindow
 
+
 type WindowsMinimizer(timeProvider: System.TimeProvider) as this =
     let [<Literal>] WM_COMMAND : Int32 = 0x111;
 

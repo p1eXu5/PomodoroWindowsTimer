@@ -5,6 +5,7 @@ open System.Collections.Generic
 open Microsoft.Data.Sqlite
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.DependencyInjection.Extensions
 open Microsoft.Extensions.Logging
 
 open Elmish
@@ -21,22 +22,60 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.WpfClient
 open System.Collections.Concurrent
 open PomodoroWindowsTimer.Abstractions
+open NSubstitute
+open System.Threading
+open PomodoroWindowsTimer.Storage.Configuration
+open NPOI.XSSF.Streaming.Values
+open Microsoft.Extensions.Options
 
 type TestBootstrap () =
     inherit Bootstrap()
     let mutable _disposed = false
-
     let mutable mockRepository : MockRepository = Unchecked.defaultof<_>
 
-    // in-memory database
+    // ------------------
+    // database bottstrap
+    // ------------------
+
     let mutable inMemoryConnection : SqliteConnection = Unchecked.defaultof<_>
 
-    member _.MockRepository with get() = mockRepository
-    
-    member _.ServiceProvider with get() = base.Host.Services
+    let createInMemoryConnection () =
+        let token = Guid.NewGuid().ToString("N")
+        let connectionString = $"Data Source=workdb{token};Mode=Memory;Cache=Shared"
+        inMemoryConnection <- new SqliteConnection(connectionString)
+        inMemoryConnection.Open()
+
+
+
+        connectionString
+
+    // ------------------
+    //    properties
+    // ------------------
 
     member val MockWindowsMinimizer : IWindowsMinimizer = NSubstitute.Substitute.For<IWindowsMinimizer>() with get
 
+    /// <summary>
+    /// <see cref="MockRepository" />.
+    /// </summary>
+    member _.MockRepository with get() = mockRepository
+    
+    /// <summary>
+    /// <see cref="IServiceProvider" />.
+    /// </summary>
+    member _.ServiceProvider with get() = base.Host.Services
+
+    
+
+
+    // ------------------
+    //     overrides
+    // ------------------
+
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
+    /// <param name="disposing"></param>
     override _.Dispose(disposing: bool) =
         if not _disposed then
             if disposing then
@@ -48,14 +87,16 @@ type TestBootstrap () =
 
         base.Dispose(disposing)
 
-    override this.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
+    /// <summary>
+    /// <inheritdoc />
+    /// </summary>
+    /// <param name="hostBuilder"></param>
+    /// <param name="services"></param>
+    override _.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
+        let connectionString = createInMemoryConnection ()
+
+        // configurations overrides:
         hostBuilder.Configuration["InTest"] <- "True"
-
-        let token = Guid.NewGuid().ToString("N")
-        let connectionString = $"Data Source=workdb{token};Mode=Memory;Cache=Shared"
-        inMemoryConnection <- new SqliteConnection(connectionString)
-        inMemoryConnection.Open()
-
         hostBuilder.Configuration["WorkDb:ConnectionString"] <- connectionString
 
         services
@@ -71,39 +112,69 @@ type TestBootstrap () =
             )
             |> ignore
 
-        let userSettingsStub = new UserSettingsStub(connectionString)
-        services.AddSingleton<IUserSettings>(userSettingsStub) |> ignore
-        services.AddSingleton<IDatabaseSettings>(userSettingsStub) |> ignore
+        services.AddSingleton<WorkEventStore>(fun sp ->
+            let repositoryFactory = sp.GetRequiredService<IRepositoryFactory>()
+
+            WorkEventStore.init repositoryFactory
+        )
+        |> ignore
+
+        services.AddSingleton<IUserSettings>(fun sp ->
+            let dbOptions = sp.GetRequiredService<IOptions<WorkDbOptions>>().Value
+            UserSettingsStub(dbOptions.ConnectionString) :> IUserSettings
+        ) |> ignore
+        services.AddSingleton<IDatabaseSettings>(fun sp ->
+            sp.GetRequiredService<IUserSettings>() :?> UserSettingsStub :> IDatabaseSettings
+        ) |> ignore
 
         services.AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
 
-        services
-            .AddSingleton<IWindowsMinimizer>(fun _ ->
-                new StabWindowsMinimizer() :> IWindowsMinimizer
-            )
-            |> ignore
-
-        services
-            .AddSingleton<IThemeSwitcher>(
-                ThemeSwitcherStub.create ()
-            )
-            |> ignore
-        ()
 
     override _.ConfigureLogging(_: HostBuilderContext, loggingBuilder: ILoggingBuilder) =
         loggingBuilder.SetMinimumLevel(LogLevel.Error) |> ignore
 
+
     override _.PostConfigureHost(builder: IHostBuilder) =
         builder.AddMockRepository(
-            [ Service<IThemeSwitcher>(); Service<IWindowsMinimizer>(); Service<IWorkEventRepository>() ],
+            [ 
+                Service<IThemeSwitcher>();
+                Service<IWindowsMinimizer>();
+            ],
             TestLogWriter(TestLogger<TestBootstrap>(TestContextWriters.Default, LogOut.All)),
             (fun mr -> mockRepository <- mr)
         )
 
 
-    member this.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: ConcurrentStack<MainModel.Msg>, testDispatcher: TestDispatcher) =
-        do this.WaitDbSeeding()
-        
+    override _.StartHost (): unit = 
+        base.StartHost()
+
+        let dbSeeder = base.Host.Services.GetRequiredService<IDbSeeder>()
+
+        let res = 
+            dbSeeder.SeedDatabaseAsync(CancellationToken.None)
+            |> Async.AwaitTask
+            |> Async.RunSynchronously
+
+        match res with
+        | Error err ->
+            raise (InvalidOperationException(err))
+        | _ -> ()
+
+        let dbSettings = base.Host.Services.GetRequiredService<IDatabaseSettings>()
+        let migrator = base.Host.Services.GetRequiredService<IDbMigrator>()
+
+        let res = 
+            migrator.ApplyMigrations(dbSettings.DatabaseFilePath)
+
+        match res with
+        | Error err ->
+            raise (InvalidOperationException(err))
+        | _ -> ()
+
+
+    member _.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: ConcurrentStack<MainModel.Msg>, testDispatcher: TestDispatcher) =
+        // do this.WaitDbSeeding()
+
         let factory = base.GetElmishProgramFactory()
         let (initMainModel, updateMainModel, _, subscribe) =
             CompositionRoot.compose
@@ -111,9 +182,7 @@ type TestBootstrap () =
                 (Func<System.Windows.Window>(fun () -> Unchecked.defaultof<System.Windows.Window>))
                 factory.Looper
                 factory.TimePointQueue
-                factory.WorkRepository
-                factory.WorkEventRepository
-                factory.ActiveTimePointRepository
+                factory.WorkEventStore
                 factory.TelegramBot
                 factory.WindowsMinimizer
                 factory.ThemeSwitcher

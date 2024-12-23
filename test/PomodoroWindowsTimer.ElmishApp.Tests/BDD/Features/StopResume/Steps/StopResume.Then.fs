@@ -225,6 +225,22 @@ let ``No event have been storred (with mock)`` () =
     }
     |> Scenario.log $"Then.``{nameof ``No event have been storred (with mock)``}``"
 
+let ``No event have been storred`` () =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+
+        let workEventRepo = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
+        match
+            workEventRepo
+                .FindByWorkIdAsync (sut.ScenarioContext["CurrentWork"] :?> Work).Id CancellationToken.None
+                |> Async.AwaitTask
+                |> Async.RunSynchronously
+        with
+        | Ok res -> %res.Should().BeEmpty()
+        | Error err -> assertionExn $"Failed to obtain work events. {err}"
+    }
+    |> Scenario.log $"Then.``{nameof ``No event have been storred``}``"
+
 let ``BreakIncreased event has been storred (with mock)`` workIdKey time =
     scenario {
         let! (sut: ISut) = Scenario.getState
@@ -274,6 +290,30 @@ let ``WorkIncreased event has been storred (with mock)`` workIdKey time =
                         |> Async.RunSynchronously
             )
     }
+
+let ``WorkIncreased event has been storred`` workIdKey time =
+    scenario {
+        let! (sut: ISut) = Scenario.getState
+        let work = sut.ScenarioContext[workIdKey] :?> Work
+        do!
+            Scenario.mockSatisfiesWithin2Sec "WorkIncreased event insertion" (fun mockRepo ->
+                let workEventRepo = sut.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository()
+                match
+                    workEventRepo
+                        .FindByWorkIdAsync work.Id CancellationToken.None
+                        |> Async.AwaitTask
+                        |> Async.RunSynchronously
+                with
+                | Ok res ->
+                    %res.Should().NotBeEmpty().And.HaveLength(1)
+                    match res |> List.head with
+                    | WorkIncreased (_, t, _) ->
+                        %t.TotalSeconds.Should().BeInRange(float time, float (time + 0.5<sec>))
+                    | _ -> assertionExn "Work event is not WorkIncreased"
+                | Error err -> assertionExn $"Failed to obtain work events. {err}"
+            )
+    }
+    |> Scenario.log $"Then.``{nameof ``WorkIncreased event has been storred``}``"
 
 let ``No dialog has been shown`` () =
     scenario {

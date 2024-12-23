@@ -98,8 +98,32 @@ type TelegramBotStub () =
 
 
 module WorkEventStoreStub =
-    let initWithWorkSpentTimeList (workSpentTimeList: WorkSpentTime list) =
+
+    let init (repositoryFactory: IRepositoryFactory) =
         {
+            GetWorkRepository = fun _ -> repositoryFactory.GetWorkRepository()
+            GetWorkEventRepository = fun _ -> repositoryFactory.GetWorkEventRepository()
+
+            StoreActiveTimePointTask = fun _ -> task { return () }
+            StoreStartedWorkEventTask = fun _ -> task { return () }
+            StoreStoppedWorkEventTask = fun _ -> task { return () }
+            StoreWorkReducedEventTask = fun _ -> task { return () }
+            StoreBreakReducedEventTask = fun _ -> task { return () }
+            StoreBreakIncreasedEventTask = fun _ -> task { return () }
+            StoreWorkIncreasedEventTask = fun _ -> task { return () }
+            WorkSpentTimeListTask = fun _ -> task { return Ok [] }
+
+            ProjectByWorkIdByPeriod = fun _ -> task { return Ok [] }
+            ProjectAllWorkStatisticList = fun _ -> task { return Ok [] }
+            ProjectDailyWorkStatisticList = fun _ -> task { return Ok [] }
+        }
+
+    let initWithWorkSpentTimeList (mockWorkRepository: IWorkRepository) (mockWorkEventRepository: IWorkEventRepository) (workSpentTimeList: WorkSpentTime list) =
+        {
+            GetWorkRepository = fun _ -> mockWorkRepository
+            GetWorkEventRepository = fun _ -> mockWorkEventRepository
+
+            StoreActiveTimePointTask = fun _ -> task { return () }
             StoreStartedWorkEventTask = fun _ -> task { return () }
             StoreStoppedWorkEventTask = fun _ -> task { return () }
             StoreWorkReducedEventTask = fun _ -> task { return () }
@@ -111,5 +135,8 @@ module WorkEventStoreStub =
                     task {
                         return Ok workSpentTimeList
                     }
-            StoreActiveTimePointTask = fun _ -> task { return () }
+
+            ProjectByWorkIdByPeriod = fun _ -> task { return Ok [] }
+            ProjectAllWorkStatisticList = fun _ -> task { return Ok [] }
+            ProjectDailyWorkStatisticList = fun _ -> task { return Ok [] }
         }

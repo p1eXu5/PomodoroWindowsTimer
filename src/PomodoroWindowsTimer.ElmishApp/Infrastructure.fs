@@ -1,12 +1,11 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 open System
-open System.Threading.Tasks
-open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-open PomodoroWindowsTimer
-open PomodoroWindowsTimer.Abstractions
 
+open PomodoroWindowsTimer
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.ElmishApp
 
 
 type TimePointPrototypeStore =
@@ -131,13 +130,14 @@ module WorkEvents =
     open PomodoroWindowsTimer.Types
     open PomodoroWindowsTimer.Abstractions
 
-    let exportToExcelTask (workEventRepo: IWorkEventRepository) (excelBook: IExcelBook) =
+    let exportToExcelTask (workEventStore: WorkEventStore) (excelBook: IExcelBook) =
         let fd = SaveFileDialog()
         fd.Filter <- "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*"
         let result = fd.ShowDialog()
         if result.HasValue && result.Value then
             fun period ct ->
                 task {
+                    let workEventRepo = workEventStore.GetWorkEventRepository ()
                     let! events = workEventRepo.FindAllByPeriodAsync period ct
                     return
                         events
@@ -150,13 +150,14 @@ module WorkEvents =
                 }
 
 
-    let exportEventsToFileTask (workEventRepo: IWorkEventRepository) =
+    let exportEventsToFileTask (workEventStore: WorkEventStore) =
         let fd = SaveFileDialog()
         fd.Filter <- "Markdown files (*.fs)|*.fs|All files (*.*)|*.*"
         let result = fd.ShowDialog()
         if result.HasValue && result.Value then
             fun period ct ->
                 task {
+                    let workEventRepo = workEventStore.GetWorkEventRepository ()
                     let! eventsRes = workEventRepo.FindAllByPeriodAsync period ct
                     match eventsRes with
                     | Ok events ->

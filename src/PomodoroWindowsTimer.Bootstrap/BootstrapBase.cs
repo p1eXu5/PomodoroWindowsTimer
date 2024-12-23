@@ -107,7 +107,7 @@ public abstract class BootstrapBase : IDisposable
         return bootstrap;
     }
 
-    public void StartHost()
+    public virtual void StartHost()
     {
         Host.Start();
     }

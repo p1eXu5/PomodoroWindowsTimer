@@ -40,8 +40,7 @@ type MainModeConfig =
         WindowsMinimizer: IWindowsMinimizer
         ThemeSwitcher: IThemeSwitcher
         TimePointStore: TimePointStore
-        WorkRepository: IWorkRepository
-        WorkEventRepository: IWorkEventRepository
+        WorkEventStore: WorkEventStore
         TimeProvider: System.TimeProvider
     }
     member this.BotSettings = this.UserSettings :> IBotSettings

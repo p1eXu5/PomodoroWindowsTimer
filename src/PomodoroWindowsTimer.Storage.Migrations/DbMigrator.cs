@@ -23,31 +23,31 @@ public sealed class DbMigrator : IDbMigrator
         _logger = logger;
     }
 
-    public FSharpResult<Unit, string> ApplyMigrations(string dbFilePath)
+    public FSharpResult<Unit, string> ApplyMigrations(string connectionString)
     {
-        if (string.IsNullOrWhiteSpace(dbFilePath))
-        {
-            const string _dbFileMustBeSetError = "Database file path must be set.";
-            _logger.LogError(_dbFileMustBeSetError);
-            return FSharpResult<Unit, string>.NewError(_dbFileMustBeSetError);
-        }
+        //if (string.IsNullOrWhiteSpace(connectionString))
+        //{
+        //    const string _dbFileMustBeSetError = "Database file path must be set.";
+        //    _logger.LogError(_dbFileMustBeSetError);
+        //    return FSharpResult<Unit, string>.NewError(_dbFileMustBeSetError);
+        //}
 
-        if (!Path.IsPathFullyQualified(dbFilePath))
-        {
-            dbFilePath = Path.Combine(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-                dbFilePath
-            );
-        }
+        //if (!Path.IsPathFullyQualified(connectionString))
+        //{
+        //    connectionString = Path.Combine(
+        //        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+        //        connectionString
+        //    );
+        //}
 
-        if (!File.Exists(dbFilePath))
-        {
-            const string _dbFileNotExistError = "Database file does not exist.";
-            _logger.LogError(_dbFileNotExistError);
-            return FSharpResult<Unit, string>.NewError(_dbFileNotExistError);
-        }
+        //if (!File.Exists(connectionString))
+        //{
+        //    const string _dbFileNotExistError = "Database file does not exist.";
+        //    _logger.LogError(_dbFileNotExistError);
+        //    return FSharpResult<Unit, string>.NewError(_dbFileNotExistError);
+        //}
 
-        var connectionString = "Data Source=" + dbFilePath + ";Pooling=false";
+        //var connectionString = "Data Source=" + connectionString + ";Pooling=false";
 
         var upgrader =
             DeployChanges.To

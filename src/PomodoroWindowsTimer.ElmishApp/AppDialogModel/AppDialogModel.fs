@@ -21,7 +21,7 @@ module AppDialogModel =
     type Cfg =
         {
             UserSettings: IUserSettings
-            WorkEventRepository: IWorkEventRepository
+            RepositoryFactory: IRepositoryFactory
             MainErrorMessageQueue: IErrorMessageQueue
         }
 

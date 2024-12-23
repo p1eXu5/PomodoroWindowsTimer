@@ -56,14 +56,14 @@ let ``CurrentWork in UserSettings`` (work) =
 ///
 /// 3. Sets UserSettings.CurrentWork to created Work
 ///
-/// 4. Adds created Work to the ScenarioContext
+/// 4. Adds created Work to the ScenarioContext within key 'CurrentWork'
 let ``Work in WorkRepository and UserSettings`` () =
     scenario {
         do!
             Scenario.replaceStateWith (fun f ->
                 fun sut ->
                     let (sut': #ISut) = f sut
-                    let workRepo = sut'.ServiceProvider.GetRequiredService<IWorkRepository>()
+                    let workRepo = sut'.ServiceProvider.GetRequiredService<IRepositoryFactory>().GetWorkRepository()
                     let work = Work.generate ()
                     let idRes = 
                         workRepo.InsertAsync work.Number work.Title CancellationToken.None   

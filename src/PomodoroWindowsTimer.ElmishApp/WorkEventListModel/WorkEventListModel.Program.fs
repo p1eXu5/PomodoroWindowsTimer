@@ -5,9 +5,7 @@ open Microsoft.Extensions.Logging
 open Elmish
 open Elmish.Extensions
 
-open PomodoroWindowsTimer
-open PomodoroWindowsTimer.Abstractions
-
+open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
@@ -15,13 +13,13 @@ open PomodoroWindowsTimer.ElmishApp.Models.WorkEventListModel
 
 module Program =
 
-    let update (workEventRepo: IWorkEventRepository) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<WorkEventListModel>) msg model =
+    let update (repositoryFactory: WorkEventStore) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<WorkEventListModel>) msg model =
         match msg with
         | MsgWith.``Start of LoadEventList`` model (workId, period, deff, cts) ->
             model |> withWorkEvents deff
             , Cmd.OfTask.perform
-                (WorkEventOffsetTimeProjector.projectByWorkIdByPeriod workEventRepo workId period)
-                cts.Token
+                repositoryFactory.ProjectByWorkIdByPeriod 
+                (workId, period, cts.Token)
                 (AsyncOperation.finishWithin Msg.LoadEventList cts)
 
         | MsgWith.``Finish of LoadEventList`` model res ->

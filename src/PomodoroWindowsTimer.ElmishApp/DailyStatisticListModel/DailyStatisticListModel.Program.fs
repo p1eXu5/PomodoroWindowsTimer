@@ -17,8 +17,9 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.DailyStatisticListModel
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
-let private storeIncreasedEventTask (workEventRepository: IWorkEventRepository) increasedEventCtor (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
+let private storeIncreasedEventTask (workEventStore: WorkEventStore) increasedEventCtor (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
     task {
+        let workEventRepository = workEventStore.GetWorkEventRepository ()
         let! lastEvent = workEventRepository.FindLastByWorkIdByDateAsync workId date CancellationToken.None
 
         match lastEvent with
@@ -38,8 +39,9 @@ let private storeIncreasedEventTask (workEventRepository: IWorkEventRepository) 
             raise (InvalidOperationException(err))
     }
 
-let private storeReducedEventTask (workEventRepository: IWorkEventRepository) reducedEventCtor (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
+let private storeReducedEventTask (workEventStore: WorkEventStore) reducedEventCtor (workId: uint64) (date: DateOnly) (offset: TimeSpan) =
     task {
+        let workEventRepository = workEventStore.GetWorkEventRepository ()
         let! lastEvent = workEventRepository.FindLastByWorkIdByDateAsync workId date CancellationToken.None
 
         match lastEvent with
@@ -59,12 +61,12 @@ let private storeReducedEventTask (workEventRepository: IWorkEventRepository) re
             raise (InvalidOperationException(err))
     }
 
-let internal addWorkTimeOffset (workEventRepo: IWorkEventRepository) model am =
-    let storeWorkIncreasedEventTask = storeIncreasedEventTask workEventRepo WorkEvent.WorkIncreased
-    let storeWorkReducedEventTask = storeReducedEventTask workEventRepo WorkEvent.WorkReduced
+let internal addWorkTimeOffset (workEventStore: WorkEventStore) model am =
+    let storeWorkIncreasedEventTask = storeIncreasedEventTask workEventStore WorkEvent.WorkIncreased
+    let storeWorkReducedEventTask = storeReducedEventTask workEventStore WorkEvent.WorkReduced
 
-    let storeBreakIncreasedEventTask = storeIncreasedEventTask workEventRepo WorkEvent.BreakIncreased
-    let storeBreakReducedEventTask = storeReducedEventTask workEventRepo WorkEvent.BreakReduced
+    let storeBreakIncreasedEventTask = storeIncreasedEventTask workEventStore WorkEvent.BreakIncreased
+    let storeBreakReducedEventTask = storeReducedEventTask workEventStore WorkEvent.BreakReduced
 
     let withOffset updateStatisticf model =
         match model.DailyStatistics with
@@ -136,7 +138,7 @@ let internal addWorkTimeOffset (workEventRepo: IWorkEventRepository) model am =
 
 let update
     (userSettings: IUserSettings)
-    (workEventRepo: IWorkEventRepository)
+    (workEventStore: WorkEventStore)
     (excelBook: IExcelBook)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<DailyStatisticListModel>)
@@ -170,7 +172,7 @@ let update
         let period = model |> period
 
         model |> withDailyStatistics deff
-        , Cmd.OfTask.perform (WorkEventProjector.projectDailyByPeriod workEventRepo period) cts.Token (AsyncOperation.finishWithin Msg.LoadDailyStatistics cts)
+        , Cmd.OfTask.perform workEventStore.ProjectDailyWorkStatisticList (period, cts.Token) (AsyncOperation.finishWithin Msg.LoadDailyStatistics cts)
         , Intent.None
 
     | MsgWith.``Finish of LoadDailyStatistics`` model res ->
@@ -221,7 +223,7 @@ let update
         let addWorkTimeModel = AddWorkTimeModel.Program.update amsg am
         model |> withAddWorkTimeModel (addWorkTimeModel |> Some) |> withCmdNone |> withNoIntent
 
-    | MsgWith.AddWorkTimeOffset model am -> addWorkTimeOffset workEventRepo model am
+    | MsgWith.AddWorkTimeOffset model am -> addWorkTimeOffset workEventStore model am
 
     // -------------------------- WorkEventListDialog
     | MsgWith.LoadWorkEventListModel model (day, work) ->
@@ -246,7 +248,7 @@ let update
     // -------------------------- export excel report
     | MsgWith.``Start of ExportToExcel`` model (deff, cts) ->
         let period = model |> period
-        let exportTask = WorkEvents.exportToExcelTask workEventRepo excelBook
+        let exportTask = WorkEvents.exportToExcelTask workEventStore excelBook
         model |> withExportToExcelState deff
         , Cmd.OfTask.perform (exportTask period) cts.Token (AsyncOperation.finishWithin Msg.ExportToExcel cts)
         , Intent.None

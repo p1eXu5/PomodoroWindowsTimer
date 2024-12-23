@@ -101,7 +101,7 @@ let internal applyMigrations dbFileName =
         TestLogger<DbMigrator>(tcw)
     )
 
-    match migrator.ApplyMigrations (dataSource dbFileName) with
+    match migrator.ApplyMigrations (getConnectionString dbFileName) with
     | Ok () -> ()
     | Error err ->
         raise (InvalidOperationException(err))

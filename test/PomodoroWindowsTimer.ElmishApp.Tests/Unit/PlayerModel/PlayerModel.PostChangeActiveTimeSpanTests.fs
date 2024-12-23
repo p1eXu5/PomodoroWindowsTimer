@@ -1,5 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp.Tests.Unit.PlayerModel
 
+open PomodoroWindowsTimer.Abstractions
+
 module PostChangeActiveTimeSpanTests =
 
     open System
@@ -463,7 +465,10 @@ module PostChangeActiveTimeSpanTests =
             }
 
         let workSpentTimeList : WorkSpentTime list = []
-        let sut = Sut.initWithWorkEventStore (WorkEventStoreStub.initWithWorkSpentTimeList workSpentTimeList)
+
+        let mockWorkRepository = Substitute.For<IWorkRepository>()
+        let mockWorkEventRepository = Substitute.For<IWorkEventRepository>()
+        let sut = Sut.initWithWorkEventStore (WorkEventStoreStub.initWithWorkSpentTimeList mockWorkRepository mockWorkEventRepository workSpentTimeList)
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)
@@ -560,7 +565,9 @@ module PostChangeActiveTimeSpanTests =
                 RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
             }
         let workSpentTimeList : WorkSpentTime list = []
-        let sut = Sut.initWithWorkEventStore (WorkEventStoreStub.initWithWorkSpentTimeList workSpentTimeList)
+        let mockWorkRepository = Substitute.For<IWorkRepository>()
+        let mockWorkEventRepository = Substitute.For<IWorkEventRepository>()
+        let sut = Sut.initWithWorkEventStore (WorkEventStoreStub.initWithWorkSpentTimeList mockWorkRepository mockWorkEventRepository workSpentTimeList)
 
         // act
         let (afterPlayerModel, cmd, intent) =  beforePlayerModel |> sut.Update (Work.generate () |> Some) (AsyncOperation.startUnit PlayerModel.Msg.PostChangeActiveTimeSpan)

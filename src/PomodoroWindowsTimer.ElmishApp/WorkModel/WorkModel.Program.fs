@@ -5,15 +5,26 @@ open Microsoft.Extensions.Logging
 open Elmish
 open Elmish.Extensions
 
-open PomodoroWindowsTimer.Abstractions
-
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkModel
+open PomodoroWindowsTimer.ElmishApp
 
 
-let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessageQueue: IErrorMessageQueue) msg model =
+let private updateWorkTask (workEventStore: WorkEventStore) (work, cancellationToken) =
+    task {
+        let workRepo = workEventStore.GetWorkRepository ()
+        return! workRepo.UpdateAsync work cancellationToken
+    }
+
+let private insertWorkTask (workEventStore: WorkEventStore) (number, title, cancellationToken) =
+    task {
+        let workRepo = workEventStore.GetWorkRepository ()
+        return! workRepo.InsertAsync number title cancellationToken
+    }
+
+let update (workEventStore: WorkEventStore) (logger: ILogger<WorkModel>) (errorMessageQueue: IErrorMessageQueue) msg model =
     match msg with
     | Msg.SetNumber n -> model |> withNumber n |> withCmdNone |> withNoIntent
     | Msg.SetTitle t -> model |> withTitle t |> withCmdNone |> withNoIntent
@@ -31,7 +42,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
 
         (
             model |> withUpdateState deff
-            , Cmd.OfTask.perform (workRepo.UpdateAsync updateWork) cts.Token (AsyncOperation.finishWithin Msg.Update cts)
+            , Cmd.OfTask.perform (updateWorkTask workEventStore) (updateWork, cts.Token) (AsyncOperation.finishWithin Msg.Update cts)
         )
         |> withNoIntent
 
@@ -46,7 +57,7 @@ let update (workRepo: IWorkRepository) (logger: ILogger<WorkModel>) (errorMessag
     | MsgWith.``Start of CreateNew`` model (deff, cts) ->
         (
             model |> withCreateNewState deff
-            , Cmd.OfTask.perform (workRepo.InsertAsync model.EditableNumber model.EditableTitle) cts.Token (AsyncOperation.finishWithin Msg.CreateNew cts)
+            , Cmd.OfTask.perform (insertWorkTask workEventStore) (model.EditableNumber, model.EditableTitle, cts.Token) (AsyncOperation.finishWithin Msg.CreateNew cts)
         )
         |> withNoIntent
 

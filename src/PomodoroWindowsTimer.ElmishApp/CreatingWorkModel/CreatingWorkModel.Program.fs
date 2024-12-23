@@ -5,17 +5,16 @@ open Microsoft.Extensions.Logging
 open Elmish
 open Elmish.Extensions
 
-open PomodoroWindowsTimer.Abstractions
-
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.CreatingWorkModel
 
-let update (workRepo: IWorkRepository) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<CreatingWorkModel>) msg model =
+let update (workEventStore: WorkEventStore) (errorMessageQueue: IErrorMessageQueue) (logger: ILogger<CreatingWorkModel>) msg model =
     let createWorkTask number title ct =
         task {
+            let workRepo = workEventStore.GetWorkRepository ()
             let! res = workRepo.InsertAsync number title ct
             return
                 res |> Result.map fst

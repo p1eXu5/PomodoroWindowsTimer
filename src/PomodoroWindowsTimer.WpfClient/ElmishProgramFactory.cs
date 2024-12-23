@@ -3,6 +3,7 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PomodoroWindowsTimer.Abstractions;
+using PomodoroWindowsTimer.ElmishApp;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 
 namespace PomodoroWindowsTimer.WpfClient;
@@ -10,9 +11,7 @@ namespace PomodoroWindowsTimer.WpfClient;
 internal sealed class ElmishProgramFactory(
     ILooper looper,
     ITimePointQueue timePointQueue,
-    IWorkRepository workRepository,
-    IWorkEventRepository workEventRepository,
-    IActiveTimePointRepository activeTimePointRepository,
+    WorkEventStore workEventStore,
     ITelegramBot telegramBot,
     IWindowsMinimizer windowsMinimizer,
     IThemeSwitcher themeSwitcher,
@@ -24,12 +23,9 @@ internal sealed class ElmishProgramFactory(
     ILoggerFactory loggerFactory
 )
 {
-
     internal ILooper Looper => looper;
     internal ITimePointQueue TimePointQueue => timePointQueue;
-    internal IWorkRepository WorkRepository => workRepository;
-    internal IWorkEventRepository WorkEventRepository => workEventRepository;
-    internal IActiveTimePointRepository ActiveTimePointRepository => activeTimePointRepository;
+    internal WorkEventStore WorkEventStore => workEventStore;
     internal ITelegramBot TelegramBot => telegramBot;
     internal IWindowsMinimizer WindowsMinimizer => windowsMinimizer;
     internal IThemeSwitcher ThemeSwitcher => themeSwitcher;
@@ -47,9 +43,7 @@ internal sealed class ElmishProgramFactory(
             workStatisticWindowFactory,
             Looper,
             TimePointQueue,
-            WorkRepository,
-            WorkEventRepository,
-            ActiveTimePointRepository,
+            WorkEventStore,
             TelegramBot,
             WindowsMinimizer,
             ThemeSwitcher,
