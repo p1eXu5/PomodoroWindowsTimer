@@ -33,6 +33,7 @@
     <Compile Include="RepositoryFactory.fs" />
     <Compile Include="DbSeeder.fs" />
     <Compile Include="CliDbMigrator.fs" />
+    <Compile Include="DbFileRevisor.fs" />
     <Compile Include="DbSeederHostedService.fs" />
     <Compile Include="TestDbSeederHostedService.fs" />
     <Compile Include="DependencyInjectionExtensions.fs" />
