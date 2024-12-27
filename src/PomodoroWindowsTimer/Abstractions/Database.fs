@@ -4,11 +4,28 @@ open System
 open System.Threading
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
+open System.Runtime.CompilerServices
 
 type IDatabaseSettings =
     interface
         abstract DatabaseFilePath : string with get, set
+        abstract Pooling : bool with get
     end
+
+[<Extension>]
+type DatabaseSettingsExtensions =
+    [<Extension>]
+    static member GetConnectionString(dbSettings: IDatabaseSettings) =
+        $"Data Source={dbSettings.DatabaseFilePath};Pooling={dbSettings.Pooling};"
+
+    static member Create(dbFilePath: string, pooling: bool) =
+        { new IDatabaseSettings with 
+            member _.DatabaseFilePath
+                with get () = dbFilePath
+                and set _ = ()
+            member _.Pooling 
+                with get () = pooling
+        }
 
 
 type IWorkRepository =
@@ -53,7 +70,9 @@ type IActiveTimePointRepository =
 
 type IRepositoryFactory =
     interface
+        abstract Replicate: IDatabaseSettings -> IRepositoryFactory
         abstract ReadDbTablesAsync: ?cancellationToken: CancellationToken -> Task<Result<string list, string>>
+        abstract ReadRowCountAsync: tableName: string * ?cancellationToken: CancellationToken -> Task<Result<int, string>>
         abstract GetWorkRepository: unit -> IWorkRepository
         abstract GetWorkEventRepository: unit -> IWorkEventRepository
         abstract GetActiveTimePointRepository: unit -> IActiveTimePointRepository
@@ -62,11 +81,18 @@ type IRepositoryFactory =
 
 type IDbSeeder =
     interface
+        abstract RepositoryFactory: IRepositoryFactory with get
         abstract SeedDatabaseAsync: CancellationToken -> Task<Result<unit, string>>
+        abstract SeedDatabaseAsync: dbSettings: IDatabaseSettings * cancellationToken: CancellationToken -> Task<Result<unit, string>>
     end
 
 type IDbMigrator =
     interface
-        abstract ApplyMigrations: dbFilePath: string -> Result<Unit, string>
-        abstract ApplyMigrationsAsync: dbFilePath: string -> cancellationToken: CancellationToken -> Task<Result<Unit, string>>
+        abstract ApplyMigrations: dbSettings: IDatabaseSettings -> Result<Unit, string>
+        abstract ApplyMigrationsAsync: dbSettings: IDatabaseSettings -> cancellationToken: CancellationToken -> Task<Result<Unit, string>>
+    end
+
+type IDbFileRevisor =
+    interface
+        abstract TryUpdateDatabaseFile: IDatabaseSettings -> CancellationToken -> Task<Result<unit, string>>
     end

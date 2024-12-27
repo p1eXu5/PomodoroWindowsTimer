@@ -15,7 +15,7 @@ type OpenDbConnection = CancellableTask<Result<DbConnection, string>>
 
 let openDbConnection (options: IDatabaseSettings) (logger: ILogger) : OpenDbConnection =
         cancellableTask {
-            let dbConnection = new SqliteConnection(options.DatabaseFilePath)
+            let dbConnection = new SqliteConnection(options.GetConnectionString())
             try
                 do! dbConnection.OpenAsync
                 return dbConnection :> DbConnection |> Ok

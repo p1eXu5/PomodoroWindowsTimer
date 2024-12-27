@@ -4,8 +4,8 @@
                     >
 
     <Style x:Key="PomodoroDialogButton"
-           BasedOn="{StaticResource MaterialDesignFlatButton}"
            TargetType="Button"
+           BasedOn="{StaticResource MaterialDesignFlatButton}"
            >
         <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
         <Setter Property="Margin" Value="10" />
@@ -13,8 +13,8 @@
     </Style>
 
     <Style x:Key="PomodoroOkDialogButton"
-           BasedOn="{StaticResource PomodoroDialogButton}"
            TargetType="Button"
+           BasedOn="{StaticResource PomodoroDialogButton}"
            >
         <Setter Property="CommandParameter">
             <Setter.Value>
@@ -27,8 +27,8 @@
     </Style>
 
     <Style x:Key="PomodoroCancelDialogButton"
-           BasedOn="{StaticResource PomodoroDialogButton}"
            TargetType="Button"
+           BasedOn="{StaticResource PomodoroDialogButton}"
            >
         <Setter Property="CommandParameter">
             <Setter.Value>

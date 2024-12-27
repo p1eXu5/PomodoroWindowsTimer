@@ -20,7 +20,7 @@ open PomodoroWindowsTimer.Abstractions
 [<Category("DB. WorkEvent")>]
 module WorkEventRepositoryTests =
 
-    let private dbFileName = $"work_event_test_{Guid.NewGuid()}.db"
+    let mutable private _dbSettings =  Unchecked.defaultof<IDatabaseSettings>
 
     let mutable private workId1 = Unchecked.defaultof<uint64>
     let mutable private work1 = Unchecked.defaultof<Work>
@@ -61,9 +61,10 @@ module WorkEventRepositoryTests =
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            _repositoryFactory <- repositoryFactory dbFileName
+            _dbSettings <- DatabaseSettingsExtensions.Create($"work_event_test_{Guid.NewGuid()}.db", false)
+            _repositoryFactory <- repositoryFactory _dbSettings
             do! seedDataBase _repositoryFactory
-            do applyMigrations dbFileName
+            do applyMigrations _dbSettings
 
             let! res = createWork ()
             match res with
@@ -100,7 +101,7 @@ module WorkEventRepositoryTests =
     [<OneTimeTearDown>]
     let TearDown () =
         task {
-            let dataSource = dbFileName |> dataSource
+            let dataSource = _dbSettings.DatabaseFilePath
             if File.Exists(dataSource) then
                 File.Delete(dataSource)
         }

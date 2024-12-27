@@ -15,8 +15,8 @@
     </Style>
 
     <Style x:Key="st_WorkEditButton"
-           BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
            TargetType="Button"
+           BasedOn="{StaticResource MaterialDesignFlatDarkBgButton}"
            >
         <Setter Property="ToolTip" Value="Edit" />
         <Setter Property="VerticalAlignment" Value="Stretch" />

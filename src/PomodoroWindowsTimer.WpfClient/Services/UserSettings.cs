@@ -189,7 +189,7 @@ internal class UserSettings : IUserSettings
             string databaseFilePath = Properties.Settings.Default.DatabaseFilePath;
             if (string.IsNullOrWhiteSpace(databaseFilePath))
             {
-                databaseFilePath = _workDbOptions.ConnectionString;
+                databaseFilePath = _workDbOptions.DatabaseFilePath;
                 Properties.Settings.Default.DatabaseFilePath = databaseFilePath;
             }
 
@@ -199,6 +199,14 @@ internal class UserSettings : IUserSettings
         {
             Properties.Settings.Default.DatabaseFilePath = value;
             Properties.Settings.Default.Save();
+        }
+    }
+
+    public bool Pooling
+    {
+        get
+        {
+            return Properties.Settings.Default.Pooling;
         }
     }
 

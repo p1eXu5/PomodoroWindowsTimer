@@ -24,7 +24,7 @@ internal sealed class OptionsHandler : IOptionsHandler
         {
             _logger.LogInformation("Starting migration...");
 
-            var result = _dbMigrator.ApplyMigrations(success.Options.ConnectionString);
+            var result = _dbMigrator.ApplyMigrations(success.Options);
 
             if (result.IsError)
             {

@@ -16,18 +16,18 @@ open PomodoroWindowsTimer.Testing.Fakers
 [<Category("DB.")>]
 module RepositoryFactoryTests =
 
-    let mutable private dbFileName = Unchecked.defaultof<string>
+    let mutable private _dbSettings = Unchecked.defaultof<IDatabaseSettings>
 
     let private repositoryFactory () =
-        repositoryFactory dbFileName
+        repositoryFactory _dbSettings
 
     [<SetUp>]
     let SetUp () =
-        dbFileName <- $"repository_factory_test_{Guid.NewGuid()}.db"
+        _dbSettings <- DatabaseSettingsExtensions.Create($"repository_factory_test_{Guid.NewGuid()}.db", false)
 
     [<TearDown>]
     let TearDown () =
-        let dataSource = dbFileName |> dataSource
+        let dataSource = _dbSettings.DatabaseFilePath
         if File.Exists(dataSource) then
             File.Delete(dataSource)
         

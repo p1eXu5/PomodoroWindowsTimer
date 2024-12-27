@@ -28,7 +28,7 @@ type DependencyInjectionExtensions() =
             services
                 .AddOptions<WorkDbOptions>()
                 .Configure(fun options ->
-                    options.ConnectionString <- "Data Source=work.db;"
+                    options.DatabaseFilePath <- "work.db"
                 )
                 .ValidateDataAnnotations()
                 .ValidateOnStart()
@@ -37,6 +37,11 @@ type DependencyInjectionExtensions() =
         services.TryAddSingleton<IRepositoryFactory, RepositoryFactory>()
         services.TryAddSingleton<IDbSeeder, DbSeeder>()
         services.TryAddSingleton<IDbMigrator, PomodoroWindowsTimer.Storage.Migrations.DbMigrator>()
+        services.TryAddSingleton<IDbFileRevisor>(fun sp ->
+            let dbSeeder = sp.GetRequiredService<IDbSeeder>()
+            let dbMigrator = sp.GetRequiredService<IDbMigrator>()
+            DbFileRevisor.init dbSeeder dbMigrator
+        )
 
         // if configuration.GetValue<bool>("InTest") |> not then
         //     services.AddHostedService<DbSeederHostedService>()

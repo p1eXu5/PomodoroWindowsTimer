@@ -19,7 +19,7 @@ open PomodoroWindowsTimer.Testing.Fakers
 
 [<Category("DB. ActiveTimePoint")>]
 module ActiveTimePointRepositoryTests =
-    let mutable private dbFileName = Unchecked.defaultof<string>
+    let mutable private _dbSettings = Unchecked.defaultof<IDatabaseSettings>
 
     let mutable _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
 
@@ -30,15 +30,15 @@ module ActiveTimePointRepositoryTests =
     [<SetUp>]
     let Setup () =
         task {
-            dbFileName <- $"active_time_point_test_{Guid.NewGuid()}.db"
-            _repositoryFactory <- repositoryFactory dbFileName
+            _dbSettings <- DatabaseSettingsExtensions.Create($"active_time_point_test_{Guid.NewGuid()}.db", false)
+            _repositoryFactory <- repositoryFactory _dbSettings
             do! seedDataBase _repositoryFactory
-            do applyMigrations dbFileName
+            do applyMigrations _dbSettings
         }
 
     [<TearDown>]
     let TearDown () =
-        let dataSource = dbFileName |> dataSource
+        let dataSource = _dbSettings.DatabaseFilePath
         if File.Exists(dataSource) then
             File.Delete(dataSource)
 

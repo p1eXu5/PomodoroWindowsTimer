@@ -23,7 +23,7 @@ public sealed class DbMigrator : IDbMigrator
         _logger = logger;
     }
 
-    public FSharpResult<Unit, string> ApplyMigrations(string connectionString)
+    public FSharpResult<Unit, string> ApplyMigrations(IDatabaseSettings databaseSettings)
     {
         //if (string.IsNullOrWhiteSpace(connectionString))
         //{
@@ -51,7 +51,7 @@ public sealed class DbMigrator : IDbMigrator
 
         var upgrader =
             DeployChanges.To
-                .SQLiteDatabase(connectionString)
+                .SQLiteDatabase(databaseSettings.GetConnectionString())
                 .WithScriptsAndCodeEmbeddedInAssembly(typeof(Script005_FillActiveTimePointId).Assembly)
                 .AddLogger(_upgradeEngineLogger)
                 .WithTransaction()
@@ -89,9 +89,9 @@ public sealed class DbMigrator : IDbMigrator
     }
 
 
-    public Task<FSharpResult<Unit, string>> ApplyMigrationsAsync(string dbFilePath, CancellationToken cancellationToken)
+    public Task<FSharpResult<Unit, string>> ApplyMigrationsAsync(IDatabaseSettings databaseSettings, CancellationToken cancellationToken)
     {
-        var res = ApplyMigrations(dbFilePath);
+        var res = ApplyMigrations(databaseSettings);
         return Task.FromResult(res);
     }
 }

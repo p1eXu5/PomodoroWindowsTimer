@@ -20,6 +20,10 @@ module internal RepositoryFactory =
             SELECT name FROM sqlite_master WHERE type='table';
             """
 
+        let SELECT_COUNT tableName = $"""
+            SELECT COUNT(*) FROM %s{tableName};
+            """
+
     type Deps =
         {
             OpenDbConnection: OpenDbConnection
@@ -47,6 +51,27 @@ module internal RepositoryFactory =
                 return! Error (ex.Format("Failed to read db tables."))
         }
 
+    let readRowCount deps tableName =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.OpenDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_COUNT tableName,
+                    cancellationToken = ct
+                )
+
+            try
+                let! rowCount = dbConnection.ExecuteScalarAsync<int>(command)
+                return rowCount
+            with ex ->
+                deps.Logger.LogError(ex, "Failed to read row count.")
+                return! Error (ex.Format("Failed to read row count."))
+        }
+
 
 type internal RepositoryFactory(
     options: IDatabaseSettings,
@@ -61,14 +86,30 @@ type internal RepositoryFactory(
             Logger = logger
         }
 
+    member _.Replicate(dbSettings: IDatabaseSettings) =
+        RepositoryFactory(dbSettings, timeProvider, loggerFactory, logger)
+
     member _.ReadDbTablesAsync (?cancellationToken) =
         let ct = defaultArg cancellationToken CancellationToken.None
         RepositoryFactory.readDbTablesAsync deps ct
+
+    member _.ReadRowCountAsync (tableName, ?cancellationToken) =
+        let ct = defaultArg cancellationToken CancellationToken.None
+        RepositoryFactory.readRowCount deps tableName ct
+
 
     interface IRepositoryFactory with
         member this.ReadDbTablesAsync (?cancellationToken) =
             let ct = defaultArg cancellationToken CancellationToken.None
             this.ReadDbTablesAsync(ct)
+
+        member this.Replicate(dbSettings: IDatabaseSettings) =
+            this.Replicate(dbSettings)
+
+        member this.ReadRowCountAsync (tableName, ?cancellationToken) =
+            let ct = defaultArg cancellationToken CancellationToken.None
+            this.ReadRowCountAsync(tableName, ct)
+
 
         member _.GetWorkRepository () : IWorkRepository = 
             WorkRepository(options, timeProvider, loggerFactory.CreateLogger<WorkRepository>()) :> IWorkRepository

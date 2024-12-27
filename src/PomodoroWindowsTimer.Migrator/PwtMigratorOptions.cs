@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommandLine;
+﻿using CommandLine;
 using p1eXu5.CliBootstrap.CommandLineParser.Options;
+using PomodoroWindowsTimer.Abstractions;
 
 namespace PomodoroWindowsTimer.Migrator;
 
-internal sealed record PwtMigratorOptions : CliOptions
+internal sealed record PwtMigratorOptions : CliOptions, IDatabaseSettings
 {
-    [Option(longName: "connection", HelpText = "Connection string", Required = true)]
-    public required string ConnectionString { get; init; }
+    [Option(longName: "database-file-path", HelpText = "Database file path", Required = true)]
+    public required string DatabaseFilePath { get; set; }
+
+    [Option(longName: "pooling", HelpText = "Pooling", Required = false)]
+    public bool Pooling { get; set; }
 }

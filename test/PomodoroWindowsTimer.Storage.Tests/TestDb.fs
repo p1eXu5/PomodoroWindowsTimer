@@ -33,25 +33,21 @@ let internal dataSource dbFileName =
         dbFileName
     )
 
-let private connectionStrings = ConcurrentDictionary<string, string>()
+//let private connectionStrings = ConcurrentDictionary<string, string>()
 
-let internal getConnectionString dbFileName =
-    match connectionStrings.TryGetValue(dbFileName) with
-    | true, connStr -> connStr
-    | false, _ ->
-        let dataSource = dbFileName |> dataSource
-        if File.Exists(dataSource) then
-            File.Delete(dataSource)
-        connectionStrings[dbFileName] <- $"Data Source=%s{dataSource};Pooling=false"
-        connectionStrings[dbFileName]
+//let internal getConnectionString dbFileName =
+//    match connectionStrings.TryGetValue(dbFileName) with
+//    | true, connStr -> connStr
+//    | false, _ ->
+//        let dataSource = dbFileName |> dataSource
+//        if File.Exists(dataSource) then
+//            File.Delete(dataSource)
+//        connectionStrings[dbFileName] <- $"Data Source=%s{dataSource};Pooling=false"
+//        connectionStrings[dbFileName]
 
 
 let internal databaseSettings dbFileName =
-    { new IDatabaseSettings with
-        member _.DatabaseFilePath
-            with get() = getConnectionString dbFileName
-            and set _ = ()
-    }
+    DatabaseSettingsExtensions.Create(dbFileName, false)
 
 let internal workRepository dbFileName =
     new WorkRepository(
@@ -77,10 +73,9 @@ let internal activeTimePointRepository dbFileName =
     )
     :> IActiveTimePointRepository
 
-let internal repositoryFactory dbFileName =
-    let options = databaseSettings dbFileName
+let internal repositoryFactory dbSettings =
     RepositoryFactory(
-        options,
+        dbSettings,
         System.TimeProvider.System,
         TestLoggerFactory.CreateWith(TestContext.Progress, TestContext.Out),
         TestLogger<RepositoryFactory>(tcw)
@@ -95,13 +90,13 @@ let internal seedDataBase (repositoryFactory: IRepositoryFactory) =
             raise (InvalidOperationException(err))
     }
 
-let internal applyMigrations dbFileName =
+let internal applyMigrations (dbSettings: IDatabaseSettings) =
     let migrator = DbMigrator(
         TestLogger<DbUp.Engine.UpgradeEngine>(tcw),
         TestLogger<DbMigrator>(tcw)
     )
 
-    match migrator.ApplyMigrations (getConnectionString dbFileName) with
+    match migrator.ApplyMigrations (dbSettings) with
     | Ok () -> ()
     | Error err ->
         raise (InvalidOperationException(err))

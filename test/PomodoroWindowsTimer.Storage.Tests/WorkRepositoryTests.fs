@@ -17,9 +17,8 @@ open PomodoroWindowsTimer.Testing.Fakers
 [<Category("DB. Work")>]
 module WorkRepositoryTests =
 
-    let private dbFileName = $"work_test_{Guid.NewGuid()}.db"
-
-    let mutable _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
+    let mutable private _dbSettings = Unchecked.defaultof<IDatabaseSettings>
+    let mutable private _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
 
     let private workRepository () = _repositoryFactory.GetWorkRepository ()
     let private workEventRepository () = _repositoryFactory.GetWorkEventRepository ()
@@ -28,15 +27,16 @@ module WorkRepositoryTests =
     [<OneTimeSetUp>]
     let Setup () =
         task {
-            _repositoryFactory <- repositoryFactory dbFileName
+            _dbSettings <- DatabaseSettingsExtensions.Create($"work_test_{Guid.NewGuid()}.db", false)
+            _repositoryFactory <- repositoryFactory _dbSettings
             do! seedDataBase _repositoryFactory
-            do applyMigrations dbFileName
+            do applyMigrations _dbSettings
         }
 
     [<OneTimeTearDown>]
     let TearDown () =
         task {
-            let dataSource = dbFileName |> dataSource
+            let dataSource = _dbSettings.DatabaseFilePath
             if File.Exists(dataSource) then
                 File.Delete(dataSource)
         }

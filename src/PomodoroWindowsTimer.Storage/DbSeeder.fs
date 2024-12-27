@@ -9,12 +9,8 @@ open PomodoroWindowsTimer.Abstractions
 /// Seeds init database.
 /// </summary>
 type DbSeeder(repositoryFactory: IRepositoryFactory, logger: ILogger<DbSeeder>) =
-    /// <summary>
-    /// Creates two tables - <c>`work`</c> (<see cref="PomodoroWindowsTimer.Storage.WorkRepository.Sql.CREATE_TABLE" />)
-    /// and <c>`work_event`</c> (<see cref="PomodoroWindowsTimer.Storage.WorkEventRepository.Sql.CREATE_TABLE" />).
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    member _.SeedDatabaseAsync(cancellationToken: CancellationToken) : Task<Result<unit, string>> =
+
+    let seedDatabaseAsync (repositoryFactory: IRepositoryFactory) (cancellationToken: CancellationToken) =
         task {
             let workRepository = repositoryFactory.GetWorkRepository() :?> WorkRepository
             let! res = workRepository.CreateTableAsync(cancellationToken)
@@ -28,7 +24,24 @@ type DbSeeder(repositoryFactory: IRepositoryFactory, logger: ILogger<DbSeeder>) 
                 return res
         }
 
+    member _.RepositoryFactory with get () = repositoryFactory
+
+    /// <summary>
+    /// Creates two tables - <c>`work`</c> (<see cref="PomodoroWindowsTimer.Storage.WorkRepository.Sql.CREATE_TABLE" />)
+    /// and <c>`work_event`</c> (<see cref="PomodoroWindowsTimer.Storage.WorkEventRepository.Sql.CREATE_TABLE" />).
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    member _.SeedDatabaseAsync(cancellationToken: CancellationToken) : Task<Result<unit, string>> =
+        seedDatabaseAsync repositoryFactory cancellationToken
+
+    member _.SeedDatabaseAsync(databaseSettings: IDatabaseSettings, cancellationToken: CancellationToken) =
+        let repositoryFactory = repositoryFactory.Replicate(databaseSettings)
+        seedDatabaseAsync repositoryFactory cancellationToken
+
+
     interface IDbSeeder with
+        member this.RepositoryFactory = this.RepositoryFactory
         member this.SeedDatabaseAsync (cancellationToken: CancellationToken) : Task<Result<unit,string>> = 
             this.SeedDatabaseAsync(cancellationToken)
-
+        member this.SeedDatabaseAsync(databaseSettings: IDatabaseSettings, cancellationToken: CancellationToken) =
+            this.SeedDatabaseAsync(databaseSettings, cancellationToken)

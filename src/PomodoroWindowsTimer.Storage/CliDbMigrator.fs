@@ -15,16 +15,16 @@ open System.Threading
 /// <summary>
 /// Runs migrator.
 /// </summary>
-type CliDbMigrator(userSettings: IDatabaseSettings, logger: ILogger<CliDbMigrator>) =
+type CliDbMigrator(logger: ILogger<CliDbMigrator>) =
 
     /// <summary>
     /// Runs migrator.
     /// </summary>
-    member _.ApplyMigrationsAsync(cancellationToken: CancellationToken) : Task<Result<unit, string>> =
+    member _.ApplyMigrationsAsync(databaseSettings: IDatabaseSettings, cancellationToken: CancellationToken) : Task<Result<unit, string>> =
         task {
             let path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
 
-            let databaseFilePath = userSettings.DatabaseFilePath
+            let databaseFilePath = databaseSettings.DatabaseFilePath
             let eqInd = databaseFilePath.IndexOf('=')
             let dbFilePath = databaseFilePath.Substring(eqInd + 1, databaseFilePath.Length - eqInd - 2)
 
@@ -58,11 +58,11 @@ type CliDbMigrator(userSettings: IDatabaseSettings, logger: ILogger<CliDbMigrato
         }
 
     interface IDbMigrator with
-        member this.ApplyMigrations (dbFilePath: string) : Result<unit, string> = 
-            this.ApplyMigrationsAsync(CancellationToken.None)
+        member this.ApplyMigrations (databaseSettings: IDatabaseSettings) : Result<unit, string> = 
+            this.ApplyMigrationsAsync(databaseSettings, CancellationToken.None)
             |> Async.AwaitTask
             |> Async.RunSynchronously
 
-        member this.ApplyMigrationsAsync _ ct : Task<Result<unit, string>> = 
-            this.ApplyMigrationsAsync(ct)
+        member this.ApplyMigrationsAsync (databaseSettings: IDatabaseSettings) ct : Task<Result<unit, string>> = 
+            this.ApplyMigrationsAsync(databaseSettings, ct)
 

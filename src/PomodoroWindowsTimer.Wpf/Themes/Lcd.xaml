@@ -31,10 +31,10 @@
                         <Grid>
                             <Grid Margin="1">
                                 <!--  LCD  -->
-                                <ContentPresenter Margin="{TemplateBinding Control.Padding}"
+                                <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
+                                                  Margin="{TemplateBinding Control.Padding}"
                                                   HorizontalAlignment="{TemplateBinding Control.HorizontalContentAlignment}"
                                                   VerticalAlignment="{TemplateBinding Control.VerticalContentAlignment}"
-                                                  Content="{TemplateBinding ContentControl.Content}"
                                                   ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
                                                   ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
                                                   SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"

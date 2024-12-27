@@ -121,7 +121,7 @@ type TestBootstrap () =
 
         services.AddSingleton<IUserSettings>(fun sp ->
             let dbOptions = sp.GetRequiredService<IOptions<WorkDbOptions>>().Value
-            UserSettingsStub(dbOptions.ConnectionString) :> IUserSettings
+            UserSettingsStub(dbOptions.GetConnectionString()) :> IUserSettings
         ) |> ignore
         services.AddSingleton<IDatabaseSettings>(fun sp ->
             sp.GetRequiredService<IUserSettings>() :?> UserSettingsStub :> IDatabaseSettings
@@ -164,7 +164,7 @@ type TestBootstrap () =
         let migrator = base.Host.Services.GetRequiredService<IDbMigrator>()
 
         let res = 
-            migrator.ApplyMigrations(dbSettings.DatabaseFilePath)
+            migrator.ApplyMigrations(dbSettings)
 
         match res with
         | Error err ->

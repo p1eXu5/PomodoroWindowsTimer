@@ -156,13 +156,33 @@ namespace PomodoroWindowsTimer.WpfClient.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("work.db")]
         public string DatabaseFilePath {
             get {
                 return ((string)(this["DatabaseFilePath"]));
             }
             set {
                 this["DatabaseFilePath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Pooling {
+            get {
+                return ((bool)(this["Pooling"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection RecentDatabaseFiles {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["RecentDatabaseFiles"]));
+            }
+            set {
+                this["RecentDatabaseFiles"] = value;
             }
         }
     }

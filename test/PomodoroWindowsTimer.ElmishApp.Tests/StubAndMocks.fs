@@ -55,7 +55,8 @@ type UserSettingsStub (connectionString: string) =
 
     interface IDatabaseSettings with
         member _.DatabaseFilePath with get () = dict["DatabaseFilePath"] :?> string and set v = dict["DatabaseFilePath"] <- v
-        
+        member _.Pooling
+            with get (): bool = false
 
 
 [<RequireQualifiedAccess>]
