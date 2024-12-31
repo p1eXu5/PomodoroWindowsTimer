@@ -168,10 +168,10 @@ namespace PomodoroWindowsTimer.WpfClient.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool Pooling {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DatabasePooling {
             get {
-                return ((bool)(this["Pooling"]));
+                return ((bool)(this["DatabasePooling"]));
             }
         }
         
@@ -183,6 +183,24 @@ namespace PomodoroWindowsTimer.WpfClient.Properties {
             }
             set {
                 this["RecentDatabaseFiles"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DatabaseMode {
+            get {
+                return ((string)(this["DatabaseMode"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DatabaseCache {
+            get {
+                return ((string)(this["DatabaseCache"]));
             }
         }
     }

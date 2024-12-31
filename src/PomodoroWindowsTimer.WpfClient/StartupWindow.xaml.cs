@@ -1,61 +1,112 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Windows;
+using PomodoroWindowsTimer.Abstractions;
 
 namespace PomodoroWindowsTimer.WpfClient;
+
 /// <summary>
 /// Interaction logic for StartupWindow.xaml
 /// </summary>
 public partial class StartupWindow : Window
 {
     private readonly IMainEntryPoint _mainEntryPoint;
+    private IUserSettings? _userSettings;
+    private string? _databaseFilePath;
 
     public StartupWindow(IMainEntryPoint mainEntryPoint)
     {
         InitializeComponent();
         _mainEntryPoint = mainEntryPoint;
-        this.Loaded += OnLoaded;
-        m_DatabaseSelector.DatabaseFilesChanged += StoreDatabaseFiles;
-        m_DatabaseSelector.SelectedDatabaseFileChanged += StoreSelectedDatabase;
-        m_DatabaseSelector.ApplyRequested += SeedAndMigrateDatabase;
-        m_DatabaseSelector.CancelRequested += Exit;
+
+        // this.Loaded += OnLoaded;
+        m_DatabaseSelector.SelectedDatabaseFileChanged += StoreSelectedDatabaseFile;
+        m_DatabaseSelector.ApplyRequested += OnApplyDatabaseFileRequested;
+        m_DatabaseSelector.CancelRequested += OnCancelRequested;
     }
 
-    private void OnLoaded(object sender, RoutedEventArgs e)
+    internal void LoadDatabaseList(IUserSettings userSettings)
     {
+        _userSettings = userSettings;
+
+        var currentDbFile = userSettings.DatabaseFilePath;
+        var recentDbFiles = userSettings.RecentDbFileList;
+        
+        if (
+            recentDbFiles.Count == 0
+            || (
+                recentDbFiles.Count == 1
+                && recentDbFiles.First().Equals(currentDbFile, StringComparison.Ordinal)
+            )
+        ) {
+            LoadMainWindow();
+            return;
+        }
+
+        m_DatabaseSelector.DatabaseFiles = new List<string> { currentDbFile }.Concat(recentDbFiles).Distinct();
+        m_DatabaseSelector.SelectDatabaseFile(currentDbFile);
         m_Spinner.Visibility = Visibility.Collapsed;
         m_DatabaseSelector.Visibility = Visibility.Visible;
     }
 
-    private void Exit(object? sender, EventArgs e)
+    internal void ShowError(string error)
     {
-        Exit();
+        m_Spinner.Visibility = Visibility.Collapsed;
+        m_DatabaseSelector.Visibility = Visibility.Collapsed;
+        m_ErrorGrid.Visibility = Visibility.Visible;
+        m_ErrorText.Text = error;
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        m_ErrorGrid.Visibility = Visibility.Collapsed;
+        m_DatabaseSelector.Visibility = Visibility.Visible;
+        m_DatabaseSelector.IsEnabled = true;
+    }
+
+    private void OnCancelRequested(object? sender, EventArgs e)
+    {
+        Shutdown();
     }
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
-        Exit();
+        Shutdown();
     }
 
-    private void SeedAndMigrateDatabase(object? sender, EventArgs e)
+    private void OnApplyDatabaseFileRequested(object? sender, EventArgs e)
     {
-        throw new NotImplementedException();
+        _mainEntryPoint.WaitBootstrap();
+        if (_userSettings is not null && !string.IsNullOrWhiteSpace(_databaseFilePath))
+        {
+            _userSettings.DatabaseFilePath = _databaseFilePath;
+
+            LoadMainWindow();
+
+            return;
+        }
+
+        // force log error:
+        throw new InvalidOperationException("Database applying has been requested, " +
+            "but user settings service has not been set or database file has not been choosen");
     }
 
-    private void StoreSelectedDatabase(object? sender, string? e)
+    private void StoreSelectedDatabaseFile(object? sender, string? e)
     {
-        throw new NotImplementedException();
+        _databaseFilePath = e;
     }
 
-    private void StoreDatabaseFiles(object? sender, IEnumerable<string>? e)
-    {
-        throw new NotImplementedException();
-    }
-
-    private void Exit()
+    private void Shutdown()
     {
         m_DatabaseSelector.IsEnabled = false;
-        _mainEntryPoint.Exit();
+        m_Spinner.Visibility = Visibility.Visible;
+        _mainEntryPoint.Shutdown();
+    }
+    private void LoadMainWindow()
+    {
+        m_DatabaseSelector.IsEnabled = false;
+        m_Spinner.Visibility = Visibility.Visible;
+        _mainEntryPoint.LoadMainWindow();
     }
 }

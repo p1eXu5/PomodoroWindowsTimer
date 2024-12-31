@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
         xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
@@ -23,17 +24,49 @@
     <pwt:GlossOnBase BeamOpacity="0.15"
                      BeamVisibility="Visible"
                      >
-        <Grid Margin="10">
+        <Grid>
+            <shared:DatabaseSelector x:Name="m_DatabaseSelector"
+                                     Margin="10"
+                                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+                                     Visibility="Collapsed"
+                                     ShowCloseButton="false"
+                                     />
+
             <pwt:BlackMirrorSpinner x:Name="m_Spinner"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
                                     LabelVisibility="Visible"
                                     Radius="30"
                                     Text="Loading Pomodoro Windows Timer ..."
+                                    Background="#55000000"
                                     />
-
-            <shared:DatabaseSelector x:Name="m_DatabaseSelector"
-                                     Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
-                                     Visibility="Collapsed"
-                                     />
+            <Grid x:Name="m_ErrorGrid"
+                  VerticalAlignment="Center"
+                  Visibility="Collapsed"
+                  >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Label HorizontalAlignment="Center"
+                       Foreground="Red"
+                       FontWeight="Bold"
+                       >
+                    Error
+                </Label>
+                <TextBlock Grid.Row="1"
+                           x:Name="m_ErrorText"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"
+                           />
+                <Button Grid.Row="2"
+                        Content="OK"
+                        Style="{StaticResource MaterialDesignFlatDarkButton}"
+                        HorizontalAlignment="Center"
+                        Click="Button_Click"
+                        />
+            </Grid>
         </Grid>
     </pwt:GlossOnBase>
 </Window>

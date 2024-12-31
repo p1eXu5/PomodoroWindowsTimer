@@ -41,13 +41,12 @@ type TestBootstrap () =
 
     let createInMemoryConnection () =
         let token = Guid.NewGuid().ToString("N")
-        let connectionString = $"Data Source=workdb{token};Mode=Memory;Cache=Shared"
+        let dbFilePath = $"workdb{token}";
+        let connectionString = $"Data Source={dbFilePath};Mode=Memory;Cache=Shared;"
         inMemoryConnection <- new SqliteConnection(connectionString)
         inMemoryConnection.Open()
 
-
-
-        connectionString
+        dbFilePath
 
     // ------------------
     //    properties
@@ -97,7 +96,7 @@ type TestBootstrap () =
 
         // configurations overrides:
         hostBuilder.Configuration["InTest"] <- "True"
-        hostBuilder.Configuration["WorkDb:ConnectionString"] <- connectionString
+        hostBuilder.Configuration["WorkDb:DatabaseFilePath"] <- connectionString
 
         services
             .AddKeyedSingleton<IErrorMessageQueue>(

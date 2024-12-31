@@ -38,10 +38,16 @@
     <Setting Name="DatabaseFilePath" Type="System.String" Scope="User">
       <Value Profile="(Default)">work.db</Value>
     </Setting>
-    <Setting Name="Pooling" Type="System.Boolean" Scope="Application">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="DatabasePooling" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="RecentDatabaseFiles" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DatabaseMode" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DatabaseCache" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

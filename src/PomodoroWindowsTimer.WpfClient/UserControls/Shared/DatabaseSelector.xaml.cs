@@ -107,6 +107,7 @@ public partial class DatabaseSelector : UserControl
             if (databaseFiles is null || !databaseFiles.Contains(openFileDialog.FileName) == true)
             {
                 DatabaseFiles = (databaseFiles ?? Enumerable.Empty<string>()).Append(openFileDialog.FileName).ToList();
+                m_ComboBox.SelectedItem = openFileDialog.FileName;
             }
         }
 
@@ -114,6 +115,14 @@ public partial class DatabaseSelector : UserControl
     }
 
     #endregion
+
+    internal void SelectDatabaseFile(string dbFilePath)
+    {
+        if (DatabaseFiles?.Any() == true && DatabaseFiles.Contains(dbFilePath))
+        {
+            m_ComboBox.SelectedItem = dbFilePath;
+        }
+    }
 
     public ICommand? ApplyCommand
     {
@@ -221,4 +230,33 @@ public partial class DatabaseSelector : UserControl
         DependencyProperty.Register("CancelButtonCaption", typeof(string), typeof(DatabaseSelector), new PropertyMetadata("CANCEL"));
 
 
+
+    public bool ShowCloseButton
+    {
+        get { return (bool)GetValue(ShowCloseButtonProperty); }
+        set { SetValue(ShowCloseButtonProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for ShowCloseButton.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty ShowCloseButtonProperty =
+        DependencyProperty.Register(
+            "ShowCloseButton",
+            typeof(bool),
+            typeof(DatabaseSelector),
+            new PropertyMetadata(true, OnShowCloseButtonPropertyChanged));
+
+    private static void OnShowCloseButtonPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is DatabaseSelector databaseSelector)
+        {
+            if (databaseSelector.ShowCloseButton)
+            {
+                databaseSelector.m_CloseButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                databaseSelector.m_CloseButton.Visibility = Visibility.Collapsed;
+            }
+        }
+    }
 }

@@ -36,8 +36,8 @@ type Bindings() =
 
     member val Database : Binding =
         nameof __.Database
-            |> Binding.twoWay ((fun m -> m.Database), SetDatabase)
-            |> Binding.addValidation (fun m -> m.Database |> validateDatabase)
+            |> Binding.twoWay ((fun m -> m.DatabaseFilePath), SetDatabase)
+            |> Binding.addValidation (fun m -> m.DatabaseFilePath |> validateDatabase)
 
     member val SelectDatabaseFileCommand : Binding =
         nameof __.SelectDatabaseFileCommand |> Binding.cmd Msg.SelectDatabaseFile

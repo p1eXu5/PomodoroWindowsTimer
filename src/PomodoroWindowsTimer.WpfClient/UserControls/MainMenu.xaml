@@ -81,7 +81,9 @@
                 >
             <Button.RenderTransform>
                 <TransformGroup>
-                    <TranslateTransform X="2" Y="1" />
+                    <TranslateTransform X="2"
+                                        Y="1"
+                                        />
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>

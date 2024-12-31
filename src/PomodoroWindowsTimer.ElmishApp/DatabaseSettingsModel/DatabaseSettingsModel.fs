@@ -4,7 +4,7 @@ open PomodoroWindowsTimer.Abstractions
 
 type DatabaseSettingsModel =
     {
-        Database: string
+        DatabaseFilePath: string
     }
 
 module DatabaseSettingsModel =
@@ -22,9 +22,9 @@ module DatabaseSettingsModel =
 
     let init (databaseSettings: IDatabaseSettings) =
         {
-            Database = databaseSettings.DatabaseFilePath
+            DatabaseFilePath = databaseSettings.DatabaseFilePath
         }
 
-    let withDatabase fileName model =
-        { model with Database = $"Data Source={fileName}" }
+    let withDatabase dbFilePath model =
+        { model with DatabaseFilePath = dbFilePath }
 

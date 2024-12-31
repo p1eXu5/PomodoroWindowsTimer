@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 #if DEBUG
 #else
@@ -9,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.Bootstrap;
 using PomodoroWindowsTimer.ElmishApp;
@@ -21,55 +23,16 @@ internal class Bootstrap : BootstrapBase
 {
     #region public_methods
 
-    //internal void WaitDbSeeding()
-    //{
-    //    if (IsInTest)
-    //    {
-    //        var seederService = Host.Services.GetRequiredService<IHostedService>() as TestDbSeederHostedService;
-    //        seederService!.Semaphore.Wait();
-    //    }
-    //    else
-    //    {
-    //        var seederService = Host.Services.GetRequiredService<IHostedService>() as DbSeederHostedService;
-    //        seederService!.Semaphore.Wait();
-    //    }
-    //}
+    internal FSharpResult<Unit, string> TryUpdateDatabaseFile()
+    {
+        var dbFileRevisor = GetDbFileRevisor();
+        var userSettings = GetUserSettings();
 
-    //internal async Task ApplyMigrationsAsync()
-    //{
-    //    var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-
-    //    var connectionString = Host.Services.GetRequiredService<IUserSettings>().DatabaseFilePath;
-    //    var eqInd = connectionString.IndexOf('=');
-    //    var dbFilePath = connectionString.Substring(eqInd + 1, connectionString.Length - eqInd - 2);
-    //    if (!Path.IsPathFullyQualified(dbFilePath))
-    //    {
-    //        connectionString = "Data Source=" + Path.Combine(path, dbFilePath) + ";";
-    //    }
-
-    //    var migratorPath =
-    //        Path.Combine(path, "migrator", "PomodoroWindowsTimer.Migrator.exe");
-
-    //    if (File.Exists(migratorPath))
-    //    {
-    //        var res = await Cli.Wrap(migratorPath)
-    //            .WithArguments(["--connection", connectionString])
-    //            .WithWorkingDirectory(Path.Combine(path, "migrator"))
-    //            .WithValidation(CommandResultValidation.None)
-    //            .ExecuteBufferedAsync();
-    //        ;
-
-    //        var logger = GetLogger<Bootstrap>();
-    //        if (!String.IsNullOrWhiteSpace(res.StandardError))
-    //        {
-    //            logger.LogError(res.StandardError);
-    //        }
-    //        else
-    //        {
-    //            logger.LogInformation(res.StandardOutput);
-    //        }
-    //    }
-    //}
+        return dbFileRevisor.TryUpdateDatabaseFileAsync(userSettings, CancellationToken.None)
+            .ConfigureAwait(false)
+            .GetAwaiter()
+            .GetResult();
+    }
 
     public void ShowMainWindow(Window window, Func<WorkStatisticWindow> workStatisticWindowFactory)
     {
@@ -87,6 +50,9 @@ internal class Bootstrap : BootstrapBase
     #endregion
 
     #region service_accessors
+
+    internal IDbFileRevisor GetDbFileRevisor()
+        => Host.Services.GetRequiredService<IDbFileRevisor>();
 
     internal IErrorMessageQueue GetMainWindowErrorMessageQueue()
         => Host.Services.GetRequiredKeyedService<IErrorMessageQueue>("main");

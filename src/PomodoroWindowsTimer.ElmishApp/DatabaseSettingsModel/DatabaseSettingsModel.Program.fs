@@ -29,7 +29,7 @@ let update (databaseSettings: IDatabaseSettings) msg model =
             model, Intent.None
 
     | Apply ->
-        databaseSettings.DatabaseFilePath <- model.Database
+        databaseSettings.DatabaseFilePath <- model.DatabaseFilePath
         model, Intent.CloseDialogRequested
 
     | Cancel ->

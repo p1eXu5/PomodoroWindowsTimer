@@ -49,7 +49,7 @@ let ``01: TryUpdateDatabaseFile -> file does not exist -> returns error``() =
         let fileRevisor = dbFileRevisor ()
 
         // Act
-        let! result = fileRevisor.TryUpdateDatabaseFile _dbSettings CancellationToken.None
+        let! result = fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
         %result.Should().BeOfCase(Result.Error)
@@ -65,7 +65,7 @@ let ``02: TryUpdateDatabaseFile -> file is empty -> returns ok``() =
         let fileRevisor = dbFileRevisor ()
 
         // Act
-        let! result = fileRevisor.TryUpdateDatabaseFile _dbSettings CancellationToken.None
+        let! result = fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
         %result.Should().BeOfCase(Result.Ok)
@@ -81,7 +81,7 @@ let ``03: TryUpdateDatabaseFile -> file is empty -> applies migrations``() =
         let fileRevisor = dbFileRevisor ()
 
         // Act
-        do! fileRevisor.TryUpdateDatabaseFile _dbSettings CancellationToken.None
+        do! fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
         let! tables = _repositoryFactory.ReadDbTablesAsync()
@@ -103,7 +103,7 @@ let ``04: TryUpdateDatabaseFile -> file with seeded db -> returns ok``() =
         let fileRevisor = dbFileRevisor ()
 
         // Act
-        let! result = fileRevisor.TryUpdateDatabaseFile _dbSettings CancellationToken.None
+        let! result = fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
         %result.Should().BeOfCase(Result.Ok)
@@ -120,7 +120,7 @@ let ``05: TryUpdateDatabaseFile -> file with seeded db -> applies migrations``()
         let fileRevisor = dbFileRevisor ()
 
         // Act
-        do! fileRevisor.TryUpdateDatabaseFile _dbSettings CancellationToken.None
+        do! fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
         let! tables = _repositoryFactory.ReadDbTablesAsync()
@@ -146,7 +146,7 @@ let ``06: TryUpdateDatabaseFile -> file is not empty and not db -> returns error
         let fileRevisor = dbFileRevisor ()
 
         // Act
-        let! result = fileRevisor.TryUpdateDatabaseFile _dbSettings CancellationToken.None
+        let! result = fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
         %result.Should().BeOfCase(Result.Error)

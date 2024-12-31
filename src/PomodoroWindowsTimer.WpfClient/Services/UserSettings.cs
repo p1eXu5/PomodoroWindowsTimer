@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
@@ -199,16 +201,14 @@ internal class UserSettings : IUserSettings
         {
             Properties.Settings.Default.DatabaseFilePath = value;
             Properties.Settings.Default.Save();
+            AddDatabaseFileToRecent(value);
         }
     }
 
-    public bool Pooling
-    {
-        get
-        {
-            return Properties.Settings.Default.Pooling;
-        }
-    }
+    // TODO: consider to use WorkDbOptions
+    public bool? Pooling => Properties.Settings.Default.DatabasePooling;
+    public string? Mode => Properties.Settings.Default.DatabaseMode;
+    public string? Cache => Properties.Settings.Default.DatabaseCache;
 
     [MaybeNull]
     public string CurrentVersion
@@ -217,6 +217,31 @@ internal class UserSettings : IUserSettings
         set
         {
             Properties.Settings.Default.CurrentVersion = value;
+            Properties.Settings.Default.Save();
+        }
+    }
+
+    public ICollection<string> RecentDbFileList
+    {
+        get
+        {
+            var coll = Properties.Settings.Default.RecentDatabaseFiles;
+            if (coll is null)
+            {
+                return Array.Empty<string>();
+            }
+
+            return coll.Cast<string>().Reverse().ToList();
+        }
+    }
+
+    public void AddDatabaseFileToRecent(string dbFilePath)
+    {
+        var recentDbFileColl = Properties.Settings.Default.RecentDatabaseFiles ?? new StringCollection();
+        if (!recentDbFileColl.Contains(dbFilePath))
+        {
+            recentDbFileColl.Add(dbFilePath);
+            Properties.Settings.Default.RecentDatabaseFiles = recentDbFileColl;
             Properties.Settings.Default.Save();
         }
     }

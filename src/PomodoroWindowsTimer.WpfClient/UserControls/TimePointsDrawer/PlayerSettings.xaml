@@ -19,7 +19,11 @@
                           IsChecked="{Binding DisableSkipBreak}"
                           >
                 <ToggleButton.RenderTransform>
-                    <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
+                    <ScaleTransform CenterX="20"
+                                    CenterY="18"
+                                    ScaleX=".6"
+                                    ScaleY="0.6"
+                                    />
                 </ToggleButton.RenderTransform>
             </ToggleButton>
             <TextBlock DockPanel.Dock="Left"
@@ -42,7 +46,11 @@
                           IsChecked="{Binding DisableMinimizeMaximizeWindows}"
                           >
                 <ToggleButton.RenderTransform>
-                    <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
+                    <ScaleTransform CenterX="20"
+                                    CenterY="18"
+                                    ScaleX=".6"
+                                    ScaleY="0.6"
+                                    />
                 </ToggleButton.RenderTransform>
             </ToggleButton>
             <TextBlock DockPanel.Dock="Left"

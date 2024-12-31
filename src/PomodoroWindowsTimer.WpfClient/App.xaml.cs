@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Extensions.Logging;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Types;
@@ -48,31 +49,62 @@ public partial class App : Application
             });
         });
 
-        Task.Run(async () =>
+        Task.Run(async () =>    
         {
             BootstrapApplication(e);
-            mainEntryPoint.BootstrapMres.Set();
-            mainEntryPoint.MainEntryMres.Wait();
 
-            if (mainEntryPoint.ExitRequested)
+            await Dispatcher.BeginInvoke(() =>
             {
-                await Dispatcher.BeginInvoke(() =>
-                {
-                    startupWindow.Close();
-                    _logger.LogInformation("Shutting down...");
-                    Shutdown();
-                });
-            }
-            else
+                startupWindow.LoadDatabaseList(_bootstrap.GetUserSettings());
+            });
+
+            mainEntryPoint.BootstrapMres.Set();
+
+            while (true)
             {
-                await Dispatcher.BeginInvoke(() =>
+                mainEntryPoint.MainEntryMres.Wait();
+
+                if (mainEntryPoint.AppShutdownRequested)
                 {
-                    ShowMainWindow(startupWindow);
-                });
+                    await Dispatcher.BeginInvoke(() =>
+                    {
+                        startupWindow.Close();
+                        _logger.LogInformation("Shutting down...");
+                        Shutdown();
+                    });
+
+                    break;
+                }
+                else
+                {
+                    var res = _bootstrap.TryUpdateDatabaseFile();
+                    if (res.IsError)
+                    {
+                        mainEntryPoint.MainEntryMres.Reset();
+
+                        await Dispatcher.BeginInvoke(() =>
+                        {
+                            startupWindow.ShowError(res.ErrorValue);
+                        });
+
+                        continue;
+                    }
+
+                    break;
+                }
             }
+
+            await Dispatcher.BeginInvoke(() =>
+            {
+                ShowMainWindow(startupWindow);
+            });
         });
     }
 
+    /// <summary>
+    /// Builds and instantiates <see cref="_bootstrap"/>.
+    /// </summary>
+    /// <param name="e"></param>
     [MemberNotNull(nameof(_bootstrap), nameof(_logger))]
     private void BootstrapApplication(StartupEventArgs e)
     {
@@ -83,12 +115,20 @@ public partial class App : Application
         _logger.LogInformation("Boostrapped.");
     }
 
+    /// <summary>
+    /// If <see cref="_bootstrap"/> is <see langword="null"/> then shutdowns application.
+    /// Instantiates <see cref="MainWindow"/>, closes <paramref name="startupWindow"/> and
+    /// shown <see cref="MainWindow"/> with Elmish bootstrapping.
+    /// </summary>
+    /// <param name="startupWindow"></param>
     private void ShowMainWindow(StartupWindow startupWindow)
     {
         if (_bootstrap is null)
         {
             _logger?.LogCritical("Application has not been bootstrapped! Shutting down...");
             Shutdown();
+
+            return;
         }
 
         _mainWindow = new MainWindow();
@@ -158,25 +198,44 @@ public partial class App : Application
     {
         private bool _disposedValue;
 
+        public SnackbarMessageQueue? MessageQueue { private get; set; }
+
         internal ManualResetEventSlim BootstrapMres { get; private set; } = new ManualResetEventSlim();
 
         internal ManualResetEventSlim MainEntryMres { get; private set; } = new ManualResetEventSlim();
 
         internal CancellationTokenSource Cts { get; private set; } = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        internal bool ExitRequested { get; private set; }
+        internal bool AppShutdownRequested { get; private set; }
 
         public void WaitBootstrap()
         {
             BootstrapMres.Wait();
         }
 
-        public void Exit()
+        public void Shutdown()
         {
-            ExitRequested = true;
+            AppShutdownRequested = true;
             MainEntryMres.Set();
         }
 
+        public void LoadMainWindow()
+        {
+            MainEntryMres.Set();
+        }
+
+        public void EnqueueError(string error)
+        {
+            MessageQueue?.Enqueue(
+                error,
+                "Clear",
+                _ => MessageQueue?.Clear(),
+                null,
+                false,
+                true,
+                TimeSpan.FromSeconds(15)
+            );
+        }
 
         public void Dispose()
         {

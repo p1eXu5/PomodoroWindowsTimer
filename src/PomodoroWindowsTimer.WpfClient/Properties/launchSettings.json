@@ -2,11 +2,11 @@
   "profiles": {
     "work.db (dev)": {
       "commandName": "Executable",
-      "executablePath": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows\\Pwt.exe",
-      "workingDirectory": "D:\\Programming\\FSharp\\_wpf\\PomodoroWindowsTimer\\src\\PomodoroWindowsTimer.WpfClient\\bin\\Debug\\net8.0-windows",
+      "executablePath": ".\\Pwt.exe",
+      "workingDirectory": "bin\\Debug\\net8.0-windows",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
-        "WorkDb__ConnectionString": "Data Source=work.db;"
+        "WorkDb__DatabaseFilePath": "Data Source=work.db;"
       }
     }
   }

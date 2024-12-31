@@ -321,9 +321,6 @@ public class BlackMirrorSpinner : Control
         float xLow1;
         float yLow1;
 
-        float xLow2;
-        float yLow2;
-
         if (0 <= a && a <= 90)
         {
             rad = a * K;

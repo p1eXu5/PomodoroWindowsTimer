@@ -49,7 +49,7 @@ module internal DbFileRevisor =
     let tryUpdateDatabaseFile (dbSeeder: IDbSeeder) (dbMigrator: IDbMigrator) (dbSettings: IDatabaseSettings) (cancellationToken: CancellationToken) =
         task {
             if not <| File.Exists(dbSettings.DatabaseFilePath) then
-                return Error $"File '{dbSettings}' does not exist"
+                return Error $"File '{dbSettings.DatabaseFilePath}' does not exist"
             else
                 if checkIfFileIsEmpty dbSettings.DatabaseFilePath then
                     match! dbSeeder.SeedDatabaseAsync(dbSettings, cancellationToken) with
@@ -69,7 +69,7 @@ module internal DbFileRevisor =
 
     let init (dbSeeder: IDbSeeder) (dbMigrator: IDbMigrator) =
         { new IDbFileRevisor with
-            member _.TryUpdateDatabaseFile dbSettings ct =
+            member _.TryUpdateDatabaseFileAsync dbSettings ct =
                 tryUpdateDatabaseFile dbSeeder dbMigrator dbSettings ct
         }
 

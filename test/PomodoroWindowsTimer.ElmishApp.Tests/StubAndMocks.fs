@@ -26,7 +26,7 @@ type LooperStub (activeTimePoint: ActiveTimePoint option) =
          member _.GetActiveTimePoint() = activeTimePoint
 
 
-type UserSettingsStub (connectionString: string) =
+type UserSettingsStub (dbFilePath: string) =
     let dict = Dictionary<string, obj>()
 
     do
@@ -39,7 +39,7 @@ type UserSettingsStub (connectionString: string) =
         dict.Add("LastStatisticPeriod", Option<Work>.None)
         dict.Add("LastDayCount", 0)
         dict.Add("CurrentVerion", null)
-        dict.Add("DatabaseFilePath", connectionString)
+        dict.Add("DatabaseFilePath", dbFilePath)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
@@ -52,11 +52,17 @@ type UserSettingsStub (connectionString: string) =
         member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
         member _.LastDayCount with get () = dict["LastDayCount"] :?> int and set v = dict["LastDayCount"] <- v
         member _.CurrentVersion with get () = dict["CurrentVersion"] :?> string and set v = dict["CurrentVersion"] <- v
+        member _.RecentDbFileList with get (): ICollection<string> =
+            raise (NotImplementedException())
+        member _.AddDatabaseFileToRecent (dbFilePath: string): unit = 
+            raise (NotImplementedException())
 
     interface IDatabaseSettings with
         member _.DatabaseFilePath with get () = dict["DatabaseFilePath"] :?> string and set v = dict["DatabaseFilePath"] <- v
-        member _.Pooling
-            with get (): bool = false
+        member _.Pooling with get (): bool = false
+        member _.Mode with get (): string = "Memory"
+        member _.Cache with get (): string = "Shared"
+            
 
 
 [<RequireQualifiedAccess>]

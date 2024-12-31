@@ -1,6 +1,7 @@
 ﻿namespace PomodoroWindowsTimer.Abstractions
 
 open System
+open System.Text
 open System.Threading
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
@@ -9,22 +10,35 @@ open System.Runtime.CompilerServices
 type IDatabaseSettings =
     interface
         abstract DatabaseFilePath : string with get, set
-        abstract Pooling : bool with get
+        abstract Pooling : Nullable<bool> with get
+        abstract Mode : string with get
+        abstract Cache: string with get
     end
 
 [<Extension>]
 type DatabaseSettingsExtensions =
     [<Extension>]
     static member GetConnectionString(dbSettings: IDatabaseSettings) =
-        $"Data Source={dbSettings.DatabaseFilePath};Pooling={dbSettings.Pooling};"
+        if dbSettings.Mode.Equals("Memory", StringComparison.Ordinal) && dbSettings.Cache.Equals("Shared", StringComparison.Ordinal) then
+            $"Data Source={dbSettings.DatabaseFilePath};Mode=Memory;Cache=Shared;"
+        else
+            StringBuilder($"Data Source={dbSettings.DatabaseFilePath};Pooling={dbSettings.Pooling};")
+            |> fun sb ->
+                if String.IsNullOrEmpty(dbSettings.Mode) then sb
+                else sb.AppendFormat("Mode={0};", dbSettings.Mode)
+            |> fun sb ->
+                if String.IsNullOrEmpty(dbSettings.Cache) then sb
+                else sb.AppendFormat("Cache={0};", dbSettings.Cache)
+            |> fun sb -> sb.ToString()
 
-    static member Create(dbFilePath: string, pooling: bool) =
+    static member Create(dbFilePath: string, pooling: Nullable<bool>) =
         { new IDatabaseSettings with 
             member _.DatabaseFilePath
                 with get () = dbFilePath
                 and set _ = ()
-            member _.Pooling 
-                with get () = pooling
+            member _.Pooling with get () = pooling
+            member _.Mode with get () = Unchecked.defaultof<_>
+            member _.Cache with get () = Unchecked.defaultof<_>
         }
 
 
@@ -94,5 +108,5 @@ type IDbMigrator =
 
 type IDbFileRevisor =
     interface
-        abstract TryUpdateDatabaseFile: IDatabaseSettings -> CancellationToken -> Task<Result<unit, string>>
+        abstract TryUpdateDatabaseFileAsync: IDatabaseSettings -> CancellationToken -> Task<Result<unit, string>>
     end
