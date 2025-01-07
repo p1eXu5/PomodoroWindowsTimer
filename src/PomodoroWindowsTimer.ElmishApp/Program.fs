@@ -8,12 +8,12 @@ open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.Abstractions
 
 [<Literal>]
-let internal tickMilliseconds = 200<ms>
+let tickMilliseconds = 200<ms>
 
 [<Literal>]
-let internal title = "Pomodoro Windows Timer"
+let title = "Pomodoro Windows Timer"
 
-let internal main
+let main
     (window: System.Windows.Window)
     (workStatisticWindowFactory: System.Func<System.Windows.Window>)
     (looper: ILooper)

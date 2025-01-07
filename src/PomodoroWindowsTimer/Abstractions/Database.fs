@@ -19,16 +19,26 @@ type IDatabaseSettings =
 type DatabaseSettingsExtensions =
     [<Extension>]
     static member GetConnectionString(dbSettings: IDatabaseSettings) =
-        if dbSettings.Mode.Equals("Memory", StringComparison.Ordinal) && dbSettings.Cache.Equals("Shared", StringComparison.Ordinal) then
+        let mode = dbSettings.Mode
+        let cache = dbSettings.Cache
+        if
+            not <| String.IsNullOrWhiteSpace(mode)
+            && not <| String.IsNullOrWhiteSpace(cache)
+            && mode.Equals("Memory", StringComparison.Ordinal)
+            && cache.Equals("Shared", StringComparison.Ordinal)
+        then
             $"Data Source={dbSettings.DatabaseFilePath};Mode=Memory;Cache=Shared;"
         else
-            StringBuilder($"Data Source={dbSettings.DatabaseFilePath};Pooling={dbSettings.Pooling};")
+            StringBuilder($"Data Source={dbSettings.DatabaseFilePath};")
             |> fun sb ->
-                if String.IsNullOrEmpty(dbSettings.Mode) then sb
-                else sb.AppendFormat("Mode={0};", dbSettings.Mode)
+                if String.IsNullOrEmpty(mode) then sb
+                else sb.AppendFormat("Mode={0};", mode)
             |> fun sb ->
-                if String.IsNullOrEmpty(dbSettings.Cache) then sb
-                else sb.AppendFormat("Cache={0};", dbSettings.Cache)
+                if String.IsNullOrEmpty(cache) then sb
+                else sb.AppendFormat("Cache={0};", cache)
+            |> fun sb ->
+                if dbSettings.Pooling.HasValue then sb.AppendFormat("Pooling={0};", dbSettings.Pooling.Value)
+                else sb
             |> fun sb -> sb.ToString()
 
     static member Create(dbFilePath: string, pooling: Nullable<bool>) =

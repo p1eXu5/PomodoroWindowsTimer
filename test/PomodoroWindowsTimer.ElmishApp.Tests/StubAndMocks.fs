@@ -9,6 +9,7 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp
+open PomodoroWindowsTimer.Storage.Configuration
 
 type LooperStub (activeTimePoint: ActiveTimePoint option) =
     member val ResumeCalledTimes : int = 0 with get, set
@@ -26,7 +27,7 @@ type LooperStub (activeTimePoint: ActiveTimePoint option) =
          member _.GetActiveTimePoint() = activeTimePoint
 
 
-type UserSettingsStub (dbFilePath: string) =
+type UserSettingsStub (workDbOptions: WorkDbOptions) =
     let dict = Dictionary<string, obj>()
 
     do
@@ -39,7 +40,7 @@ type UserSettingsStub (dbFilePath: string) =
         dict.Add("LastStatisticPeriod", Option<Work>.None)
         dict.Add("LastDayCount", 0)
         dict.Add("CurrentVerion", null)
-        dict.Add("DatabaseFilePath", dbFilePath)
+        dict.Add("DatabaseFilePath", workDbOptions.DatabaseFilePath)
 
     interface IUserSettings with
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
@@ -59,7 +60,7 @@ type UserSettingsStub (dbFilePath: string) =
 
     interface IDatabaseSettings with
         member _.DatabaseFilePath with get () = dict["DatabaseFilePath"] :?> string and set v = dict["DatabaseFilePath"] <- v
-        member _.Pooling with get (): bool = false
+        member _.Pooling with get (): Nullable<bool> = Nullable<bool>(false)
         member _.Mode with get (): string = "Memory"
         member _.Cache with get (): string = "Shared"
             

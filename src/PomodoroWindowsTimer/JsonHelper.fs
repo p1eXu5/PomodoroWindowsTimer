@@ -75,7 +75,7 @@ type JsonHelpers() =
         JsonSerializer.Serialize(o, JsonHelpers.JsonNoIndentSerializerOptions)
 
     static member Deserialize<'T>(s: string) : 'T =
-        match JsonSerializer.Deserialize<'T>(s, JsonHelpers.JsonSerializerOptions) with
+        match JsonSerializer.Deserialize(s, typeof<'T>, JsonHelpers.JsonSerializerOptions) with
         | null -> Unchecked.defaultof<'T>
-        | v -> v
+        | v -> v :?> 'T
 

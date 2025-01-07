@@ -27,6 +27,7 @@ open System.Threading
 open PomodoroWindowsTimer.Storage.Configuration
 open NPOI.XSSF.Streaming.Values
 open Microsoft.Extensions.Options
+open Microsoft.Extensions.Configuration
 
 type TestBootstrap () =
     inherit Bootstrap()
@@ -39,14 +40,15 @@ type TestBootstrap () =
 
     let mutable inMemoryConnection : SqliteConnection = Unchecked.defaultof<_>
 
-    let createInMemoryConnection () =
+    let createInMemoryConnection (configuration: IConfiguration) =
         let token = Guid.NewGuid().ToString("N")
         let dbFilePath = $"workdb{token}";
+        configuration["WorkDb:DatabaseFilePath"] <- dbFilePath
+        configuration["WorkDb:Mode"] <- "Memory"
+        configuration["WorkDb:Cache"] <- "Shared"
         let connectionString = $"Data Source={dbFilePath};Mode=Memory;Cache=Shared;"
         inMemoryConnection <- new SqliteConnection(connectionString)
         inMemoryConnection.Open()
-
-        dbFilePath
 
     // ------------------
     //    properties
@@ -92,11 +94,9 @@ type TestBootstrap () =
     /// <param name="hostBuilder"></param>
     /// <param name="services"></param>
     override _.PreConfigureServices(hostBuilder: HostBuilderContext,  services: IServiceCollection) =
-        let connectionString = createInMemoryConnection ()
-
         // configurations overrides:
         hostBuilder.Configuration["InTest"] <- "True"
-        hostBuilder.Configuration["WorkDb:DatabaseFilePath"] <- connectionString
+        createInMemoryConnection (hostBuilder.Configuration)
 
         services
             .AddKeyedSingleton<IErrorMessageQueue>(
@@ -120,7 +120,7 @@ type TestBootstrap () =
 
         services.AddSingleton<IUserSettings>(fun sp ->
             let dbOptions = sp.GetRequiredService<IOptions<WorkDbOptions>>().Value
-            UserSettingsStub(dbOptions.GetConnectionString()) :> IUserSettings
+            UserSettingsStub(dbOptions) :> IUserSettings
         ) |> ignore
         services.AddSingleton<IDatabaseSettings>(fun sp ->
             sp.GetRequiredService<IUserSettings>() :?> UserSettingsStub :> IDatabaseSettings

@@ -10,5 +10,9 @@ internal sealed record PwtMigratorOptions : CliOptions, IDatabaseSettings
     public required string DatabaseFilePath { get; set; }
 
     [Option(longName: "pooling", HelpText = "Pooling", Required = false)]
-    public bool Pooling { get; set; }
+    public bool? Pooling { get; set; }
+
+    public string? Mode { get; }
+
+    public string? Cache { get; }
 }
