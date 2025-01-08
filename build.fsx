@@ -290,9 +290,9 @@ Target.create "CheckRelease" (fun _ ->
     ==> "Restore"
 
 if isGitHubActions then
-    "CheckReleaseSecrets" ==> "Build" ==> "SetupNuGet" ==> "Test"
+    "Restore" ==> "CheckReleaseSecrets" ==> "Build" ==> "SetupNuGet" ==> "Test"
 else
-    "Build" ==> "Test"
+    "Restore" ==> "Build" ==> "Test"
 
 "Test"
     ==> "Publish"
