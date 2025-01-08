@@ -26,6 +26,12 @@ open Fake.BuildServer
 open Fake.Tools
 open Fake.Api
 
+// -------------------
+//   Bootstrap Fake
+// -------------------
+// To run script without fake.exe (no need multiple .NET sdk versions) - https://fake.build/guide/fake-debugging.html#Run-script-without-fake-exe-via-fsi
+Fake.Core.Context.setExecutionContextFromCommandLineArgs __SOURCE_FILE__
+
 // ------------------
 //    Properties
 // ------------------
@@ -80,18 +86,6 @@ let gitName = getVarOrDefaultFromVault "REPOSITORY_NAME_GITHUB" "PomodoroWindows
 let githubToken = releaseSecret "<githubtoken>" "GITHUB_TOKEN"
 // let githubNugetToken = releaseSecret "<githubtoken>" "GITHUB_NUGET_TOKEN"
 
-
-// -------------------
-//   Bootstrap Fake
-// -------------------
-// To run script without fake.exe (.net version problem) - https://fake.build/guide/fake-debugging.html#Run-script-without-fake-exe-via-fsi
-System.Environment.GetCommandLineArgs()
-|> Array.skip 2 // skip fsi.exe; build.fsx
-|> Array.toList
-|> Fake.Core.Context.FakeExecutionContext.Create false __SOURCE_FILE__
-|> Fake.Core.Context.RuntimeContext.Fake
-|> Fake.Core.Context.setExecutionContext
-
 do Environment.setEnvironVar "COREHOST_TRACE" "0"
 
 // https://fake.build/guide/buildserver.html
@@ -118,8 +112,13 @@ let private zipFileName versionString =
 // ------------------
 //    Targets
 // ------------------
-Target.create "CheckReleaseSecrets" (fun _ ->
-    // Trace.log (sprintf "%A" (Environment.environVars ()))
+Target.create "CheckReleaseSecrets" (fun p ->
+    // Environment.environVars ()
+    // |> Seq.sortBy fst
+    // |> Seq.iter (fun (k, v) -> Trace.log (sprintf "%s: %s" k v))
+    // 
+    // Trace.log (sprintf "TargetParamer.Context.Arguments: %A" (p.Context.Arguments))
+
     for secret in secrets do
         secret.Force() |> ignore
 )
@@ -253,8 +252,6 @@ Target.create "Compress" (fun _ ->
     files |> Zip.zip publishDir (uploadDir </> zipFileName)
 )
 
-
-// Upload target
 Target.create "GitHubRelease" (fun _ ->
     let token = githubToken.Value
     let auth = sprintf "%s:x-oauth-basic@" token
@@ -280,7 +277,6 @@ Target.create "GitHubRelease" (fun _ ->
     |> Async.RunSynchronously
 )
 
-Target.create "Empty" ignore
 Target.create "All" ignore
 Target.create "Local" ignore
 

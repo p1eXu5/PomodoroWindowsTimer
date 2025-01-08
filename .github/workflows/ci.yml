@@ -22,7 +22,7 @@ jobs:
         with:
             dotnet-version: '8.0.x'
       - name: Fake
-        run: dotnet fsi build.fsx -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
   test:
     runs-on: ${{ matrix.os }}
@@ -37,4 +37,4 @@ jobs:
         with:
             dotnet-version: '8.0.x'
       - name: Fake
-        run: dotnet fsi build.fsx -t Test -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -t Test
