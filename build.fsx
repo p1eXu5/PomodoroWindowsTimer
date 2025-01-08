@@ -95,12 +95,14 @@ System.Environment.GetCommandLineArgs()
 |> Fake.Core.Context.RuntimeContext.Fake
 |> Fake.Core.Context.setExecutionContext
 
+do Environment.setEnvironVar "COREHOST_TRACE" "0"
+
 // https://fake.build/guide/buildserver.html
 BuildServer.install [
     GitHubActions.Installer
 ]
 
-CoreTracing.ensureConsoleListener ()
+// CoreTracing.ensureConsoleListener ()
 
 
 // ------------------
@@ -206,6 +208,9 @@ Target.create "Compress" (fun _ ->
     let publishDir = versionString |> publishDir
     let uploadDir = versionString |> uploadDir
     let zipFileName = versionString |> zipFileName
+
+    if not <| Directory.Exists uploadDir then
+        Directory.CreateDirectory uploadDir |> ignore
 
     !!(sprintf "%s/**" publishDir) |> Zip.zip uploadDir zipFileName
 )
