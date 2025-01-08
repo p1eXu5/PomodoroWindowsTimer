@@ -69,8 +69,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrator", "Migrator", "{02
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PomodoroWindowsTimer.Storage.Migrations", "src\PomodoroWindowsTimer.Storage.Migrations\PomodoroWindowsTimer.Storage.Migrations.csproj", "{F8764CAA-9979-4D93-B34C-ABF435A9E27B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

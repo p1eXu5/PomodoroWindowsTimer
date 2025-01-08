@@ -51,7 +51,6 @@ let [<Literal>] versionStringKey = "VersionString"
 let release = ReleaseNotes.load "RELEASE_NOTES.md"
 
 let isGitHubActions = Environment.hasEnvironVar "GITHUB_ACTIONS"
-let isWindows = Environment.isWindows
 
 // ------------------
 //      Secrets
@@ -102,7 +101,7 @@ BuildServer.install [
     GitHubActions.Installer
 ]
 
-CoreTracing.ensureConsoleListener ()
+// CoreTracing.ensureConsoleListener () // duplicates logs on ci
 
 
 // ------------------
@@ -158,6 +157,15 @@ Target.create "Build" (fun _ ->
         }) project
 )
 
+// Build target
+Target.create "Build_Debug" (fun _ ->
+    DotNet.build (fun opts ->
+        { opts with
+            Configuration = DotNet.BuildConfiguration.Debug
+            NoRestore = true
+        }) project
+)
+
 // Test target
 Target.create "Test" (fun _ ->
     DotNet.test (fun opts ->
@@ -209,10 +217,16 @@ Target.create "Compress" (fun _ ->
     let uploadDir = versionString |> uploadDir
     let zipFileName = versionString |> zipFileName
 
+    let files = !!(sprintf "%s/**" publishDir)
+
+    Trace.log uploadDir
+    Trace.log publishDir
+    Trace.log (sprintf "%A" files)
+
     if not <| Directory.Exists uploadDir then
         Directory.CreateDirectory uploadDir |> ignore
 
-    !!(sprintf "%s/**" publishDir) |> Zip.zip uploadDir zipFileName
+    files |> Zip.zip publishDir (uploadDir </> zipFileName)
 )
 
 
@@ -243,6 +257,7 @@ Target.create "GitHubRelease" (fun _ ->
 )
 
 Target.create "All" ignore
+Target.create "Local" ignore
 
 Target.create "CheckRelease" (fun _ ->
     Trace.log (sprintf "%A" (System.Environment.GetCommandLineArgs()))
@@ -253,10 +268,20 @@ Target.create "CheckRelease" (fun _ ->
     ==> "Clean"
     ==> "Restore"
     ==> "Build"
-    =?> ("Test", not <| isWindows && isGitHubActions)
+
+"Build" ==> "Test"
+
+"Test"
     ==> "Publish"
     ==> "Compress"
-    =?> ("GitHubRelease", not <| isWindows && isGitHubActions)
+    =?> ("GitHubRelease", isGitHubActions)
     ==> "All"
+
+"Build"
+    ==> "Build_Debug"
+    ==> "Publish"
+    ==> "Compress"
+    ==> "Local"
+
 
 Target.runOrDefaultWithArguments "All"

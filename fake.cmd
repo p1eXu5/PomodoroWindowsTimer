@@ -1,2 +1,2 @@
-dotnet fsi build.fsx -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true
+dotnet fsi build.fsx -t Local -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true
 PAUSE

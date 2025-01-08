@@ -14,6 +14,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
+    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - name: Setup .NET 8
@@ -22,3 +23,18 @@ jobs:
             dotnet-version: '8.0.x'
       - name: Fake
         run: dotnet fsi build.fsx -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+    if: github.ref != 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: '8.0.x'
+      - name: Fake
+        run: dotnet fsi build.fsx -t Test -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true

@@ -74,13 +74,9 @@ public abstract class BootstrapBase : IDisposable
                     System.Reflection.BindingFlags.Instance
                     | System.Reflection.BindingFlags.NonPublic
                     | System.Reflection.BindingFlags.Public,
-                    Array.Empty<Type>()
-                );
-
-        if (parameterlessCtor is null)
-        {
-            throw new ArgumentException("TBootstrap type has no parameterless constructor.");
-        }
+                    []
+                )
+                ?? throw new ArgumentException("TBootstrap type has no parameterless constructor.");
 
         TBootstrap bootstrap = (TBootstrap)parameterlessCtor.Invoke(null);
 
@@ -160,12 +156,6 @@ public abstract class BootstrapBase : IDisposable
     {
         // Configure Serilog
         var cfg = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
-            .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Verbose)
-            .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Verbose)
-            .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Verbose)
             .Enrich.FromLogContext()
             .Enrich.WithMachineName()
             .Enrich.WithThreadId()
@@ -173,6 +163,27 @@ public abstract class BootstrapBase : IDisposable
             .Destructure.ToMaximumStringLength(100)
             .Destructure.ToMaximumCollectionCount(10)
             ;
+
+        if (!hostBuilderContext.HostingEnvironment.IsDevelopment())
+        {
+            cfg = cfg
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Warning);
+        }
+        else
+        {
+            cfg = cfg
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
+                .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Verbose)
+                .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Verbose)
+                .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Verbose);
+        }
 
         if (!hostBuilderContext.HostingEnvironment.IsDevelopment())
         {
