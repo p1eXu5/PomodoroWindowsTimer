@@ -131,7 +131,7 @@ Target.create "SetupNuGet" (fun _ ->
     <configuration>
       <packageSources>
         <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
-        <add key="github" value="https://nuget.pkg.github.com/your-github-username/index.json" />
+        <add key="github" value="https://nuget.pkg.github.com/p1eXu5/index.json" />
       </packageSources>
       <packageSourceCredentials>
         <github>
