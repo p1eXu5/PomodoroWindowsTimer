@@ -78,6 +78,7 @@ let githubReleaseUser = getVarOrDefaultFromVault "RELEASE_USER_GITHUB" "p1eXu5"
 let gitName = getVarOrDefaultFromVault "REPOSITORY_NAME_GITHUB" "PomodoroWindowsTimer"
 
 let githubToken = releaseSecret "<githubtoken>" "GITHUB_TOKEN"
+// let githubNugetToken = releaseSecret "<githubtoken>" "GITHUB_NUGET_TOKEN"
 
 
 // -------------------
@@ -114,11 +115,15 @@ let private uploadDir versionString =
 let private zipFileName versionString =
     "pwt_" + (runtime.Replace("-", "_")) + versionString + ".zip"
 
-
 // ------------------
 //    Targets
 // ------------------
-let setupNuGetSource () =
+Target.create "CheckReleaseSecrets" (fun _ ->
+    for secret in secrets do
+        secret.Force() |> ignore
+)
+
+Target.create "SetupNuGet" (fun _ ->
     let token = githubToken.Value
     let nugetConfig = """
     <configuration>
@@ -136,9 +141,6 @@ let setupNuGetSource () =
     """
     let configContent = System.String.Format(nugetConfig, token)
     System.IO.File.WriteAllText("NuGet.Config", configContent)
-
-Target.create "SetupNuGet" (fun _ ->
-    setupNuGetSource()
     Trace.log "NuGet source configured."
 )
 
@@ -289,10 +291,9 @@ Target.create "CheckRelease" (fun _ ->
 "GetVersion"
     ==> "Clean"
     ==> "Restore"
-    ==> "Build"
 
 if isGitHubActions then
-    "Build" ==> "SetupNuGet" ==> "Test"
+    "CheckReleaseSecrets" ==> "Build" ==> "SetupNuGet" ==> "Test"
 else
     "Build" ==> "Test"
 
