@@ -196,7 +196,7 @@ Target.create "Test" (fun _ ->
         { opts with
             Configuration = DotNet.BuildConfiguration.Release
             NoRestore = true
-            NoBuild = true
+            NoBuild = false
         }) "."
 )
 
