@@ -292,12 +292,11 @@ Target.create "CheckRelease" (fun _ ->
     ==> "Build"
 
 if isGitHubActions then
-    "Build" ==> "SetupNuGet"
+    "Build" ==> "SetupNuGet" ==> "Test"
 else
     "Build" ==> "Test"
 
-"SetupNuGet"
-    ?=> "Test"
+"Test"
     ==> "Publish"
     ==> "Compress"
     =?> ("GitHubRelease", isGitHubActions)
