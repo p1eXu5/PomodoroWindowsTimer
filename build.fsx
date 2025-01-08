@@ -119,6 +119,7 @@ let private zipFileName versionString =
 //    Targets
 // ------------------
 Target.create "CheckReleaseSecrets" (fun _ ->
+    Trace.log (sprintf "%A" Environment.environVars)
     for secret in secrets do
         secret.Force() |> ignore
 )
