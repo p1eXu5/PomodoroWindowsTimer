@@ -1,13 +1,14 @@
 open System.IO.Compression
 
 #r "nuget: Fake.Api.GitHub, 6.1.3"
-#r "nuget: Fake.DotNet.Cli, 6.1.3"
-#r "nuget: Fake.IO.FileSystem, 6.1.3"
+#r "nuget: Fake.BuildServer.GitHubActions, 6.1.3"
 #r "nuget: Fake.Core.Target, 6.1.3"
 #r "nuget: Fake.Core.Vault, 6.1.3"
 #r "nuget: Fake.Core.ReleaseNotes, 6.1.3"
-#r "nuget: Fake.BuildServer.GitHubActions, 6.1.3"
+#r "nuget: Fake.DotNet.Cli, 6.1.3"
+#r "nuget: Fake.IO.FileSystem, 6.1.3"
 #r "nuget: Fake.IO.Zip, 6.1.3"
+#r "nuget: Fake.DotNet.NuGet, 6.1.3"
 #r "nuget: Fake.Tools.Git, 6.1.3"
 #r "nuget: MSBuild.StructuredLogger, 2.2.386" // MSBuild log version fix
 #r "nuget: System.Formats.Asn1, 9.0.0" // vulnerabilities
@@ -17,6 +18,7 @@ open System.IO.Compression
 open System.IO
 open Fake.Core
 open Fake.DotNet
+open Fake.DotNet.NuGet
 open Fake.IO
 open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
@@ -166,9 +168,8 @@ Target.create "Clean" (fun _ ->
 
 // Restore target
 Target.create "Restore" (fun _ ->
-    DotNet.restore
-        id
-        project
+    !!("./**/*.*sproj")
+    |> Seq.iter (DotNet.restore id)
 )
 
 // Build target
@@ -194,6 +195,8 @@ Target.create "Test" (fun _ ->
     DotNet.test (fun opts ->
         { opts with
             Configuration = DotNet.BuildConfiguration.Release
+            NoRestore = true
+            NoBuild = true
         }) "."
 )
 
@@ -280,31 +283,21 @@ Target.create "GitHubRelease" (fun _ ->
 Target.create "All" ignore
 Target.create "Local" ignore
 
-Target.create "CheckRelease" (fun _ ->
-    Trace.log (sprintf "%A" (System.Environment.GetCommandLineArgs()))
-    Trace.log (sprintf "%A" release)
-)
-
-"GetVersion"
-    ==> "Clean"
-    ==> "Restore"
+"GetVersion" ==> "Clean"
 
 if isGitHubActions then
-    "Restore" ==> "CheckReleaseSecrets" ==> "Build" ==> "SetupNuGet" ==> "Test"
+    "Clean" ==> "CheckReleaseSecrets" ==> "SetupNuGet" ==> "Restore" ==> "Build" ==> "Test"
 else
-    "Restore" ==> "Build" ==> "Test"
+    "Clean" ==> "Restore" ==> "Build" ==> "Test"
 
-"Test"
-    ==> "Publish"
-    ==> "Compress"
-    =?> ("GitHubRelease", isGitHubActions)
-    ==> "All"
+"Test" ==> "Publish"
 
-"Build"
-    ==> "Build_Debug"
-    ==> "Publish"
-    ==> "Compress"
-    ==> "Local"
+"Publish" ==> "Compress"
+"Compress" =?> ("GitHubRelease", isGitHubActions)
 
+"Build" ==> "Build_Debug"
 
-Target.runOrDefaultWithArguments "All"
+"Build_Debug" ==> "Local"
+"Compress" ==> "Local"
+
+Target.runOrDefaultWithArguments "Local"
