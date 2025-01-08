@@ -10,7 +10,6 @@ namespace PomodoroWindowsTimer.WpfClientInstaller;
 internal class Bootstrap : IDisposable
 {
     private bool _isDisposed;
-    private bool _isInTest;
 
     protected Bootstrap()
     {
@@ -79,13 +78,9 @@ internal class Bootstrap : IDisposable
                     BindingFlags.Instance
                     | BindingFlags.NonPublic
                     | BindingFlags.Public,
-                    Array.Empty<Type>()
-                );
-
-        if (parameterlessCtor is null)
-        {
-            throw new ArgumentException("TBootstrap type has no parameterless constructor.");
-        }
+                    []
+                )
+                ?? throw new ArgumentException("TBootstrap type has no parameterless constructor.");
 
         return (TBootstrap)parameterlessCtor.Invoke(null);
     }

@@ -11,7 +11,6 @@ open System.IO.Compression
 #r "nuget: Fake.Tools.Git, 6.1.3"
 #r "nuget: MSBuild.StructuredLogger, 2.2.386" // MSBuild log version fix
 #r "nuget: System.Formats.Asn1, 9.0.0" // vulnerabilities
-#r "nuget: Octokit, 13.0.1"
 
 #load "./utils/scripts/project_file_versions.fsx"
 
@@ -23,8 +22,6 @@ open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Core.TargetOperators
 open Project_file_versions
-open Octokit
-open Octokit.Internal
 open Fake.BuildServer
 open Fake.Tools
 open Fake.Api
@@ -121,6 +118,30 @@ let private zipFileName versionString =
 // ------------------
 //    Targets
 // ------------------
+let setupNuGetSource () =
+    let token = Environment.environVarOrFail "GITHUB_NUGET_TOKEN"
+    let nugetConfig = """
+    <configuration>
+      <packageSources>
+        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />
+        <add key="github" value="https://nuget.pkg.github.com/your-github-username/index.json" />
+      </packageSources>
+      <packageSourceCredentials>
+        <github>
+          <add key="Username" value="your-github-username" />
+          <add key="ClearTextPassword" value="{0}" />
+        </github>
+      </packageSourceCredentials>
+    </configuration>
+    """
+    let configContent = System.String.Format(nugetConfig, token)
+    System.IO.File.WriteAllText("NuGet.Config", configContent)
+
+Target.create "SetupNuGet" (fun _ ->
+    setupNuGetSource()
+    Trace.log "NuGet source configured."
+)
+
 Target.create "GetVersion" (fun _ ->
     let versionString = getCurrentVersion project |> Option.defaultValue release.AssemblyVersion
 
@@ -256,6 +277,7 @@ Target.create "GitHubRelease" (fun _ ->
     |> Async.RunSynchronously
 )
 
+Target.create "Empty" ignore
 Target.create "All" ignore
 Target.create "Local" ignore
 
@@ -269,9 +291,13 @@ Target.create "CheckRelease" (fun _ ->
     ==> "Restore"
     ==> "Build"
 
-"Build" ==> "Test"
+if isGitHubActions then
+    "Build" ==> "SetupNuGet"
+else
+    "Build" ==> "Test"
 
-"Test"
+"SetupNuGet"
+    ?=> "Test"
     ==> "Publish"
     ==> "Compress"
     =?> ("GitHubRelease", isGitHubActions)

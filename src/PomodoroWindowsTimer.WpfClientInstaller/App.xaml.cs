@@ -9,7 +9,6 @@ namespace PomodoroWindowsTimer.WpfClientInstaller;
 public partial class App : Application
 {
     private Bootstrap _bootstrap = default!;
-    private MainWindow _mainWindow = default!;
     private ILogger<App> _logger = default!;
 
     public App()
@@ -54,13 +53,13 @@ public partial class App : Application
     private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         _logger?.LogError("Current domain unhandled exception. {ExceptionObject}", e.ExceptionObject);
-        string errorMessage = e.ExceptionObject.ToString() + Environment.NewLine;
+        // string errorMessage = e.ExceptionObject.ToString() + Environment.NewLine;
     }
 
     private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         _logger?.LogError(e.Exception, "Unobserved task exception.");
-        string errorMessage = e.Exception.InnerExceptions.First().Message + Environment.NewLine + e.Exception.GetType();
+        // string errorMessage = e.Exception.InnerExceptions.First().Message + Environment.NewLine + e.Exception.GetType();
     }
 }
 
