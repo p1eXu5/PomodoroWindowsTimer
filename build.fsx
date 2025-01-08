@@ -102,7 +102,7 @@ BuildServer.install [
     GitHubActions.Installer
 ]
 
-// CoreTracing.ensureConsoleListener ()
+CoreTracing.ensureConsoleListener ()
 
 
 // ------------------
