@@ -119,7 +119,7 @@ let private zipFileName versionString =
 //    Targets
 // ------------------
 let setupNuGetSource () =
-    let token = Environment.environVarOrFail "GITHUB_NUGET_TOKEN"
+    let token = githubToken.Value
     let nugetConfig = """
     <configuration>
       <packageSources>
