@@ -1,16 +1,93 @@
+open System.IO.Compression
+
+#r "nuget: Fake.Api.GitHub, 6.1.3"
 #r "nuget: Fake.DotNet.Cli, 6.1.3"
 #r "nuget: Fake.IO.FileSystem, 6.1.3"
 #r "nuget: Fake.Core.Target, 6.1.3"
-#r "nuget: MSBuild.StructuredLogger, 2.2.386"
+#r "nuget: Fake.Core.Vault, 6.1.3"
+#r "nuget: Fake.Core.ReleaseNotes, 6.1.3"
+#r "nuget: Fake.BuildServer.GitHubActions, 6.1.3"
+#r "nuget: Fake.IO.Zip, 6.1.3"
+#r "nuget: Fake.Tools.Git, 6.1.3"
+#r "nuget: MSBuild.StructuredLogger, 2.2.386" // MSBuild log version fix
+#r "nuget: System.Formats.Asn1, 9.0.0" // vulnerabilities
+#r "nuget: Octokit, 13.0.1"
 
+#load "./utils/scripts/project_file_versions.fsx"
+
+open System.IO
 open Fake.Core
 open Fake.DotNet
 open Fake.IO
 open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
 open Fake.Core.TargetOperators
+open Project_file_versions
+open Octokit
+open Octokit.Internal
+open Fake.BuildServer
+open Fake.Tools
+open Fake.Api
 
-// Boilerplate
+// ------------------
+//    Properties
+// ------------------
+let [<Literal>] project = "./src/PomodoroWindowsTimer.WpfClient/PomodoroWindowsTimer.WpfClient.csproj"
+
+let [<Literal>] framework = "net8.0-windows"
+let [<Literal>] runtime = "win-x64"
+
+let [<Literal>] releaseRootDir = "./release"
+let collectedArtifactsDir = releaseRootDir </> "artifacts"
+
+/// releaseRootDir/publish
+let publishRootDir = releaseRootDir </> "publish"
+
+/// releaseRootDir/upload
+let uploadRootDir = releaseRootDir </> "upload"
+
+let [<Literal>] versionStringKey = "VersionString"
+
+let release = ReleaseNotes.load "RELEASE_NOTES.md"
+
+let isGitHubActions = Environment.hasEnvironVar "GITHUB_ACTIONS"
+let isWindows = Environment.isWindows
+
+// ------------------
+//      Secrets
+// ------------------
+let mutable secrets = []
+
+let vault = Vault.fromFakeEnvironmentVariable()
+
+let getVarOrDefaultFromVault name defaultValue =
+    match vault.TryGet name with
+    | Some v -> v
+    | None -> Environment.environVarOrDefault name defaultValue
+
+let releaseSecret replacement name =
+    let secret =
+        lazy
+            let env =
+                match getVarOrDefaultFromVault name "default_unset" with
+                | "default_unset" -> failwithf "variable '%s' is not set" name
+                | s -> s
+            TraceSecrets.register replacement env
+            env
+
+    secrets <- secret :: secrets
+    secret
+
+let githubReleaseUser = getVarOrDefaultFromVault "RELEASE_USER_GITHUB" "p1eXu5"
+let gitName = getVarOrDefaultFromVault "REPOSITORY_NAME_GITHUB" "PomodoroWindowsTimer"
+
+let githubToken = releaseSecret "<githubtoken>" "GITHUB_TOKEN"
+
+
+// -------------------
+//   Bootstrap Fake
+// -------------------
+// To run script without fake.exe (.net version problem) - https://fake.build/guide/fake-debugging.html#Run-script-without-fake-exe-via-fsi
 System.Environment.GetCommandLineArgs()
 |> Array.skip 2 // skip fsi.exe; build.fsx
 |> Array.toList
@@ -18,25 +95,54 @@ System.Environment.GetCommandLineArgs()
 |> Fake.Core.Context.RuntimeContext.Fake
 |> Fake.Core.Context.setExecutionContext
 
-// Define the project and output directories
-let project = "./src/PomodoroWindowsTimer.WpfClient/PomodoroWindowsTimer.WpfClient.csproj"
-let outputDir = "./publish/win-x64"
+// https://fake.build/guide/buildserver.html
+BuildServer.install [
+    GitHubActions.Installer
+]
 
-// Define the target framework and runtime
-let framework = "net8.0-windows"
-let runtime = "win-x64"
+CoreTracing.ensureConsoleListener ()
+
+
+// ------------------
+//    Privates
+// ------------------
+/// publishRootDir/versionString/runtime
+let private publishDir versionString =
+    publishRootDir </> versionString </> runtime
+
+let private uploadDir versionString =
+    uploadRootDir </> versionString
+
+let private zipFileName versionString =
+    "pwt_" + (runtime.Replace("-", "_")) + versionString + ".zip"
+
+
+// ------------------
+//    Targets
+// ------------------
+Target.create "GetVersion" (fun _ ->
+    let versionString = getCurrentVersion project |> Option.defaultValue release.AssemblyVersion
+
+    if versionString <> release.AssemblyVersion then
+        failwith (sprintf "Release notes for version %s has not been found" versionString)
+
+    Trace.log $"Version string: {versionString}"
+    // Store the version string in the context for later use
+    FakeVar.set versionStringKey versionString
+)
 
 Target.create "Clean" (fun _ ->
-    !! "src/**/bin" ++ "src/**/obj"
-    |> Shell.cleanDirs)
+    let versionString = FakeVar.get versionStringKey |> Option.get
+    let publishDir = versionString |> publishDir
+    let uploadDir = versionString |> uploadDir
+
+    !! "src/**/bin" ++ "src/**/obj" ++ publishDir ++ uploadDir
+    |> Shell.cleanDirs
+)
 
 // Restore target
 Target.create "Restore" (fun _ ->
     DotNet.restore
-        // (fun o ->
-        //     { o with
-        //         MSBuildParams = { o.MSBuildParams with DisableInternalBinLog = true }
-        // })
         id
         project
 )
@@ -58,41 +164,94 @@ Target.create "Test" (fun _ ->
         }) "."
 )
 
-// GetVersion target
-Target.create "GetVersion" (fun _ ->
-    let versionString = "???" // getVersionString()
-    Trace.log $"Version string: {versionString}"
-    // Store the version string in the context for later use
-    FakeVar.set "VersionString" "foo"
-    //Context. "VersionString" versionString
-)
 
 // Publish target
 Target.create "Publish" (fun _ ->
-    let versionString = FakeVar.get "VersionString" |> Option.defaultValue "v0.0.0"
+    let versionString = FakeVar.get versionStringKey |> Option.get
     Trace.log $"Publishing version: {versionString}"
 
-    // let outputDir = System.IO.Path.Combine(baseOutputDir, versionString)
-    // 
-    // DotNet.publish (fun opts ->
-    //     { opts with
-    //         Configuration = DotNet.BuildConfiguration.Release
-    //         Framework = Some framework
-    //         Runtime = Some runtime
-    //         OutputPath = Some outputDir
-    //         SelfContained = Some true
-    //     }) project
+    let publishFolder = versionString |> publishDir
+    
+    DotNet.publish (fun opts ->
+        { opts with
+            Configuration = DotNet.BuildConfiguration.Release
+            Framework = Some framework
+            Runtime = Some runtime
+            OutputPath = Some publishFolder
+            SelfContained = Some true
+            VersionSuffix = Some versionString
+            MSBuildParams =
+                { MSBuild.CliArguments.Create ()
+                    with
+                        Properties = [ 
+                            "PublishSingleFile", "true"
+                            "PublishReadyToRun", "true"
+                            "DebugType", "embedded"
+                        ]
+                }
+        }) project
+)
+
+(*
+    .publish
+        - 0.0.0
+            - win_x64
+
+    .upload
+        pwt_win_x64_0.0.0.zip
+*)
+
+Target.create "Compress" (fun _ ->
+    let versionString = FakeVar.get versionStringKey |> Option.get
+    let publishDir = versionString |> publishDir
+    let uploadDir = versionString |> uploadDir
+    let zipFileName = versionString |> zipFileName
+
+    !!(sprintf "%s/**" publishDir) |> Zip.zip uploadDir zipFileName
 )
 
 
+// Upload target
+Target.create "GitHubRelease" (fun _ ->
+    let token = githubToken.Value
+    let auth = sprintf "%s:x-oauth-basic@" token
+    let repoUrl = sprintf "https://%sgithub.com/%s/%s.git" auth githubReleaseUser gitName
+
+    let versionString = FakeVar.get versionStringKey |> Option.get
+    let uploadDir = versionString |> uploadDir
+
+    let gitDirectory = getVarOrDefaultFromVault "GIT_DIRECTORY" ""
+    if not BuildServer.isLocalBuild then
+        Git.CommandHelper.directRunGitCommandAndFail gitDirectory "config user.email v1adp1exu5@gmail.com"
+        Git.CommandHelper.directRunGitCommandAndFail gitDirectory "config user.name \"Vladimir Likhatskiy\""
+
+    // Add Tag (To create a new release you must have a corresponding tag in the repository. See the git-database.md docs for details.)
+    let tag = sprintf "v%s" versionString
+    Git.Branches.tag gitDirectory tag
+    Git.Branches.pushTag gitDirectory repoUrl tag
+
+    GitHub.createClientWithToken token
+    |> GitHub.draftNewRelease githubReleaseUser gitName tag (release.SemVer.PreRelease <> None) release.Notes
+    |> GitHub.uploadFiles !!uploadDir
+    |> GitHub.publishDraft
+    |> Async.RunSynchronously
+)
 
 Target.create "All" ignore
 
-"Clean"
+Target.create "CheckRelease" (fun _ ->
+    Trace.log (sprintf "%A" (System.Environment.GetCommandLineArgs()))
+    Trace.log (sprintf "%A" release)
+)
+
+"GetVersion"
+    ==> "Clean"
     ==> "Restore"
     ==> "Build"
-    ==> "Test"
-    // ==> "GetVersion"
+    =?> ("Test", not <| isWindows && isGitHubActions)
     ==> "Publish"
+    ==> "Compress"
+    =?> ("GitHubRelease", not <| isWindows && isGitHubActions)
+    ==> "All"
 
-Target.runOrDefault "Test"
+Target.runOrDefaultWithArguments "All"

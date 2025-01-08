@@ -103,6 +103,7 @@ public partial class StartupWindow : Window
         m_Spinner.Visibility = Visibility.Visible;
         _mainEntryPoint.Shutdown();
     }
+
     private void LoadMainWindow()
     {
         m_DatabaseSelector.IsEnabled = false;

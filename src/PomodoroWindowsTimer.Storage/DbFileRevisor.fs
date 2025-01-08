@@ -9,9 +9,12 @@ module internal DbFileRevisor =
 
     open System.IO
 
-    let private checkIfFileIsEmpty (dbFilePath: string) =
-        let fileInfo = FileInfo(dbFilePath)
-        fileInfo.Length = 0L
+    let private checkFileNotExistOrEmpty (dbFilePath: string) =
+        if not <| File.Exists(dbFilePath) then
+            true
+        else
+            let fileInfo = FileInfo(dbFilePath)
+            fileInfo.Length = 0L
 
     let private checkDatabaseStructure (dbSeeder: IDbSeeder) (dbSettings: IDatabaseSettings) (cancellationToken: CancellationToken) =
         task {
@@ -48,23 +51,20 @@ module internal DbFileRevisor =
 
     let tryUpdateDatabaseFile (dbSeeder: IDbSeeder) (dbMigrator: IDbMigrator) (dbSettings: IDatabaseSettings) (cancellationToken: CancellationToken) =
         task {
-            if not <| File.Exists(dbSettings.DatabaseFilePath) then
-                return Error $"File '{dbSettings.DatabaseFilePath}' does not exist"
+            if checkFileNotExistOrEmpty dbSettings.DatabaseFilePath then
+                match! dbSeeder.SeedDatabaseAsync(dbSettings, cancellationToken) with
+                | Ok () ->
+                    return dbMigrator.ApplyMigrations dbSettings
+                | Error err ->
+                    return Error err
             else
-                if checkIfFileIsEmpty dbSettings.DatabaseFilePath then
-                    match! dbSeeder.SeedDatabaseAsync(dbSettings, cancellationToken) with
-                    | Ok () ->
-                        return dbMigrator.ApplyMigrations dbSettings
-                    | Error err ->
-                        return Error err
-                else
-                    match! checkDatabaseStructure dbSeeder dbSettings cancellationToken with
-                    | Choice1Of3 _ ->
-                        return dbMigrator.ApplyMigrations dbSettings
-                    | Choice2Of3 _ ->
-                        return Ok ()
-                    | Choice3Of3 err ->
-                        return Error err
+                match! checkDatabaseStructure dbSeeder dbSettings cancellationToken with
+                | Choice1Of3 _ ->
+                    return dbMigrator.ApplyMigrations dbSettings
+                | Choice2Of3 _ ->
+                    return Ok ()
+                | Choice3Of3 err ->
+                    return Error err
         }
 
     let init (dbSeeder: IDbSeeder) (dbMigrator: IDbMigrator) =

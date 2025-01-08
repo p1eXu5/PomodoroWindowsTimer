@@ -4,117 +4,21 @@ on:
   push:
     branches:
       - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
-  # ==================
-  # run tests
-  # ==================
-  run_tests:
-    runs-on: windows-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Generate appsettings.Production.json
-      run: |
-        # cp src/PomodoroWindowsTimer.WpfClient/appsettings.Development.template.json src/PomodoroWindowsTimer.WpfClient/appsettings.Development.json
-        cp src/PomodoroWindowsTimer.WpfClient/appsettings.Production.template.json src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
-
-    - name: Restore dependencies
-      run: dotnet restore
-      env:
-        NuGetPackageSourceCredentials_github: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-
-    - name: Test
-      run: dotnet test --configuration Release --no-build
-
-  # ==================
-  # publish release
-  # ==================
-  publish_release:
-    runs-on: windows-latest
-    needs: run_tests
-    if: startsWith(github.ref, 'refs/heads/v')
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Generate appsettings.Production.json
-      run: |
-        cp src/PomodoroWindowsTimer.WpfClient/appsettings.Production.template.json src/PomodoroWindowsTimer.WpfClient/appsettings.Production.json
-
-    - name: Restore dependencies
-      run: dotnet restore
-      env:
-        NuGetPackageSourceCredentials_github: Username=${{ github.actor }};Password=${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-
-    - name: Update version in .csproj and cherry-pick to develop
-      run: |
-        branch_name=${GITHUB_REF##*/}
-        IFS='.' read -r -a version_parts <<< "${branch_name#v}"
-
-        echo "Updating version of WpfClient to $branch_name"
-        sed -i "s|<Version>.*</Version>|<Version>${version_parts[0]}.${version_parts[1]}.${version_parts[2]}</Version>|" **/PomodoroWindowsTimer.WpfClient.csproj
-        sed -i "s|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${version_parts[0]}.${version_parts[1]}</AssemblyVersion>|" **/PomodoroWindowsTimer.WpfClient.csproj
-        sed -i "s|<FileVersion>.*</FileVersion>|<Version>${version_parts[0]}.${version_parts[1]}.${version_parts[2]}.0</FileVersion>|" **/PomodoroWindowsTimer.WpfClient.csproj
-        
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git commit -am "Update version to $version"
-        git push
-
-        # Get the commit hash of the version update
-        commit_hash=$(git rev-parse HEAD)
-
-        # Checkout the develop branch
-        git fetch origin
-        git checkout develop
-
-        # Cherry-pick the commit
-        git cherry-pick $commit_hash
-
-        # Push the changes to the develop branch
-        git push origin develop
-
-    - name: Publish to GitHub Releases
-      run: |
-        dotnet publish -c Release -o ./publish
-        # Remove foo.json from the publish directory
-        rm ./publish/appsettings.Production.template.json
-        rm ./publish/appsettings.Development.template.json
-
-        # Create a zip file with the branch name in the name
-        branch_name=${GITHUB_REF##*/}
-        zip_file_name="PomodoroWindowsTimer_${branch_name#v}.zip"
-        zip -r $zip_file_name ./publish
-
-    - name: Get release notes
-      id: get_release_notes
-      run: |
-        # Get all commit messages except the last one
-        release_notes=$(git log --pretty=format:"%s" HEAD~1..HEAD^)
-        echo "release_notes=$release_notes" >> $GITHUB_ENV
-
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: App_${{ github.ref_name }}.zip
-        body: ${{ env.release_notes }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v4
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: '8.0.x'
+      - name: Fake
+        run: dotnet fsi build.fsx -v build --parallel 3 -e FAKE_DETAILED_ERRORS=true

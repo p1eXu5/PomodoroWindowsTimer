@@ -43,7 +43,7 @@ let TearDown () =
 
 
 [<Test>]
-let ``01: TryUpdateDatabaseFile -> file does not exist -> returns error``() =
+let ``01: TryUpdateDatabaseFile -> file does not exist -> returns ok``() =
     task {
         // Arrange
         let fileRevisor = dbFileRevisor ()
@@ -52,11 +52,29 @@ let ``01: TryUpdateDatabaseFile -> file does not exist -> returns error``() =
         let! result = fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
 
         // Assert
-        %result.Should().BeOfCase(Result.Error)
+        %result.Should().BeOfCase(Result.Ok)
     }
 
 [<Test>]
-let ``02: TryUpdateDatabaseFile -> file is empty -> returns ok``() =
+let ``02: TryUpdateDatabaseFile -> file does not exist -> applies migrations``() =
+    taskResult {
+        // Arrange
+        let fileRevisor = dbFileRevisor ()
+
+        // Act
+        let! result = fileRevisor.TryUpdateDatabaseFileAsync _dbSettings CancellationToken.None
+
+        // Assert
+        let! tables = _repositoryFactory.ReadDbTablesAsync()
+        %tables.Should().Contain("SchemaVersions")
+
+        let! migrationCount = _repositoryFactory.ReadRowCountAsync("SchemaVersions")
+        %migrationCount.Should().BeGreaterThan(0)
+    }
+    |> TaskResult.runTest
+
+[<Test>]
+let ``03: TryUpdateDatabaseFile -> file is empty -> returns ok``() =
     task {
         // Arrange
         let stream = File.Create(_dbSettings.DatabaseFilePath)
@@ -72,7 +90,7 @@ let ``02: TryUpdateDatabaseFile -> file is empty -> returns ok``() =
     }
 
 [<Test>]
-let ``03: TryUpdateDatabaseFile -> file is empty -> applies migrations``() =
+let ``04: TryUpdateDatabaseFile -> file is empty -> applies migrations``() =
     taskResult {
         // Arrange
         let stream = File.Create(_dbSettings.DatabaseFilePath)
@@ -93,7 +111,7 @@ let ``03: TryUpdateDatabaseFile -> file is empty -> applies migrations``() =
     |> TaskResult.runTest
 
 [<Test>]
-let ``04: TryUpdateDatabaseFile -> file with seeded db -> returns ok``() =
+let ``05: TryUpdateDatabaseFile -> file with seeded db -> returns ok``() =
     task {
         let stream = File.Create(_dbSettings.DatabaseFilePath)
         stream.Dispose()
@@ -110,7 +128,7 @@ let ``04: TryUpdateDatabaseFile -> file with seeded db -> returns ok``() =
     }
 
 [<Test>]
-let ``05: TryUpdateDatabaseFile -> file with seeded db -> applies migrations``() =
+let ``06: TryUpdateDatabaseFile -> file with seeded db -> applies migrations``() =
     taskResult {
         let stream = File.Create(_dbSettings.DatabaseFilePath)
         stream.Dispose()
@@ -133,7 +151,7 @@ let ``05: TryUpdateDatabaseFile -> file with seeded db -> applies migrations``()
 
 
 [<Test>]
-let ``06: TryUpdateDatabaseFile -> file is not empty and not db -> returns error``() =
+let ``07: TryUpdateDatabaseFile -> file is not empty and not db -> returns error``() =
     task {
         let stream = File.Create(_dbSettings.DatabaseFilePath)
         let streamWriter = new StreamWriter(stream)

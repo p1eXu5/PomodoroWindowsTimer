@@ -8,7 +8,7 @@ open System
 type WorkDbOptions () =
     static member SectionName = "WorkDb"
     [<Required>]
-    [<MinLength(16)>]
+    [<MinLength(1)>]
     member val DatabaseFilePath: string = "" with get, set
     member val Pooling: Nullable<bool> = Unchecked.defaultof<_> with get, set
     member val Mode: string = Unchecked.defaultof<_> with get, set
