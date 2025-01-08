@@ -74,7 +74,7 @@ let releaseSecret replacement name =
     secrets <- secret :: secrets
     secret
 
-let githubReleaseUser = getVarOrDefaultFromVault "RELEASE_USER_GITHUB" "p1eXu5"
+let githubReleaseUser = getVarOrDefaultFromVault "GITHUB_ACTOR" "p1eXu5"
 let gitName = getVarOrDefaultFromVault "REPOSITORY_NAME_GITHUB" "PomodoroWindowsTimer"
 
 let githubToken = releaseSecret "<githubtoken>" "GITHUB_TOKEN"
@@ -119,7 +119,7 @@ let private zipFileName versionString =
 //    Targets
 // ------------------
 Target.create "CheckReleaseSecrets" (fun _ ->
-    Trace.log (sprintf "%A" (Environment.environVars ()))
+    // Trace.log (sprintf "%A" (Environment.environVars ()))
     for secret in secrets do
         secret.Force() |> ignore
 )
