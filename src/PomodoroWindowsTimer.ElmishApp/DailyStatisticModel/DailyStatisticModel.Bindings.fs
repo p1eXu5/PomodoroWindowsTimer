@@ -102,11 +102,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val ShowExportEvents : Binding =
         nameof __.ShowExportEvents
-#if RELEASE
-            |> Binding.oneWay (fun _ -> false)
-#else
             |> Binding.oneWay (fun _ -> true)
-#endif
 
     member val ExportEventsCommand : Binding =
         nameof __.ExportEventsCommand
