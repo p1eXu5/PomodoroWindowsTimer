@@ -300,4 +300,4 @@ else
 "Build_Debug" ==> "Local"
 "Compress" ==> "Local"
 
-Target.runOrDefaultWithArguments "Local"
+Target.runOrDefaultWithArguments "Publish"
