@@ -50,7 +50,7 @@ let internal projectStatistic (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
-            | WorkEvent.WorkStarted (timePointName = n), WorkEvent.Stopped _ ->
+            | WorkEvent.WorkStarted (timePointName = n), _ ->
                 Calculating (
                     { stat with
                         TimePointNameStack = n :: stat.TimePointNameStack
@@ -73,7 +73,7 @@ let internal projectStatistic (workEvents: WorkEvent list) =
                         Period = { stat.Period with EndInclusive = evDate }
                     }, lastWorkEvent = ev)
 
-            | WorkEvent.BreakStarted (timePointName = n), WorkEvent.Stopped _ ->
+            | WorkEvent.BreakStarted (timePointName = n), _ ->
                 Calculating (
                     { stat with
                         TimePointNameStack = n :: stat.TimePointNameStack
@@ -149,24 +149,32 @@ let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPe
 let projectDailyByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
     task {
         let! res = workEventRepo.FindAllByPeriodAsync period ct
-        return
-            res
-            |> Result.map (fun workEvents ->
+        match res with
+        | Error err -> return err |> Error
+        | Ok workEvents ->
+            let groups =
                 workEvents
                 |> WorkEventList.List.groupByDay
-                |> List.map (fun (day, wel) ->
-                    {
-                        Date = day
-                        WorkStatistic =
-                            wel
-                            |> List.map (fun wel ->
-                                {
-                                    Work = wel.Work
-                                    Statistic = wel.Events |> projectStatistic
-                                }
-                            )
-                    }
-                )
-            )
+
+            try
+                let dailyStatisticList = 
+                    groups
+                    |> List.map (fun (day, wel) ->
+                        {
+                            Date = day
+                            WorkStatistic =
+                                wel
+                                |> List.map (fun wel ->
+                                    {
+                                        Work = wel.Work
+                                        Statistic = wel.Events |> projectStatistic
+                                    }
+                                )
+                        }
+                    )
+
+                return dailyStatisticList |> Ok
+            with ex ->
+                return ex.Message |> Error
     }
 
