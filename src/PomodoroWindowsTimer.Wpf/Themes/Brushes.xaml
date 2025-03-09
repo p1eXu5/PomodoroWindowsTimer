@@ -59,7 +59,44 @@
     <Color x:Key="{x:Static local:PwtColors.SpinnerFilledKey}">#999B9B9B</Color>
     <Color x:Key="{x:Static local:PwtColors.SpinnerUnfilledKey}">#009B9B9B</Color>
 
-    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerFilledKey}" Color="{DynamicResource {x:Static local:PwtColors.SpinnerFilledKey}}" />
-    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerUnfilledKey}" Color="{DynamicResource {x:Static local:PwtColors.SpinnerUnfilledKey}}" />
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerFilledKey}"
+                     Color="{DynamicResource {x:Static local:PwtColors.SpinnerFilledKey}}"
+                     />
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerUnfilledKey}"
+                     Color="{DynamicResource {x:Static local:PwtColors.SpinnerUnfilledKey}}"
+                     />
+
+    <!--  =======  -->
+    <!--  diagram  -->
+    <!--  =======  -->
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush1Key}">#556B2F</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush1Key}">#B2FF66</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush2Key}">#9932CC</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush2Key}">#FF4F94</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush3Key}">#B8860B</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush3Key}">#FFFF33</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush4Key}">#483D8B</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush4Key}">#00BFFF</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush5Key}">#8B4513</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush5Key}">#FF5E00</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush6Key}">#006400</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush6Key}">#A8D700</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush7Key}">#008080</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush7Key}">#00FFFF</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush8Key}">#9370DB</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush8Key}">#FF69B4</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush9Key}">#556B2F</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush9Key}">#CCFF00</SolidColorBrush>
+
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramBrush10Key}">#9400D3</SolidColorBrush>
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.DiagramAccentBrush10Key}">#A500FF</SolidColorBrush>
 
 </ResourceDictionary>

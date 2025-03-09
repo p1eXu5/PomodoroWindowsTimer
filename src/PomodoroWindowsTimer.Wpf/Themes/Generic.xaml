@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
                     xmlns:local="clr-namespace:PomodoroWindowsTimer.Wpf"
@@ -11,6 +11,7 @@
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Lcd.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/Beam.xaml" />
         <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/BlackMirrorSpinner.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/PomodoroWindowsTimer.Wpf;component/Themes/LinearDiagram.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>
