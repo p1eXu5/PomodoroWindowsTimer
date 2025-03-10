@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'" >
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
@@ -22,6 +22,7 @@
     <Compile Include="Projectors\WorkEventProjector.fs" />
     <Compile Include="Projectors\WorkEventOffsetTimeProjector.fs" />
     <Compile Include="Projectors\WorkEventSpentTimeProjector.fs" />
+    <Compile Include="Projectors\LinearDiagramProjector.fs" />
     <Compile Include="ExcelExporter.fs" />
     <Compile Include="EventExporter.fs" />
     <Compile Include="TimePointQueue.fs" />

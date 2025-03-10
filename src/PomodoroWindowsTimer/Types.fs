@@ -114,6 +114,12 @@ type WorkEventList =
         Events: WorkEvent list
     }
 
+type WorkAndEvent =
+    {
+        Work: Work
+        Event: WorkEvent
+    }
+
 type Statistic =
     {
         Period: DateTimePeriod
@@ -126,6 +132,17 @@ type WorkStatistic =
     {
         Work: Work
         Statistic: Statistic option
+    }
+
+/// Value for LinearDiagram
+[<Struct>]
+type WorkEventDuration =
+    {
+        Id: WorkId
+        Number: string
+        IsWork: Nullable<bool>
+        StartTime: TimeOnly
+        Duration: TimeSpan
     }
 
 type DailyStatistic =
