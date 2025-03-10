@@ -80,7 +80,7 @@ let projectByWorkIdByPeriod (workEventRepo: IWorkEventRepository) (workId: uint6
 
 let projectByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
     task {
-        let! res = workEventRepo.FindAllByPeriodAsync period ct
+        let! res = workEventRepo.FindWelByPeriodAsync period ct
         return
             res
             |> Result.map (

@@ -138,7 +138,7 @@ module WorkEvents =
             fun period ct ->
                 task {
                     let workEventRepo = workEventStore.GetWorkEventRepository ()
-                    let! events = workEventRepo.FindAllByPeriodAsync period ct
+                    let! events = workEventRepo.FindWelByPeriodAsync period ct
                     return
                         events
                         |> Result.bind (ExcelExporter.export excelBook (TimeSpan.FromMinutes(5)) fd.FileName)
@@ -158,7 +158,7 @@ module WorkEvents =
             fun period ct ->
                 task {
                     let workEventRepo = workEventStore.GetWorkEventRepository ()
-                    let! eventsRes = workEventRepo.FindAllByPeriodAsync period ct
+                    let! eventsRes = workEventRepo.FindWelByPeriodAsync period ct
                     match eventsRes with
                     | Ok events ->
                         return! EventExporter.export fd.FileName events

@@ -130,6 +130,19 @@ module internal WorkEventRepository =
             ;
             """
 
+        /// Parameters: DateMin, DateMax.
+        let SELECT_JOIN_WORK_BY_WORK_ID_BY_PERIOD_DESC = $"""
+            SELECT e.*, '' AS split, w.*
+            FROM {Table.NAME} e
+                INNER JOIN {WorkTable.NAME} w ON w.{WorkTable.Columns.id} = e.{Table.Columns.work_id} 
+            WHERE
+                e.{Table.Columns.created_at} >= @DateMin
+                AND e.{Table.Columns.created_at} < @DateMax
+            ORDER BY
+                  e.{Table.Columns.created_at} DESC
+            ;
+            """
+
         /// Parameters: CreatedAtMax, AtpId, EventNames.
         let SELECT_JOIN_WORK_BY_ATP_ID_BY_MAX_DATE = $"""
             WITH first_event_created_at ({Table.Columns.created_at}) AS (
@@ -159,6 +172,12 @@ module internal WorkEventRepository =
             TimeProvider: System.TimeProvider
             Logger: ILogger
         }
+
+    let toWorkEvent (row: Table.Row) =
+        JsonHelpers.Deserialize<WorkEvent>(row.event_json)
+
+    let toWorkEventList (rows: Table.Row seq) =
+        rows |> Seq.map (fun r -> JsonHelpers.Deserialize<WorkEvent>(r.event_json)) |> Seq.toList
 
     let createTableAsync deps =
         cancellableTaskResult {
@@ -366,7 +385,7 @@ module internal WorkEventRepository =
                 return! Error (ex.Format($"Failed to find work events by workId {workId} and date {date}."))
         }
 
-    let toWorkEventTupleList (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
+    let private toWorkEventTupleList (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
         rows
         |> Seq.map (fun (r, w) ->
             let work = w |> WorkTable.Row.ToWork
@@ -374,7 +393,7 @@ module internal WorkEventRepository =
             (work, ev)
         )
 
-    let toWorkEventLists (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
+    let private toWorkEventLists (rows: System.Collections.Generic.IEnumerable<Table.Row * WorkTable.Row>) =
         rows
         |> toWorkEventTupleList
         |> Seq.groupBy fst
@@ -386,7 +405,51 @@ module internal WorkEventRepository =
         )
         |> Seq.toList
 
-    let findAllByPeriodAsync deps (period: DateOnlyPeriod) =
+    let findByPeriodAsync deps (period: DateOnlyPeriod) =
+        cancellableTaskResult {
+            let! (dbConnection: DbConnection) = deps.GetDbConnection
+            use _ = dbConnection
+
+            let! ct = CancellableTask.getCancellationToken ()
+
+            let dateMin = DateTimeOffset(period.Start, TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+            let dateMax = DateTimeOffset(period.EndInclusive.AddDays(1), TimeOnly(0, 0, 0), deps.TimeProvider.LocalTimeZone.BaseUtcOffset).ToUnixTimeMilliseconds()
+
+            let command =
+                CommandDefinition(
+                    Sql.SELECT_JOIN_WORK_BY_WORK_ID_BY_PERIOD_DESC,
+                    parameters = {|
+                        DateMin = dateMin
+                        DateMax = dateMax
+                    |},
+                    cancellationToken = ct
+                )
+
+            try
+                let! rows =
+                   dbConnection.QueryAsync<Table.Row, WorkTable.Row, Table.Row * WorkTable.Row>(
+                        command,
+                        Func<Table.Row, WorkTable.Row, Table.Row * WorkTable.Row>(
+                            fun f s ->
+                                (f, s)
+                        ),
+                        "split"
+                    )
+                return
+                    rows
+                    |> Seq.map (fun (e, w) ->
+                        {
+                            Work = w |> Tables.Work.Row.ToWork
+                            Event = e |> toWorkEvent
+                        }
+                    )
+                    |> Seq.toList
+            with ex ->
+                deps.Logger.FailedToFindWorkEventsByPeriod(period, ex)
+                return! Error (ex.Format($"Failed to find work events by period [{period.Start} - {period.EndInclusive}]."))
+        }
+
+    let findWelByPeriodAsync deps (period: DateOnlyPeriod) =
         cancellableTaskResult {
             let! (dbConnection: DbConnection) = deps.GetDbConnection
             use _ = dbConnection
@@ -509,8 +572,11 @@ type internal WorkEventRepository(options: IDatabaseSettings, timeProvider: Syst
         member _.FindByWorkIdByPeriodAsync workId period cancellationToken =
             WorkEventRepository.findByWorkIdByPeriodAsync deps workId period cancellationToken
 
-        member _.FindAllByPeriodAsync period cancellationToken =
-            WorkEventRepository.findAllByPeriodAsync deps period cancellationToken
+        member _.FindWelByPeriodAsync period cancellationToken =
+            WorkEventRepository.findWelByPeriodAsync deps period cancellationToken
+
+        member _.FindByPeriodAsync period cancellationToken =
+            WorkEventRepository.findByPeriodAsync deps period cancellationToken
 
         member _.FindLastByWorkIdByDateAsync workId date cancellationToken =
             WorkEventRepository.findLastByWorkIdByDateAsync deps workId date cancellationToken

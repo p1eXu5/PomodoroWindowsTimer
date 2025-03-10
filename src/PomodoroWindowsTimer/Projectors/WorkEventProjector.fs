@@ -132,7 +132,7 @@ let internal projectStatistic (workEvents: WorkEvent list) =
 
 let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
     task {
-        let! res = workEventRepo.FindAllByPeriodAsync period ct
+        let! res = workEventRepo.FindWelByPeriodAsync period ct
         return
             res
             |> Result.map (fun workEvents ->
@@ -148,7 +148,7 @@ let projectAllByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPe
 
 let projectDailyByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnlyPeriod) ct =
     task {
-        let! res = workEventRepo.FindAllByPeriodAsync period ct
+        let! res = workEventRepo.FindWelByPeriodAsync period ct
         match res with
         | Error err -> return err |> Error
         | Ok workEvents ->
@@ -159,15 +159,16 @@ let projectDailyByPeriod (workEventRepo: IWorkEventRepository) (period: DateOnly
             try
                 let dailyStatisticList = 
                     groups
-                    |> List.map (fun (day, wel) ->
+                    |> List.map (fun (day, wels) ->
                         {
                             Date = day
                             WorkStatistic =
-                                wel
+                                wels
                                 |> List.map (fun wel ->
+                                    let statistic = wel.Events |> projectStatistic
                                     {
                                         Work = wel.Work
-                                        Statistic = wel.Events |> projectStatistic
+                                        Statistic = statistic
                                     }
                                 )
                         }

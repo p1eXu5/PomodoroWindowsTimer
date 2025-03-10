@@ -233,7 +233,7 @@ module WorkEventRepositoryTests =
                     |> fun dt -> dt.DateTime
                 )
 
-            let! rows = workEventRepo.FindAllByPeriodAsync ({ Start = minDate; EndInclusive = maxDate }) ct
+            let! rows = workEventRepo.FindWelByPeriodAsync ({ Start = minDate; EndInclusive = maxDate }) ct
 
             let list = rows |> Seq.toList
             list.Length |> should greaterThanOrEqualTo 2

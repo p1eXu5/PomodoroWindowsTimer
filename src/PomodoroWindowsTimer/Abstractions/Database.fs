@@ -73,7 +73,9 @@ type IWorkEventRepository =
         abstract FindLastByWorkIdByDateAsync: workId: WorkId -> DateOnly -> cancellationToken: CancellationToken -> Task<Result<WorkEvent option, string>>
         
         /// Returns work event list ordered by work id then by created at time.
-        abstract FindAllByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
+        abstract FindWelByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkEventList list, string>>
+        /// Returns work event list ordered descended by created at
+        abstract FindByPeriodAsync: DateOnlyPeriod -> CancellationToken -> Task<Result<WorkAndEvent list, string>>
         
         abstract FindByActiveTimePointIdByDateAsync:
             timePointId: TimePointId
