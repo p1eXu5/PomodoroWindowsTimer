@@ -246,7 +246,7 @@ module internal WorkRepository =
                     }
         }
 
-    let updateAsync deps work =
+    let updateAsync deps (work: Work) =
         cancellableTaskResult {
             let! (dbConnection: DbConnection) = deps.OpenDbConnection
             use _ = dbConnection
@@ -277,7 +277,7 @@ module internal WorkRepository =
                 return! Error (ex.Format($"Failed to update work {work.Id}."))
         }
 
-    let deleteAsync deps work =
+    let deleteAsync deps (work: Work) =
         cancellableTaskResult {
             let! (dbConnection: DbConnection) = deps.OpenDbConnection
             use _ = dbConnection

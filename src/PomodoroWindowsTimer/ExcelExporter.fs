@@ -25,7 +25,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
         | WorkEvent.WorkStarted (ct, _, _)
         | WorkEvent.BreakStarted (ct, _, _) ->
 
-            let reduceTime work (startTime: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
+            let reduceTime (work: Work) (startTime: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
                 let rec running (value: TimeSpan) (rows: ExcelRow list) res =
                     match rows with
                     | [] ->
@@ -86,7 +86,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
 
             // ---------------- increaseTime
 
-            let increaseTime work (_: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
+            let increaseTime (work: Work) (_: TimeOnly) (value: TimeSpan) (rows: ExcelRow list) =
                 let rec running (value: TimeSpan) (rows: ExcelRow list) res =
                     match rows with
                     | [] ->
@@ -120,7 +120,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
             // ----------------
 
 
-            let folder (startDt: TimeOnly) (rows: ExcelRow list, last: Work * WorkEvent) curr =
+            let folder (startDt: TimeOnly) (rows: ExcelRow list, last: Work * WorkEvent) (curr: Work * WorkEvent) =
                 let (currWork, currEv) = curr
                 let (lastWork, lastEv) = last
 

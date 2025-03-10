@@ -18,18 +18,76 @@ let internal projectStatistic (workEvents: WorkEvent list) =
         | Initialized ->
             let evDate = ev |> WorkEvent.localDateTime
             let tpName = ev |> WorkEvent.tpName
-            let statistic =
-                {
-                    Period =
-                        {
-                            Start = evDate
-                            EndInclusive = evDate
-                        }
-                    WorkTime = TimeSpan.Zero
-                    BreakTime = TimeSpan.Zero
-                    TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
-                }
-            (statistic, ev) |> Calculating
+            match ev with
+            | WorkEvent.WorkIncreased (value = v) ->
+                let statistic =
+                    {
+                        Period =
+                            {
+                                Start = evDate
+                                EndInclusive = evDate
+                            }
+                        WorkTime = v
+                        BreakTime = TimeSpan.Zero
+                        TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
+                    }
+                (statistic, ev) |> Calculating
+
+            | WorkEvent.BreakIncreased (value = v) ->
+                let statistic =
+                    {
+                        Period =
+                            {
+                                Start = evDate
+                                EndInclusive = evDate
+                            }
+                        WorkTime = TimeSpan.Zero
+                        BreakTime = v
+                        TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
+                    }
+                (statistic, ev) |> Calculating
+
+            | WorkEvent.WorkReduced (value = v) ->
+                let statistic =
+                    {
+                        Period =
+                            {
+                                Start = evDate
+                                EndInclusive = evDate
+                            }
+                        WorkTime = -v
+                        BreakTime = TimeSpan.Zero
+                        TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
+                    }
+                (statistic, ev) |> Calculating
+
+            | WorkEvent.BreakReduced (value = v) ->
+                let statistic =
+                    {
+                        Period =
+                            {
+                                Start = evDate
+                                EndInclusive = evDate
+                            }
+                        WorkTime = TimeSpan.Zero
+                        BreakTime = -v
+                        TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
+                    }
+                (statistic, ev) |> Calculating
+
+            | _ ->
+                let statistic =
+                    {
+                        Period =
+                            {
+                                Start = evDate
+                                EndInclusive = evDate
+                            }
+                        WorkTime = TimeSpan.Zero
+                        BreakTime = TimeSpan.Zero
+                        TimePointNameStack = tpName |> Option.map List.singleton |> Option.defaultValue []
+                    }
+                (statistic, ev) |> Calculating
 
         | Calculating (stat, lastEvent) ->
             let evDate = ev |> WorkEvent.localDateTime

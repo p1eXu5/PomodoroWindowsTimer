@@ -43,6 +43,9 @@ type Bindings() =
         nameof __.ApplyAsBreakAndCloseCommand
             |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.ApplyAsBreakTime)
 
+    member val EraseCommand : Binding =
+        nameof __.EraseCommand |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.SubstractSpentTime)
+
     member val CloseCommand : Binding =
         nameof __.CloseCommand |> Binding.cmd (Msg.SetLocalRollbackStrategyAndClose LocalRollbackStrategy.DoNotCorrect)
 

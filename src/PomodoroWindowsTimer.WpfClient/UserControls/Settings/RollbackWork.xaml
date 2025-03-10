@@ -1,9 +1,9 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Settings.RollbackWork"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
-             xmlns:conv="clr-namespace:PomodoroWindowsTimer.WpfClient.Converters"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              Height="Auto"
@@ -29,78 +29,69 @@
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
                    materialDesign:HintAssist.Hint="Number"
-                   Text="{Binding Number,
-                                  Converter={StaticResource conv_NoNumberConverter},
-                                  FallbackValue='NO NUMBER'}"
-                   FontWeight="Normal"
                    FontSize="11"
+                   FontWeight="Normal"
+                   Text="{Binding Number, Converter={StaticResource conv_NoNumberConverter}, FallbackValue='NO NUMBER'}"
                    />
-        <TextBlock ToolTip="{Binding Title}"
-                   Margin="10,5"
+        <TextBlock Margin="10,5"
                    VerticalAlignment="Top"
                    materialDesign:HintAssist.Hint="Title"
                    FontSize="16"
                    FontWeight="Normal"
-                   Text="{Binding Title,
-                                  FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                   Text="{Binding Title, FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
                    TextTrimming="CharacterEllipsis"
                    TextWrapping="Wrap"
+                   ToolTip="{Binding Title}"
                    />
         <TextBlock Margin="0,20"
                    HorizontalAlignment="Center"
                    FontSize="20"
-                   Text="{Binding Difference,
-                                  Converter={StaticResource conv_TimeSpanToMinutes},
-                                  FallbackValue='20 mimutes'}"
+                   Text="{Binding Difference, Converter={StaticResource conv_TimeSpanToMinutes}, FallbackValue='20 mimutes'}"
                    TextAlignment="Center"
                    TextWrapping="Wrap"
                    />
         <StackPanel HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     >
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding InterpretAsBreakAndCloseCommand}"
+            <Button Command="{Binding InterpretAsBreakAndCloseCommand}"
                     Content="AS BREAK"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsWorkKind,
-                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsWorkKind, Converter={StaticResource conv_BooleanToVisibility}}"
                     />
 
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding InterpretAsWorkAndCloseCommand}"
+            <Button Command="{Binding InterpretAsWorkAndCloseCommand}"
                     Content="AS WORK"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsBreakKind,
-                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsBreakKind, Converter={StaticResource conv_BooleanToVisibility}}"
                     />
 
 
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding CloseCommand}"
+            <Button Command="{Binding EraseCommand}"
                     Content="ERASE"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
                     />
 
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding CloseCommand}"
+            <Button Command="{Binding CloseCommand}"
                     Content="LEAVE AS WORK"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsWorkKind,
-                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsWorkKind, Converter={StaticResource conv_BooleanToVisibility}}"
                     />
 
-            <Button DockPanel.Dock="Bottom"
-                    Command="{Binding CloseCommand}"
+            <Button Command="{Binding CloseCommand}"
                     Content="LEAVE AS BREAK"
+                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsBreakKind,
-                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsBreakKind, Converter={StaticResource conv_BooleanToVisibility}}"
                     />
         </StackPanel>
 
-        <CheckBox Content="Remember my choice"
-                  Margin="0,10,0,0"
+        <CheckBox Margin="0,10,0,0"
                   HorizontalAlignment="Center"
+                  Content="Remember my choice"
                   IsChecked="{Binding RememberChoice}"
                   Visibility="Collapsed"
                   />
