@@ -86,37 +86,34 @@ public class LinearDiagram : ItemsControl
 
         base.OnItemsSourceChanged(oldValue, newValue);
 
-        if (newValue is IDictionary<LinearDiagramItemKey, IReadOnlyCollection<LinearDiagramItemValue>> data)
+        if (newValue is IReadOnlyCollection<LinearDiagramItem> data)
         {
-            var startTime = data.Values.First().First().StartTime;
+            var startTime = data.First().StartTime;
             StartTime = $"{startTime.Hour}:{startTime.Minute.ToString("00")}";
-            var last = data.Values.Last().Last();
+            var last = data.Last();
             var endTime = last.StartTime.AddMinutes(last.Duration.TotalMinutes);
             EndTime = $"{endTime.Hour}:{endTime.Minute.ToString("00")}";
 
             List<RectData> rectangles = [];
 
-            foreach (var kvp in data)
+            foreach (var value in data)
             {
-                foreach (var value in kvp.Value)
+                if (!value.IsWork.HasValue)
                 {
-                    if (!value.IsWork.HasValue)
-                    {
-                        rectangles.Add(new(
-                            Fill: Brushes.Transparent,
-                            Width: value.Duration.TotalMinutes,
-                            Hint: GetHint(kvp.Key.Name, value.StartTime, value.Duration, value.IsWork)
-                        ));
-
-                        continue;
-                    }
-
                     rectangles.Add(new(
-                        Fill: GetBrush(kvp.Key.Id, value.IsWork.Value),
+                        Fill: Brushes.Transparent,
                         Width: value.Duration.TotalMinutes,
-                        Hint: GetHint(kvp.Key.Name, value.StartTime, value.Duration, value.IsWork)
+                        Hint: GetHint(value.Name, value.StartTime, value.Duration, value.IsWork)
                     ));
+
+                    continue;
                 }
+
+                rectangles.Add(new(
+                    Fill: GetBrush(value.Id, value.IsWork.Value),
+                    Width: value.Duration.TotalMinutes,
+                    Hint: GetHint(value.Name, value.StartTime, value.Duration, value.IsWork)
+                ));
             }
 
             _innerItemsControl.ItemsSource = rectangles;

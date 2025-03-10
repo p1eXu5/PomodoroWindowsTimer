@@ -25,42 +25,45 @@ public partial class MainWindow : Window
     {
         base.OnInitialized(e);
 
-        m_Diagram.ItemsSource = new Dictionary<LinearDiagramItemKey, IReadOnlyCollection<LinearDiagramItemValue>>
+        m_Diagram.ItemsSource = new LinearDiagramItem[]
         {
-            [new LinearDiagramItemKey(1, "Work1")] = new[]
-            {
-                new LinearDiagramItemValue(
-                    StartTime: new TimeOnly(8, 0),
-                    Duration: TimeSpan.FromMinutes(25),
-                    true
-                ),
-                new LinearDiagramItemValue(
-                    StartTime: new TimeOnly(8, 25),
-                    Duration: TimeSpan.FromMinutes(5),
-                    false
-                ),
-            },
-            [new LinearDiagramItemKey(2, "Work2")] = new[]
-            {
-                new LinearDiagramItemValue(
-                    StartTime: new TimeOnly(8, 30),
-                    Duration: TimeSpan.FromMinutes(25),
-                    true
-                ),
-                new LinearDiagramItemValue(
-                    StartTime: new TimeOnly(8, 55),
-                    Duration: TimeSpan.FromMinutes(5),
-                    false
-                ),
-            },
-            [new LinearDiagramItemKey(0, "Idle")] = new[]
-            {
-                new LinearDiagramItemValue(
-                    StartTime: new TimeOnly(9, 00),
-                    Duration: TimeSpan.FromHours(7),
-                    null
-                ),
-            },
+            new LinearDiagramItem(
+                Id: 1,
+                Name: "Work1",
+                StartTime: new TimeOnly(8, 0),
+                Duration: TimeSpan.FromMinutes(25),
+                true
+            ),
+            new LinearDiagramItem(
+                Id: 1,
+                Name: "Work1",
+                StartTime: new TimeOnly(8, 25),
+                Duration: TimeSpan.FromMinutes(5),
+                false
+            ),
+            
+            new LinearDiagramItem(
+                Id: 2,
+                Name: "Work2",
+                StartTime: new TimeOnly(8, 30),
+                Duration: TimeSpan.FromMinutes(25),
+                true
+            ),
+            new LinearDiagramItem(
+                Id: 2,
+                Name: "Work2",
+                StartTime: new TimeOnly(8, 55),
+                Duration: TimeSpan.FromMinutes(5),
+                false
+            ),
+
+            new LinearDiagramItem(
+                Id: 0,
+                Name: "Idle",
+                StartTime: new TimeOnly(9, 00),
+                Duration: TimeSpan.FromHours(7),
+                null
+            ),
         };
     }
 }
