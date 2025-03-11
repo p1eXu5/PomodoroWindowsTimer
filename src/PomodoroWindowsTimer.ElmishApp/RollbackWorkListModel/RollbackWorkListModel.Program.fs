@@ -15,7 +15,7 @@ module Program =
         match msg with
         | Msg.RollbackWorkModelMsg (workId, smsg) ->
             model.RollbackList
-            |> List.mapFirstIntent (_.WorkId >> (=) workId) (updateRollbackWorkModel smsg) RollbackWorkModel.Intent.None
+            |> List.mapFirstIntent (_.Work.Id >> (=) workId) (updateRollbackWorkModel smsg) RollbackWorkModel.Intent.None
             |> fst
             |> flip withRollbackList model
             |> withNoIntent

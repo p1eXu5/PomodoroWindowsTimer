@@ -2,13 +2,12 @@
 
 open System
 open PomodoroWindowsTimer.Abstractions
-open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 
 type RollbackWorkModel =
     {
-        WorkId: uint64
+        Work: Work
         Kind: Kind
         ActiveTimePointId: TimePointId
         Time: DateTimeOffset
@@ -38,7 +37,7 @@ module RollbackWorkModel =
 
     let init (workSpentTime: WorkSpentTime) timePointKind timePointId time =
         {
-            WorkId = workSpentTime.Work.Id
+            Work = workSpentTime.Work
             Kind = timePointKind
             ActiveTimePointId = timePointId
             Time = time
@@ -47,9 +46,9 @@ module RollbackWorkModel =
             RollbackStrategy = LocalRollbackStrategy.DoNotCorrect
         }
 
-    let initWithMissingTime workId timePointKind timePointId difference time =
+    let initWithMissingTime work timePointKind timePointId difference time =
         {
-            WorkId = workId
+            Work = work
             Kind = timePointKind
             ActiveTimePointId = timePointId
             Time = time

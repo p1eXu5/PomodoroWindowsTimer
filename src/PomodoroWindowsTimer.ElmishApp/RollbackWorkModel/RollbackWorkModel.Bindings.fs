@@ -58,3 +58,8 @@ type Bindings() =
     member val Difference : Binding =
         nameof __.Difference |> Binding.oneWay _.Difference
 
+    member val Number : Binding =
+        nameof __.Number |> Binding.oneWay (_.Work >> _.Number)
+
+    member val Title : Binding =
+        nameof __.Title |> Binding.oneWay (_.Work >> _.Title)

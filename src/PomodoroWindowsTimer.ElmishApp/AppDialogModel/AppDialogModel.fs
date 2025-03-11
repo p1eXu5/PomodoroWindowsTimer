@@ -40,7 +40,7 @@ module AppDialogModel =
         | LoadRollbackWorkListDialogModel of WorkSpentTime list * Kind * TimePointId * DateTimeOffset
         | RollbackWorkListModelMsg of RollbackWorkListModel.Msg
 
-        | LoadSkipOrApplyMissingTimeDialogModel of WorkId * Kind * TimePointId * TimeSpan * DateTimeOffset
+        | LoadSkipOrApplyMissingTimeDialogModel of Work * Kind * TimePointId * TimeSpan * DateTimeOffset
         | SkipOrApplyMissingTimeModelMsg of RollbackWorkModel.Msg
 
         | Unload

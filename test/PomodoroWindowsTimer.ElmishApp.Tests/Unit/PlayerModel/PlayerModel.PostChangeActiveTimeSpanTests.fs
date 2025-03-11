@@ -295,7 +295,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().HaveLength(1)
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
         sut.LooperMock.Received(1).Resume()
 
     let initializedAndStoppedStates : System.Collections.IEnumerable =
@@ -391,7 +391,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork.Id, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
         sut.LooperMock.DidNotReceive().Resume()
 
     // -------------------------------

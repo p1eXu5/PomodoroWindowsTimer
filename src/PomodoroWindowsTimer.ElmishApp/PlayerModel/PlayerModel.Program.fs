@@ -301,7 +301,7 @@ Current work is [{wm.Number}] {wm.Title}."""
                     |> withoutShiftAndPreShiftTimes
                     , storeWorkStartedCmd
                     , Intent.SkipOrApplyMissingTime (
-                        currentWork.Id,
+                        currentWork,
                         atp.Kind,
                         atp.Id,
                         TimeSpan.FromSeconds(float (shiftTimes.PreShiftActiveRemainingSeconds - shiftTimes.NewActiveRemainingSeconds)),

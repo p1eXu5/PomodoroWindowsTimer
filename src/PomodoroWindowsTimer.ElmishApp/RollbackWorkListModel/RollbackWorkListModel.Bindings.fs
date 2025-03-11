@@ -35,7 +35,7 @@ type Bindings() =
             |> Binding.subModelSeq (
                 _.RollbackList,
                 snd,
-                _.WorkId,
+                _.Work.Id,
                 Msg.RollbackWorkModelMsg,
                 RollbackWorkModel.Bindings.ToList
             )
