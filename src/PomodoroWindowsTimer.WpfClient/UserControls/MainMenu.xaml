@@ -49,44 +49,91 @@
 
             </Style>
         </DockPanel.Resources>
-        <!--  version  -->
-        <TextBlock DockPanel.Dock="Right"
-                   Margin="5,5,10,5"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Text="{Binding AssemblyVersion,
-                                  FallbackValue=v 1.0.1.0}"
-                   Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
-                   />
+
+        <!--  DockPanel.Dock="Right"  -->
+        <StackPanel DockPanel.Dock="Right"
+                    Orientation="Horizontal"
+                    >
+            <Rectangle Width="1"
+                       Margin="10"
+                       Stroke="{StaticResource MaterialDesign.Brush.Primary.Dark}"
+                       SnapsToDevicePixels="True"
+                       Opacity="0.6"
+                       />
+            <!--  version  -->
+            <TextBlock Margin="5,5,10,5"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="{Binding AssemblyVersion,
+                                      FallbackValue=v 1.0.1.0}"
+                       Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
+                       />
+        </StackPanel>
+
+        <!--  DockPanel.Dock="Left"  -->
         <!--  running time points  -->
-        <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"
+        <ToggleButton DockPanel.Dock="Left"
+                      Content="{materialDesign:PackIcon TimerPlayOutline}"
                       ToolTip="Playlist"
                       Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding IsTimePointsShown}"
                       />
+
         <!--  work selector  -->
-        <ToggleButton Content="{materialDesign:PackIcon TimerCogOutline}"
+        <ToggleButton DockPanel.Dock="Right"
+                      Content="{materialDesign:PackIcon TimerCogOutline}"
                       ToolTip="Work Selector"
                       Style="{StaticResource st_MenuToggleButton}"
                       IsChecked="{Binding IsWorkSelectorLoaded}"
                       />
 
-        <!--  telegram bot settings open dialog button  -->
-        <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
-                DataContext="{Binding AppDialog}"
-                Command="{Binding OpenBotSettingsDialogCommand}"
-                Content="{materialDesign:PackIcon CommentAccountOutline}"
-                ToolTip="Telegram bot settings"
-                Style="{StaticResource st_MenuButton}"
-                >
-            <Button.RenderTransform>
-                <TransformGroup>
-                    <TranslateTransform X="2"
-                                        Y="1"
-                                        />
-                </TransformGroup>
-            </Button.RenderTransform>
-        </Button>
+        <StackPanel HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    >
+
+
+            <!--  work statistic open window button  -->
+            <ToggleButton Content="{materialDesign:PackIcon ListBoxOutline}"
+                          ToolTip="Works statistic"
+                          Style="{StaticResource st_MenuToggleButton}"
+                          IsChecked="{Binding IsWorkStatisticShown}"
+                          >
+                <ToggleButton.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform X="3" />
+                    </TransformGroup>
+                </ToggleButton.RenderTransform>
+            </ToggleButton>
+
+            <!--  telegram bot settings open dialog button  -->
+            <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
+                    DataContext="{Binding AppDialog}"
+                    Command="{Binding OpenBotSettingsDialogCommand}"
+                    Content="{materialDesign:PackIcon CommentAccountOutline}"
+                    ToolTip="Telegram bot settings"
+                    Style="{StaticResource st_MenuButton}"
+                    >
+                <Button.RenderTransform>
+                    <TransformGroup>
+                        <TranslateTransform X="2"
+                                            Y="1"
+                                            />
+                    </TransformGroup>
+                </Button.RenderTransform>
+            </Button>
+
+            <!--  datgabase settings open dialog button  -->
+            <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
+                    DataContext="{Binding AppDialog}"
+                    Command="{Binding OpenDatabaseSettingsDialogCommand}"
+                    Content="{materialDesign:PackIcon DatabaseEditOutline}"
+                    ToolTip="Database settings"
+                    Style="{StaticResource st_MenuButton}"
+                    Visibility="{Binding ShowOpenDatabaseSettingsDialogCommand,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
+                    />
+        </StackPanel>
+
 
         <!--  work statistic open dialog button  -->
         <!--<Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
@@ -110,30 +157,6 @@
                                                       />
             </Behaviors:Interaction.Behaviors>
         </Button>-->
-
-        <!--  work statistic open window button  -->
-        <ToggleButton Content="{materialDesign:PackIcon ListBoxOutline}"
-                      ToolTip="Works statistic"
-                      Style="{StaticResource st_MenuToggleButton}"
-                      IsChecked="{Binding IsWorkStatisticShown}"
-                      >
-            <ToggleButton.RenderTransform>
-                <TransformGroup>
-                    <TranslateTransform X="3" />
-                </TransformGroup>
-            </ToggleButton.RenderTransform>
-        </ToggleButton>
-
-        <!--  datgabase settings open dialog button  -->
-        <Button d:DataContext="{d:DesignInstance Type=appDialogModel:Bindings, IsDesignTimeCreatable=False}"
-                DataContext="{Binding AppDialog}"
-                Command="{Binding OpenDatabaseSettingsDialogCommand}"
-                Content="{materialDesign:PackIcon CogOutline}"
-                ToolTip="Database settings"
-                Style="{StaticResource st_MenuButton}"
-                Visibility="{Binding ShowOpenDatabaseSettingsDialogCommand,
-                                     Converter={StaticResource conv_BooleanToVisibility}}"
-                />
 
         <!--  save time points button  -->
         <!--

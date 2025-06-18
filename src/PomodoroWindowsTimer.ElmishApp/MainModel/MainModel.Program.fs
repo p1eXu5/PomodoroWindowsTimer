@@ -50,7 +50,7 @@ let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
         ]
 
 let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =
-    let (tplModel) = model.TimePointList |> updatef tplMsg
+    let (tplModel) = model.TimePointList |> Option.map (updatef tplMsg)
     model |> withTimePointListModel tplModel |> withCmdNone
 
 let private chain f (model, cmd) =
@@ -82,11 +82,18 @@ let update
     // Time Points
     // --------------------
     | Msg.SetIsTimePointsShown v ->
-        if v then
-            model |> withoutWorkSelectorModel |> withIsTimePointsShown v |> withCmdNone
-        else
-            model |> withIsTimePointsShown v |> withCmdNone
+        match model.TimePointList, v with
+        | None, true ->
+            let m = TimePointListModel.init []
+            
+            model |> withoutWorkSelectorModel |> withTimePointListModel (m |> Some) |> withIsTimePointsShown v
+            , Cmd.ofMsg Msg.LoadTimePointsFromSettings
 
+        | Some _, false ->
+            model |> withoutTimePointListModel |> withIsTimePointsShown v |> withCmdNone
+        | _ ->
+            model |> withIsTimePointsShown v |> withCmdNone
+        
     | Msg.LoadTimePointsFromSettings ->
         let timePoints = cfg.TimePointStore.Read()
         cfg.TimePointQueue.Reload(timePoints)
@@ -162,12 +169,15 @@ let update
             model |> withCmdNone
 
     | Msg.SetIsWorkSelectorLoaded v ->
-        if v then
+        match model.WorkSelector, v with
+        | None , true ->
             let (m, cmd) = WorkSelectorModel.init cfg.UserSettings (model.CurrentWork |> Option.map (_.Work >> _.Id))
-            model |> withWorkSelectorModel (m |> Some) |> withIsTimePointsShown false
+
+            model |> withoutTimePointListModel |> withWorkSelectorModel (m |> Some) |> withIsTimePointsShown false
             , Cmd.map Msg.WorkSelectorModelMsg cmd
-        else
+        | Some _, false ->
             model |> withoutWorkSelectorModel |> withCmdNone
+        | _ -> model |> withCmdNone
 
     | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
         let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m

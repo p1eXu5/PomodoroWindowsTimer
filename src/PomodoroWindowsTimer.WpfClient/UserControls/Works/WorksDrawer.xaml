@@ -11,6 +11,7 @@
              xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
              d:DataContext="{d:DesignInstance Type=WorkSelectorModel:Bindings, IsDesignTimeCreatable=False}"
              MinWidth="350"
+             Margin="1,0,0,0"
              d:DesignHeight="300"
              d:DesignWidth="350"
              d:Foreground="{StaticResource MaterialDesign.Brush.Foreground}"

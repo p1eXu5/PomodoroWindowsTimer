@@ -1,5 +1,5 @@
-﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Lcd"
-             x:Name="m_LcdRoot"
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.MainContent"
+             x:Name="m_MainContentRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:MainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
@@ -21,6 +21,7 @@
         <sel:WorkSubModelTemplateSelector x:Key="sel_WorkSubModelTemplate" />
         <local:DrawerWidthConverter x:Key="conv_DrawerWidth" />
     </UserControl.Resources>
+    
     <materialDesign:DrawerHost x:Name="DrawerHost"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
@@ -33,14 +34,15 @@
                                RightDrawerBackground="Transparent"
                                RightDrawerCloseOnClickAway="True"
                                >
+
+        <!--  TimePointsDrawer  -->
         <materialDesign:DrawerHost.LeftDrawerContent>
             <tpDrawer:TimePointsDrawer DataContext="{Binding}"
                                        Width="350"
                                        />
         </materialDesign:DrawerHost.LeftDrawerContent>
 
-        <!--  time points generator  -->
-
+        <!--  WorksDrawer  -->
         <materialDesign:DrawerHost.RightDrawerContent>
             <works:WorksDrawer DataContext="{Binding WorkSelector}"
                                Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
@@ -52,6 +54,7 @@
                                />
         </materialDesign:DrawerHost.RightDrawerContent>
 
+        <!--  menu & MainScreen  -->
         <DockPanel Margin="10,0,10,0"
                    LastChildFill="True"
                    >

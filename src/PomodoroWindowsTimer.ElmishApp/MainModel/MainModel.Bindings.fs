@@ -58,7 +58,7 @@ type Bindings(
     
     member val TimePointList : Binding =
         nameof __.TimePointList
-            |> Binding.SubModel.required (fun () -> TimePointListModel.Bindings.ToList())
+            |> Binding.SubModel.opt (fun () -> TimePointListModel.Bindings.ToList())
             |> Binding.mapModel _.TimePointList
             |> Binding.mapMsg Msg.TimePointListModelMsg
 

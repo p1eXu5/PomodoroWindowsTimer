@@ -6,9 +6,9 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls;
 /// <summary>
 /// Interaction logic for Lcd.xaml
 /// </summary>
-public partial class Lcd : UserControl
+public partial class MainContent : UserControl
 {
-    public Lcd()
+    public MainContent()
     {
         InitializeComponent();
     }

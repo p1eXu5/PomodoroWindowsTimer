@@ -57,8 +57,15 @@
                                              />
 
                 <!--  LCD container  -->
-                <pwt:Lcd Margin="40,30,40,0">
-                    <userControls:Lcd DataContext="{Binding}" />
+                <pwt:Lcd x:Name="m_MainContentContainer"
+                         Margin="40,30,40,0"
+                         >
+                    <userControls:MainContent DataContext="{Binding}"
+                                              Width="{Binding ElementName=m_MainContentContainer,
+                                                              Path=ActualWidth}"
+                                              Height="{Binding ElementName=m_MainContentContainer,
+                                                               Path=ActualHeight}"
+                                              />
                 </pwt:Lcd>
             </DockPanel>
         </pwt:GlossOnBase>

@@ -1,5 +1,6 @@
 ﻿namespace PomodoroWindowsTimer.ElmishApp
 
+open Elmish
 open PomodoroWindowsTimer.Types
 
 /// Used in theme switcher on WPF side
@@ -17,6 +18,12 @@ type RollbackWorkStrategy =
     | SubstractWorkAddBreak
     | Default
 *)
+
+type ModelInitUpdate<'Model,'Msg> =
+    {
+        Init: unit -> ('Model * Cmd<'Msg>)
+        Update: 'Msg -> 'Model -> ('Model * Cmd<'Msg>)
+    }
 
 [<Struct>]
 type LocalRollbackStrategy = 
