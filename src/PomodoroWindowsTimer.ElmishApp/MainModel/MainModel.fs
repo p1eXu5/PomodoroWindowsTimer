@@ -16,7 +16,7 @@ type MainModel =
         // TimePointsGeneratorModel: TimePointsGeneratorModel option
         
         /// Left drawer model
-        TimePointList: TimePointListModel option
+        TimePointList: TimePointListModel
         IsTimePointsShown: bool
 
         Player: PlayerModel
@@ -127,7 +127,7 @@ module MainModel =
         //let botSettingsModel = BotSettingsModel.init cfg.BotSettings
         //let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
         {
-            TimePointList = None //TimePointListModel.init []
+            TimePointList = TimePointListModel.init []
             IsTimePointsShown = false
 
             Player = PlayerModel.init userSettings
@@ -142,7 +142,7 @@ module MainModel =
             AppDialog = AppDialogModel.NoDialog
         }
         , Cmd.batch [
-            // Cmd.ofMsg Msg.LoadTimePointsFromSettings
+            Cmd.ofMsg Msg.LoadTimePointsFromSettings
             Cmd.ofMsg Msg.LoadCurrentWork
             // Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
         ]
@@ -162,9 +162,6 @@ module MainModel =
     let withoutWorkSelectorModel (model: MainModel) =
          { model with WorkSelector = None }
 
-    let withoutTimePointListModel (model: MainModel) =
-         { model with TimePointList = None; IsTimePointsShown = false }
-
     let withIsTimePointsShown v (model: MainModel) =
          { model with IsTimePointsShown = v }
 
@@ -175,7 +172,7 @@ module MainModel =
         { model with Player = playerModel }
 
     let withInitTimePointListModel timePoints (model: MainModel) =
-        { model with TimePointList = TimePointListModel.init timePoints |> Some }
+        { model with TimePointList = TimePointListModel.init timePoints }
 
     let withTimePointListModel timePointListModel (model: MainModel) =
         { model with TimePointList = timePointListModel }
