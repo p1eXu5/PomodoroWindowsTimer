@@ -41,7 +41,10 @@
                                      MessageQueue="{Binding ErrorMessageQueue}"
                                      />
 
-            <TabControl SelectedIndex="{Binding SelectedTabInd, Mode=OneWayToSource}">
+            <TabControl materialDesign:ColorZoneAssist.Background="{StaticResource MaterialDesign.Brush.Primary.Dark.Foreground}"
+                        SelectedIndex="{Binding SelectedTabInd,
+                                                Mode=OneWayToSource}"
+                        >
                 <TabItem Header="Statistics">
                     <workStatistic:DailyStatisticTableList DataContext="{Binding DailyStatistics}"
                                                            Margin="5,0,0,0"
