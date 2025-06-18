@@ -5,8 +5,8 @@
                     xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
                     >
     <Style x:Key="st_HorizontalStackButtonIcon"
-           BasedOn="{StaticResource st_IconBase}"
            TargetType="materialDesign:PackIcon"
+           BasedOn="{StaticResource st_IconBase}"
            >
         <Setter Property="Margin" Value="4,0,-4,0" />
     </Style>
@@ -20,8 +20,8 @@
     </Style>
 
     <Style x:Key="st_UnselectedTimePointV2"
-           BasedOn="{StaticResource st_TimePointBaseV2}"
            TargetType="shared:TimePointV2"
+           BasedOn="{StaticResource st_TimePointBaseV2}"
            >
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding TimeSpan}" />
         <Setter Property="ButtonForeground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
@@ -31,8 +31,8 @@
     </Style>
 
     <Style x:Key="st_SelectedTimePointV2"
-           BasedOn="{StaticResource st_TimePointBaseV2}"
            TargetType="shared:TimePointV2"
+           BasedOn="{StaticResource st_TimePointBaseV2}"
            >
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}" />
         <Setter Property="ButtonForeground" Value="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}" />
@@ -46,8 +46,8 @@
         <shared:TimePointV2 Style="{StaticResource st_UnselectedTimePointV2}">
             <shared:TimePointV2.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Kind="Play"
-                                             Style="{StaticResource st_HorizontalStackButtonIcon}"
+                    <materialDesign:PackIcon Style="{StaticResource st_HorizontalStackButtonIcon}"
+                                             Kind="Play"
                                              />
                 </ControlTemplate>
             </shared:TimePointV2.ButtonIcon>
@@ -59,8 +59,8 @@
         <shared:TimePointV2 Style="{StaticResource st_SelectedTimePointV2}">
             <shared:TimePointV2.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Kind="Play"
-                                             Style="{StaticResource st_HorizontalStackButtonIcon}"
+                    <materialDesign:PackIcon Style="{StaticResource st_HorizontalStackButtonIcon}"
+                                             Kind="Play"
                                              />
                 </ControlTemplate>
             </shared:TimePointV2.ButtonIcon>
@@ -72,8 +72,8 @@
         <shared:TimePointV2 Style="{StaticResource st_SelectedTimePointV2}">
             <shared:TimePointV2.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Kind="Stop"
-                                             Style="{StaticResource st_HorizontalStackButtonIcon}"
+                    <materialDesign:PackIcon Style="{StaticResource st_HorizontalStackButtonIcon}"
+                                             Kind="Stop"
                                              />
                 </ControlTemplate>
             </shared:TimePointV2.ButtonIcon>

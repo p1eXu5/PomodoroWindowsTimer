@@ -24,8 +24,8 @@
                                    />
 
                         <!--  LCD  -->
-                        <ContentPresenter Margin="{TemplateBinding Control.Padding}"
-                                          Content="{TemplateBinding ContentControl.Content}"
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
+                                          Margin="{TemplateBinding Control.Padding}"
                                           ContentStringFormat="{TemplateBinding ContentControl.ContentStringFormat}"
                                           ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"
                                           SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"
