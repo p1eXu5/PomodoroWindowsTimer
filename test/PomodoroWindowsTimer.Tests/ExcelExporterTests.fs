@@ -17,7 +17,7 @@ open PomodoroWindowsTimer.Types
 
 module ExcelExporterTests =
 
-    let private ``5 min threshold`` = TimeSpan.FromMinutes(5)
+    let private ``5 min threshold`` = TimeSpan.FromMinutes(5L)
 
     [<Test>]
     let ``01: single work events with idle time, threshold is less then idle time`` () =
@@ -115,8 +115,8 @@ module ExcelExporterTests =
                 [
                     WorkEvent.WorkStarted    (startDt, "W1", TimePointId.generate ())
                     WorkEvent.Stopped        (startDt.AddMinutes 20)
-                    WorkEvent.WorkReduced    (startDt.AddMinutes 21, TimeSpan.FromMinutes(20), None)
-                    WorkEvent.BreakIncreased (startDt.AddMinutes 22, TimeSpan.FromMinutes(20), None)
+                    WorkEvent.WorkReduced    (startDt.AddMinutes 21, TimeSpan.FromMinutes(20L), None)
+                    WorkEvent.BreakIncreased (startDt.AddMinutes 22, TimeSpan.FromMinutes(20L), None)
                     WorkEvent.WorkStarted    (startDt.AddMinutes 23, "W1", TimePointId.generate ())
                 ]
 
@@ -149,7 +149,7 @@ module ExcelExporterTests =
             let events =
                 [
                     WorkEvent.WorkStarted    (startDt, "W1", TimePointId.generate ())
-                    WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60, None)
+                    WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60L, None)
                     WorkEvent.Stopped        (startDt.AddMinutes 20)
                     WorkEvent.BreakStarted   (startDt.AddMinutes 20, "B1", TimePointId.generate ())
                     WorkEvent.Stopped        (startDt.AddMinutes 30)
@@ -185,7 +185,7 @@ module ExcelExporterTests =
             let events1 =
                 [
                     WorkEvent.WorkStarted    (startDt, "W1", TimePointId.generate ())
-                    WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60, None)
+                    WorkEvent.WorkIncreased  (startDt.AddMinutes 10, TimeSpan.FromMinutes 60L, None)
                     WorkEvent.Stopped        (startDt.AddMinutes 20)
                 ]
 

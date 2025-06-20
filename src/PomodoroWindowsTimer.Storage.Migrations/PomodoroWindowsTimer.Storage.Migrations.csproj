@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <NoWarn>IDE0290</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,7 +33,6 @@
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
   </ItemGroup>

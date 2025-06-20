@@ -23,7 +23,7 @@ module WorkEventSpentTimeProjectorTests =
     let private ct = CancellationToken.None
     let private work = Work.generate ()
 
-    let fromMin (v: int) = TimeSpan.FromMinutes(v)
+    let fromMin (v: int64) = TimeSpan.FromMinutes(v)
 
     let diff (endTime: string) (startTime: string) =
         TimeOnly.ParseExact(endTime, "HH:mm", null) - TimeOnly.ParseExact(startTime, "HH:mm", null)

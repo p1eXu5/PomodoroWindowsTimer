@@ -37,7 +37,7 @@ type JsonHelpers() =
         JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic, UnicodeRanges.Specials)
     
     [<Extension>]
-    static member SetJsonFSharpOptions(options: JsonSerializerOptions) =
+    static member SetJsonFSharpOptions(options: JsonSerializerOptions) : JsonSerializerOptions =
         options.PropertyNameCaseInsensitive <- true
         options.DefaultIgnoreCondition <- JsonIgnoreCondition.WhenWritingNull
         options.Converters.Add(JsonStringEnumConverter())
@@ -52,7 +52,7 @@ type JsonHelpers() =
         options
 
     [<Extension>]
-    static member SetJsonNoIndentFSharpOptions(options: JsonSerializerOptions) =
+    static member SetJsonNoIndentFSharpOptions(options: JsonSerializerOptions) : JsonSerializerOptions =
         options.PropertyNameCaseInsensitive <- true
         options.DefaultIgnoreCondition <- JsonIgnoreCondition.WhenWritingNull
         options.Converters.Add(JsonStringEnumConverter())

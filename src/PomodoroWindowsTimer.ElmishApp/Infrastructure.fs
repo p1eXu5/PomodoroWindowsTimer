@@ -103,7 +103,7 @@ module TelegramBot =
     let sendMessage (botClient: ITelegramBotClient) chatId text =
         task {
             let! _ =
-                botClient.SendTextMessageAsync(
+                botClient.SendMessage(
                     chatId,
                     text)
 
@@ -141,7 +141,7 @@ module WorkEvents =
                     let! events = workEventRepo.FindWelByPeriodAsync period ct
                     return
                         events
-                        |> Result.bind (ExcelExporter.export excelBook (TimeSpan.FromMinutes(5)) fd.FileName)
+                        |> Result.bind (ExcelExporter.export excelBook (TimeSpan.FromMinutes(5L)) fd.FileName)
                 }
         else
             fun _ _ ->

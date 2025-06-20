@@ -25,8 +25,6 @@ open System
 
 let ct = CancellationToken.None
 
-let tcw = TestContextWriters.Default
-
 let internal dataSource dbFileName =
     Path.Combine(
         Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -53,7 +51,7 @@ let internal workRepository dbFileName =
     new WorkRepository(
         databaseSettings dbFileName,
         System.TimeProvider.System,
-        TestLogger<WorkRepository>(tcw)
+        TestLogger<WorkRepository>(TestContextWriters.GetInstance<TestContext>())
     )
     :> IWorkRepository
     
@@ -61,7 +59,7 @@ let internal workEventRepository dbFileName =
     new WorkEventRepository(
         databaseSettings dbFileName,
         System.TimeProvider.System,
-        TestLogger<WorkEventRepository>(tcw)
+        TestLogger<WorkEventRepository>(TestContextWriters.GetInstance<TestContext>())
     )
     :> IWorkEventRepository
 
@@ -69,7 +67,7 @@ let internal activeTimePointRepository dbFileName =
     new ActiveTimePointRepository(
         databaseSettings dbFileName,
         System.TimeProvider.System,
-        TestLogger<ActiveTimePointRepository>(tcw)
+        TestLogger<ActiveTimePointRepository>(TestContextWriters.GetInstance<TestContext>())
     )
     :> IActiveTimePointRepository
 
@@ -77,13 +75,13 @@ let internal repositoryFactory dbSettings =
     RepositoryFactory(
         dbSettings,
         System.TimeProvider.System,
-        TestLoggerFactory.CreateWith(TestContext.Progress, TestContext.Out),
-        TestLogger<RepositoryFactory>(tcw)
+        TestLoggerFactory.Create(),
+        TestLogger<RepositoryFactory>(TestContextWriters.GetInstance<TestContext>())
     )
 
 let internal seedDataBase (repositoryFactory: IRepositoryFactory) =
     task {
-        let seeder = DbSeeder(repositoryFactory, TestLogger<DbSeeder>(TestContextWriters.Default))
+        let seeder = DbSeeder(repositoryFactory, TestLogger<DbSeeder>(TestContextWriters.GetInstance<TestContext>()))
         match! seeder.SeedDatabaseAsync(CancellationToken.None) with
         | Ok _ -> return ()
         | Error err ->
@@ -92,8 +90,8 @@ let internal seedDataBase (repositoryFactory: IRepositoryFactory) =
 
 let internal applyMigrations (dbSettings: IDatabaseSettings) =
     let migrator = DbMigrator(
-        TestLogger<DbUp.Engine.UpgradeEngine>(tcw),
-        TestLogger<DbMigrator>(tcw)
+        TestLogger<DbUp.Engine.UpgradeEngine>(TestContextWriters.GetInstance<TestContext>()),
+        TestLogger<DbMigrator>(TestContextWriters.GetInstance<TestContext>())
     )
 
     match migrator.ApplyMigrations (dbSettings) with

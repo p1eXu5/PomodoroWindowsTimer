@@ -119,9 +119,10 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
             "{TimePointQueueMsgName} has been handled."
         )
 
-    let closeScope (scope: IDisposable) (msgName: string) =
+    let closeScope (scope: IDisposable | null) (msgName: string) =
         endHandleMessage.Invoke(logger, msgName, null)
-        scope.Dispose()
+        scope
+        |> function NonNull s -> s.Dispose() | _ -> ()
 
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->

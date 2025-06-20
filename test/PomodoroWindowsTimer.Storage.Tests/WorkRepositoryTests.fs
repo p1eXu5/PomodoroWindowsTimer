@@ -1,4 +1,4 @@
-namespace PomodoroWindowsTimer.Storage.Tests
+﻿namespace PomodoroWindowsTimer.Storage.Tests
 
 open System
 open System.IO
@@ -40,10 +40,6 @@ module WorkRepositoryTests =
             if File.Exists(dataSource) then
                 File.Delete(dataSource)
         }
-
-    [<SetUp>]
-    let SetWriters () =
-        tcw.SetWriters(TestContext.Progress, TestContext.Out)
 
     [<Test>]
     let ``01: InsertAsync -> by default -> inserts work row`` () =

@@ -259,7 +259,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                 let round (row: ExcelRow) =
                     let minute = (row |> ExcelRow.endTimeOnly).Minute % 5
                     if minute = 0 then row
-                    elif minute < 3 then row |> ExcelRow.subTime (TimeSpan.FromMinutes(minute))
+                    elif minute < 3 then row |> ExcelRow.subTime (TimeSpan.FromMinutes(int64 minute))
                     else row |> ExcelRow.addTime (TimeSpan.FromMinutes(float (5 - minute)))
 
                 let fakeStartRow = ExcelRow.createIdleExcelRow 0 startDt |> round
@@ -270,7 +270,7 @@ let internal excelRows (gluingThreshold: TimeSpan) (workEventOffsetTimes: WorkEv
                         List.scanBack (fun (curr: ExcelRow) (prev: ExcelRow) ->
                             let mutable curr' = (curr |> round)
                             while (curr' |> ExcelRow.endTimeOnly) < (prev |> ExcelRow.endTimeOnly) do
-                                curr' <- curr' |> ExcelRow.addTime (TimeSpan.FromMinutes(5))
+                                curr' <- curr' |> ExcelRow.addTime (TimeSpan.FromMinutes(5L))
                             curr'
                         ) rows fakeStartRow
                         |> List.rev

@@ -55,7 +55,7 @@ let generateWorkTimePointPrototype () =
             Name = sprintf "Work %i" _workTPCounter
             Kind = Kind.Work
             KindAlias = "w" |> Alias.createOrThrow
-            TimeSpan = TimeSpan.FromMinutes(25)
+            TimeSpan = TimeSpan.FromMinutes(25L)
         }
     _workTPCounter <- _workTPCounter + 1
     tpPrototype
@@ -66,7 +66,7 @@ let generateBreakTimePointPrototype () =
             Name = sprintf "Break %i" _breakTPCounter
             Kind = Kind.Break
             KindAlias = "b" |> Alias.createOrThrow
-            TimeSpan = TimeSpan.FromMinutes(5)
+            TimeSpan = TimeSpan.FromMinutes(5L)
         }
     _breakTPCounter <- _breakTPCounter + 1
     tpPrototype
@@ -77,7 +77,7 @@ let generateLongBreakTimePointPrototype () =
             Name = sprintf "Long Break %i" _longBreakTPCounter
             Kind = Kind.LongBreak
             KindAlias = "lb" |> Alias.createOrThrow
-            TimeSpan = TimeSpan.FromMinutes(20)
+            TimeSpan = TimeSpan.FromMinutes(20L)
         }
     _longBreakTPCounter <- _longBreakTPCounter + 1
     tpPrototype
@@ -159,7 +159,7 @@ module TimePoint =
         }
 
     let generate () =
-        generateWith (TimeSpan.FromMinutes(faker.Random.Int(1, 100)))
+        generateWith (TimeSpan.FromMinutes(faker.Random.Long(1, 100)))
 
     let gewerateLongBreakTP (timeSpan: float<sec>) =
         {
@@ -236,10 +236,10 @@ module WorkEvent =
         WorkEvent.Stopped (generateCreatedAt date timeStr)
 
     let generateWorkIncreased () =
-        WorkEvent.WorkIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+        WorkEvent.WorkIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Long(1, 25)), TimePointId.generateOption ())
 
     let generateWorkIncreasedWith (date: DateOnly) (timeStr: string) =
-        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Int(1, 25)), None)
+        WorkEvent.WorkIncreased (generateCreatedAt date timeStr, TimeSpan.FromMinutes(faker.Random.Long(1, 25)), None)
 
     let createWorkIncreasedWithNoTimePoint (date: DateOnly) (timeStr: string) (time: TimeSpan) =
         WorkEvent.WorkIncreased (generateCreatedAt date timeStr, time, None)
@@ -248,16 +248,16 @@ module WorkEvent =
         WorkEvent.WorkIncreased (generateCreatedAt date timeStr, time, timePointId)
 
     let generateWorkReduced () =
-        WorkEvent.WorkReduced (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+        WorkEvent.WorkReduced (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Long(1, 25)), TimePointId.generateOption ())
 
     let createWorkReducedWith (date: DateOnly) (timeStr: string) (time: TimeSpan) (timePointId: TimePointId option) =
         WorkEvent.WorkReduced (generateCreatedAt date timeStr, time, timePointId)
 
     let generateBreakIncreased () =
-        WorkEvent.BreakIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+        WorkEvent.BreakIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Long(1, 25)), TimePointId.generateOption ())
 
     let generateBreakReduced () =
-        WorkEvent.BreakReduced (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), TimePointId.generateOption ())
+        WorkEvent.BreakReduced (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Long(1, 25)), TimePointId.generateOption ())
 
     let generate () =
         let eventFactory =

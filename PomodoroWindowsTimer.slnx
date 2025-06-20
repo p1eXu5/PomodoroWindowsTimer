@@ -19,9 +19,7 @@
     <File Path="docs/design/development-notes.md" />
     <File Path="docs/design/er-diagram.md" />
     <File Path="docs/design/time-shifting-with-slider.md" />
-  </Folder>
-  <Folder Name="/Solution Items/Migrator/">
-    <Project Path="src/PomodoroWindowsTimer.Migrator/PomodoroWindowsTimer.Migrator.csproj" />
+    <File Path="projects.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/PomodoroWindowsTimer.ElmishApp/PomodoroWindowsTimer.ElmishApp.fsproj" />
@@ -45,6 +43,9 @@
       <BuildType Solution="Personal|*" Project="Debug" />
     </Project>
     <Project Path="src/PomodoroWindowsTimer.Storage/PomodoroWindowsTimer.Storage.fsproj" />
+  </Folder>
+  <Folder Name="/src/Migrator/">
+    <Project Path="src/PomodoroWindowsTimer.Migrator/PomodoroWindowsTimer.Migrator.csproj" />
   </Folder>
   <Folder Name="/src/Wpf/">
     <Project Path="src/PomodoroWindowsTimer.Wpf.Demo/PomodoroWindowsTimer.Wpf.Demo.csproj">

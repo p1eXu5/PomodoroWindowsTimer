@@ -26,7 +26,7 @@ module UnprocessedMessage =
 
     type LoggerExtensions () =
         [<Extension>]
-        static member LogUnprocessedMessage<'Msg,'Model>(logger: ILogger, msg: 'Msg, model: 'Model) =
+        static member LogUnprocessedMessage<'Msg,'Model when 'Msg: not null and 'Model: not null>(logger: ILogger, msg: 'Msg, model: 'Model) =
             if logger.IsEnabled(LogLevel.Trace) then
                 loggerMessage.Invoke(
                     logger,

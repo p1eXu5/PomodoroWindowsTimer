@@ -1,7 +1,4 @@
 ﻿namespace PomodoroWindowsTimer.Storage.Migrations;
-
-using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using DbUp;
@@ -51,7 +48,7 @@ public sealed class DbMigrator : IDbMigrator
 
         var upgrader =
             DeployChanges.To
-                .SQLiteDatabase(databaseSettings.GetConnectionString())
+                .SqliteDatabase(databaseSettings.GetConnectionString())
                 .WithScriptsAndCodeEmbeddedInAssembly(typeof(Script005_FillActiveTimePointId).Assembly)
                 .AddLogger(_upgradeEngineLogger)
                 .WithTransaction()

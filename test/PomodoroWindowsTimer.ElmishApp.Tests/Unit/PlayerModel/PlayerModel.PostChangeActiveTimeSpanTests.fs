@@ -25,7 +25,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("no shifting")>]
     [<Category("PlayerModel")>]
     let ``01-0: PostChangeActiveTimeSpan Start -> no current work, shifting less than 1 sec, preshift state is playing -> resume, no cmd, no intent`` (offset: float) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -70,7 +70,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("no shifting")>]
     [<Category("PlayerModel")>]
     let ``01-1: PostChangeActiveTimeSpan Start -> some current work, shifting less than 1 sec, preshift state is playing -> resume, store strarted cmd, no intent`` (offset: float) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -124,7 +124,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("no shifting")>]
     [<Category("PlayerModel")>]
     let ``01-2: PostChangeActiveTimeSpan Start -> no current work, shifting less than 1 sec, preshift state is not playing -> no resume call, no cmd, no intent`` (offset: float, state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -167,7 +167,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("no shifting")>]
     [<Category("PlayerModel")>]
     let ``01-3: PostChangeActiveTimeSpan Start -> some current work, shifting less than 1 sec, preshift state is not playing -> no resume call, no cmd, no intent`` (offset: float, state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -212,7 +212,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
     let ``02-0: PostChangeActiveTimeSpan Start -> no current work, shifting forward, preshift state is playing -> resume, no cmd, no intent`` () =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -255,7 +255,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
     let ``02-1: PostChangeActiveTimeSpan Start -> some current work, shifting forward, preshift state is playing -> resume, store started cmd, SkipOrApply intent`` () =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -295,7 +295,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().HaveLength(1)
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3L), now))
         sut.LooperMock.Received(1).Resume()
 
     let initializedAndStoppedStates : System.Collections.IEnumerable =
@@ -308,7 +308,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
     let ``02-2: PostChangeActiveTimeSpan Start -> no current work, shifting forward, preshift state is not playing -> no resume call, no cmd, no intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -351,7 +351,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting forward")>]
     [<Category("PlayerModel")>]
     let ``02-3: PostChangeActiveTimeSpan Start -> some current work, shifting forward, preshift state is not playing -> no resume call, no cmd, SkipOrApply intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -391,7 +391,7 @@ module PostChangeActiveTimeSpanTests =
             )
 
         %cmd.Should().BeEmpty()
-        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3), now))
+        %intent.Should().Be(PlayerModel.Intent.SkipOrApplyMissingTime (currentWork, timePoint.Kind, beforePlayerModel.ActiveTimePoint.Value.Id, TimeSpan.FromSeconds(3L), now))
         sut.LooperMock.DidNotReceive().Resume()
 
     // -------------------------------
@@ -400,7 +400,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``03-0: PostChangeActiveTimeSpan Start -> no current work, shifting backward, preshift state is playing -> resume, no cmd, no intent`` () =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePoint |> Some
@@ -443,7 +443,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``03-1: PostChangeActiveTimeSpan Start -> some current work, shifting backward, preshift state is playing -> resume, cmd with StoreStoppedWorkEventTask, no intent`` () =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
@@ -501,7 +501,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``03-2: PostChangeActiveTimeSpan Start -> no current work, shifting backward, preshift state is not playing -> no resume call, no cmd, no intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
@@ -544,7 +544,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``03-3: PostChangeActiveTimeSpan Start -> some current work, shifting backward, preshift state is playing -> no resume call, cmd, no intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let beforePlayerModel : PlayerModel =
             {
                 ActiveTimePoint = timePoint |> TimePoint.toActiveTimePointWithSec 8.0<sec> |> Some
@@ -607,7 +607,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``04-0: PostChangeActiveTimeSpan Finish -> error -> emits OnError msg, no intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let retrieveWorkSpentTimesState, cts =
             AsyncDeferredState.NotRequested
             |> AsyncDeferredState.forceInProgressWithCancellation
@@ -657,7 +657,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``04-1: PostChangeActiveTimeSpan Finish -> ok with empty -> no cmd, no intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let retrieveWorkSpentTimesState, cts =
             AsyncDeferredState.NotRequested
             |> AsyncDeferredState.forceInProgressWithCancellation
@@ -707,7 +707,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``04-3: PostChangeActiveTimeSpan Finish -> ok with single work -> no cmd, RollbackTime intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let retrieveWorkSpentTimesState, cts =
             AsyncDeferredState.NotRequested
             |> AsyncDeferredState.forceInProgressWithCancellation
@@ -735,7 +735,7 @@ module PostChangeActiveTimeSpanTests =
         let workSpentTime =
             {
                 Work = currentWork
-                SpentTime = TimeSpan.FromSeconds(3)
+                SpentTime = TimeSpan.FromSeconds(3L)
             }
 
         // act
@@ -764,7 +764,7 @@ module PostChangeActiveTimeSpanTests =
     [<Category("shifting backward")>]
     [<Category("PlayerModel")>]
     let ``04-4: PostChangeActiveTimeSpan Finish -> ok with multiple works -> no cmd, MultipleRollbackTime intent`` (state: LooperState) =
-        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10))
+        let timePoint = TimePoint.generateWith (TimeSpan.FromSeconds(10L))
         let retrieveWorkSpentTimesState, cts =
             AsyncDeferredState.NotRequested
             |> AsyncDeferredState.forceInProgressWithCancellation
@@ -794,12 +794,12 @@ module PostChangeActiveTimeSpanTests =
         let previousWorkSpentTime =
             {
                 Work = previousWork
-                SpentTime = TimeSpan.FromSeconds(1)
+                SpentTime = TimeSpan.FromSeconds(1L)
             }
         let currentWorkSpentTime =
             {
                 Work = currentWork
-                SpentTime = TimeSpan.FromSeconds(2)
+                SpentTime = TimeSpan.FromSeconds(2L)
             }
 
         // act

@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
-    <Compile Include="TestContextWriters.fs" />
     <Compile Include="Projectors\WorkEventProjectorTests.fs" />
     <Compile Include="Projectors\WorkEventSpentTimeProjectorTests.fs" />
     <Compile Include="ExcelExporterTests.fs" />

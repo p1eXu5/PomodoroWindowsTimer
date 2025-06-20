@@ -23,8 +23,8 @@ let mutable private _repositoryFactory = Unchecked.defaultof<IRepositoryFactory>
 
 let private dbFileRevisor () =
     DbFileRevisor.init
-        (DbSeeder(_repositoryFactory, TestLogger<DbSeeder>(TestContextWriters.Default)))
-        (DbMigrator(TestLogger<DbUp.Engine.UpgradeEngine>(TestContextWriters.Default), TestLogger<DbMigrator>(TestContextWriters.Default)))
+        (DbSeeder(_repositoryFactory, TestLogger<DbSeeder>(TestContextWriters.GetInstance<TestContext>())))
+        (DbMigrator(TestLogger<DbUp.Engine.UpgradeEngine>(TestContextWriters.GetInstance<TestContext>()), TestLogger<DbMigrator>(TestContextWriters.GetInstance<TestContext>())))
 
 [<OneTimeSetUp>]
 let Setup () =

@@ -118,7 +118,7 @@ module DailyStatisticModel =
 
                 let overall = statistics |> List.map (snd >> Statistic.total) |> List.reduce (+)
 
-                if (Statistic.overallMinutesPerDayMax - overall) > TimeSpan.FromMinutes(1) then
+                if (Statistic.overallMinutesPerDayMax - overall) > TimeSpan.FromMinutes(1L) then
                     model.AllocateBreakTimeState
                     |> AsyncDeferred.tryInProgressWithCancellation
                     |> Option.map (fun (deff, cts) -> (statistics, overall, deff, cts))
@@ -245,8 +245,8 @@ module DailyStatisticModel =
         | AsyncDeferred.Retrieved l, AsyncDeferred.NotRequested ->
             let (overall, ``break``) = l |> WorkStatisticModel.List.dailyOverallAndBreakTimeRemains
             model.AllocatedBreaks |> List.isEmpty
-            && ``break`` > TimeSpan.FromMinutes(1)
-            && overall > TimeSpan.FromMinutes(1)
+            && ``break`` > TimeSpan.FromMinutes(1L)
+            && overall > TimeSpan.FromMinutes(1L)
         | _ -> false
 
     let canRedoAllocateBreakTime (model: DailyStatisticModel) =

@@ -44,7 +44,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PomodoroWindowsTimer.Storage.Migrations\PomodoroWindowsTimer.Storage.Migrations.csproj" />
-    <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

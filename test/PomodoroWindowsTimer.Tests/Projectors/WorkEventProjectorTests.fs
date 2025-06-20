@@ -60,7 +60,7 @@ module WorkEventProjectorTests =
                             Start = ``23:00:00``.LocalDateTime
                             EndInclusive = ``23:10:00``.LocalDateTime
                         }
-                    WorkTime = TimeSpan.FromMinutes(10)
+                    WorkTime = TimeSpan.FromMinutes(10L)
                     BreakTime = TimeSpan.Zero
                     TimePointNameStack = ["Work 1"; "Break 1"]
                 } |> Some
@@ -78,8 +78,8 @@ module WorkEventProjectorTests =
                             Start = ``23:00:00``.LocalDateTime
                             EndInclusive = ``23:20:00``.LocalDateTime
                         }
-                    WorkTime = TimeSpan.FromMinutes(10)
-                    BreakTime = TimeSpan.FromMinutes(10)
+                    WorkTime = TimeSpan.FromMinutes(10L)
+                    BreakTime = TimeSpan.FromMinutes(10L)
                     TimePointNameStack = ["Work 1"; "Break 1"; "Work 2"]
                 } |> Some
             ).SetName("03: WorkStarted -> Break Started -> WorkStarted")
@@ -97,8 +97,8 @@ module WorkEventProjectorTests =
                             Start = ``23:00:00``.LocalDateTime
                             EndInclusive = ``23:30:00``.LocalDateTime
                         }
-                    WorkTime = TimeSpan.FromMinutes(20)
-                    BreakTime = TimeSpan.FromMinutes(10)
+                    WorkTime = TimeSpan.FromMinutes(20L)
+                    BreakTime = TimeSpan.FromMinutes(10L)
                     TimePointNameStack = ["Work 1"; "Break 1"; "Work 2"; "Long Break"]
                 } |> Some
             ).SetName("04: WorkStarted -> Break Started -> Work Started -> Long Break Started")
@@ -114,7 +114,7 @@ module WorkEventProjectorTests =
                             Start = ``23:00:00``.LocalDateTime
                             EndInclusive = ``23:10:00``.LocalDateTime
                         }
-                    WorkTime = TimeSpan.FromMinutes(10)
+                    WorkTime = TimeSpan.FromMinutes(10L)
                     BreakTime = TimeSpan.Zero
                     TimePointNameStack = ["Work 1";]
                 } |> Some
@@ -131,7 +131,7 @@ module WorkEventProjectorTests =
                             Start = ``23:50:00``.LocalDateTime
                             EndInclusive = ``00:00:00``.LocalDateTime
                         }
-                    WorkTime = TimeSpan.FromMinutes(10)
+                    WorkTime = TimeSpan.FromMinutes(10L)
                     BreakTime = TimeSpan.Zero
                     TimePointNameStack = ["Work 1";]
                 } |> Some
@@ -151,8 +151,8 @@ module WorkEventProjectorTests =
                             Start = ``23:00:00``.LocalDateTime
                             EndInclusive = ``23:40:00``.LocalDateTime
                         }
-                    WorkTime = TimeSpan.FromMinutes(20)
-                    BreakTime = TimeSpan.FromMinutes(10)
+                    WorkTime = TimeSpan.FromMinutes(20L)
+                    BreakTime = TimeSpan.FromMinutes(10L)
                     TimePointNameStack = ["Work 1"; "Break 1"]
                 } |> Some
             ).SetName("07: Work Started -> Stopped -> Work Started -> Break Started -> Stopped")
@@ -160,7 +160,7 @@ module WorkEventProjectorTests =
             TestCaseData(
                 [
                     WorkEvent.WorkStarted   (start23,               "W1", TimePointId.generate ())
-                    WorkEvent.WorkIncreased (start23.AddMinutes  5, TimeSpan.FromMinutes 60, None)
+                    WorkEvent.WorkIncreased (start23.AddMinutes  5, TimeSpan.FromMinutes 60L, None)
                     WorkEvent.Stopped       (start23.AddMinutes 10)        
                     WorkEvent.WorkStarted   (start23.AddMinutes 20, "W1", TimePointId.generate ())
                     WorkEvent.BreakStarted  (start23.AddMinutes 30, "B1", TimePointId.generate ())
@@ -173,7 +173,7 @@ module WorkEventProjectorTests =
                             EndInclusive = start23.AddMinutes(40.0).LocalDateTime // by start/stop event created time (not increase/reduce)
                         }
                     WorkTime = TimeSpan.FromMinutes(20. + 60.)
-                    BreakTime = TimeSpan.FromMinutes(10)
+                    BreakTime = TimeSpan.FromMinutes(10L)
                     TimePointNameStack = ["W1"; "B1"]
                 } |> Some
             ).SetName("08: Work Started -> WorkIncreased -> Stopped -> Work Started -> Break Started -> Stopped")

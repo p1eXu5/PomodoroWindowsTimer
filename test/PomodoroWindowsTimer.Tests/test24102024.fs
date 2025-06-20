@@ -1,4 +1,4 @@
-namespace PomodoroWindowsTimer.Tests
+﻿namespace PomodoroWindowsTimer.Tests
 open System
 open System.Globalization
 
@@ -15,7 +15,7 @@ open PomodoroWindowsTimer.Helpers.DateTimeOffset
 
 [<Category("TempExcelRows Tests")>]
 module Day24102024Tests =
-    let private ``5 min threshold`` = TimeSpan.FromMinutes(5)
+    let private ``5 min threshold`` = TimeSpan.FromMinutes(5L)
 
     [<Test>]
     let Work1_1Test () =

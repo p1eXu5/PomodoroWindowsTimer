@@ -20,25 +20,25 @@ open Microsoft.Extensions.Logging
 
 let private testTimePoints =
     [
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"); Name = "1"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"); Name = "2"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"); Name = "3"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"); Name = "4"; TimeSpan = TimeSpan.FromSeconds(1); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"); Name = "1"; TimeSpan = TimeSpan.FromSeconds(1L); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"); Name = "2"; TimeSpan = TimeSpan.FromSeconds(1L); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"); Name = "3"; TimeSpan = TimeSpan.FromSeconds(1L); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"); Name = "4"; TimeSpan = TimeSpan.FromSeconds(1L); Kind = Work; KindAlias = Work |> Kind.alias }
     ]
 
 let timeProvider () =
     System.TimeProvider.System
 
 let testLooper (timePoints: TimePoint list) (setupTime: System.TimeProvider -> System.TimeProvider) =
-    let cts = new CancellationTokenSource(TimeSpan.FromSeconds(60))
+    let cts = new CancellationTokenSource(TimeSpan.FromSeconds(60L))
 
-    let tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<TimePointQueue>, -1<ms>, cts.Token)
+    let tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(TestContextWriters.GetInstance<TestContext>(), LogOut.All) :> ILogger<TimePointQueue>, -1<ms>, cts.Token)
     tpQueue.Start()
     tpQueue.AddMany(timePoints)
 
     let timeProvider = Substitute.For<System.TimeProvider>()
 
-    let looper = new Looper(tpQueue, setupTime timeProvider, 200<ms>, TestLogger<Looper>(tcw, LogOut.Out ||| LogOut.Progress) :> ILogger<Looper>, cts.Token)
+    let looper = new Looper(tpQueue, setupTime timeProvider, 200<ms>, TestLogger<Looper>(TestContextWriters.GetInstance<TestContext>(), LogOut.All) :> ILogger<Looper>, cts.Token)
     let eventQueue = Queue<LooperEvent>()
     let subscriber looperEvent =
         async {
@@ -56,7 +56,7 @@ let testLooper (timePoints: TimePoint list) (setupTime: System.TimeProvider -> S
     )
 
 let waitEventCount count (eventQueue: IReadOnlyCollection<LooperEvent>) =
-    SpinWait.SpinUntil((fun () -> eventQueue.Count = count), TimeSpan.FromSeconds(5))
+    SpinWait.SpinUntil((fun () -> eventQueue.Count = count), TimeSpan.FromSeconds(5L))
     |> ignore
 
 let date = DateOnly(2024, 01, 01)

@@ -139,7 +139,7 @@ type TestBootstrap () =
                 Service<IThemeSwitcher>();
                 Service<IWindowsMinimizer>();
             ],
-            TestLogWriter(TestLogger<TestBootstrap>(TestContextWriters.Default, LogOut.All)),
+            TestLogWriter(TestLogger<TestBootstrap>(TestContextWriters.GetInstance<TestContext>(), LogOut.All)),
             (fun mr -> mockRepository <- mr)
         )
 

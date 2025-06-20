@@ -115,7 +115,7 @@ module WorkEventRepositoryTests =
             let! id1 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith atpId1) ct
             let! id2 = workEventRepo.InsertAsync workId1 (WorkEvent.generateWith atpId1) ct
 
-            let ev = WorkEvent.BreakIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Int(1, 25)), None)
+            let ev = WorkEvent.BreakIncreased (faker.Date.RecentOffset(7), TimeSpan.FromMinutes(faker.Random.Long(1, 25)), None)
             let! id3 = workEventRepo.InsertAsync workId1 ev ct
 
             id1 |> shouldBeGreaterThan 0UL

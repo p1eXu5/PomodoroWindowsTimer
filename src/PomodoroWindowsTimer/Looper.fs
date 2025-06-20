@@ -108,11 +108,6 @@ type Looper(
     let now () =
         timeProvider.GetLocalNow().DateTime
 
-    let beginScope (looperMsgName: string) =
-        let scope = logger.BeginMessageScope(looperMsgName)
-        logger.LogStartHandleMessage(looperMsgName)
-        scope
-
     let notifierAgent = new MailboxProcessor<Choice<Async<unit> list, unit>>(
         (fun inbox ->
             let rec loop () =
@@ -178,6 +173,16 @@ type Looper(
             logger.LogWarning("It's trying to shift not existing active time point.")
             state
 
+    let beginScope (looperMsgName: string) =
+        let scope = logger.BeginMessageScope(looperMsgName)
+        logger.LogStartHandleMessage(looperMsgName)
+        scope
+
+    let endScope (scope: IDisposable | null) =
+        match scope with
+        | NonNull s -> s.Dispose()
+        | _ -> ()
+
     let agent = new MailboxProcessor<Msg>(
         (fun inbox ->
             let rec loop (state: State) =
@@ -195,7 +200,7 @@ type Looper(
                         atpOpt
                         |> Option.iter (fun atp -> LooperEvent.TimePointStarted (TimePointStartedEventArgs.init atp None) |> tryPostEvent)
 
-                        scope.Dispose()
+                        scope |> endScope
                         return! loop { state with ActiveTimePoint = atpOpt }
 
                     | Resume when state.ActiveTimePoint |> Option.isSome && state.IsStopped ->
@@ -206,7 +211,7 @@ type Looper(
                     | Next ->
                         use scope = beginScope (nameof Next)
                         let newState = initialize { state with IsStopped = false; StartTime = now () }
-                        scope.Dispose()
+                        scope |> endScope
                         return! loop newState
 
                     | Tick when state.ActiveTimePoint |> Option.isNone && not (state.IsStopped) ->
@@ -248,14 +253,14 @@ type Looper(
                     | Shift seconds when state.IsStopped ->
                         use scope = beginScope (nameof Next)
                         let newState = state |> withActiveTimePointTimeSpan seconds
-                        scope.Dispose()
+                        scope |> endScope
                         return! loop newState
 
                     | ShiftAck (seconds, reply) when state.IsStopped ->
                         use scope = beginScope (nameof Next)
                         let newState = state |> withActiveTimePointTimeSpan seconds
                         reply.Reply ()
-                        scope.Dispose()
+                        scope |> endScope
                         return! loop newState
 
                     | GetActiveTimePoint reply ->
@@ -281,7 +286,7 @@ type Looper(
     /// Starts Looper in Stop state
     member _.Start(subscribers: (LooperEvent -> Async<unit>) list) =
         if Interlocked.CompareExchange(started, 1 ,0) = 0 then
-            if timer = null then
+            if box timer = null then
                 timer <-
                     new Timer(fun _ ->
                         agent.Post(Tick)
@@ -329,7 +334,7 @@ type Looper(
         if _isDisposed then ()
         else
             if isDisposing then
-                if timer <> null then
+                if box timer <> null then
                     timer.Dispose()
 
                 agent.Post(Stop)

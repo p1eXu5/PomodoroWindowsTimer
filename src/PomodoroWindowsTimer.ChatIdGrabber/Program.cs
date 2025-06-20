@@ -29,13 +29,13 @@ var semaphore = new SemaphoreSlim(0, 1);
 
 botClient.StartReceiving(
     updateHandler: HandleUpdateAsync,
-    pollingErrorHandler: HandlePollingErrorAsync,
+    errorHandler: HandlePollingErrorAsync,
     receiverOptions: receiverOptions,
     cancellationToken: cts.Token
 );
 
 
-var me = await botClient.GetMeAsync();
+var me = await botClient.GetMe();
 
 Console.WriteLine($"Start listening for @{me.Username}");
 Console.WriteLine("Send something to bot to get Chat ID.");
@@ -64,7 +64,7 @@ async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, Cancel
     Console.WriteLine(text);
 
     // Echo received message text
-    Message sentMessage = await botClient.SendTextMessageAsync(
+    Message sentMessage = await botClient.SendMessage(
         chatId: chatId,
         text: text,
         cancellationToken: cancellationToken);
