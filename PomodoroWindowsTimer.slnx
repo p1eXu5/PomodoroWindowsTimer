@@ -1,0 +1,63 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Personal" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="build.fsx" />
+    <File Path="fake.cmd" />
+    <File Path="README.md" />
+    <File Path="RELEASE_NOTES.md" />
+  </Folder>
+  <Folder Name="/Solution Items/.github/" />
+  <Folder Name="/Solution Items/.github/workflows/">
+    <File Path=".github/workflows/ci.yml" />
+  </Folder>
+  <Folder Name="/Solution Items/docs/">
+    <File Path="docs/design/development-notes.md" />
+    <File Path="docs/design/er-diagram.md" />
+    <File Path="docs/design/time-shifting-with-slider.md" />
+  </Folder>
+  <Folder Name="/Solution Items/Migrator/">
+    <Project Path="src/PomodoroWindowsTimer.Migrator/PomodoroWindowsTimer.Migrator.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/PomodoroWindowsTimer.ElmishApp/PomodoroWindowsTimer.ElmishApp.fsproj" />
+    <Project Path="src/PomodoroWindowsTimer.WpfClient/PomodoroWindowsTimer.WpfClient.csproj" />
+    <Project Path="src/PomodoroWindowsTimer.WpfClientInstaller/PomodoroWindowsTimer.WpfClientInstaller.csproj">
+      <BuildType Solution="Personal|*" Project="Debug" />
+    </Project>
+    <Project Path="src/PomodoroWindowsTimer/PomodoroWindowsTimer.fsproj" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/PomodoroWindowsTimer.AppAgent/PomodoroWindowsTimer.AppAgent.csproj" />
+    <Project Path="src/PomodoroWindowsTimer.Bootstrap/PomodoroWindowsTimer.Bootstrap.csproj">
+      <BuildType Solution="Personal|*" Project="Debug" />
+    </Project>
+    <Project Path="src/PomodoroWindowsTimer.ChatIdGrabber/PomodoroWindowsTimer.ChatIdGrabber.csproj" />
+    <Project Path="src/PomodoroWindowsTimer.Exporter.Excel/PomodoroWindowsTimer.Exporter.Excel.csproj" />
+    <Project Path="src/PomodoroWindowsTimer.Installer/PomodoroWindowsTimer.Installer.csproj">
+      <BuildType Solution="Personal|*" Project="Debug" />
+    </Project>
+    <Project Path="src/PomodoroWindowsTimer.Storage.Migrations/PomodoroWindowsTimer.Storage.Migrations.csproj">
+      <BuildType Solution="Personal|*" Project="Debug" />
+    </Project>
+    <Project Path="src/PomodoroWindowsTimer.Storage/PomodoroWindowsTimer.Storage.fsproj" />
+  </Folder>
+  <Folder Name="/src/Wpf/">
+    <Project Path="src/PomodoroWindowsTimer.Wpf.Demo/PomodoroWindowsTimer.Wpf.Demo.csproj">
+      <BuildType Solution="Personal|*" Project="Debug" />
+    </Project>
+    <Project Path="src/PomodoroWindowsTimer.Wpf/PomodoroWindowsTimer.Wpf.csproj">
+      <BuildType Solution="Personal|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/PomodoroWindowsTimer.ElmishApp.Tests/PomodoroWindowsTimer.ElmishApp.Tests.fsproj" />
+    <Project Path="test/PomodoroWindowsTimer.Storage.Tests/PomodoroWindowsTimer.Storage.Tests.fsproj" />
+    <Project Path="test/PomodoroWindowsTimer.Testing.Fakers/PomodoroWindowsTimer.Testing.Fakers.fsproj" />
+    <Project Path="test/PomodoroWindowsTimer.Tests/PomodoroWindowsTimer.Tests.fsproj" />
+  </Folder>
+</Solution>
