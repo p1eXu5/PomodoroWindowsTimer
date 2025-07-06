@@ -6,26 +6,40 @@ open System.Threading
 open System.Threading.Tasks
 open PomodoroWindowsTimer.Types
 open System.Runtime.CompilerServices
+open System.Diagnostics.CodeAnalysis
 
 type IDatabaseSettings =
     interface
         abstract DatabaseFilePath : string with get, set
         abstract Pooling : Nullable<bool> with get
-        abstract Mode : string with get
-        abstract Cache: string with get
+        [<MaybeNull>]
+        abstract Mode : string | null with get
+        [<MaybeNull>]
+        abstract Cache: string | null with get
     end
 
 [<Extension>]
 type DatabaseSettingsExtensions =
     [<Extension>]
     static member GetConnectionString(dbSettings: IDatabaseSettings) =
-        let mode = dbSettings.Mode
+        let mode = dbSettings.Mode 
         let cache = dbSettings.Cache
+
+        let isMemoryMode =
+            match mode with
+            | NonNull m -> m.Equals("Memory", StringComparison.Ordinal)
+            | _ -> false
+
+        let isSharedCache =
+            match cache with
+            | NonNull c -> c.Equals("Shared", StringComparison.Ordinal)
+            | _ -> false
+
         if
             not <| String.IsNullOrWhiteSpace(mode)
             && not <| String.IsNullOrWhiteSpace(cache)
-            && mode.Equals("Memory", StringComparison.Ordinal)
-            && cache.Equals("Shared", StringComparison.Ordinal)
+            && isMemoryMode
+            && isSharedCache
         then
             $"Data Source={dbSettings.DatabaseFilePath};Mode=Memory;Cache=Shared;"
         else
