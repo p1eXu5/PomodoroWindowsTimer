@@ -1,10 +1,10 @@
 ﻿namespace PomodoroWindowsTimer.Storage
 
-open System.Threading
-open System.Threading.Tasks
-open PomodoroWindowsTimer.Abstractions
 open System
+open System.Threading
+open PomodoroWindowsTimer.Abstractions
 
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module internal DbFileRevisor =
 
     open System.IO
