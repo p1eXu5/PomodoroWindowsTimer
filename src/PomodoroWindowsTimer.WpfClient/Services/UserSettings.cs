@@ -29,6 +29,8 @@ internal class UserSettings : IUserSettings
         _workDbOptions = workDbOptions.Value;
     }
 
+    #region IDisableSkipBreakSettings implementation
+
     public bool DisableSkipBreak
     {
         get => Properties.Settings.Default.DisableSkipBreak;
@@ -38,6 +40,10 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+
+    #endregion
+
+    #region ITimePointSettings implementation
 
     public FSharpOption<string> TimePointSettings
     {
@@ -49,6 +55,10 @@ internal class UserSettings : IUserSettings
         }
     }
 
+    #endregion
+
+    #region ITimePointPrototypesSettings implementation
+
     public FSharpOption<string> TimePointPrototypesSettings
     {
         get => Properties.Settings.Default.TimePointPrototypes.ToFSharpOption();
@@ -58,6 +68,11 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+
+    #endregion
+
+    #region IPatternSettings implementation
+
     public FSharpList<string> Patterns
     {
         get
@@ -84,6 +99,10 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+
+    #endregion
+
+    #region IBotSettings implementation
 
     public FSharpOption<string> BotToken
     {
@@ -126,6 +145,10 @@ internal class UserSettings : IUserSettings
         }
     }
 
+    #endregion
+
+    #region ICurrentWorkItemSettings implementation
+
     public FSharpOption<Work> CurrentWork
     {
         get
@@ -154,6 +177,42 @@ internal class UserSettings : IUserSettings
             Properties.Settings.Default.Save();
         }
     }
+
+    #endregion
+
+    #region IDatabaseSettings implementation
+
+    string IDatabaseSettings.DatabaseFilePath
+    {
+        get
+        {
+            string databaseFilePath = Properties.Settings.Default.DatabaseFilePath;
+            if (string.IsNullOrWhiteSpace(databaseFilePath))
+            {
+                databaseFilePath = _workDbOptions.DatabaseFilePath;
+                Properties.Settings.Default.DatabaseFilePath = databaseFilePath;
+            }
+
+            return databaseFilePath;
+        }
+        set
+        {
+            Properties.Settings.Default.DatabaseFilePath = value;
+            Properties.Settings.Default.Save();
+            AddDatabaseFileToRecent(value);
+        }
+    }
+
+    // TODO: consider to use WorkDbOptions
+    bool? IDatabaseSettings.Pooling => Properties.Settings.Default.DatabasePooling;
+
+    string? IDatabaseSettings.Mode => Properties.Settings.Default.DatabaseMode;
+    
+    string? IDatabaseSettings.Cache => Properties.Settings.Default.DatabaseCache;
+
+    #endregion
+
+    #region IUserSettings implementation
 
     public FSharpOption<DateOnlyPeriod> LastStatisticPeriod
     {
@@ -184,34 +243,17 @@ internal class UserSettings : IUserSettings
         }
     }
 
-    public string DatabaseFilePath
+    public int LastDayCount
     {
-        get
-        {
-            string databaseFilePath = Properties.Settings.Default.DatabaseFilePath;
-            if (string.IsNullOrWhiteSpace(databaseFilePath))
-            {
-                databaseFilePath = _workDbOptions.DatabaseFilePath;
-                Properties.Settings.Default.DatabaseFilePath = databaseFilePath;
-            }
-
-            return databaseFilePath;
-        }
+        get => Properties.Settings.Default.LastDayCount;
         set
         {
-            Properties.Settings.Default.DatabaseFilePath = value;
+            Properties.Settings.Default.LastDayCount = value;
             Properties.Settings.Default.Save();
-            AddDatabaseFileToRecent(value);
         }
     }
 
-    // TODO: consider to use WorkDbOptions
-    public bool? Pooling => Properties.Settings.Default.DatabasePooling;
-    public string? Mode => Properties.Settings.Default.DatabaseMode;
-    public string? Cache => Properties.Settings.Default.DatabaseCache;
-
-    [MaybeNull]
-    public string CurrentVersion
+    public string? CurrentVersion
     {
         get => Properties.Settings.Default.CurrentVersion;
         set
@@ -246,6 +288,8 @@ internal class UserSettings : IUserSettings
         }
     }
 
+    #endregion
+
     /* TODO:
     public RollbackWorkStrategy RollbackWorkStrategy
     {
@@ -276,14 +320,4 @@ internal class UserSettings : IUserSettings
         }
     }
     */
-
-    public int LastDayCount
-    {
-        get => Properties.Settings.Default.LastDayCount;
-        set
-        {
-            Properties.Settings.Default.LastDayCount = value;
-            Properties.Settings.Default.Save();
-        }
-    }
 }
