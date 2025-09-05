@@ -493,7 +493,7 @@ module TimePointPrototype =
             { Name = "Long break"; Kind = Kind.LongBreak; KindAlias = Kind.LongBreak |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(20L) }
         ]
 
-    let toTimePoint ind prototype =
+    let toTimePoint ind (prototype: TimePointPrototype) =
         {
             Id = Guid.NewGuid()
             Name = sprintf "%s %i" prototype.Name ind
