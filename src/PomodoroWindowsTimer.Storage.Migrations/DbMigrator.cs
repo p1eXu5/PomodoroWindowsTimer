@@ -2,8 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using DbUp;
+using DbUp.Builder;
 using DbUp.Engine;
-using DbUp.Extensions.Logging;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.Abstractions;
@@ -46,14 +46,15 @@ public sealed class DbMigrator : IDbMigrator
 
         //var connectionString = "Data Source=" + connectionString + ";Pooling=false";
 
-        var upgrader =
+        UpgradeEngineBuilder builder =
             DeployChanges.To
                 .SqliteDatabase(databaseSettings.GetConnectionString())
                 .WithScriptsAndCodeEmbeddedInAssembly(typeof(Script005_FillActiveTimePointId).Assembly)
-                .AddLogger(_upgradeEngineLogger)
-                .WithTransaction()
-                .Build();
+                .LogTo(_upgradeEngineLogger)
+                .LogScriptOutput()
+                .WithTransaction();
 
+        UpgradeEngine upgrader = builder.Build();
 
         if (_logger.IsEnabled(LogLevel.Trace))
         {
