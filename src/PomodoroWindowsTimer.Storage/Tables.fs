@@ -118,3 +118,74 @@ module internal Work =
         let [<Literal>] created_at = nameof row.created_at
         let [<Literal>] updated_at = nameof row.updated_at
         let [<Literal>] last_event_created_at = nameof row.last_event_created_at
+
+module internal Tag =
+    open System
+    open PomodoroWindowsTimer.Types
+
+    [<CLIMutable>]
+    type internal Row =
+        {
+            id: int64
+            name: string
+            created_at: int64
+            updated_at: int64
+        }
+        with
+            static member ToTag (row: Row) : Tag =
+                {
+                    Id = uint64 row.id
+                    Name = row.name
+                }
+
+    let [<Literal>] NAME = "tag"
+
+    module Columns =
+        let private row : Row = Unchecked.defaultof<_>
+        let [<Literal>] id = nameof row.id
+        let [<Literal>] name = nameof row.name
+        let [<Literal>] created_at = nameof row.created_at
+
+module internal Commit =
+    open System
+    open PomodoroWindowsTimer.Types
+
+    [<CLIMutable>]
+    type internal Row =
+        {
+            id: int64
+            message: string
+            work_id: int64
+            created_at: int64
+            updated_at: int64
+        }
+
+    let [<Literal>] NAME = "commit"
+
+    module Columns =
+        let private row : Row = Unchecked.defaultof<_>
+        let [<Literal>] id = nameof row.id
+        let [<Literal>] message = nameof row.message
+        let [<Literal>] work_id = nameof row.work_id
+        let [<Literal>] created_at = nameof row.created_at
+        let [<Literal>] updated_at = nameof row.updated_at
+
+module internal CommitTag =
+    open System
+    open PomodoroWindowsTimer.Types
+
+    [<CLIMutable>]
+    type internal Row =
+        {
+            commit_id: int64
+            tag_id: int64
+            created_at: int64
+        }
+
+    let [<Literal>] NAME = "commit_tag"
+
+    module Columns =
+        let private row : Row = Unchecked.defaultof<_>
+        let [<Literal>] commit_id = nameof row.commit_id
+        let [<Literal>] tag_id = nameof row.tag_id
+        let [<Literal>] created_at = nameof row.created_at
