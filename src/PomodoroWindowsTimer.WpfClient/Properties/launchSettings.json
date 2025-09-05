@@ -1,9 +1,9 @@
-{
+﻿{
   "profiles": {
     "work.db (dev)": {
       "commandName": "Executable",
       "executablePath": ".\\Pwt.exe",
-      "workingDirectory": "bin\\Debug\\net8.0-windows",
+      "workingDirectory": "bin\\Debug\\net9.0-windows",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
         "WorkDb__DatabaseFilePath": "Data Source=work.db;"
