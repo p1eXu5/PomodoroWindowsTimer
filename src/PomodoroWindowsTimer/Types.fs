@@ -88,6 +88,23 @@ and
 type Pattern = string
 
 type WorkId = uint64
+type TagId = uint64
+type CommitId = uint64
+
+type Tag =
+    {
+        Id: TagId
+        Name: string
+    }
+
+type Commit =
+    {
+        CommitId: CommitId
+        Message: string
+        Tags: Tag list
+        CreatedAt: DateTimeOffset
+        UpdatedAt: DateTimeOffset
+    }
 
 type Work =
     {
