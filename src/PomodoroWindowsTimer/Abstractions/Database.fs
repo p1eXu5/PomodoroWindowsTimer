@@ -68,13 +68,18 @@ type DatabaseSettingsExtensions =
 
 type IWorkRepository =
     interface
-        abstract InsertAsync: number: string -> title: string -> cancellationToken: CancellationToken -> Task<Result<(uint64 * DateTimeOffset), string>>
+        abstract InsertAsync: number: string -> title: string -> cancellationToken: CancellationToken -> Task<Result<(WorkId * DateTimeOffset), string>>
         abstract ReadAllAsync: cancellationToken: CancellationToken -> Task<Result<Work list, string>>
         abstract SearchByNumberOrTitleAsync: text: string -> cancellationToken: CancellationToken -> Task<Result<Work list, string>>
         abstract FindByIdAsync: workId: WorkId -> cancellationToken: CancellationToken -> Task<Result<Work option, string>>
         abstract FindByIdOrCreateAsync: work: Work -> cancellationToken: CancellationToken -> Task<Result<Work, string>>
         abstract UpdateAsync: work: Work -> cancellationToken: CancellationToken -> Task<Result<DateTimeOffset, string>>
         abstract DeleteAsync: work: Work -> cancellationToken: CancellationToken -> Task<Result<unit, string>>
+    end
+
+type ICommitRepository =
+    interface
+        abstract InsertAsync: message: string -> workId: WorkId -> tags: Tag list -> cancellationToken: CancellationToken -> Task<Result<(CommitId * DateTimeOffset), string>>
     end
 
 type IWorkEventRepository =
