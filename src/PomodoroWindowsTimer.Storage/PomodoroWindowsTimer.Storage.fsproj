@@ -33,6 +33,7 @@
     <Compile Include="WorkRepository.fs" />
     <Compile Include="WorkEventRepository.fs" />
     <Compile Include="ActiveTimePointRepository.fs" />
+    <Compile Include="CommitRepository.fs" />
     <Compile Include="RepositoryFactory.fs" />
     <Compile Include="DbSeeder.fs" />
     <Compile Include="CliDbMigrator.fs" />
