@@ -23,7 +23,7 @@ module internal WorkRepository =
     module Sql =
         let CREATE_INIT_TABLE = $"""
             CREATE TABLE IF NOT EXISTS {Table.NAME} (
-                    {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
+                  {Table.Columns.id} INTEGER PRIMARY KEY AUTOINCREMENT
                 , {Table.Columns.number} TEXT NOT NULL
                 , {Table.Columns.title} TEXT NOT NULL
                 , {Table.Columns.created_at} INTEGER NOT NULL
@@ -337,8 +337,4 @@ type internal WorkRepository(options: IDatabaseSettings, timeProvider: System.Ti
 
         member _.DeleteAsync work cancellationToken = 
             WorkRepository.deleteAsync deps work cancellationToken
-
-
-
-
 
