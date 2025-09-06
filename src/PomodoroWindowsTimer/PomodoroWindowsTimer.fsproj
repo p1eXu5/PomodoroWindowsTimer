@@ -33,11 +33,11 @@
   <ItemGroup>
     <PackageReference Include="FParsec" Version="2.0.0-beta2" />
     <PackageReference Include="FSharp.Control.AsyncSeq" Version="3.2.1" />
-    <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.6" />
+    <PackageReference Include="FsToolkit.ErrorHandling.IcedTasks" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
     <PackageReference Include="OptimizedPriorityQueue" Version="5.1.0" />
     <PackageReference Include="FSharp.SystemTextJson" Version="1.4.36" />
-    <PackageReference Include="System.Text.Json" Version="9.0.6" />
+    <PackageReference Include="System.Text.Json" Version="9.0.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.300" />
+    <PackageReference Update="FSharp.Core" Version="9.0.303" />
   </ItemGroup>
 </Project>

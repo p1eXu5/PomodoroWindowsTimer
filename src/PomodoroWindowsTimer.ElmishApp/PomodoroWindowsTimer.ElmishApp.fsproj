@@ -92,7 +92,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
-    <PackageReference Include="Telegram.Bot" Version="22.5.1" />
+    <PackageReference Include="Telegram.Bot" Version="22.7.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -106,7 +106,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="9.0.300" />
+    <PackageReference Update="FSharp.Core" Version="9.0.303" />
   </ItemGroup>
 
 </Project>
