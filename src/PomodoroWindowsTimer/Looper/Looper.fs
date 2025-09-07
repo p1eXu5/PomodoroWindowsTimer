@@ -1,4 +1,4 @@
-﻿module PomodoroWindowsTimer.Looper
+﻿namespace PomodoroWindowsTimer.Looper
 
 open FSharp.Control
 open PomodoroWindowsTimer.Types
@@ -6,7 +6,7 @@ open PomodoroWindowsTimer.Abstractions
 open System
 open System.Threading
 open Microsoft.Extensions.Logging
-open System.Runtime.CompilerServices
+open LoggingExtensions
 
 
 type private State = 
@@ -16,6 +16,13 @@ type private State =
         Subscribers: (LooperEvent -> Async<unit>) list
         IsStopped: bool
     }
+    static member Init(startDateTime) =
+        {
+            ActiveTimePoint = None
+            StartTime = startDateTime
+            Subscribers = []
+            IsStopped = false
+        }
 
 type private Msg =
     | PreloadTimePoint
@@ -30,69 +37,9 @@ type private Msg =
     | GetActiveTimePoint of AsyncReplyChannel<ActiveTimePoint option>
 
 
-module private State =
-    let init (timeProvider: System.TimeProvider) =
-        {
-            ActiveTimePoint = None
-            StartTime = timeProvider.GetLocalNow().DateTime
-            Subscribers = []
-            IsStopped = false
-        }
-
-[<AutoOpen>]
-module private BeginMessageScope =
-    let private messageScope =
-        LoggerMessage.DefineScope<string>(
-            "Scope of Looper message: {LooperMsgName}"
-        )
-
-    type LoggerExtensions () =
-        [<Extension>]
-        static member BeginMessageScope(logger: ILogger, looperMsgName: string) =
-            messageScope.Invoke(logger, looperMsgName)
-
-[<AutoOpen>]
-module private StartHandleMessage =
-    let private loggerMessage = LoggerMessage.Define<string>(
-        LogLevel.Debug,
-        new EventId(0b0_0010_0001, "Start Handle Looper Message"),
-        "Start handle Looper message: {LooperMsgName}"
-    )
-
-    type LoggerExtensions () =
-        [<Extension>]
-        static member LogStartHandleMessage(logger: ILogger, looperMsgName: string) =
-            loggerMessage.Invoke(logger, looperMsgName, null)
-
-[<AutoOpen>]
-module private LooperStateUpdated =
-    let private loggerMessageTrace = LoggerMessage.Define<string>(
-        LogLevel.Trace,
-        new EventId(0b0_0001_0010, "Looper State Updated"),
-        "Looper state updated: {NewLooperState}"
-    )
-
-    let private loggerMessage = LoggerMessage.Define(
-        LogLevel.Trace,
-        new EventId(0b0_0001_0010, "Looper State Updated"),
-        "Looper state updated"
-    )
-
-    type LoggerExtensions () =
-        [<Extension>]
-        static member LogLooperStateUpdated(logger: ILogger, state: State) =
-            if logger.IsEnabled(LogLevel.Trace) then
-                loggerMessageTrace.Invoke(
-                    logger,
-                    (JsonHelpers.Serialize state),
-                    null
-                )
-            else
-                loggerMessage.Invoke(logger, null)
-
-
 /// 1. Start looper
 /// 2. TryReceive time point from queue and store to active time point
+[<Sealed>]
 type Looper(
     timePointQueue: ITimePointQueue,
     timeProvider: System.TimeProvider,
@@ -173,24 +120,24 @@ type Looper(
             logger.LogWarning("It's trying to shift not existing active time point.")
             state
 
-    let beginScope (looperMsgName: string) =
-        let scope = logger.BeginMessageScope(looperMsgName)
-        logger.LogStartHandleMessage(looperMsgName)
-        scope
-
-    let endScope (scope: IDisposable | null) =
-        match scope with
-        | NonNull s -> s.Dispose()
-        | _ -> ()
-
     let agent = new MailboxProcessor<Msg>(
         (fun inbox ->
             let rec loop (state: State) =
+                let beginScope (looperMsgName: string) =
+                    let scope = logger.BeginMessageScope(looperMsgName)
+                    logger.LogStartHandleMessage(looperMsgName)
+                    scope
+
+                let endScope (scope: IDisposable | null) =
+                    match scope with
+                    | NonNull s -> s.Dispose()
+                    | _ -> ()
+
                 let tryPostEvent = tryPostEvent state
 
                 async {
                     let! msg = inbox.Receive()
-                    // printfn "%A: %A\n" msg state
+                    logger.LogLooperCurrentState(state)
 
                     match msg with
                     | PreloadTimePoint when state.ActiveTimePoint |> Option.isNone ->
@@ -248,6 +195,8 @@ type Looper(
                         return! loop { state with Subscribers = subscribers @ state.Subscribers }
 
                     | Stop when not state.IsStopped ->
+                        let atp = state.ActiveTimePoint |> Option.get
+                        tryPostEvent (LooperEvent.TimePointStopped atp)
                         return! loop { state with IsStopped = true; StartTime = timeProvider.GetLocalNow().DateTime }
 
                     | Shift seconds when state.IsStopped ->
@@ -270,7 +219,7 @@ type Looper(
                     | _ -> return! loop state
                 }
 
-            loop (State.init timeProvider)
+            loop (State.Init(timeProvider.GetLocalNow().DateTime))
         )
         , defaultArg cancellationToken CancellationToken.None
     )
@@ -354,15 +303,12 @@ type Looper(
         member this.ShiftAck(seconds: float<sec>) = this.ShiftAck(seconds)
         member this.Resume() = this.Resume()
         member this.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) = this.AddSubscriber(subscriber)
-        /// Tryes to pick TimePoint from queue, if it present
+        /// Tries to pick TimePoint from queue, if it present
         /// emits TimePointStarted event and sets ActiveTimePoint.
         member this.PreloadTimePoint() = this.PreloadTimePoint()
         member this.GetActiveTimePoint() = this.GetActiveTimePoint()
 
     interface IDisposable with
         member this.Dispose() = this.Dispose(true)
-        
-
-
 
 
