@@ -1,31 +1,31 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkCard"
-             x:Name="m_WorkCardRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
-             xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:DataContext="{d:DesignInstance Type=WorkModel:Bindings, IsDesignTimeCreatable=False}"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="m_WorkCardRoot"
              MinHeight="52"
+             d:DataContext="{d:DesignInstance Type=WorkModel:Bindings,
+                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="82"
              d:DesignWidth="300"
-             Foreground="{StaticResource MaterialDesign.Brush.Primary}"
              Background="#030C10"
+             Foreground="{StaticResource MaterialDesign.Brush.Primary}"
              mc:Ignorable="d"
              >
     <materialDesign:Card Padding="10,5"
                          VerticalAlignment="Center"
-                         Background="{Binding ElementName=m_WorkCardRoot,
-                                              Path=Background}"
+                         Background="{Binding ElementName=m_WorkCardRoot, Path=Background}"
                          >
         <DockPanel VerticalAlignment="Center"
                    LastChildFill="True"
                    >
-            <Grid DockPanel.Dock="Top"
-                  Margin="0,0,0,5"
+            <Grid Margin="0,0,0,5"
                   HorizontalAlignment="Stretch"
+                  DockPanel.Dock="Top"
                   >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -36,40 +36,32 @@
                            HorizontalAlignment="Left"
                            VerticalAlignment="Bottom"
                            materialDesign:HintAssist.Hint="Number"
-                           Text="{Binding Number,
-                                          Converter={StaticResource conv_NoNumberConverter},
-                                          FallbackValue='NO NUMBER'}"
-                           FontWeight="Normal"
                            FontSize="11"
+                           FontWeight="Normal"
+                           Text="{Binding Number, Converter={StaticResource conv_NoNumberConverter}, FallbackValue='NO NUMBER'}"
                            />
                 <TextBlock Grid.Column="1"
                            HorizontalAlignment="Right"
                            VerticalAlignment="Bottom"
                            materialDesign:HintAssist.Hint="Number"
-                           Text="{Binding LastEventCreatedAtOrUpdatedAt,
-                                          Converter={StaticResource conv_DateTimeOffsetToShortDate},
-                                          FallbackValue='12.02.2024'}"
-                           FontWeight="Normal"
                            FontSize="11"
+                           FontWeight="Normal"
+                           Text="{Binding LastEventCreatedAtOrUpdatedAt, Converter={StaticResource conv_DateTimeOffsetToShortDate}, FallbackValue='12.02.2024'}"
                            />
             </Grid>
             <!--  Title  -->
             <TextBlock x:Name="m_TitleTextBlock"
-                       ToolTip="{Binding Title}"
-                       Height="{Binding ElementName=m_WorkCardRoot,
-                                        Path=TitleHeight}"
-                       Margin="{Binding ElementName=m_WorkCardRoot,
-                                        Path=TitleMargin}"
+                       Height="{Binding ElementName=m_WorkCardRoot, Path=TitleHeight}"
+                       Margin="{Binding ElementName=m_WorkCardRoot, Path=TitleMargin}"
                        VerticalAlignment="Top"
                        materialDesign:HintAssist.Hint="Title"
-                       Text="{Binding Title,
-                                      FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
                        FontSize="16"
-                       TextWrapping="{Binding ElementName=m_WorkCardRoot,
-                                              Path=TitleWrapping}"
-                       TextTrimming="CharacterEllipsis"
                        FontWeight="Light"
+                       Text="{Binding Title, FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
                        TextAlignment="Justify"
+                       TextTrimming="CharacterEllipsis"
+                       TextWrapping="{Binding ElementName=m_WorkCardRoot, Path=TitleWrapping}"
+                       ToolTip="{Binding Title}"
                        />
         </DockPanel>
     </materialDesign:Card>

@@ -59,8 +59,12 @@
     <Color x:Key="{x:Static local:PwtColors.SpinnerFilledKey}">#999B9B9B</Color>
     <Color x:Key="{x:Static local:PwtColors.SpinnerUnfilledKey}">#009B9B9B</Color>
 
-    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerFilledKey}" Color="{DynamicResource {x:Static local:PwtColors.SpinnerFilledKey}}" />
-    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerUnfilledKey}" Color="{DynamicResource {x:Static local:PwtColors.SpinnerUnfilledKey}}" />
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerFilledKey}"
+                     Color="{DynamicResource {x:Static local:PwtColors.SpinnerFilledKey}}"
+                     />
+    <SolidColorBrush x:Key="{x:Static local:PwtBrushes.SpinnerUnfilledKey}"
+                     Color="{DynamicResource {x:Static local:PwtColors.SpinnerUnfilledKey}}"
+                     />
 
     <!--  =======  -->
     <!--  diagram  -->

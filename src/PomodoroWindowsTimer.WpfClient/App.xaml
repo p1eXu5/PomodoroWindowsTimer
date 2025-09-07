@@ -45,9 +45,13 @@
 
             <!--<SolidColorBrush x:Key="PrimaryHueDarkBrush" Color="#1A1A1A" />-->
 
-            <SolidColorBrush x:Key="WorkDigitForeground" Color="#00FF00" />
+            <SolidColorBrush x:Key="WorkDigitForeground"
+                             Color="#00FF00"
+                             />
 
-            <SolidColorBrush x:Key="BreakDigitForeground" Color="#FF0000" />
+            <SolidColorBrush x:Key="BreakDigitForeground"
+                             Color="#FF0000"
+                             />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

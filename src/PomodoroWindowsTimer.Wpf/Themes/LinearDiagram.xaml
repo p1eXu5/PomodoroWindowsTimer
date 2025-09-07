@@ -44,11 +44,11 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Rectangle ToolTip="{Binding Hint}"
-                                                       Width="{Binding Width}"
+                                            <Rectangle Width="{Binding Width}"
                                                        Height="26"
                                                        Margin="0"
                                                        Fill="{Binding Fill}"
+                                                       ToolTip="{Binding Hint}"
                                                        />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
@@ -58,14 +58,14 @@
 
                         <Label Grid.Row="1"
                                Grid.Column="0"
-                               Content="{TemplateBinding StartTime}"
                                HorizontalAlignment="Left"
+                               Content="{TemplateBinding StartTime}"
                                Foreground="{TemplateBinding Foreground}"
                                />
                         <Label Grid.Row="1"
                                Grid.Column="1"
-                               Content="{TemplateBinding EndTime}"
                                HorizontalAlignment="Right"
+                               Content="{TemplateBinding EndTime}"
                                Foreground="{TemplateBinding Foreground}"
                                />
                     </Grid>

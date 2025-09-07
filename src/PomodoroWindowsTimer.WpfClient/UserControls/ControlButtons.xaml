@@ -4,11 +4,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:digitPanel="clr-namespace:p1eXu5.Wpf.DigitPanel;assembly=p1eXu5.Wpf.DigitPanel"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
+             xmlns:mainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:mainModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.MainModel;assembly=PomodoroWindowsTimer.ElmishApp"
              xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
-             d:DataContext="{d:DesignInstance Type=mainModel:Bindings, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance Type=mainModel:Bindings,
+                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="100"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -59,19 +60,18 @@
                                           HorizontalAlignment="Stretch"
                                           >
                                         <Border x:Name="border"
+                                                Background="{TemplateBinding Background}"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius),
-                                                                       RelativeSource={RelativeSource TemplatedParent}}"
-                                                Background="{TemplateBinding Background}"
+                                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
                                                 />
 
                                         <ContentPresenter x:Name="MyContentPresenter"
-                                                          Content="{TemplateBinding Content}"
                                                           Height="{TemplateBinding Height}"
                                                           Margin="{TemplateBinding Padding}"
                                                           HorizontalAlignment="Center"
                                                           VerticalAlignment="Center"
+                                                          Content="{TemplateBinding Content}"
                                                           />
                                     </Grid>
                                 </Grid>
@@ -89,8 +89,7 @@
         </StackPanel.Resources>
 
         <pwt:Lcd Style="{StaticResource st_MediaButtonLcd}"
-                 Visibility="{Binding LooperIsRunning,
-                                      Converter={StaticResource conv_BooleanToVisibility}}"
+                 Visibility="{Binding LooperIsRunning, Converter={StaticResource conv_BooleanToVisibility}}"
                  >
             <Button Command="{Binding ReplayCommand}"
                     Content="Replay"
@@ -99,20 +98,18 @@
         </pwt:Lcd>
 
 
-        <pwt:Lcd Style="{StaticResource st_MediaButtonLcd}"
-                 Margin="20,0,0,0"
+        <pwt:Lcd Margin="20,0,0,0"
+                 Style="{StaticResource st_MediaButtonLcd}"
                  >
             <Button Command="{Binding PlayStopCommand}"
-                    Content="{Binding PlayPauseButtonText,
-                                      FallbackValue=Resume}"
+                    Content="{Binding PlayPauseButtonText, FallbackValue=Resume}"
                     Style="{StaticResource st_MediaButton}"
                     />
         </pwt:Lcd>
 
-        <pwt:Lcd Style="{StaticResource st_MediaButtonLcd}"
-                 Margin="20,0,0,0"
-                 Visibility="{Binding LooperIsRunning,
-                                      Converter={StaticResource conv_BooleanToVisibility}}"
+        <pwt:Lcd Margin="20,0,0,0"
+                 Style="{StaticResource st_MediaButtonLcd}"
+                 Visibility="{Binding LooperIsRunning, Converter={StaticResource conv_BooleanToVisibility}}"
                  >
             <Button Command="{Binding NextCommand}"
                     Content="Next"
