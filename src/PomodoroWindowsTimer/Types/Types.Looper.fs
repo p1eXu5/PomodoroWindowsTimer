@@ -2,6 +2,7 @@
 
 type LooperEvent =
     | TimePointStarted of TimePointStartedEventArgs
+    | TimePointStopped of ActiveTimePoint
     | TimePointTimeReduced of ActiveTimePoint
 and
     TimePointStartedEventArgs =
