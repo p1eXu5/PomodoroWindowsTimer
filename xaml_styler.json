@@ -1,0 +1,50 @@
+{
+    "AttributeIndentation": 0,
+    "AttributeIndentationStyle": 1,
+    "AttributesTolerance": 1,
+    "KeepFirstAttributeOnSameLine": true,
+    "MaxAttributeCharactersPerLine": 0,
+    "MaxAttributesPerLine": 1,
+    "NewlineExemptionElements": "Color, RadialGradientBrush, GradientStop, LinearGradientBrush, ScaleTransform, SkewTransform, RotateTransform, TranslateTransform, Trigger, Condition, Setter, BeginStoryboard, ColumnDefinition, RowDefinition",
+    "RemoveDesignTimeReferences":  false,
+    "SeparateByGroups": false,
+
+    "AttributeOrderingRuleGroups": [
+        "x:Class",
+        "xmlns, xmlns:x",
+        "xmlns:*",
+        "x:Key, Key, x:Name, Name, x:Uid, Uid, Title",
+        "Grid.Row, Grid.RowSpan, Grid.Column, Grid.ColumnSpan, Canvas.Left, Canvas.Top, Canvas.Right, Canvas.Bottom",
+        "Width, Height, MinWidth, MinHeight, MaxWidth, MaxHeight, WidthRequest, HeightRequest",
+        "Margin, Padding, HorizontalAlignment, VerticalAlignment, HorizontalOptions, VerticalOptions, HorizontalContentAlignment, VerticalContentAlignment, Panel.ZIndex",
+        "TextElement.*",
+        "*:*, *",
+        "PageSource, PageIndex, Offset, Color, TargetName, Property, Value, StartPoint, EndPoint",
+        "mc:Ignorable, d:IsDataSource, d:LayoutOverrides, d:IsStaticText",
+        "Storyboard.*, From, To, Duration"
+    ],
+    "EnableAttributeReordering": true,
+    "FirstLineAttributes": "",
+    "IgnoreDesignTimeReferencePrefix": false,
+    "OrderAttributesByName": true,
+
+    "PutEndingBracketOnNewLine": true,
+    "RemoveEndingTagOfEmptyElement": true,
+    "RootElementLineBreakRule": 0,
+    "SpaceBeforeClosingSlash": true,
+
+    "ReorderCanvasChildren": false,
+    "ReorderGridChildren": false,
+    "ReorderSetters": 0,
+    "ReorderVSM": 2,
+    "ReorderVisualStateManager": 2,
+
+    "FormatMarkupExtension": true,
+    "NoNewLineMarkupExtensions": "x:Bind, Binding",
+
+    "CommentPadding": 2,
+    "FormatOnSave": true,
+
+    "ThicknessAttributes": "Margin, Padding, BorderThickness, ThumbnailClipMargin",
+    "ThicknessSeparator": 2
+}
