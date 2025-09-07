@@ -1,5 +1,4 @@
 ﻿<Window x:Class="PomodoroWindowsTimer.WpfClient.MainWindow"
-        x:Name="m_Root"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,14 +8,16 @@
         xmlns:pwt="clr-namespace:PomodoroWindowsTimer.Wpf;assembly=PomodoroWindowsTimer.Wpf"
         xmlns:sel="clr-namespace:PomodoroWindowsTimer.WpfClient.Selectors"
         xmlns:userControls="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls"
-        d:DataContext="{d:DesignInstance Type=mainModel:Bindings, IsDesignTimeCreatable=False}"
+        x:Name="m_Root"
         Title="{Binding Title}"
-        Style="{StaticResource MaterialDesignWindow}"
         Width="800"
         Height="520"
         MinWidth="800"
         MinHeight="595"
+        d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
+                                         IsDesignTimeCreatable=False}"
         Background="Black"
+        Style="{StaticResource MaterialDesignWindow}"
         TextElement.FontSize="13"
         TextElement.FontWeight="Regular"
         TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
@@ -28,43 +29,39 @@
     </Window.Resources>
 
     <materialDesign:DialogHost x:Name="m_RootDialogHost"
-                               DataContext="{Binding AppDialog}"
                                CloseOnClickAway="False"
+                               DataContext="{Binding AppDialog}"
                                DialogContent="{Binding AppDialogId}"
                                DialogContentTemplateSelector="{StaticResource set_MainDialogContentTemplate}"
                                DialogTheme="Inherit"
                                Identifier="RootDialog"
                                IsOpen="{Binding IsDialogOpened}"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
-                                                              Path=MessageQueue}"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar, Path=MessageQueue}"
                                >
 
         <pwt:GlossOnBase>
-            <DockPanel d:DataContext="{d:DesignInstance Type=mainModel:Bindings}"
-                       DataContext="{Binding ElementName=m_Root,
-                                             Path=DataContext}"
+            <DockPanel d:DataContext="{d:DesignInstance Type=mainModel:IBindings}"
+                       DataContext="{Binding ElementName=m_Root, Path=DataContext}"
                        >
-                <materialDesign:Snackbar DockPanel.Dock="Bottom"
-                                         x:Name="m_ErrorMessageQueueSnackbar"
+                <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
                                          HorizontalAlignment="Stretch"
                                          ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
+                                         DockPanel.Dock="Bottom"
                                          MessageQueue="{Binding ErrorMessageQueue}"
                                          />
 
-                <userControls:ControlButtons DockPanel.Dock="Bottom"
+                <userControls:ControlButtons VerticalAlignment="Top"
                                              DataContext="{Binding Player}"
-                                             VerticalAlignment="Top"
+                                             DockPanel.Dock="Bottom"
                                              />
 
                 <!--  LCD container  -->
                 <pwt:Lcd x:Name="m_MainContentContainer"
                          Margin="40,30,40,0"
                          >
-                    <userControls:MainContent DataContext="{Binding}"
-                                              Width="{Binding ElementName=m_MainContentContainer,
-                                                              Path=ActualWidth}"
-                                              Height="{Binding ElementName=m_MainContentContainer,
-                                                               Path=ActualHeight}"
+                    <userControls:MainContent Width="{Binding ElementName=m_MainContentContainer, Path=ActualWidth}"
+                                              Height="{Binding ElementName=m_MainContentContainer, Path=ActualHeight}"
+                                              DataContext="{Binding}"
                                               />
                 </pwt:Lcd>
             </DockPanel>
