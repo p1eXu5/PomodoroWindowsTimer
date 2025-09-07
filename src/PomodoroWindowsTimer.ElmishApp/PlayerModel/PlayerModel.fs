@@ -3,13 +3,10 @@
 open System
 open Elmish.Extensions
 open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Looper
-open PomodoroWindowsTimer.TimePointQueue
 open PomodoroWindowsTimer.ElmishApp
-open PomodoroWindowsTimer.ElmishApp.Abstractions
-open PomodoroWindowsTimer.ElmishApp.Infrastructure
 open PomodoroWindowsTimer.Abstractions
 
+// TODO: move to Player entity
 type PlayerModel =
     {
         ActiveTimePoint: ActiveTimePoint option
@@ -43,7 +40,7 @@ module PlayerModel =
 
     [<RequireQualifiedAccess>]
     type Msg =
-        | LooperMsg of LooperMsg
+        | LooperMsg of LooperEvent
         | SetDisableSkipBreak of bool
         | SetDisableMinimizeMaximizeWindows of bool
         | StartTimePoint of Operation<Guid, unit>

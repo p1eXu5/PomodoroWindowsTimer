@@ -57,7 +57,7 @@ module MainModel =
         | StartTimePoint of TimePointId
         | PlayStopCommand of initiator: TimePointId
 
-        | LooperMsg of LooperMsg
+        | LooperMsg of LooperEvent
 
         | PlayerModelMsg of PlayerModel.Msg
         | SetDisableMinimizeMaximizeWindows of bool
@@ -86,11 +86,11 @@ module MainModel =
 
         /// Using in test
         | Terminate
-    and
-        LooperMsg =
-            | TimePointTimeReduced of ActiveTimePoint
-            /// Includes SetActiveTimePoint and StoreStartedWorkEventTask 
-            | TimePointStarted of TimePointStartedEventArgs
+    //and
+    //    LooperMsg =
+    //        | TimePointTimeReduced of ActiveTimePoint
+    //        /// Includes SetActiveTimePoint and StoreStartedWorkEventTask 
+    //        | TimePointStarted of TimePointStartedEventArgs
 
 
     module MsgWith =

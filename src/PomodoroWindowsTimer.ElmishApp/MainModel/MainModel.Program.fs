@@ -57,6 +57,13 @@ let private chain f (model, cmd) =
     let (model', cmd') = f model
     model', Cmd.batch [ cmd; cmd' ]
 
+let private chainIf predicate f (model, cmd) =
+    if predicate model then
+        let (model', cmd') = f model
+        model', Cmd.batch [ cmd; cmd' ]
+    else
+        model, cmd
+
 let update
     (cfg: MainModeConfig)
     (workEventStore: WorkEventStore)
@@ -112,23 +119,21 @@ let update
         model, Cmd.ofMsg (model.Player |> PlayerModel.Msg.playStopResume |> Msg.PlayerModelMsg)
 
     | Msg.LooperMsg lmsg ->
-        match lmsg with
-        | LooperMsg.TimePointTimeReduced tp ->
+        let (model', cmd) =
             model
             |> withUpdatedPlayerModel
                 updatePlayerModel
-                (PlayerModel.LooperMsg.TimePointTimeReduced tp |> PlayerModel.Msg.LooperMsg)
+                (lmsg |> PlayerModel.Msg.LooperMsg)
 
-        | LooperMsg.TimePointStarted args ->
-            model
-            |> withUpdatedPlayerModel
-                updatePlayerModel
-                (PlayerModel.LooperMsg.TimePointStarted args |> PlayerModel.Msg.LooperMsg)
+        match lmsg with
+        | LooperEvent.TimePointStarted args ->
+            (model', cmd)
             |> chain (
                 withUpdatedTimePointListModel
                     TimePointListModel.Program.update
                     (TimePointListModel.Msg.SetActiveTimePointId (args.NewActiveTimePoint.OriginalId |> Some))
             )
+        | _ -> (model', cmd)
 
     // --------------------
     // Work
