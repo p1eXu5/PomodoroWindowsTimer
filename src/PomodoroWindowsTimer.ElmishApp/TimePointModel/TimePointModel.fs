@@ -20,6 +20,7 @@ module TimePointModel =
 
 namespace PomodoroWindowsTimer.ElmishApp.TimePointModel
 
+open System
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.TimePointModel
@@ -31,16 +32,32 @@ module Program =
         | SetName v ->
             { model with TimePoint.Name = v }
 
+
+open PomodoroWindowsTimer.Types
+
+/// Design time bindings
+type IBindings =
+    interface
+        abstract Id: TimePointId
+        abstract Name: string
+        abstract TimeSpan: TimeSpan
+        abstract Kind: Kind
+        // TODO: move to presentation
+        abstract KindAlias: string
+        abstract IsSelected: bool
+    end
+
 module Bindings =
 
     open Elmish.WPF
-    open PomodoroWindowsTimer.Types
+
+    let private __ = Unchecked.defaultof<IBindings>
 
     let bindings () : Binding<TimePointModel, TimePointModel.Msg> list =
         [
-            "Name" |> Binding.twoWay (_.TimePoint.Name, Msg.SetName)
-            "TimeSpan" |> Binding.oneWay _.TimePoint.TimeSpan.ToString("h':'mm")
-            "Kind" |> Binding.oneWay _.TimePoint.Kind
-            "KindAlias" |> Binding.oneWay _.TimePoint.KindAlias
-            "Id" |> Binding.oneWay _.TimePoint.Id
+            nameof __.Id        |> Binding.oneWay _.TimePoint.Id
+            nameof __.Name      |> Binding.twoWay (_.TimePoint.Name, Msg.SetName)
+            nameof __.TimeSpan  |> Binding.oneWay _.TimePoint.TimeSpan.ToString("h':'mm")
+            nameof __.Kind      |> Binding.oneWay _.TimePoint.Kind
+            nameof __.KindAlias |> Binding.oneWay _.TimePoint.KindAlias
         ]

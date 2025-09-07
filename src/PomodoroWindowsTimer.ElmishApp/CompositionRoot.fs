@@ -178,7 +178,7 @@ let compose
 
     let mainModelBindings =
         fun () ->
-            MainModel.Bindings.ToList title assemblyVer workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue timePointQueue looper
+            MainModel.Bindings.bindings title assemblyVer workStatisticWindowFactory mainErrorMessageQueue dialogErrorMessageQueue
 
     // subscriptions
     let subscribe _ : (SubId * Subscribe<_>) list =
@@ -186,12 +186,7 @@ let compose
             let onLooperEvt =
                 fun evt ->
                     async {
-                        match evt with
-                        | LooperEvent.TimePointTimeReduced tp ->
-                            do dispatch (MainModel.LooperMsg.TimePointTimeReduced tp |> MainModel.Msg.LooperMsg)
-
-                        | LooperEvent.TimePointStarted args ->
-                            do dispatch (MainModel.LooperMsg.TimePointStarted args |> MainModel.Msg.LooperMsg)
+                        do dispatch (evt |> MainModel.Msg.LooperMsg)
                     }
             looper.AddSubscriber(onLooperEvt)
             { new IDisposable with 
