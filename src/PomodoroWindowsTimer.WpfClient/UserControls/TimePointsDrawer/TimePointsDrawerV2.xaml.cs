@@ -17,9 +17,9 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer;
 /// <summary>
 /// Interaction logic for TimePointDrawerV2.xaml
 /// </summary>
-public partial class TimePointDrawerV2 : UserControl
+public partial class TimePointsDrawerV2 : UserControl
 {
-    public TimePointDrawerV2()
+    public TimePointsDrawerV2()
     {
         InitializeComponent();
     }

@@ -7,13 +7,12 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:s="clr-namespace:System;assembly=mscorlib"
+             d:DataContext="{d:DesignInstance Type=mainModel:IBindings, IsDesignTimeCreatable=False}"
              MinWidth="350"
              HorizontalAlignment="Stretch"
-             TextElement.Foreground="{StaticResource MaterialDesignBody}"
-             d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
-                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="250"
              d:DesignWidth="300"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <!--  content  -->
@@ -28,17 +27,19 @@
                                >
         <!--  TimePointsDrawer  -->
         <materialDesign:DrawerHost.LeftDrawerContent>
-            <local:TimePointsGenerator Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=ActualWidth}"
-                                       DataContext="{Binding TimePointGenerator}"
+            <local:TimePointsGenerator DataContext="{Binding TimePointGenerator}"
+                                       Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                      AncestorType=UserControl},
+                                                       Path=ActualWidth}"
                                        />
         </materialDesign:DrawerHost.LeftDrawerContent>
         <DockPanel LastChildFill="True">
-            <Button HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+            <Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
                     CommandParameter="{x:Static Dock.Left}"
                     Content="{materialDesign:PackIcon ArrowLeft}"
                     Style="{StaticResource MaterialDesignIconButton}"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
                     />
 
         </DockPanel>
