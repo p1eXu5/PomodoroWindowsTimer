@@ -10,6 +10,7 @@ using PomodoroWindowsTimer.ElmishApp;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.ElmishApp.Infrastructure;
 using PomodoroWindowsTimer.Exporter.Excel;
+using PomodoroWindowsTimer.Looper;
 using PomodoroWindowsTimer.Storage.Configuration;
 using PomodoroWindowsTimer.TimePointQueue;
 using PomodoroWindowsTimer.WpfClient;
@@ -34,9 +35,9 @@ internal static class DependencyInjectionExtensions
         {
             ITimePointQueue timePointQueue = sp.GetRequiredService<ITimePointQueue>();
             TimeProvider timeProvider = sp.GetRequiredService<System.TimeProvider>();
-            ILogger<Looper.Looper> logger = sp.GetRequiredService<ILogger<Looper.Looper>>();
+            ILogger<Looper> logger = sp.GetRequiredService<ILogger<Looper>>();
             return
-                new Looper.Looper(timePointQueue, timeProvider, Program.tickMilliseconds, logger, default);
+                new Looper(timePointQueue, timeProvider, Program.tickMilliseconds, logger, default);
         });
 
     public static void AddTelegramBot(this IServiceCollection services)
