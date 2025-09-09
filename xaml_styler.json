@@ -14,7 +14,7 @@
         "xmlns, xmlns:x",
         "xmlns:*",
         "x:Key, Key, x:Name, Name, x:Uid, Uid, Title",
-        "Grid.Row, Grid.RowSpan, Grid.Column, Grid.ColumnSpan, Canvas.Left, Canvas.Top, Canvas.Right, Canvas.Bottom",
+        "Grid.Row, Grid.RowSpan, Grid.Column, Grid.ColumnSpan, Canvas.Left, Canvas.Top, Canvas.Right, Canvas.Bottom, DockPanel.Dock",
         "Width, Height, MinWidth, MinHeight, MaxWidth, MaxHeight, WidthRequest, HeightRequest",
         "Margin, Padding, HorizontalAlignment, VerticalAlignment, HorizontalOptions, VerticalOptions, HorizontalContentAlignment, VerticalContentAlignment, Panel.ZIndex",
         "TextElement.*",
