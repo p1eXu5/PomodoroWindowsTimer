@@ -146,13 +146,13 @@ let update
 
     | Msg.LooperMsg evt ->
         match evt with
-        | LooperMsg.TimePointTimeReduced tp ->
+        | LooperEvent.TimePointTimeReduced tp ->
             model
             |> withActiveTimePoint (tp |> Some)
             |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
             |> withNoCmdAndIntent
 
-        | LooperMsg.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }) ->
+        | LooperEvent.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }) ->
             let timePointKind = nextTp |> TimePointKind.ofActiveTimePoint
 
             let storeStartedWorkEventOrActiveTimePointCmd =
