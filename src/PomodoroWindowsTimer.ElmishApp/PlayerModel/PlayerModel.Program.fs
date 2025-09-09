@@ -229,6 +229,10 @@ Current work is [{wm.Number}] {wm.Title}."""
             , cmd
             , Intent.None
 
+        | LooperEvent.TimePointStopped _ ->
+            // stub
+            model |> withNoCmdAndIntent
+
     // --------------------
     // Active time changing
     // --------------------
