@@ -210,3 +210,25 @@ module Pattern =
         [
             "(w-b)3-w-lb"
         ]
+
+module PatternParsedItem =
+
+    module List =
+        let timePoints (prototypeMap: Map<Alias, TimePointPrototype>) (patternParsedItems: PatternParsedItem list) =
+            patternParsedItems
+            |> List.mapi (fun idx item ->
+                match item with
+                | PatternParsedItem.Alias alias ->
+                    let prototype = prototypeMap[alias]
+                    prototype |> TimePointPrototype.toTimePoint (idx + 1)
+
+                | PatternParsedItem.AliasTimeSpan (alias, ts) ->
+                    let prototype = prototypeMap[alias]
+                    let tp = prototype |> TimePointPrototype.toTimePoint (idx + 1)
+                    { tp with TimeSpan = ts }
+
+                | PatternParsedItem.AliasTimeSpanName (alias, ts, name) ->
+                    let prototype = prototypeMap[alias]
+                    let tp = prototype |> TimePointPrototype.toTimePoint (idx + 1)
+                    { tp with TimeSpan = ts; Name = sprintf "%s %i" name (idx + 1) }
+            )
