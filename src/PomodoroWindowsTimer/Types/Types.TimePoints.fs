@@ -92,6 +92,8 @@ module Alias =
         let ``break`` = "b" |> Alias
         let longBreak = "lb" |> Alias
 
+        let all = [ work; ``break``; longBreak ]
+
 module Kind =
     let displayString = function
         | Work -> "WORK"
