@@ -16,14 +16,19 @@ module PatternParser =
         let pmilliseconds = skipChar '.' >>. ws >>. puint16
         let pminOrSec = skipChar ':' >>. ws >>. puint8
         let phours = puint8
+        let pend = ws .>> nextCharSatisfies (fun ch -> ch = ',' || ch = ']')
 
         choice [
-            pmilliseconds |>> (fun ms -> TimeSpan(0, 0, 0, 0, int ms))
-            pminOrSec .>> ws .>>. pmilliseconds |>> (fun (s, ms) -> TimeSpan(0, 0, 0, int s, int ms))
-            pminOrSec .>> ws .>>. pminOrSec .>> ws .>>. pmilliseconds |>> (fun ((m, s), ms) -> TimeSpan(0, 0, int m, int s, int ms))
-            phours .>> ws .>>. pminOrSec .>> ws .>>. pminOrSec .>> ws .>>. pmilliseconds |>> (fun (((h, m), s), ms) -> TimeSpan(0, int h, int m, int s, int ms))
+            pmilliseconds .>> pend |>> (fun ms -> TimeSpan(0, 0, 0, 0, int ms)) |> attempt
+            pminOrSec .>> pend |>> (fun m -> TimeSpan(0, int m, 0)) |> attempt
+            pminOrSec .>> ws .>> skipChar '.' .>> pend |>> (fun s -> TimeSpan(0, 0, int s)) |> attempt
+            phours .>> ws .>> skipChar '.' .>> pend |>> (fun s -> TimeSpan(0, 0, int s)) |> attempt
+            pminOrSec .>> ws .>>. pmilliseconds .>> pend |>> (fun (s, ms) -> TimeSpan(0, 0, 0, int s, int ms)) |> attempt
+            pminOrSec .>> ws .>>. pminOrSec .>> pend |>> (fun (m, s) -> TimeSpan(0, int m, int s)) |> attempt
+            pminOrSec .>> ws .>>. pminOrSec .>> ws .>>. pmilliseconds .>> pend |>> (fun ((m, s), ms) -> TimeSpan(0, 0, int m, int s, int ms)) |> attempt
+            phours .>> ws .>>. pminOrSec .>> ws .>>. pminOrSec .>>  pend |>> (fun ((h, m), s) -> TimeSpan(int h, int m, int s)) |> attempt
+            phours .>> ws .>>. pminOrSec .>> ws .>>. pminOrSec .>> ws .>>. pmilliseconds .>> pend |>> (fun (((h, m), s), ms) -> TimeSpan(0, int h, int m, int s, int ms))  |> attempt
         ]
-        .>> ws .>> nextCharSatisfies (fun ch -> ch = ',' || ch = ']')
 
     let palias (timePointAliases: string seq) =
         timePointAliases |> Seq.map pstring |> choice
@@ -57,17 +62,16 @@ module PatternParser =
 
     let pitem (timePointAliases: string seq) =
         choice [
-            paliasItem timePointAliases
-            paliasTimeSpanItem timePointAliases
-            paliasTimeSpanNameItem timePointAliases
+            paliasTimeSpanNameItem timePointAliases |> attempt
+            paliasTimeSpanItem timePointAliases |> attempt
+            paliasItem timePointAliases |> attempt
         ]
 
     let ptimePointSeq (timePointAliases: string seq) =
         sepBy (pitem timePointAliases) (ws >>? skipChar '-' >>? ws >>? nextCharSatisfiesNot ((=) '('))
 
     let ptimePointGroup (timePointAliases: string seq) =
-        ws
-        >>. between (skipChar '(') (ws >>? skipChar ')') (ptimePointSeq timePointAliases)
+        between (skipChar '(' >>? ws ) (ws >>? skipChar ')') (ptimePointSeq timePointAliases)
 
     let ptimePointGroupMany (timePointAliases: string seq) =
         (ptimePointGroup timePointAliases)
@@ -85,7 +89,7 @@ module PatternParser =
                 (ptimePointGroup timePointAliases) |> attempt
                 (ptimePointSeq timePointAliases) |> attempt
             ])
-            (ws >>? skipChar '-')
+            (ws >>? skipChar '-' >>? ws)
         .>> ws
         .>> eof
         |>> List.concat

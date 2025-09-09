@@ -214,7 +214,18 @@ module Pattern =
 
 module PatternParsedItem =
 
+    let ofAliasOrThrow = Alias.createOrThrow >> PatternParsedItem.Alias
+
+    let ofAliasTimeSpanOrThrow (aliasStr: string) (ts: TimeSpan) =
+        let alias = aliasStr |> Alias.createOrThrow
+        PatternParsedItem.AliasTimeSpan (alias, ts)
+
+    let ofAliasTimeSpanNameOrThrow (aliasStr: string) (ts: TimeSpan) (name: string) =
+        let alias = aliasStr |> Alias.createOrThrow
+        PatternParsedItem.AliasTimeSpanName (alias, ts, name)
+
     module List =
+
         let timePoints (prototypeMap: Map<Alias, TimePointPrototype>) (patternParsedItems: PatternParsedItem list) =
             patternParsedItems
             |> List.mapi (fun idx item ->
