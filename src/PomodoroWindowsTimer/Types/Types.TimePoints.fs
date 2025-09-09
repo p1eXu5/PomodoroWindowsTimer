@@ -43,6 +43,12 @@ type TimePointPrototype =
 
 type Pattern = string
 
+[<RequireQualifiedAccess>]
+type PatternParsedItem =
+    | Alias of Alias
+    | AliasTimeSpan of Alias * TimeSpan
+    | AliasTimeSpanName of Alias * TimeSpan * Name
+
 // ------------------------------- modules
 
 module Alias =
