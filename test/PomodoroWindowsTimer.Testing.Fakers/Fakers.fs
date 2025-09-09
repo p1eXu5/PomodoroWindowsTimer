@@ -54,7 +54,7 @@ let generateWorkTimePointPrototype () =
         {
             Name = sprintf "Work %i" _workTPCounter
             Kind = Kind.Work
-            KindAlias = "w" |> Alias.createOrThrow
+            Alias = "w" |> Alias.createOrThrow
             TimeSpan = TimeSpan.FromMinutes(25L)
         }
     _workTPCounter <- _workTPCounter + 1
@@ -65,7 +65,7 @@ let generateBreakTimePointPrototype () =
         {
             Name = sprintf "Break %i" _breakTPCounter
             Kind = Kind.Break
-            KindAlias = "b" |> Alias.createOrThrow
+            Alias = "b" |> Alias.createOrThrow
             TimeSpan = TimeSpan.FromMinutes(5L)
         }
     _breakTPCounter <- _breakTPCounter + 1
@@ -76,7 +76,7 @@ let generateLongBreakTimePointPrototype () =
         {
             Name = sprintf "Long Break %i" _longBreakTPCounter
             Kind = Kind.LongBreak
-            KindAlias = "lb" |> Alias.createOrThrow
+            Alias = "lb" |> Alias.createOrThrow
             TimeSpan = TimeSpan.FromMinutes(20L)
         }
     _longBreakTPCounter <- _longBreakTPCounter + 1

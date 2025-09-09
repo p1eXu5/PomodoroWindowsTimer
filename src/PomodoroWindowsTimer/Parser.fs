@@ -1,7 +1,13 @@
-﻿module PomodoroWindowsTimer.Parser
+﻿namespace PomodoroWindowsTimer
 
-open FParsec
+open System
 open PomodoroWindowsTimer.Types
+
+
+
+module PatternParser =
+
+    open FParsec
 
 let ws = spaces
 let ws1 = spaces1

@@ -12,14 +12,14 @@ open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGeneratorModel
 
 
 let private parsePattern pattern model =
-    Parser.parse (model.TimePointPrototypes |> List.map _.Prototype.KindAlias) pattern
+    PatternParser.parse (model.TimePointPrototypes |> List.map _.Prototype.Alias) pattern
 
 let private toTimePoints aliases model =
     let rec running l (state: int array) res =
         match l with
         | [] -> res |> List.rev
         | head :: tail ->
-            let ind = model.TimePointPrototypes |> List.findIndex (fun p -> p.Prototype.KindAlias |> (=) head)
+            let ind = model.TimePointPrototypes |> List.findIndex (fun p -> p.Prototype.Alias |> (=) head)
             let prototype =
                 (model.TimePointPrototypes |> List.item ind |> _.Prototype |> TimePointPrototype.toTimePoint state[ind] |> TimePointModel.init)
             do

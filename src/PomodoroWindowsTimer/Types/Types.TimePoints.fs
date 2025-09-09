@@ -37,7 +37,7 @@ type TimePointPrototype =
     {
         Name: string
         Kind: Kind
-        KindAlias: Alias
+        Alias: Alias
         TimeSpan: TimeSpan
     }
 
@@ -102,9 +102,9 @@ module TimePointPrototype =
 
     let defaults =
         [
-            { Name = "Focused work"; Kind = Kind.Work; KindAlias = Kind.Work |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(25L) }
-            { Name = "Break"; Kind = Kind.Break; KindAlias = Kind.Break |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(5L) }
-            { Name = "Long break"; Kind = Kind.LongBreak; KindAlias = Kind.LongBreak |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(20L) }
+            { Name = "Focused work"; Kind = Kind.Work; Alias = Kind.Work |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(25L) }
+            { Name = "Break"; Kind = Kind.Break; Alias = Kind.Break |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(5L) }
+            { Name = "Long break"; Kind = Kind.LongBreak; Alias = Kind.LongBreak |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(20L) }
         ]
 
     let toTimePoint ind (prototype: TimePointPrototype) =
@@ -113,7 +113,7 @@ module TimePointPrototype =
             Name = sprintf "%s %i" prototype.Name ind
             TimeSpan = prototype.TimeSpan
             Kind = prototype.Kind
-            KindAlias = prototype.KindAlias
+            KindAlias = prototype.Alias
         }
 
 
