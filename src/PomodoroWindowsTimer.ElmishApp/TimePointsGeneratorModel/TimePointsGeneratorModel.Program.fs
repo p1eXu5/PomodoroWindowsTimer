@@ -32,6 +32,16 @@ let private toTimePoints aliases model =
 
     running aliases counts []
 
+let private toTimePointModels (patternParsedItems: PatternParsedItem list) model =
+    let prototypeMap =
+        model.TimePointPrototypes
+        |> List.map (fun tp -> (tp.Prototype.Alias, tp.Prototype))
+        |> Map.ofList
+
+    patternParsedItems
+    |> PatternParsedItem.List.timePoints prototypeMap
+    |> List.map TimePointModel.init
+
 let update (patternStore: PatternStore) (timePointPrototypeStore: TimePointPrototypeStore) (errorMessageQueue: IErrorMessageQueue) msg model =
 
     match msg with
@@ -47,7 +57,7 @@ let update (patternStore: PatternStore) (timePointPrototypeStore: TimePointProto
         match res with
         | Ok parsedAliases ->
             model |> unsetIsPatternWrong
-            , Cmd.OfFunc.perform (toTimePoints parsedAliases) model SetGeneratedTimePoints
+            , Cmd.OfFunc.perform (toTimePointModels parsedAliases) model SetGeneratedTimePoints
             , Intent.None
         | Error err ->
             errorMessageQueue.EnqueueError(err)

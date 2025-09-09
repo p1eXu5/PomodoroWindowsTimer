@@ -2,6 +2,7 @@
 
 open System
 open Elmish.Extensions
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 
 type TimePointsGeneratorModel =
@@ -19,7 +20,7 @@ module TimePointsGeneratorModel =
 
     type Msg =
         | SetPatterns of string list
-        | ProcessParsingResult of Result<Alias list, string>
+        | ProcessParsingResult of Result<PatternParsedItem list, string>
         | SetGeneratedTimePoints of TimePointModel list
         | SetSelectedPatternIndex of int
         | SetSelectedPattern of Pattern option
