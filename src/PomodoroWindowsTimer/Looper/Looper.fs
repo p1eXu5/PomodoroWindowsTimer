@@ -195,8 +195,11 @@ type Looper(
                         return! loop { state with Subscribers = subscribers @ state.Subscribers }
 
                     | Stop when not state.IsStopped ->
-                        let atp = state.ActiveTimePoint |> Option.get
-                        tryPostEvent (LooperEvent.TimePointStopped atp)
+                        do
+                            state.ActiveTimePoint
+                            |> Option.iter (fun atp ->
+                                tryPostEvent (LooperEvent.TimePointStopped atp)
+                            )
                         return! loop { state with IsStopped = true; StartTime = timeProvider.GetLocalNow().DateTime }
 
                     | Shift seconds when state.IsStopped ->
