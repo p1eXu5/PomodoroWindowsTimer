@@ -142,6 +142,27 @@ module TimePointPrototype =
 
 module TimePoint =
 
+    module Name =
+
+        let [<Literal>] WORK = "Focused Work"
+        let [<Literal>] BREAK = "Break"
+        let [<Literal>] LONG_BREAK = "Long Break"
+
+        let ofKind (kind: Kind) =
+            match kind with
+            | Kind.Work -> WORK
+            | Kind.Break -> BREAK
+            | Kind.LongBreak -> LONG_BREAK
+
+    let create name timeSpan kind =
+        {
+            Id = Guid.NewGuid()
+            Name = name
+            TimeSpan = timeSpan
+            Kind = kind
+            KindAlias = kind |> Kind.alias
+        }
+
     [<CompiledName("Defaults")>]
     let defaults =
         [
