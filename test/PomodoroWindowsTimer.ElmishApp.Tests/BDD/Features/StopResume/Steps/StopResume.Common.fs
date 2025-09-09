@@ -15,7 +15,7 @@ let ``Looper TimePointReduced event has been despatched with`` (timePointId: Sys
     scenario {
         do! Scenario.msgDispatchedWithin2Sec "TimePointReduced" (fun msg ->
             match msg with
-            | MainModel.Msg.LooperMsg (LooperMsg.TimePointTimeReduced atp) ->
+            | MainModel.Msg.LooperMsg (LooperEvent.TimePointTimeReduced atp) ->
                 atp.OriginalId = timePointId
                 && (
                     float (expectedSeconds - tolerance) <= atp.RemainingTimeSpan.TotalSeconds

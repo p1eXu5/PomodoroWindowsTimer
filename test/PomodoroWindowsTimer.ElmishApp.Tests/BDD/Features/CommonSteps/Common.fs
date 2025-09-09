@@ -14,7 +14,10 @@ let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: 
     scenario {
         do! Scenario.msgDispatchedWithin 3.0<sec> "TimePointStarted" (fun msg ->
             match msg with
-            | MainModel.Msg.LooperMsg (LooperMsg.TimePointStarted ({ NewActiveTimePoint = newTp; OldActiveTimePoint = oldTp})) when newTp.OriginalId = newTimePointId ->
+            | MainModel.Msg.LooperMsg (
+                LooperEvent.TimePointStarted ({ NewActiveTimePoint = newTp; OldActiveTimePoint = oldTp}))
+                    when newTp.OriginalId = newTimePointId
+                ->
                 match oldTp, oldTimePointId with
                 | None, None -> true
                 | Some t1, Some t2 -> t1.OriginalId = t2

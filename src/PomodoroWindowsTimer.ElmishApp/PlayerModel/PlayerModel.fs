@@ -54,12 +54,6 @@ module PlayerModel =
         | PostChangeActiveTimeSpan of AsyncOperation<unit, Result<WorkSpentTime list, string>>
         | OnError of string
         | OnExn of exn
-    and
-        LooperMsg =
-            | TimePointTimeReduced of ActiveTimePoint
-            /// Includes SetActiveTimePoint and StoreStartedWorkEventTask 
-            | TimePointStarted of TimePointStartedEventArgs
-
 
     module Msg = 
         let tryNext (model: PlayerModel) =
