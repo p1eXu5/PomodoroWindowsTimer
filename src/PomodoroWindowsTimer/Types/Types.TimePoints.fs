@@ -120,7 +120,6 @@ module Kind =
     let isWork = isBreak >> not
 
 
-
 module TimePointPrototype =
 
     let defaults =
