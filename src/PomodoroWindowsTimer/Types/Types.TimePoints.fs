@@ -2,7 +2,6 @@
 
 open System
 
-// TODO: rename to abbreviation
 /// Kind alias, used in patterns.
 type Alias = private Alias of string
 
@@ -20,6 +19,7 @@ type TimePoint =
         TimeSpan: TimeSpan
         Kind: Kind
         KindAlias: Alias
+        // TODO: AutoProlongation : bool
     }
 
 type ActiveTimePoint =
@@ -33,12 +33,24 @@ type ActiveTimePoint =
         KindAlias: Alias
     }
 
+/// <summary>
+/// Could be set in settings for App.
+///
+/// For example: <br/>
+///
+/// <code>
+/// | Name   | Alias | TimeSpan | Kind  | <br/>
+/// | ------ | ----- | -------- | ----- | <br/>
+/// | Coffee |   c   |      :15 | Break |
+/// </code>
+/// </summary>
 type TimePointPrototype =
     {
         Name: string
         Kind: Kind
         Alias: Alias
         TimeSpan: TimeSpan
+        // TODO: AutoProlongation : bool
     }
 
 type Pattern = string
