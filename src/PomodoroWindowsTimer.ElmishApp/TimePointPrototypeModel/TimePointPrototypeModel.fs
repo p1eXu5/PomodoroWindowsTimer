@@ -42,7 +42,7 @@ module Bindings =
         [
             "Name" |> Binding.oneWay (fun m -> m.Prototype.Name)
             "Kind" |> Binding.oneWay (fun m -> m.Prototype.Kind)
-            "KindAlias" |> Binding.oneWay (_.Prototype.KindAlias >> Alias.value)
+            "KindAlias" |> Binding.oneWay (_.Prototype.Alias >> Alias.value)
             "TimeSpan" |> Binding.twoWay ((fun m -> m.Prototype.TimeSpan.ToString("h':'mm")), Msg.SetTimeSpan)
         ]
 
