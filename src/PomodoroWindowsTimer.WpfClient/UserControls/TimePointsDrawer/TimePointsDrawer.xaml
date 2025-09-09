@@ -6,23 +6,24 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DataContext="{d:DesignInstance Type=MainModel:Bindings, IsDesignTimeCreatable=False}"
              MinWidth="350"
              HorizontalAlignment="Stretch"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
+             d:DataContext="{d:DesignInstance Type=MainModel:IBindings,
+                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="250"
              d:DesignWidth="300"
-             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <!--  content  -->
     <DockPanel LastChildFill="True">
         <!--  PlayerModel flags  -->
-        <local:PlayerSettings DockPanel.Dock="Bottom"
-                              DataContext="{Binding Player}"
+        <local:PlayerSettings DataContext="{Binding Player}"
+                              DockPanel.Dock="Bottom"
                               />
 
-        <local:RunningTimePoints DockPanel.Dock="Top"
-                                 DataContext="{Binding TimePointList}"
+        <local:RunningTimePoints DataContext="{Binding TimePointList}"
+                                 DockPanel.Dock="Top"
                                  />
     </DockPanel>
 </UserControl>
