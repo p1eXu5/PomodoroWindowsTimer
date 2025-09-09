@@ -64,6 +64,7 @@ type PatternParsedItem =
 // ------------------------------- modules
 
 module Alias =
+
     let create str =
         let maxLen = 10
         if String.IsNullOrEmpty(str) then
@@ -85,6 +86,11 @@ module Alias =
 
     let value (Alias v) = v
 
+    module Defaults =
+
+        let work = "w" |> Alias
+        let ``break`` = "b" |> Alias
+        let longBreak = "lb" |> Alias
 
 module Kind =
     let displayString = function
@@ -94,10 +100,9 @@ module Kind =
 
     let alias = 
         (function
-            | Work -> "w"
-            | Break -> "b"
-            | LongBreak -> "lb")
-        >> Alias.createOrThrow
+            | Work -> Alias.Defaults.work
+            | Break -> Alias.Defaults.``break``
+            | LongBreak -> Alias.Defaults.longBreak)
 
     [<CompiledName("ToShortString")>]
     let toShortString = function
