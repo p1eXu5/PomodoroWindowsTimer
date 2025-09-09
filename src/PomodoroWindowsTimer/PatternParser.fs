@@ -12,7 +12,6 @@ module PatternParser =
     let ws = spaces
     let ws1 = spaces1
 
-
     let ptimeSpan : Parser<TimeSpan, unit> =
         let pmilliseconds = skipChar '.' >>. ws >>. puint16
         let pminOrSec = skipChar ':' >>. ws >>. puint8

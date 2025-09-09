@@ -1,4 +1,4 @@
-﻿module PomodoroWindowsTimer.Tests.ParserTests
+﻿module PomodoroWindowsTimer.Tests.PatternParserTests
 
 open NUnit.Framework
 open FsToolkit.ErrorHandling

@@ -24,7 +24,7 @@
     <Compile Include="Abstractions\TelegramBot.fs" />
     <Compile Include="Abstractions\Excel.fs" />
     <Compile Include="Abstractions\UserSettings.fs" />
-    <Compile Include="Parser.fs" />
+    <Compile Include="PatternParser.fs" />
     <Compile Include="TimePointQueue.fs" />
     <Compile Include="Looper\Looper.LoggingExtensions.fs" />
     <Compile Include="Looper\Looper.fs" />

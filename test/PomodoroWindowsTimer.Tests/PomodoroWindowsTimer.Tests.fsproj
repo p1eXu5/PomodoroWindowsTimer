@@ -17,7 +17,7 @@
     <Compile Include="test24102024.fs" />
     <Compile Include="TimePointQueueTests.fs" />
     <Compile Include="LooperTests.fs" />
-    <Compile Include="ParserTests.fs" />
+    <Compile Include="PatternParserTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
