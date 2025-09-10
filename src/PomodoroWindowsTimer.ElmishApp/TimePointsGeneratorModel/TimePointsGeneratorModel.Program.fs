@@ -33,13 +33,12 @@ let private toTimePoints aliases model =
     running aliases counts []
 
 let private toTimePointModels (patternParsedItems: PatternParsedItem list) model =
-    let prototypeMap =
+    let prototypeList =
         model.TimePointPrototypes
-        |> List.map (fun tp -> (tp.Prototype.Alias, tp.Prototype))
-        |> Map.ofList
+        |> List.map (fun tp -> tp.Prototype)
 
     patternParsedItems
-    |> PatternParsedItem.List.timePoints prototypeMap
+    |> PatternParsedItem.List.timePoints prototypeList
     |> List.map TimePointModel.init
 
 let update (patternStore: PatternStore) (timePointPrototypeStore: TimePointPrototypeStore) (errorMessageQueue: IErrorMessageQueue) msg model =

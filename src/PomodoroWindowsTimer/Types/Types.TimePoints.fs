@@ -226,7 +226,12 @@ module PatternParsedItem =
 
     module List =
 
-        let timePoints (prototypeMap: Map<Alias, TimePointPrototype>) (patternParsedItems: PatternParsedItem list) =
+        let timePoints (prototypeList: TimePointPrototype list) (patternParsedItems: PatternParsedItem list) =
+            let prototypeMap =
+                prototypeList
+                |> List.map (fun p -> (p.Alias, p))
+                |> Map.ofList
+
             patternParsedItems
             |> List.mapi (fun idx item ->
                 match item with
