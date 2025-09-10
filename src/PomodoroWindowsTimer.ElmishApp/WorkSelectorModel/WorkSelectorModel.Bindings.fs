@@ -41,7 +41,7 @@ type Bindings() =
 
     member val UpdatingWorkModel : Binding =
         nameof __.UpdatingWorkModel
-            |> Binding.SubModel.opt WorkModel.Bindings.ToList
+            |> Binding.SubModel.opt WorkModel.Bindings.bindings
             |> Binding.mapModel updatingWorkModel
             |> Binding.mapMsg Msg.UpdatingWorkModelMsg
 

@@ -111,9 +111,9 @@ Current work is [{wm.Work.Number}] {wm.Work.Title}."""
             // ------------------------------------------------------
 
             nameof __.CurrentWork
-                |> Binding.SubModel.opt (WorkModel.Bindings.ToList)
+                |> Binding.SubModel.opt (CurrentWorkModel.Bindings.bindings)
                 |> Binding.mapModel _.CurrentWork
-                |> Binding.mapMsg Msg.WorkModelMsg
+                |> Binding.mapMsg Msg.CurrentWorkModelMsg
 
             nameof __.IsCurrentWorkSet
                 |> Binding.oneWay (_.CurrentWork >> Option.isSome)

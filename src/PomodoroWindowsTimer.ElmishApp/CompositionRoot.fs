@@ -144,6 +144,9 @@ let compose
                 updateWorkListModel
                 (loggerFactory.CreateLogger<StatisticMainModel>())
 
+        let updateCurrentWorkModel =
+            CurrentWorkModel.Program.update
+
         let updatePlayerModel =
             PlayerModel.Program.update
                 looper
@@ -160,7 +163,7 @@ let compose
         MainModel.Program.update
             mainModelCfg
             workEventStore
-            updateWorkModel
+            updateCurrentWorkModel
             updateAppDialogModel
             updateWorkSelectorModel
             initStatisticMainModel

@@ -4,75 +4,68 @@ open System
 open Elmish.WPF
 open Elmish.Extensions
 
+open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkModel
+open System.Windows.Input
 
-type private Binding = Binding<WorkModel, WorkModel.Msg>
+type IBindings =
+    interface
+        abstract Id: WorkId
+        abstract Number: string
+        abstract Title: string
+        abstract LastEventCreatedAt: DateTimeOffset option
+        abstract LastEventCreatedAtOrUpdatedAt: DateTimeOffset
+        abstract EditNumber: string with get, set
+        abstract EditTitle: string with get, set
+        abstract UpdatedAt: DateTimeOffset
+        abstract UpdateCommand: ICommand
+        abstract CreateCommand: ICommand
+        abstract SelectCommand: ICommand
+        abstract EditCommand: ICommand
+        abstract CancelEditCommand: ICommand
+    end
 
-[<Sealed>]
-type Bindings() =
-    static let props = Utils.bindingProperties typeof<Bindings>
-    static let mutable __ = Unchecked.defaultof<Bindings>
-    static member Instance() =
-        if System.Object.ReferenceEquals(__, null) then
-            __ <- Bindings()
-            __
-        else __
+module Bindings =
+    let private __ = Unchecked.defaultof<IBindings>
 
-    static member ToList () =
-        Utils.bindings<Binding>
-            (Bindings.Instance())
-            props
+    let bindings () : Binding<WorkModel, WorkModel.Msg> list =
+        [
+            nameof __.Id |> Binding.oneWay (_.Work >> _.Id)
+            nameof __.Number |> Binding.oneWay (_.Work >> _.Number)
+            nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
+            nameof __.LastEventCreatedAt |> Binding.oneWayOpt (_.Work >> _.LastEventCreatedAt)
 
-    member val Id : Binding =
-        nameof __.Id |> Binding.oneWay (_.Work >> _.Id)
+            nameof __.LastEventCreatedAtOrUpdatedAt
+                |> Binding.oneWay (fun m ->
+                    m.Work |> _.LastEventCreatedAt |> Option.defaultValue m.Work.UpdatedAt
+                )
 
-    member val Number : Binding =
-        nameof __.Number |> Binding.oneWay (_.Work >> _.Number)
+            nameof __.EditNumber
+                |> Binding.twoWay (_.EditableNumber, (fun (v: string) -> v.Trim() |> Msg.SetNumber))
 
-    member val Title : Binding =
-        nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
+            nameof __.EditTitle
+                |> Binding.twoWay (_.EditableTitle, (fun (v: string) -> v.Trim() |> Msg.SetTitle))
 
-    member val LastEventCreatedAt : Binding =
-        nameof __.LastEventCreatedAt |> Binding.oneWayOpt (_.Work >> _.LastEventCreatedAt)
+            nameof __.UpdatedAt |> Binding.oneWay (_.Work >> _.UpdatedAt)
 
-    member val LastEventCreatedAtOrUpdatedAt : Binding =
-        nameof __.LastEventCreatedAtOrUpdatedAt |> Binding.oneWay (fun m -> m.Work |> _.LastEventCreatedAt |> Option.defaultValue m.Work.UpdatedAt)
+            nameof __.UpdateCommand
+                |> Binding.cmdIf (fun m ->
+                    match m |> isModified, m.CreateNewState with
+                    | true, AsyncDeferred.NotRequested ->
+                        AsyncOperation.startUnit Msg.Update |> Some
+                    | _ -> None
+                )
 
+            nameof __.CreateCommand
+                |> Binding.cmdIf (fun m ->
+                    match m |> isModified, m.UpdateState with
+                    | true, AsyncDeferred.NotRequested ->
+                        AsyncOperation.startUnit Msg.Update |> Some
+                    | _ -> None
+                )
 
-    member val EditNumber : Binding =
-        nameof __.EditNumber |> Binding.twoWay (_.EditableNumber, (fun (v: string) -> v.Trim() |> Msg.SetNumber))
-
-    member val EditTitle : Binding =
-        nameof __.EditTitle |> Binding.twoWay (_.EditableTitle, (fun (v: string) -> v.Trim() |> Msg.SetTitle))
-
-    member val UpdatedAt : Binding =
-        nameof __.UpdatedAt |> Binding.oneWay (_.Work >> _.UpdatedAt)
-
-    member val UpdateCommand : Binding =
-        nameof __.UpdateCommand
-            |> Binding.cmdIf (fun m ->
-                match m |> isModified, m.CreateNewState with
-                | true, AsyncDeferred.NotRequested ->
-                    AsyncOperation.startUnit Msg.Update |> Some
-                | _ -> None
-            )
-
-    member val CreateCommand : Binding =
-        nameof __.CreateCommand
-            |> Binding.cmdIf (fun m ->
-                match m |> isModified, m.UpdateState with
-                | true, AsyncDeferred.NotRequested ->
-                    AsyncOperation.startUnit Msg.Update |> Some
-                | _ -> None
-            )
-
-    member val SelectCommand : Binding =
-        nameof __.SelectCommand |> Binding.cmd Msg.Select
-
-    member val EditCommand : Binding =
-        nameof __.EditCommand |> Binding.cmd Msg.Edit
-
-    member val CancelEditCommand : Binding =
-        nameof __.CancelEditCommand |> Binding.cmd Msg.CancelEdit
-
+            nameof __.SelectCommand |> Binding.cmd Msg.Select
+            nameof __.EditCommand |> Binding.cmd Msg.Edit
+            nameof __.CancelEditCommand |> Binding.cmd Msg.CancelEdit
+        ]

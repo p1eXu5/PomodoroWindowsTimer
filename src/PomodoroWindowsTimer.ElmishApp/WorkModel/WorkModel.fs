@@ -90,6 +90,7 @@ module WorkModel =
     let withUpdateState deff (model: WorkModel) =
         { model with UpdateState = deff }
 
+    /// Updates Work.Number, Work.Title and Work.UpdatedAt.
     let withUpdatedWork updatedAt (model: WorkModel) =
         {
             model with

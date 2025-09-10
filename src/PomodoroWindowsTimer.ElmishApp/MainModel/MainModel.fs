@@ -19,11 +19,11 @@ type MainModel =
         TimePointList: TimePointListModel
         IsTimePointsShown: bool
 
+        CurrentWork: CurrentWorkModel option
         Player: PlayerModel
 
         /// Right drawer model
         WorkSelector: WorkSelectorModel option
-        CurrentWork: WorkModel option
 
         /// Statistic window
         StatisticMainModel: StatisticMainModel option
@@ -73,7 +73,7 @@ module MainModel =
 
         | LoadCurrentWork
         | SetCurrentWorkIfNone of Result<Work, string>
-        | WorkModelMsg of WorkModel.Msg
+        | CurrentWorkModelMsg of CurrentWorkModel.Msg
 
         | SetIsWorkSelectorLoaded of bool
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
@@ -144,7 +144,7 @@ module MainModel =
     // =========
     // accessors
     // =========
-    let withWorkModel workModel (model: MainModel) =
+    let withCurrentWorkModel workModel (model: MainModel) =
          { model with CurrentWork = workModel }
 
     let withAppDialogModel addDialogModel (model: MainModel) =

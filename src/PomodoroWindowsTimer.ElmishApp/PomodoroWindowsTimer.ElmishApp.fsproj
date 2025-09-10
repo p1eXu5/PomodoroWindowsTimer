@@ -71,6 +71,9 @@
     <Compile Include="AppDialogModel\AppDialogModel.fs" />
     <Compile Include="AppDialogModel\AppDialogModel.Program.fs" />
     <Compile Include="AppDialogModel\AppDialogModel.Bindings.fs" />
+    <Compile Include="CurrentWorkModel\CurrentWorkModel.fs" />
+    <Compile Include="CurrentWorkModel\CurrentWorkModel.Program.fs" />
+    <Compile Include="CurrentWorkModel\CurrentWorkModel.Bindings.fs" />
     <Compile Include="TimePointListModel\TimePointListModel.fs" />
     <Compile Include="TimePointListModel\TimePointListModel.Program.fs" />
     <Compile Include="TimePointListModel\TimePointListModel.Bindings.fs" />

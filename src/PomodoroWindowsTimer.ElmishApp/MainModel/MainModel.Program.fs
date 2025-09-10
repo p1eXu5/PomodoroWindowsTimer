@@ -67,7 +67,7 @@ let private chainIf predicate f (model, cmd) =
 let update
     (cfg: MainModeConfig)
     (workEventStore: WorkEventStore)
-    updateWorkModel
+    updateCurrentWorkModel
     updateAppDialogModel
     updateWorkSelectorModel
     initWorkStatisticListModel
@@ -149,7 +149,7 @@ let update
         | Ok work ->
             cfg.CurrentWorkItemSettings.CurrentWork <- work |> Some
             if model.CurrentWork |> Option.isNone then
-                { model with CurrentWork = work |> WorkModel.init |> Some}, Cmd.none
+                { model with CurrentWork = work |> CurrentWorkModel.init |> Some}, Cmd.none
             else
                 model, Cmd.none
         | Error err ->
@@ -157,12 +157,12 @@ let update
             model, Cmd.ofMsg (Msg.OnError err)
    
 
-    | Msg.WorkModelMsg wmsg ->
+    | Msg.CurrentWorkModelMsg wmsg ->
         match model.CurrentWork with
         | Some wmodel ->
-            let (wmodel, wcmd, _) = updateWorkModel wmsg wmodel
-            model |> withWorkModel (wmodel |> Some)
-            , Cmd.map Msg.WorkModelMsg wcmd
+            let (wmodel, wcmd) = updateCurrentWorkModel wmsg wmodel
+            model |> withCurrentWorkModel (wmodel |> Some)
+            , Cmd.map Msg.CurrentWorkModelMsg wcmd
         | None ->
             model |> withCmdNone
 
@@ -184,28 +184,37 @@ let update
             , cmd
         | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
             cfg.CurrentWorkItemSettings.CurrentWork <- workModel.Work |> Some
+            let currentWorkModel = workModel.Work |> CurrentWorkModel.init |> Some
 
             if model.Player.LooperState = LooperState.Playing then
                 let time = cfg.TimeProvider.GetUtcNow()
                 match model.CurrentWork with
                 | Some currWork when currWork.Id <> workModel.Id ->
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                    model
+                    |> withWorkSelectorModel (workSelectorModel |> Some)
+                    |> withCurrentWorkModel currentWorkModel
                     , Cmd.batch [
                         cmd
                         Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time.AddMilliseconds(-1), model.Player.ActiveTimePoint.Value) Msg.OnExn
                         Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (workModel.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
                 | Some _ ->
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                    model
+                    |> withWorkSelectorModel (workSelectorModel |> Some)
+                    |> withCurrentWorkModel currentWorkModel
                     , cmd
                 | None ->
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                    model
+                    |> withWorkSelectorModel (workSelectorModel |> Some)
+                    |> withCurrentWorkModel currentWorkModel
                     , Cmd.batch [
                         cmd
                         Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (workModel.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
             else
-                model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel (workModel |> Some)
+                model
+                |> withWorkSelectorModel (workSelectorModel |> Some)
+                |> withCurrentWorkModel currentWorkModel
                 , cmd
 
         | WorkSelectorModel.Intent.UnselectCurrentWork ->
@@ -215,16 +224,16 @@ let update
                 match model.CurrentWork with
                 | Some currWork ->
                     let time = cfg.TimeProvider.GetUtcNow()
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withCurrentWorkModel None
                     , Cmd.batch [
                         cmd
                         Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
                 | None ->
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withCurrentWorkModel None
                     , cmd
             else
-                model |> withWorkSelectorModel (workSelectorModel |> Some) |> withWorkModel None
+                model |> withWorkSelectorModel (workSelectorModel |> Some) |> withCurrentWorkModel None
                 , cmd
 
         | WorkSelectorModel.Intent.Close ->

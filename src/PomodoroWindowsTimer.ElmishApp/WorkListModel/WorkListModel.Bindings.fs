@@ -26,7 +26,7 @@ type Bindings() =
 
     member val WorkModelList : Binding =
         nameof __.WorkModelList
-            |> Binding.subModelSeq (WorkModel.Bindings.ToList, _.Work >> _.Id)
+            |> Binding.subModelSeq (WorkModel.Bindings.bindings, _.Work >> _.Id)
             |> Binding.mapModel (fun m  ->
                 m.Works
                 |> AsyncDeferred.chooseRetrieved
@@ -40,7 +40,7 @@ type Bindings() =
 
     member val SelectedWorkModel : Binding =
         nameof __.SelectedWorkModel
-            |> Binding.SubModel.opt WorkModel.Bindings.ToList
+            |> Binding.SubModel.opt WorkModel.Bindings.bindings
             |> Binding.mapModel selectedWorkModel
             |> Binding.mapMsgWithModel (fun msg model -> Msg.WorkModelMsg (model.SelectedWorkId.Value, msg))
 
