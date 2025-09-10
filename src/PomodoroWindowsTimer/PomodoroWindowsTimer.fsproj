@@ -28,7 +28,7 @@
     <Compile Include="TimePointQueue.fs" />
     <Compile Include="Looper\Looper.LoggingExtensions.fs" />
     <Compile Include="Looper\Looper.fs" />
-    <Compile Include="Projectors\LooperEventProjector.fs" />
+    <Compile Include="Projectors\LooperToWorkEventProjector.fs" />
     <Compile Include="Projectors\WorkEventProjector.fs" />
     <Compile Include="Projectors\WorkEventOffsetTimeProjector.fs" />
     <Compile Include="Projectors\WorkEventSpentTimeProjector.fs" />
