@@ -1,13 +1,15 @@
 ﻿namespace PomodoroWindowsTimer.Looper
 
-open FSharp.Control
-open PomodoroWindowsTimer.Types
-open PomodoroWindowsTimer.Abstractions
 open System
+open System.Runtime.CompilerServices
 open System.Threading
 open Microsoft.Extensions.Logging
-open LoggingExtensions
 
+open FSharp.Control
+
+open PomodoroWindowsTimer.Types
+open PomodoroWindowsTimer.Abstractions
+open LoggingExtensions
 
 type private State = 
     {
@@ -46,7 +48,7 @@ type Looper(
     tickMilliseconds: int<ms>,
     logger: ILogger<Looper>, 
     ?cancellationToken: System.Threading.CancellationToken
-) =
+) as this =
     let mutable timer : Timer = Unchecked.defaultof<_>
     let mutable _isDisposed = false
 
@@ -227,13 +229,23 @@ type Looper(
         , defaultArg cancellationToken CancellationToken.None
     )
 
-    member val Subscribers = [] with get, set
+    member val private Subscribers = [] with get, set
 
     member val TimePointQueue = timePointQueue with get
 
     /// Starts Looper in Stop state
-    member this.Start() =
-        this.Start(this.Subscribers)
+    member _.Start() =
+        let subscribers = this.Subscribers
+        this.Subscribers <- []
+        
+        this.Start(subscribers)
+
+        let subscribers = this.Subscribers
+        if subscribers |> (not << List.isEmpty) then
+            this.Subscribers <- []
+            subscribers
+            |> List.iter this.AddSubscriber
+
 
     /// Starts Looper in Stop state
     member _.Start(subscribers: (LooperEvent -> Async<unit>) list) =
@@ -251,35 +263,46 @@ type Looper(
             agent.Post(Stop)
 
     member _.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) =
-        agent.Post(Subscribe subscriber)
+        ObjectDisposedException.ThrowIf(_isDisposed, this)
+        if started.Value = 0 then
+            this.Subscribers <- subscriber :: this.Subscribers
+        else
+            agent.Post(Subscribe subscriber)
 
-    /// Tryes to pick TimePoint from queue, if it present
+    /// Tries to pick TimePoint from queue, if it present
     /// emits TimePointStarted event and sets ActiveTimePoint.
     member _.PreloadTimePoint() =
+        this.ThrowIfNotRunOrDisposed()
         agent.Post(PreloadTimePoint)
 
     member _.Shift(seconds: float<sec>) =
         if seconds < 0.0<sec> then
             logger.LogWarning("It's trying to shift to negative time")
         else
+            this.ThrowIfNotRunOrDisposed()
             agent.Post(Shift seconds)
 
     member _.ShiftAck(seconds: float<sec>) =
         if seconds < 0.0<sec> then
             logger.LogWarning("It's trying to shift to negative time")
         else
+            this.ThrowIfNotRunOrDisposed()
             agent.PostAndReply(fun r -> ShiftAck (seconds, r))
 
     member _.Resume() =
+        this.ThrowIfNotRunOrDisposed()
         agent.Post(Resume)
 
     member _.Next() =
+        this.ThrowIfNotRunOrDisposed()
         agent.Post(Next)
 
     member _.Stop() =
+        this.ThrowIfNotRunOrDisposed()
         agent.Post(Stop)
 
     member _.GetActiveTimePoint() =
+        this.ThrowIfNotRunOrDisposed()
         agent.PostAndReply(Msg.GetActiveTimePoint)
 
     member private _.Dispose(isDisposing: bool) =
@@ -296,6 +319,16 @@ type Looper(
                 timePointQueue.Dispose()
 
             _isDisposed <- true
+
+    member private _.ThrowIfNotRunOrDisposed ([<CallerMemberNameAttribute>] ?memberName: string) =
+        ObjectDisposedException.ThrowIf(_isDisposed, this)
+        if started.Value = 0 then
+            let msg =
+                memberName
+                |> function
+                    | Some n -> $"Failed to execute {n}. Looper agent is not running."
+                    | None -> "Looper agent is not running."
+            raise (new InvalidOperationException(msg))
 
     interface ILooper with
         /// Starts Looper in Stop state
