@@ -151,7 +151,7 @@ module MainModel =
          { model with AppDialog = addDialogModel }
 
     let withWorkSelectorModel workSelectorModel (model: MainModel) =
-         { model with WorkSelector = workSelectorModel }
+         { model with WorkSelector = workSelectorModel |> Some }
 
     let withoutWorkSelectorModel (model: MainModel) =
          { model with WorkSelector = None }

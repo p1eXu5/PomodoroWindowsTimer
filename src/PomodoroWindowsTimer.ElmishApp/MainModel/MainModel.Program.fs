@@ -16,6 +16,8 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
+let inline private withCmd cmd (model: MainModel) = model, cmd
+
 let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
     let (playerModel, playerCmd, playerIntent) =
         model.Player
@@ -169,7 +171,7 @@ let update
     | Msg.SetIsWorkSelectorLoaded v ->
         if v then
             let (m, cmd) = WorkSelectorModel.init cfg.UserSettings (model.CurrentWork |> Option.map (_.Work >> _.Id))
-            model |> withWorkSelectorModel (m |> Some) |> withIsTimePointsShown false
+            model |> withWorkSelectorModel m |> withIsTimePointsShown false
             , Cmd.map Msg.WorkSelectorModelMsg cmd
         else
             model |> withoutWorkSelectorModel |> withCmdNone
@@ -180,8 +182,8 @@ let update
 
         match intent with
         | WorkSelectorModel.Intent.None ->
-            model |> withWorkSelectorModel (workSelectorModel |> Some)
-            , cmd
+            model |> withWorkSelectorModel workSelectorModel |> withCmd cmd
+
         | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
             cfg.CurrentWorkItemSettings.CurrentWork <- workModel.Work |> Some
             let currentWorkModel = workModel.Work |> CurrentWorkModel.init |> Some
@@ -191,7 +193,7 @@ let update
                 match model.CurrentWork with
                 | Some currWork when currWork.Id <> workModel.Id ->
                     model
-                    |> withWorkSelectorModel (workSelectorModel |> Some)
+                    |> withWorkSelectorModel workSelectorModel
                     |> withCurrentWorkModel currentWorkModel
                     , Cmd.batch [
                         cmd
@@ -200,12 +202,12 @@ let update
                     ]
                 | Some _ ->
                     model
-                    |> withWorkSelectorModel (workSelectorModel |> Some)
+                    |> withWorkSelectorModel workSelectorModel
                     |> withCurrentWorkModel currentWorkModel
                     , cmd
                 | None ->
                     model
-                    |> withWorkSelectorModel (workSelectorModel |> Some)
+                    |> withWorkSelectorModel workSelectorModel
                     |> withCurrentWorkModel currentWorkModel
                     , Cmd.batch [
                         cmd
@@ -213,7 +215,7 @@ let update
                     ]
             else
                 model
-                |> withWorkSelectorModel (workSelectorModel |> Some)
+                |> withWorkSelectorModel workSelectorModel
                 |> withCurrentWorkModel currentWorkModel
                 , cmd
 
@@ -224,20 +226,20 @@ let update
                 match model.CurrentWork with
                 | Some currWork ->
                     let time = cfg.TimeProvider.GetUtcNow()
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withCurrentWorkModel None
+                    model |> withWorkSelectorModel workSelectorModel |> withCurrentWorkModel None
                     , Cmd.batch [
                         cmd
                         Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
                 | None ->
-                    model |> withWorkSelectorModel (workSelectorModel |> Some) |> withCurrentWorkModel None
+                    model |> withWorkSelectorModel workSelectorModel |> withCurrentWorkModel None
                     , cmd
             else
-                model |> withWorkSelectorModel (workSelectorModel |> Some) |> withCurrentWorkModel None
+                model |> withWorkSelectorModel workSelectorModel |> withCurrentWorkModel None
                 , cmd
 
         | WorkSelectorModel.Intent.Close ->
-            model |> withWorkSelectorModel None |> withCmdNone
+            model |> withoutWorkSelectorModel |> withCmdNone
 
     // --------------------
     // Player, Windows
