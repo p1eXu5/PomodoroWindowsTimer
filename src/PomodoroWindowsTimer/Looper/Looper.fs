@@ -104,7 +104,7 @@ type Looper(
                 |> Option.map (fun t -> (t, None))
                 |> Option.defaultValue (nextTp |> TimePoint.toActiveTimePoint, state.ActiveTimePoint)
 
-            tryPostEvent state (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init newAtp oldAtp))
+            tryPostEvent state (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init newAtp oldAtp, timeProvider.GetUtcNow()))
             timer.Change(int tickMilliseconds, 0) |> ignore
             { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
 
@@ -116,7 +116,7 @@ type Looper(
         match state.ActiveTimePoint with
         | Some atp ->
             let atp = { atp with RemainingTimeSpan = TimeSpan.FromSeconds(float seconds) }
-            tryPostEvent state (LooperEvent.TimePointTimeReduced atp)
+            tryPostEvent state (LooperEvent.TimePointTimeReduced (atp, timeProvider.GetUtcNow()))
             { state with ActiveTimePoint = atp |> Some }
         | None ->
             logger.LogWarning("It's trying to shift not existing active time point.")
@@ -147,7 +147,7 @@ type Looper(
 
                         let atpOpt = timePointQueue.TryPick() |> Option.map TimePoint.toActiveTimePoint
                         atpOpt
-                        |> Option.iter (fun atp -> LooperEvent.TimePointStarted (TimePointStartedEventArgs.init atp None) |> tryPostEvent)
+                        |> Option.iter (fun atp -> LooperEvent.TimePointStarted (TimePointStartedEventArgs.init atp None, timeProvider.GetUtcNow()) |> tryPostEvent)
 
                         scope |> endScope
                         return! loop { state with ActiveTimePoint = atpOpt }
@@ -175,17 +175,17 @@ type Looper(
                             let tpOpt = timePointQueue.TryGetNext() |> Option.map TimePoint.toActiveTimePoint
                             match tpOpt with
                             | None ->
-                                tryPostEvent (LooperEvent.TimePointTimeReduced atp)
+                                tryPostEvent (LooperEvent.TimePointTimeReduced (atp, timeProvider.GetUtcNow()))
                                 timer.Change(int tickMilliseconds, 0) |> ignore
                                 return! loop { state with StartTime = dt; ActiveTimePoint = None }
 
                             | Some tp ->
                                 let newAtp = { tp with RemainingTimeSpan = tp.RemainingTimeSpan + atp.RemainingTimeSpan }
-                                tryPostEvent (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init newAtp (atp |> Some)))
+                                tryPostEvent (LooperEvent.TimePointStarted (TimePointStartedEventArgs.init newAtp (atp |> Some), timeProvider.GetUtcNow()))
                                 timer.Change(int tickMilliseconds, 0) |> ignore
                                 return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
                         else
-                            tryPostEvent (LooperEvent.TimePointTimeReduced atp)
+                            tryPostEvent (LooperEvent.TimePointTimeReduced (atp, timeProvider.GetUtcNow()))
                             timer.Change(int tickMilliseconds, 0) |> ignore
                             return! loop { state with ActiveTimePoint = atp |> Some; StartTime = dt }
 
@@ -200,7 +200,7 @@ type Looper(
                         do
                             state.ActiveTimePoint
                             |> Option.iter (fun atp ->
-                                tryPostEvent (LooperEvent.TimePointStopped atp)
+                                tryPostEvent (LooperEvent.TimePointStopped (atp, timeProvider.GetUtcNow()))
                             )
                         return! loop { state with IsStopped = true; StartTime = timeProvider.GetLocalNow().DateTime }
 

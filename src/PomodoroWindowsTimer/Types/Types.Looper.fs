@@ -1,9 +1,11 @@
 ﻿namespace PomodoroWindowsTimer.Types
 
+open System
+
 type LooperEvent =
-    | TimePointStarted of TimePointStartedEventArgs
-    | TimePointStopped of ActiveTimePoint
-    | TimePointTimeReduced of ActiveTimePoint
+    | TimePointStarted of TimePointStartedEventArgs * sentTime: DateTimeOffset
+    | TimePointStopped of ActiveTimePoint * sentTime: DateTimeOffset
+    | TimePointTimeReduced of ActiveTimePoint * sentTime: DateTimeOffset
 and
     TimePointStartedEventArgs =
         {
