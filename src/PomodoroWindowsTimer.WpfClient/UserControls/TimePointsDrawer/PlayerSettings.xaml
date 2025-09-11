@@ -22,10 +22,10 @@
                     <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
                 </ToggleButton.RenderTransform>
             </ToggleButton>
-            <TextBlock Margin="0,0"
+            <TextBlock DockPanel.Dock="Left"
+                       Margin="0,0"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       DockPanel.Dock="Left"
                        FontSize="12"
                        Style="{StaticResource MaterialDesignOverlineTextBlock}"
                        Text="Disable skip break"
@@ -45,10 +45,10 @@
                     <ScaleTransform CenterX="20" CenterY="18" ScaleX=".6" ScaleY="0.6" />
                 </ToggleButton.RenderTransform>
             </ToggleButton>
-            <TextBlock Margin="0,0"
+            <TextBlock DockPanel.Dock="Left"
+                       Margin="0,0"
                        HorizontalAlignment="Left"
                        VerticalAlignment="Center"
-                       DockPanel.Dock="Left"
                        FontSize="12"
                        Style="{StaticResource MaterialDesignOverlineTextBlock}"
                        Text="Disable minimize/maximize windows"

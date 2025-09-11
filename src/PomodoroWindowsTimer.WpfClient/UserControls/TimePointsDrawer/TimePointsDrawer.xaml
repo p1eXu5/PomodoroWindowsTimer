@@ -18,12 +18,12 @@
     <!--  content  -->
     <DockPanel LastChildFill="True">
         <!--  PlayerModel flags  -->
-        <local:PlayerSettings DataContext="{Binding Player}"
-                              DockPanel.Dock="Bottom"
+        <local:PlayerSettings DockPanel.Dock="Bottom"
+                              DataContext="{Binding Player}"
                               />
 
-        <local:RunningTimePoints DataContext="{Binding TimePointList}"
-                                 DockPanel.Dock="Top"
+        <local:RunningTimePoints DockPanel.Dock="Top"
+                                 DataContext="{Binding TimePointList}"
                                  />
     </DockPanel>
 </UserControl>

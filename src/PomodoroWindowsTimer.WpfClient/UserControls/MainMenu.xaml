@@ -18,8 +18,8 @@
              mc:Ignorable="d"
              >
     <!--  top menu buttons  -->
-    <DockPanel VerticalAlignment="Center"
-               DockPanel.Dock="Top"
+    <DockPanel DockPanel.Dock="Top"
+               VerticalAlignment="Center"
                >
         <DockPanel.Resources>
             <Style x:Key="st_MenuToggleButton"
@@ -72,16 +72,16 @@
 
         <!--  DockPanel.Dock="Left"  -->
         <!--  running time points  -->
-        <ToggleButton Content="{materialDesign:PackIcon TimerPlayOutline}"
-                      DockPanel.Dock="Left"
+        <ToggleButton DockPanel.Dock="Left"
+                      Content="{materialDesign:PackIcon TimerPlayOutline}"
                       IsChecked="{Binding IsTimePointsShown}"
                       Style="{StaticResource st_MenuToggleButton}"
                       ToolTip="Playlist"
                       />
 
         <!--  work selector  -->
-        <ToggleButton Content="{materialDesign:PackIcon TimerCogOutline}"
-                      DockPanel.Dock="Right"
+        <ToggleButton DockPanel.Dock="Right"
+                      Content="{materialDesign:PackIcon TimerCogOutline}"
                       IsChecked="{Binding IsWorkSelectorLoaded}"
                       Style="{StaticResource st_MenuToggleButton}"
                       ToolTip="Work Selector"

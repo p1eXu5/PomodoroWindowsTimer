@@ -21,15 +21,15 @@
 
     <DockPanel LastChildFill="True">
         <!--  current TimePoint name  -->
-        <TextBlock Margin="1,0,0,20"
-                   DockPanel.Dock="Top"
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="1,0,0,20"
                    Foreground="{Binding ElementName=m_TimerRoot, Path=Foreground}"
                    Text="{Binding ActiveTimePointName, FallbackValue='Time Point Name'}"
                    />
 
         <!--  slider  -->
-        <Slider Margin="0,40,0,0"
-                DockPanel.Dock="Bottom"
+        <Slider DockPanel.Dock="Bottom"
+                Margin="0,40,0,0"
                 Foreground="{Binding ElementName=m_TimerRoot, Path=Foreground}"
                 IsEnabled="{Binding CanShiftActiveTime}"
                 Maximum="{Binding ActiveTimeDuration}"
