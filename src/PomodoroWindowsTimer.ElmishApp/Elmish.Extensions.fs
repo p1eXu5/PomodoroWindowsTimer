@@ -72,10 +72,22 @@ module Helpers =
 
     open Elmish
 
-    let withCmdNone = fun m -> m, Cmd.none
-    
-    let flip f b a = f a b
+    let inline withCmdNone m = m, Cmd.none
 
+    let inline withCmd cmd model = model, cmd
+
+    let inline flip f b a = f a b
+
+    let chain f (model, cmd) =
+        let (model', cmd') = f model
+        model', Cmd.batch [ cmd; cmd' ]
+
+    let chainIf predicate f (model, cmd) =
+        if predicate model then
+            let (model', cmd') = f model
+            model', Cmd.batch [ cmd; cmd' ]
+        else
+            model, cmd
 
 [<AutoOpen>]
 module Model =

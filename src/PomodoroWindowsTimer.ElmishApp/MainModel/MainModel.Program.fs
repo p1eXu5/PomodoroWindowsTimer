@@ -16,8 +16,6 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 
-let inline private withCmd cmd (model: MainModel) = model, cmd
-
 let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
     let (playerModel, playerCmd, playerIntent) =
         model.Player
@@ -54,17 +52,6 @@ let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
 let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =
     let (tplModel) = model.TimePointList |> updatef tplMsg
     model |> withTimePointListModel tplModel |> withCmdNone
-
-let private chain f (model, cmd) =
-    let (model', cmd') = f model
-    model', Cmd.batch [ cmd; cmd' ]
-
-let private chainIf predicate f (model, cmd) =
-    if predicate model then
-        let (model', cmd') = f model
-        model', Cmd.batch [ cmd; cmd' ]
-    else
-        model, cmd
 
 let update
     (cfg: MainModeConfig)
