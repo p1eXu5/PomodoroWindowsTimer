@@ -35,7 +35,7 @@ module PlayTests =
         let sut = Sut.init ()
 
         // act
-        let (afterPlayerModel, cmd, intent) = beforePlayerModel |> sut.Update None PlayerModel.Msg.Play
+        let (afterPlayerModel, cmd, intent) = beforePlayerModel |> sut.Update PlayerModel.Msg.Play
 
         // assert
         %afterPlayerModel
@@ -56,7 +56,7 @@ module PlayTests =
         let beforePlayerModel = { beforePlayerModel with ActiveTimePoint = Some (ActiveTimePoint.generate ()) }
 
         // act
-        let (afterPlayerModel, cmd, intent) = beforePlayerModel |> sut.Update None PlayerModel.Msg.Play
+        let (afterPlayerModel, cmd, intent) = beforePlayerModel |> sut.Update PlayerModel.Msg.Play
 
         // assert
         %afterPlayerModel

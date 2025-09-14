@@ -11,7 +11,7 @@ type PlayerModel =
     {
         ActiveTimePoint: ActiveTimePoint option
 
-        LooperState : LooperState
+        LooperState: LooperState
         LastAtpWhenPlayOrNextIsManuallyPressed: TimePointId option
 
         ShiftAndPreShiftTimes: ShiftAndPreShiftTimes option
@@ -22,12 +22,18 @@ type PlayerModel =
         RetrieveWorkSpentTimesState: AsyncDeferredState
     }
 and
+    // TODO: rename to Player State
+    /// Player state.
     LooperState =
         | Initialized
         | Playing
         | Stopped
         /// To restore LooperState when shifting end and previous state was not Playing.
         | TimeShifting of previousState: LooperState
+and
+    WindowsState =
+        | Maximized
+        | Minimized
 and
     [<Struct>]
     ShiftAndPreShiftTimes =
@@ -101,7 +107,7 @@ module PlayerModel =
     type Intent =
         | None
         /// When slider has been rolled forward.
-        | SkipOrApplyMissingTime of Work * atpKind: Kind * atpId: TimePointId * diff: TimeSpan * time: DateTimeOffset
+        | SkipOrApplyMissingTime of (*Work * *)atpKind: Kind * atpId: TimePointId * diff: TimeSpan * time: DateTimeOffset
         /// When slider has been rolled backward and only one work is counted.
         | RollbackTime of WorkSpentTime * atpKind: Kind * atpId: TimePointId * time: DateTimeOffset
         /// When slider has been rolled backward and multiple worka are counted.
@@ -128,6 +134,12 @@ module PlayerModel =
 
     let withLooperState looperState (model: PlayerModel) =
         { model with LooperState = looperState }
+
+    let withNotRequestedRetrieveWorkSpentTimesState (model: PlayerModel) =
+        { model with
+            RetrieveWorkSpentTimesState =
+                model.RetrieveWorkSpentTimesState |> AsyncDeferredState.forceNotRequestedWithCancellation
+        }
 
     let timePointKindEnum (model: PlayerModel) =
         model.ActiveTimePoint
@@ -224,6 +236,7 @@ module PlayerModel =
     let withoutShiftAndPreShiftTimes (model: PlayerModel) =
         { model with ShiftAndPreShiftTimes = None }
 
+    /// Sets model.ShiftAndPreShiftTimes and model.LooperState to TimeShifting.
     let withPreShiftState (model: PlayerModel) =
         let atp = model.ActiveTimePoint.Value
         { model with

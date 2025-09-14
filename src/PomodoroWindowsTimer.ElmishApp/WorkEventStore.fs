@@ -37,7 +37,11 @@ module WorkEventStore =
             | Error err -> raise (InvalidOperationException(err))
         }
 
-    let private storeStartedWorkEventTask (workEventRepository: IWorkEventRepository) (activeTimePointRepository: IActiveTimePointRepository) (workId: uint64, createdAt: DateTimeOffset, activeTimePoint: ActiveTimePoint) =
+    let private storeStartedWorkEventTask
+        (workEventRepository: IWorkEventRepository)
+        (activeTimePointRepository: IActiveTimePointRepository)
+        (workId: uint64, createdAt: DateTimeOffset, activeTimePoint: ActiveTimePoint)
+        =
         task {
             let workEvent =
                 match activeTimePoint.Kind with

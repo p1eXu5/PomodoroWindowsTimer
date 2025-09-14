@@ -8,6 +8,7 @@ open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
+open System.Threading
 
 
 type MainModel =
@@ -19,7 +20,7 @@ type MainModel =
         TimePointList: TimePointListModel
         IsTimePointsShown: bool
 
-        CurrentWork: CurrentWorkModel option
+        CurrentWork: CurrentWorkModel
         Player: PlayerModel
 
         /// Right drawer model
@@ -62,7 +63,7 @@ module MainModel =
         | PlayerModelMsg of PlayerModel.Msg
         | SetDisableMinimizeMaximizeWindows of bool
 
-        | LoadTimePointsFromSettings
+        // | LoadTimePointsFromSettings
         /// Stores and loads generated timepoints from prototypes.
         | LoadTimePoints of TimePoint list
         | SetIsTimePointsShown of bool
@@ -71,8 +72,7 @@ module MainModel =
 
         | AppDialogModelMsg of AppDialogModel.Msg
 
-        | LoadCurrentWork
-        | SetCurrentWorkIfNone of Result<Work, string>
+        // | LoadCurrentWork
         | CurrentWorkModelMsg of CurrentWorkModel.Msg
 
         | SetIsWorkSelectorLoaded of bool
@@ -117,17 +117,22 @@ module MainModel =
 
     open Elmish
 
-    let init (userSettings: IUserSettings) : MainModel * Cmd<Msg> =
-        //let botSettingsModel = BotSettingsModel.init cfg.BotSettings
-        //let (tpSettingsModel, tpSettingsModelCmd) = TimePointsGenerator.init cfg.TimePointPrototypeStore cfg.PatternStore
+    let init
+        (userSettings: IUserSettings)
+        (timePointStore: TimePointStore)
+        initCurrentWorkModel
+        : MainModel * Cmd<Msg>
+        =
+        let timePoints = timePointStore.Read()
+        let (currentWorkModel, currentWorkCmd) = initCurrentWorkModel ()
         {
-            TimePointList = TimePointListModel.init []
+            TimePointList = TimePointListModel.init timePoints
             IsTimePointsShown = false
 
             Player = PlayerModel.init userSettings
 
             WorkSelector = None
-            CurrentWork = None
+            CurrentWork = currentWorkModel
             //BotSettingsModel = None
             //TimePointsGeneratorModel = None
 
@@ -136,16 +141,24 @@ module MainModel =
             AppDialog = AppDialogModel.NoDialog
         }
         , Cmd.batch [
-            Cmd.ofMsg Msg.LoadTimePointsFromSettings
-            Cmd.ofMsg Msg.LoadCurrentWork
+            Cmd.ofMsg (Msg.LoadTimePoints timePoints)
+            Cmd.map Msg.CurrentWorkModelMsg currentWorkCmd
+
+            //if currentWork.IsSome then
+            //    Cmd.OfTask.perform
+            //        (workRepo.FindByIdOrCreateAsync currentWork.Value)
+            //        CancellationToken.None
+            //        Msg.SetCurrentWorkIfNone
+         
+            // Cmd.ofMsg Msg.LoadCurrentWork
             // Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
         ]
 
     // =========
     // accessors
     // =========
-    let withCurrentWorkModel workModel (model: MainModel) =
-         { model with CurrentWork = workModel }
+    let withCurrentWorkModel currentWorkModel (model: MainModel) =
+         { model with CurrentWork = currentWorkModel }
 
     let withAppDialogModel addDialogModel (model: MainModel) =
          { model with AppDialog = addDialogModel }

@@ -90,14 +90,14 @@ module Bindings =
             // For the test purpose
             nameof __.SendToChatBotCommand
                 |> Binding.cmd (fun m ->
-                    match m.Player.ActiveTimePoint, m.CurrentWork with
+                    match m.Player.ActiveTimePoint, m.CurrentWork.Work with
                     | Some tp, None ->
                         Msg.SendToChatBot $"It's time to {tp.Name}!!"
                     | Some tp, Some wm ->
                         Msg.SendToChatBot (
                         $"""It's time to {tp.Name}!!
 
-Current work is [{wm.Work.Number}] {wm.Work.Title}."""
+Current work is [{wm.Number}] {wm.Title}."""
                         )
                     | _ ->
                         Msg.SendToChatBot $"It's time!!"
@@ -111,12 +111,12 @@ Current work is [{wm.Work.Number}] {wm.Work.Title}."""
             // ------------------------------------------------------
 
             nameof __.CurrentWork
-                |> Binding.SubModel.opt (CurrentWorkModel.Bindings.bindings)
+                |> Binding.SubModel.required (CurrentWorkModel.Bindings.bindings)
                 |> Binding.mapModel _.CurrentWork
                 |> Binding.mapMsg Msg.CurrentWorkModelMsg
 
             nameof __.IsCurrentWorkSet
-                |> Binding.oneWay (_.CurrentWork >> Option.isSome)
+                |> Binding.oneWay (_.CurrentWork.Work >> Option.isSome)
 
             // ------------------------------------------------------
 

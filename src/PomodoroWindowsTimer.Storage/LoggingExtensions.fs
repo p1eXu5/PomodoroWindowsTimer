@@ -42,11 +42,10 @@ type LoggingExtensions () =
         LogLevel.Error,
         new EventId(1, nameof LoggingExtensions.FailedToOpenConnection),
         "Failed to open db connection.")
-    
 
     static let failedToInsert = LoggerMessage.Define<string>(
         LogLevel.Error,
-        new EventId(3, nameof LoggingExtensions.FailedToInsert),
+        new EventId(2, nameof LoggingExtensions.FailedToInsert),
         "Failed to insert `{TableName}`.")
 
     static let failedToUpdateWork = LoggerMessage.Define<string>(
@@ -66,25 +65,40 @@ type LoggingExtensions () =
 
     static let failedToFindWorkEventsByWorkIdByPeriod = LoggerMessage.Define<uint64, DateOnly, DateOnly>(
         LogLevel.Error,
-        new EventId(5, nameof LoggingExtensions.FailedToFindWorkEventsByWorkIdByPeriod),
+        new EventId(6, nameof LoggingExtensions.FailedToFindWorkEventsByWorkIdByPeriod),
         "Failed to find work events by workId {WorkId} and by period [{StartDate} - {EndDateInclusive}].")
 
     static let failedToFindWorkEventsByPeriod = LoggerMessage.Define<DateOnly, DateOnly>(
         LogLevel.Error,
-        new EventId(5, nameof LoggingExtensions.FailedToFindWorkEventsByPeriod),
+        new EventId(7, nameof LoggingExtensions.FailedToFindWorkEventsByPeriod),
         "Failed to find work events by period [{StartDate} - {EndDateInclusive}].")
 
     static let failedToFindByActiveTimePointIdByDate = LoggerMessage.Define<TimePointId, DateTimeOffset>(
         LogLevel.Error,
-        new EventId(6, nameof LoggingExtensions.FailedToFindByActiveTimePointIdByDate),
+        new EventId(8, nameof LoggingExtensions.FailedToFindByActiveTimePointIdByDate),
         "Failed to find work events by active time point id {ActiveTimePointId} and created not after {NotAfterDate}.")
 
-    
+    static let workEventInsertingMessage = LoggerMessage.Define<WorkId, string>(
+        LogLevel.Debug,
+        new EventId(9, "Work Event Inserting"),
+        "'{WorkNumber}' work event '{EventName}' is inserting..."
+    )
 
+    static let activeTimePointInsertingMessage = LoggerMessage.Define<Name, Kind>(
+        LogLevel.Debug,
+        new EventId(10, "Active TimePoint Inserting"),
+        "'{TimePointNumber}' active time point of '{Kind}' is inserting..."
+    )
 
    
 
-    
+    [<Extension>]
+    static member LogWorkEventInserting(logger: ILogger, workId: WorkId, workEvent: WorkEvent) =
+        workEventInsertingMessage.Invoke(logger, workId, workEvent |> WorkEvent.name, null)
+
+    [<Extension>]
+    static member LogActiveTimePointInserting(logger: ILogger, atp: ActiveTimePoint) =
+        activeTimePointInsertingMessage.Invoke(logger, atp.Name, atp.Kind, null)
 
     // -----------------------
     // TableCreated

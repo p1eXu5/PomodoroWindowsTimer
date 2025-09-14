@@ -32,21 +32,21 @@ let compose
     =
     let patternStore = PatternStore.init userSettings
     let timePointPrototypeStore = TimePointPrototypeStore.initialize userSettings
-
-    let mainModelCfg =
-        {
-            UserSettings = userSettings
-            TelegramBot = telegramBot
-            Looper = looper
-            TimePointQueue = timePointQueue
-            WindowsMinimizer = windowsMinimizer
-            ThemeSwitcher = themeSwitcher
-            TimePointStore = TimePointStore.initialize userSettings
-            WorkEventStore = workEventStore
-            TimeProvider = timeProvider
-        }
+    let timePointStore = TimePointStore.initialize userSettings
 
     // TODO: remove
+    // let mainModelCfg =
+    //     {
+    //         UserSettings = userSettings
+    //         TelegramBot = telegramBot
+    //         Looper = looper
+    //         TimePointQueue = timePointQueue
+    //         WindowsMinimizer = windowsMinimizer
+    //         ThemeSwitcher = themeSwitcher
+    //         TimePointStore = TimePointStore.initialize userSettings
+    //         WorkEventStore = workEventStore
+    //         TimeProvider = timeProvider
+    //     }
     // let appDialogModelCfg : AppDialogModel.Cfg =
     //     {
     //         UserSettings = userSettings
@@ -56,7 +56,10 @@ let compose
 
     // init
     let initMainModel () =
-        MainModel.init userSettings
+        let initCurrentWorkModel () =
+            CurrentWorkModel.init userSettings (workEventStore.GetWorkRepository())
+
+        MainModel.init userSettings timePointStore initCurrentWorkModel
 
     // update
     let updateMainModel =
@@ -132,6 +135,9 @@ let compose
         let updateCreatingWorkModel =
             CreatingWorkModel.Program.update workEventStore mainErrorMessageQueue (loggerFactory.CreateLogger<CreatingWorkModel>())
 
+        let initWorkSelectorModel =
+            WorkSelectorModel.init userSettings
+
         let updateWorkSelectorModel =
             WorkSelectorModel.Program.update updateWorkListModel updateCreatingWorkModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
 
@@ -144,8 +150,18 @@ let compose
                 updateWorkListModel
                 (loggerFactory.CreateLogger<StatisticMainModel>())
 
+        let updateTimePointListModel =
+            TimePointListModel.Program.update
+
         let updateCurrentWorkModel =
             CurrentWorkModel.Program.update
+                userSettings
+                workEventStore
+                looper
+                timeProvider
+                telegramBot
+                mainErrorMessageQueue
+                (loggerFactory.CreateLogger<CurrentWorkModel>())
 
         let updatePlayerModel =
             PlayerModel.Program.update
@@ -154,23 +170,26 @@ let compose
                 timeProvider
                 workEventStore 
                 themeSwitcher 
-                telegramBot 
                 userSettings 
                 timePointQueue 
                 mainErrorMessageQueue 
                 (loggerFactory.CreateLogger<PlayerModel>())
 
         MainModel.Program.update
-            mainModelCfg
-            workEventStore
+            looper
+            timePointQueue
+            timePointStore
+            telegramBot
+            mainErrorMessageQueue
+            (loggerFactory.CreateLogger<MainModel>())
+            updatePlayerModel
             updateCurrentWorkModel
+            updateTimePointListModel
             updateAppDialogModel
+            initWorkSelectorModel
             updateWorkSelectorModel
             initStatisticMainModel
             updateStatisticMainModel
-            updatePlayerModel
-            mainErrorMessageQueue
-            (loggerFactory.CreateLogger<MainModel>())
 
     // bindings:
     let ver = System.Reflection.Assembly.GetEntryAssembly().GetName().Version

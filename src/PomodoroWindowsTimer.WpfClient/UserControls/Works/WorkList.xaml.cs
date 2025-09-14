@@ -23,6 +23,6 @@ public partial class WorkList : UserControl
 
         // Sort by the Content property
         m_WorkList.Items.SortDescriptions.Add(
-            new SortDescription(nameof(ElmishApp.WorkModel.Bindings.LastEventCreatedAt), ListSortDirection.Descending));
+            new SortDescription(nameof(ElmishApp.WorkModel.IBindings.LastEventCreatedAt), ListSortDirection.Descending));
     }
 }

@@ -21,6 +21,7 @@ module TimePointListModel =
     type Msg =
         | TimePointModelMsg of TimePointModel.Msg // Preserved message
         | SetActiveTimePointId of TimePointId option
+        | LooperMsg of LooperEvent
 
     let init timePoint =
         {

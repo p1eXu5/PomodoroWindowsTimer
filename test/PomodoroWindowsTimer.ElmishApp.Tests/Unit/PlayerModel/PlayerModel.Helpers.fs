@@ -17,13 +17,13 @@ type internal Sut =
     {
         LooperMock: ILooper
         TimeProvider: System.TimeProvider
-        Update: Work option -> PlayerModel.Msg -> PlayerModel -> (PlayerModel * Cmd<PlayerModel.Msg> * PlayerModel.Intent)
+        Update: PlayerModel.Msg -> PlayerModel -> (PlayerModel * Cmd<PlayerModel.Msg> * PlayerModel.Intent)
     }
 
 
 module Sut =
 
-    let internal initWithWorkEventStore (workEventStore: WorkEventStore) =
+    let internal initWithWorkEventStore (workEventStore: WorkEventStore) : Sut =
         let looperMock = Substitute.For<ILooper>()
         let timeProvider = Substitute.For<System.TimeProvider>()
         {
@@ -36,8 +36,7 @@ module Sut =
                     timeProvider
                     workEventStore
                     (Substitute.For<IThemeSwitcher>())
-                    (Substitute.For<ITelegramBot>())
-                    (Substitute.For<IUserSettings>())
+                    (Substitute.For<IDisableSkipBreakSettings>())
                     (Substitute.For<ITimePointQueue>())
                     (Substitute.For<IErrorMessageQueue>())
                     (Substitute.For<ILogger<PlayerModel>>())

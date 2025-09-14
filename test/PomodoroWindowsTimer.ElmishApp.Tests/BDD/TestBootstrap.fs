@@ -122,6 +122,7 @@ type TestBootstrap () =
             let dbOptions = sp.GetRequiredService<IOptions<WorkDbOptions>>().Value
             UserSettingsStub(dbOptions) :> IUserSettings
         ) |> ignore
+
         services.AddSingleton<IDatabaseSettings>(fun sp ->
             sp.GetRequiredService<IUserSettings>() :?> UserSettingsStub :> IDatabaseSettings
         ) |> ignore
@@ -129,8 +130,21 @@ type TestBootstrap () =
         services.AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
 
 
+
     override _.ConfigureLogging(_: HostBuilderContext, loggingBuilder: ILoggingBuilder) =
-        loggingBuilder.SetMinimumLevel(LogLevel.Error) |> ignore
+        loggingBuilder
+            .SetMinimumLevel(LogLevel.Debug)
+            .ClearProviders()
+            .AddTestLogger(TestContextWriters.GetInstance<TestContext>(), LogOut.All)
+            .AddFilter(fun category logLevel ->
+                if
+                    category.StartsWith("DbUp", StringComparison.Ordinal)
+                    || category.StartsWith("PomodoroWindowsTimer.Looper", StringComparison.Ordinal)
+                    || category.StartsWith("PomodoroWindowsTimer.TimePointQueue", StringComparison.Ordinal)
+                then false
+                else logLevel >= LogLevel.Debug
+            )
+            |> ignore
 
 
     override _.PostConfigureHost(builder: IHostBuilder) =

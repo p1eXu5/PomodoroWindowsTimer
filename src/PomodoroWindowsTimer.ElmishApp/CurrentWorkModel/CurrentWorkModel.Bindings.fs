@@ -2,21 +2,17 @@
 
 open System
 open Elmish.WPF
-open Elmish.Extensions
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.CurrentWorkModel
-open System.Windows.Input
 
 type IBindings =
     interface
-        abstract Id: WorkId
-        abstract Number: string
-        abstract Title: string
+        abstract Id: WorkId option
+        abstract Number: string option
+        abstract Title: string option
         abstract LastEventCreatedAt: DateTimeOffset option
-        abstract LastEventCreatedAtOrUpdatedAt: DateTimeOffset
-        abstract UpdatedAt: DateTimeOffset
+        abstract UpdatedAt: DateTimeOffset option
     end
 
 module Bindings =
@@ -24,14 +20,9 @@ module Bindings =
 
     let bindings () : Binding<CurrentWorkModel, CurrentWorkModel.Msg> list =
         [
-            nameof __.Id |> Binding.oneWay (_.Work >> _.Id)
-            nameof __.Number |> Binding.oneWay (_.Work >> _.Number)
-            nameof __.Title |> Binding.oneWay (_.Work >> _.Title)
-            nameof __.LastEventCreatedAt |> Binding.oneWayOpt (_.Work >> _.LastEventCreatedAt)
-
-            nameof __.LastEventCreatedAtOrUpdatedAt
-                |> Binding.oneWay (fun m ->
-                    m.Work |> _.LastEventCreatedAt |> Option.defaultValue m.Work.UpdatedAt
-                )
-            nameof __.UpdatedAt |> Binding.oneWay (_.Work >> _.UpdatedAt)
+            nameof __.Id |> Binding.oneWayOpt (_.Work >> Option.map _.Id)
+            nameof __.Number |> Binding.oneWay (_.Work >> Option.map _.Number)
+            nameof __.Title |> Binding.oneWay (_.Work >> Option.map _.Title)
+            nameof __.LastEventCreatedAt |> Binding.oneWayOpt (_.Work >> Option.bind _.LastEventCreatedAt)
+            nameof __.UpdatedAt |> Binding.oneWayOpt (_.Work >> Option.map _.UpdatedAt)
         ]

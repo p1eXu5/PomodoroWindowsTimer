@@ -18,6 +18,9 @@ let update msg model =
     match msg with
     | Msg.SetActiveTimePointId tpId ->
         model |> withActiveTimePointId tpId
+
+    | Msg.LooperMsg (LooperEvent.TimePointStarted (args, _)) ->
+        model |> withActiveTimePointId (args.NewActiveTimePoint.OriginalId |> Some)
     | _ ->
         model
 

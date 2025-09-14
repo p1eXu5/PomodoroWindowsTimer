@@ -15,156 +15,166 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
+open PomodoroWindowsTimer.Abstractions
 
-let private withUpdatedPlayerModel updatef pmsg (model: MainModel) =
-    let (playerModel, playerCmd, playerIntent) =
-        model.Player
-        |> updatef (model.CurrentWork |> Option.map _.Work) pmsg
 
-    let cmd = Cmd.map Msg.PlayerModelMsg playerCmd
+/// Msg.SetIsTimePointsShown handler.
+let private setIsTimePointsShown (v: bool) (model: MainModel) =
+    if v then model |> withoutWorkSelectorModel else model
+    |> withIsTimePointsShown v
+    |> withCmdNone
 
-    match playerIntent with
-    | PlayerModel.Intent.None ->
-        model |> withPlayerModel playerModel
-        , cmd
 
-    | PlayerModel.Intent.RollbackTime (workSpentTime, kind, atpId, time) ->
-        model |> withPlayerModel playerModel
-        , Cmd.batch [
-            cmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, kind, atpId, time)))
-        ]
-
-    | PlayerModel.Intent.MultipleRollbackTime (workSpentTime, kind, atpId, time) ->
-        model |> withPlayerModel playerModel
-        , Cmd.batch [
-            cmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadRollbackWorkListDialogModel (workSpentTime, kind, atpId, time)))
-        ]
-
-    | PlayerModel.Intent.SkipOrApplyMissingTime (work, kind, atpId, diff, time) ->
-        model |> withPlayerModel playerModel
-        , Cmd.batch [
-            cmd
-            Cmd.ofMsg (Msg.AppDialogModelMsg (AppDialogModel.Msg.LoadSkipOrApplyMissingTimeDialogModel (work, kind, atpId, diff, time)))
-        ]
-
-let private withUpdatedTimePointListModel updatef tplMsg (model: MainModel) =
-    let (tplModel) = model.TimePointList |> updatef tplMsg
-    model |> withTimePointListModel tplModel |> withCmdNone
-
-let update
-    (cfg: MainModeConfig)
-    (workEventStore: WorkEventStore)
-    updateCurrentWorkModel
-    updateAppDialogModel
-    updateWorkSelectorModel
-    initWorkStatisticListModel
-    updateStatisticMainModel
-    updatePlayerModel
-    (errorMessageQueue: IErrorMessageQueue)
-    (logger: ILogger<MainModel>)
-    (msg: Msg)
+/// Msg.LoadTimePoints handler.
+let private loadTimePoints
+    (looper: ILooper)
+    (timePointQueue: ITimePointQueue)
+    (timePointStore: TimePointStore)
+    (timePoints: TimePoint list)
     (model: MainModel)
     =
-    let findWorkByIdOrCreateTask work =
-        task {
-            let workRepo = cfg.WorkEventStore.GetWorkRepository ()
-            return! workRepo.FindByIdOrCreateAsync work CancellationToken.None
-        }
+    looper.Stop()
+    timePointQueue.Reload(timePoints)
+    looper.PreloadTimePoint()
 
-    match msg with
-    // --------------------
-    // Time Points
-    // --------------------
-    | Msg.SetIsTimePointsShown v ->
-        if v then
-            model |> withoutWorkSelectorModel |> withIsTimePointsShown v |> withCmdNone
-        else
-            model |> withIsTimePointsShown v |> withCmdNone
+    model |> withInitTimePointListModel timePoints
+    , Cmd.OfFunc.attempt timePointStore.Write timePoints Msg.OnExn
 
-    | Msg.LoadTimePointsFromSettings ->
-        let timePoints = cfg.TimePointStore.Read()
-        cfg.TimePointQueue.Reload(timePoints)
-        cfg.Looper.PreloadTimePoint()
-        
-        model |> withInitTimePointListModel timePoints |> withCmdNone
 
-    | Msg.LoadTimePoints timePoints ->
-        cfg.Looper.Stop()
-        cfg.TimePointQueue.Reload(timePoints)
-        cfg.TimePointStore.Write(timePoints)
-        cfg.Looper.PreloadTimePoint()
+/// SetIsWorkSelectorLoaded handler
+let private setIsWorkSelectorLoaded initWorkSelectorModel (v: bool) (model: MainModel) =
+    if v then
+        let (m, cmd) = initWorkSelectorModel (model.CurrentWork.Id)
+        model |> withWorkSelectorModel m |> withIsTimePointsShown false
+        , Cmd.map Msg.WorkSelectorModelMsg cmd
+    else
+        model |> withoutWorkSelectorModel |> withCmdNone
 
-        model |> withInitTimePointListModel timePoints |> withCmdNone
 
-    | Msg.TimePointListModelMsg smsg ->
-        model |> withUpdatedTimePointListModel TimePointListModel.Program.update smsg
+/// Maps PlayerModel.Intent to MainModel.Msg
+let private playerIntentCmd playerIntent (model: MainModel) =
+    match playerIntent with
+    | PlayerModel.Intent.None -> Cmd.none
 
-    | Msg.StartTimePoint tpId ->
-        model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
-
-    | Msg.PlayStopCommand _ ->
-        model, Cmd.ofMsg (model.Player |> PlayerModel.Msg.playStopResume |> Msg.PlayerModelMsg)
-
-    | Msg.LooperMsg lmsg ->
-        let (model', cmd) =
-            model
-            |> withUpdatedPlayerModel
-                updatePlayerModel
-                (lmsg |> PlayerModel.Msg.LooperMsg)
-
-        match lmsg with
-        | LooperEvent.TimePointStarted args ->
-            (model', cmd)
-            |> chain (
-                withUpdatedTimePointListModel
-                    TimePointListModel.Program.update
-                    (TimePointListModel.Msg.SetActiveTimePointId (args.NewActiveTimePoint.OriginalId |> Some))
+    | PlayerModel.Intent.RollbackTime (workSpentTime, kind, atpId, time) ->
+        Cmd.ofMsg (
+            Msg.AppDialogModelMsg (
+                AppDialogModel.Msg.LoadRollbackWorkDialogModel (workSpentTime, kind, atpId, time)
             )
-        | _ -> (model', cmd)
+        )
 
-    // --------------------
-    // Work
-    // --------------------
-    | Msg.LoadCurrentWork ->
-        match cfg.CurrentWorkItemSettings.CurrentWork with
-        | None -> model, Cmd.none
-        | Some work ->
-            model, Cmd.OfTask.perform findWorkByIdOrCreateTask work Msg.SetCurrentWorkIfNone
+    | PlayerModel.Intent.MultipleRollbackTime (workSpentTime, kind, atpId, time) ->
+        Cmd.ofMsg (
+            Msg.AppDialogModelMsg (
+                AppDialogModel.Msg.LoadRollbackWorkListDialogModel (workSpentTime, kind, atpId, time)
+            )
+        )
 
-    | Msg.SetCurrentWorkIfNone res ->
-        match res with
-        | Ok work ->
-            cfg.CurrentWorkItemSettings.CurrentWork <- work |> Some
-            if model.CurrentWork |> Option.isNone then
-                { model with CurrentWork = work |> CurrentWorkModel.init |> Some}, Cmd.none
-            else
-                model, Cmd.none
-        | Error err ->
-            cfg.CurrentWorkItemSettings.CurrentWork <- None
-            model, Cmd.ofMsg (Msg.OnError err)
-   
+    | PlayerModel.Intent.SkipOrApplyMissingTime (kind, atpId, diff, time) ->
+        model.CurrentWork.Work
+        |> Option.map (fun work ->
+            Cmd.ofMsg (
+                Msg.AppDialogModelMsg (
+                    AppDialogModel.Msg.LoadSkipOrApplyMissingTimeDialogModel (work, kind, atpId, diff, time)
+                )
+            )
+        )
+        |> Option.defaultValue Cmd.none
 
-    | Msg.CurrentWorkModelMsg wmsg ->
-        match model.CurrentWork with
-        | Some wmodel ->
-            let (wmodel, wcmd) = updateCurrentWorkModel wmsg wmodel
-            model |> withCurrentWorkModel (wmodel |> Some)
-            , Cmd.map Msg.CurrentWorkModelMsg wcmd
-        | None ->
-            model |> withCmdNone
+/// Msg.PlayerModelMsg handler.
+let private mapPlayerModelMsg updatePlayerModel pmsg (model: MainModel) =
+    let (playerModel, playerCmd, playerIntent) = updatePlayerModel pmsg model.Player
 
-    | Msg.SetIsWorkSelectorLoaded v ->
-        if v then
-            let (m, cmd) = WorkSelectorModel.init cfg.UserSettings (model.CurrentWork |> Option.map (_.Work >> _.Id))
-            model |> withWorkSelectorModel m |> withIsTimePointsShown false
-            , Cmd.map Msg.WorkSelectorModelMsg cmd
-        else
-            model |> withoutWorkSelectorModel |> withCmdNone
+    let cmd = Cmd.map Msg.PlayerModelMsg playerCmd
+    let intentCmd = playerIntentCmd playerIntent model
 
-    | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
-        let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m
+    model |> withPlayerModel playerModel
+    , Cmd.batch [ cmd; intentCmd ]
+
+
+/// Msg.LooperMsg handler.
+let private mapLooperMsg updatePlayerModel updateCurrentWorkModel updateTimePointListModel lmsg (model: MainModel) =
+    let (playerModel, playerCmd, playerIntent) =
+        updatePlayerModel (lmsg |> PlayerModel.Msg.LooperMsg) model.Player
+
+    let (currentWorkModel, currentWorkCmd) =
+        updateCurrentWorkModel (lmsg |> CurrentWorkModel.Msg.LooperMsg) model.CurrentWork
+       
+    let (timePointListModel) =
+        updateTimePointListModel (lmsg |> TimePointListModel.Msg.LooperMsg) model.TimePointList
+
+    model
+    |> withPlayerModel playerModel
+    |> withCurrentWorkModel currentWorkModel
+    |> withTimePointListModel timePointListModel
+    , Cmd.batch [
+        Cmd.map Msg.PlayerModelMsg playerCmd
+        playerIntentCmd playerIntent model
+        Cmd.map Msg.CurrentWorkModelMsg currentWorkCmd
+    ]
+
+
+/// Maps WorkSelectorModel.Intent to MainModel.Msg
+let workSelectorIntentCmd intent =
+    match intent with
+    | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
+        Cmd.ofMsg (
+            Msg.CurrentWorkModelMsg (
+                CurrentWorkModel.Msg.SetWork workModel.Work
+            )
+        )
+    | WorkSelectorModel.Intent.UnselectCurrentWork ->
+        Cmd.ofMsg (
+            Msg.CurrentWorkModelMsg (
+                CurrentWorkModel.Msg.UnsetWork
+            )
+        )
+    | _ ->
+        Cmd.none
+
+
+/// MsgWith.WorkSelectorModelMsg handler
+let private mapWorkSelectorModelMsg updateWorkSelectorModel smsg m (model: MainModel) =
+    let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m
+
+    let cmd =  Cmd.map Msg.WorkSelectorModelMsg workSelectorCmd
+    let intentCmd = workSelectorIntentCmd intent
+
+    intent
+    |> function
+        | WorkSelectorModel.Intent.Close -> model |> withoutWorkSelectorModel
+        | _ -> model
+    |> withWorkSelectorModel workSelectorModel
+    , Cmd.batch [ cmd; intentCmd ]
+
+
+/// Msg.SetIsWorkStatisticShown handler.
+let private setIsWorkStatisticShown initStatisticMainModel v (model: MainModel) =
+    if v then
+        let (statisticMainModel, statisticCmd) = initStatisticMainModel ()
+        model |> MainModel.withDailyStatisticList (statisticMainModel |> Some)
+        , Cmd.map Msg.StatisticMainModelMsg statisticCmd
+    else
+        model |> MainModel.withDailyStatisticList None
+        , Cmd.none
+
+
+/// MsgWith.StatisticMainModelMsg handler.
+let private mapStatisticMainModelMsg updateStatisticMainModel (sm: StatisticMainModel) (model: MainModel) =
+    let (statisticMainModel, statisticCmd, statisticIntent) = updateStatisticMainModel sm
+
+    match statisticIntent with
+    | StatisticMainModel.Intent.None ->
+        model |> MainModel.withDailyStatisticList (statisticMainModel |> Some)
+        , Cmd.map Msg.StatisticMainModelMsg statisticCmd
+
+    | StatisticMainModel.Intent.CloseWindow ->
+        model |> MainModel.withDailyStatisticList None
+        , Cmd.none
+
+    (*
+    
+    let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m
         let cmd =  Cmd.map Msg.WorkSelectorModelMsg workSelectorCmd
 
         match intent with
@@ -173,7 +183,35 @@ let update
 
         | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
             cfg.CurrentWorkItemSettings.CurrentWork <- workModel.Work |> Some
-            let currentWorkModel = workModel.Work |> CurrentWorkModel.init |> Some
+            
+            let (currWorkModel', currWorkCmd) =
+                match model.Player.LooperState, model.CurrentWork with
+                | LooperState.Playing, Some currWorkModel ->
+                    currWorkModel
+                    |> updateCurrentWorkModel
+                        (CurrentWorkModel.Msg.SetPlayingWork (workModel.Work, model.Player.ActiveTimePoint.Value)) 
+
+                | LooperState.Playing, None ->
+                    initPlayingCurrentWorkModel workModel.Work
+
+                | _, Some currWorkModel ->
+                    currWorkModel
+                    |> updateCurrentWorkModel
+                        (CurrentWorkModel.Msg.SetWork workModel.Work)
+                        
+                | _, None ->
+                    CurrentWorkModel.init workModel.Work
+
+            model
+            |> withWorkSelectorModel workSelectorModel
+            |> withCurrentWorkModel currWorkModel'
+            , Cmd.batch [
+                cmd
+                Cmd.map Msg.CurrentWorkModelMsg currWorkCmd
+            ]
+
+            (*
+            let currentWorkModel = workModel.Work |> CurrentWorkModel.init
 
             if model.Player.LooperState = LooperState.Playing then
                 let time = cfg.TimeProvider.GetUtcNow()
@@ -205,6 +243,7 @@ let update
                 |> withWorkSelectorModel workSelectorModel
                 |> withCurrentWorkModel currentWorkModel
                 , cmd
+            *)  
 
         | WorkSelectorModel.Intent.UnselectCurrentWork ->
             cfg.CurrentWorkItemSettings.CurrentWork <- None
@@ -213,69 +252,132 @@ let update
                 match model.CurrentWork with
                 | Some currWork ->
                     let time = cfg.TimeProvider.GetUtcNow()
-                    model |> withWorkSelectorModel workSelectorModel |> withCurrentWorkModel None
+                    model
+                    |> withWorkSelectorModel workSelectorModel
+                    |> withoutCurrentWorkModel
                     , Cmd.batch [
                         cmd
                         Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
                     ]
                 | None ->
-                    model |> withWorkSelectorModel workSelectorModel |> withCurrentWorkModel None
+                    model |> withWorkSelectorModel workSelectorModel |> withoutCurrentWorkModel
                     , cmd
             else
-                model |> withWorkSelectorModel workSelectorModel |> withCurrentWorkModel None
+                model |> withWorkSelectorModel workSelectorModel |> withoutCurrentWorkModel
                 , cmd
 
         | WorkSelectorModel.Intent.Close ->
             model |> withoutWorkSelectorModel |> withCmdNone
 
+    *)
+
+/// MainModel.Program update function.
+let update
+    (looper: ILooper)
+    (timePointQueue: ITimePointQueue)
+    (timePointStore: TimePointStore)
+    (telegramBot: ITelegramBot)
+    (errorMessageQueue: IErrorMessageQueue)
+    (logger: ILogger<MainModel>)
+    updatePlayerModel
+    updateCurrentWorkModel
+    updateTimePointListModel
+    updateAppDialogModel
+    initWorkSelectorModel
+    updateWorkSelectorModel
+    initStatisticMainModel
+    updateStatisticMainModel
+    (msg: Msg)
+    (model: MainModel)
+    =
+    match msg with
     // --------------------
-    // Player, Windows
+    // Time Points
     // --------------------
+    | Msg.SetIsTimePointsShown v ->
+        model |> setIsTimePointsShown v
+
+    | Msg.LoadTimePoints timePoints ->
+        model |> loadTimePoints looper timePointQueue timePointStore timePoints
+
+    | Msg.TimePointListModelMsg smsg ->
+        model |> map _.TimePointList withTimePointListModel (updateTimePointListModel smsg) |> withCmdNone
+
+    | Msg.StartTimePoint tpId ->
+        model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
+
+    // --------------------
+    // Player
+    // --------------------
+    | Msg.PlayStopCommand _ ->
+        model, Cmd.ofMsg (model.Player |> PlayerModel.Msg.playStopResume |> Msg.PlayerModelMsg)
+
+    | Msg.LooperMsg lmsg ->
+        model |> mapLooperMsg updatePlayerModel updateCurrentWorkModel updateTimePointListModel lmsg
 
     | Msg.PlayerModelMsg pmsg ->
-        model |> withUpdatedPlayerModel updatePlayerModel pmsg
+        model |> mapPlayerModelMsg updatePlayerModel pmsg
+
+    // --------------------
+    // Work
+    // --------------------
+    | Msg.CurrentWorkModelMsg currWorkMsg ->
+        model |> mapc _.CurrentWork withCurrentWorkModel Msg.CurrentWorkModelMsg (updateCurrentWorkModel currWorkMsg)
+
+    | Msg.SetIsWorkSelectorLoaded v ->
+        model |> setIsWorkSelectorLoaded initWorkSelectorModel v
+
+    | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
+        model |> mapWorkSelectorModelMsg updateWorkSelectorModel smsg m
+
+    // --------------------
+    // Dialog Windows
+    // --------------------
+    | Msg.AppDialogModelMsg smsg ->
+        model |> mapc _.AppDialog withAppDialogModel Msg.AppDialogModelMsg (updateAppDialogModel smsg)
 
     | Msg.SetIsWorkStatisticShown v ->
-        if v then
-            let (m, cmd) = initWorkStatisticListModel ()
-            model |> MainModel.withDailyStatisticList (m |> Some)
-            , Cmd.map Msg.StatisticMainModelMsg cmd
-        else
-            model |> MainModel.withDailyStatisticList None
-            , Cmd.none
-
+        model |> setIsWorkStatisticShown initStatisticMainModel v
 
     | MsgWith.StatisticMainModelMsg model (smsg, sm) ->
-        let (m, cmd, intent) = updateStatisticMainModel smsg sm
-        match intent with
-        | StatisticMainModel.Intent.None ->
-            model |> MainModel.withDailyStatisticList (m |> Some)
-            , Cmd.map Msg.StatisticMainModelMsg cmd
-        | StatisticMainModel.Intent.CloseWindow ->
-            model |> MainModel.withDailyStatisticList None
-            , Cmd.none
+        model |> mapStatisticMainModelMsg (updateStatisticMainModel smsg) sm
 
     // --------------------
     
+    // for test purpose:
     | Msg.SendToChatBot message ->
-        model, Cmd.OfTask.attempt cfg.TelegramBot.SendMessage message Msg.OnExn
-
-    | Msg.AppDialogModelMsg smsg ->
-        let (m, cmd) = updateAppDialogModel smsg model.AppDialog
-        model |> withAppDialogModel m
-        , Cmd.map Msg.AppDialogModelMsg cmd
+        model, Cmd.OfTask.attempt telegramBot.SendMessage message Msg.OnExn
 
     // --------------------
-
-    | Msg.OnExn ex ->
-        logger.LogError(ex, "Exception has been thrown in MainModel Program.")
-        errorMessageQueue.EnqueueError ex.Message
+    | Msg.OnError err ->
+        logger.LogProgramError err
+        errorMessageQueue.EnqueueError err
         model, Cmd.none
 
-    | Msg.OnError err ->
-        errorMessageQueue.EnqueueError err
+    | Msg.OnExn ex ->
+        logger.LogProgramExn ex
+        errorMessageQueue.EnqueueError ex.Message
         model, Cmd.none
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)
         model, Cmd.none
+
+    // TODO: remove
+    // old:
+    // 
+    // | Msg.LoadTimePointsFromSettings ->
+    //    let timePoints = cfg.TimePointStore.Read()
+    //    cfg.TimePointQueue.Reload(timePoints)
+    //    cfg.Looper.PreloadTimePoint()
+    //
+    //    model |> withInitTimePointListModel timePoints |> withCmdNone
+    //
+    // | Msg.LoadCurrentWork ->
+    //    match cfg.CurrentWorkItemSettings.CurrentWork with
+    //    | None -> model, Cmd.none
+    //    | Some work ->
+    //        model, Cmd.OfTask.perform findWorkByIdOrCreateTask work Msg.SetCurrentWorkIfNone
+    //
+    // | Msg.SetCurrentWorkIfNone res ->
+    //    model |> setCurrentWorkIfNone cfg.UserSettings res

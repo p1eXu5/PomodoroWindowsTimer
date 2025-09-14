@@ -92,9 +92,16 @@ module Helpers =
 [<AutoOpen>]
 module Model =
 
-    let map get set f model =
-        model |> get |> f |> flip set model
+    open Elmish
 
+    let inline map get set updatef model =
+        model |> get |> updatef |> flip set model
+
+    let inline mapc get set cmdf updatef model =
+        model |> get |> updatef |> fun (m, cmd) -> m |> flip set model, Cmd.map cmdf cmd
+
+    let inline mapci get set cmdf intentf updatef model =
+        model |> get |> updatef |> fun (m, cmd, intent) -> m |> flip set model, Cmd.batch [ Cmd.map cmdf cmd; intentf intent ]
 
 [<AutoOpen>]
 module List =
@@ -400,6 +407,24 @@ module AsyncDeferredState =
             (AsyncDeferredState.InProgress (newCts), newCts)
         | AsyncDeferredState.Retrieved ->
             (AsyncDeferredState.InProgress (newCts), newCts)
+
+    /// If asyncDeferred is InProgress then cancels it.
+    let forceNotRequestedWithCancellation
+        (asyncDeferred: AsyncDeferredState)
+        : AsyncDeferredState
+        =
+        match asyncDeferred with
+        | AsyncDeferredState.InProgress (cts) ->
+            // CancellationTokenSource is disposed in a Program module,
+            // using LastInProgressWithCancellation active pattern below
+            // last cts reference contains AsyncOperation Finish message
+            cts.Cancel()
+            cts.Dispose()
+            AsyncDeferredState.NotRequested
+        | AsyncDeferredState.NotRequested ->
+            AsyncDeferredState.NotRequested
+        | AsyncDeferredState.Retrieved ->
+            AsyncDeferredState.NotRequested
 
     /// Is operation cts is equal to in progress deferred cts then return Some with cts disposing
     /// or returns None with disposing operation cts.

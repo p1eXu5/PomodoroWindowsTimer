@@ -58,7 +58,7 @@ let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint lis
 
         let! (sut: ISut) = Scenario.getState
 
-        return sut.MainModel.CurrentWork.Value.Work
+        return sut.MainModel.CurrentWork.Work.Value
     }
 
 (* TODO:

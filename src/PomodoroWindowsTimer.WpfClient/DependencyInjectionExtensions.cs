@@ -59,7 +59,7 @@ internal static class DependencyInjectionExtensions
         });
 
     public static void AddThemeSwitcher(this IServiceCollection services)
-        => services.TryAddSingleton<IThemeSwitcher>(new ThemeSwitcher());
+        => services.TryAddSingleton<IThemeSwitcher, ThemeSwitcher>();
 
     /// <summary>
     /// Registers <see cref="ISettingsManager"/>.

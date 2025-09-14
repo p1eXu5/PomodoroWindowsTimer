@@ -127,6 +127,7 @@ module internal ActiveTimePointRepository =
                 )
 
             try
+                deps.Logger.LogActiveTimePointInserting(activeTimePoint)
                 let! _ = dbConnection.ExecuteAsync(command)
                 return ()
             with ex ->

@@ -31,10 +31,10 @@ let ``Current Work has been set to`` (expectedCurrentWork: Work) =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        match sut.MainModel.CurrentWork with
+        match sut.MainModel.CurrentWork.Work with
         | Some actualCurrentWork ->
-            actualCurrentWork.Work.Number |> should equal expectedCurrentWork.Number
-            actualCurrentWork.Work.Title |> should equal expectedCurrentWork.Title
+            actualCurrentWork.Number |> should equal expectedCurrentWork.Number
+            actualCurrentWork.Title |> should equal expectedCurrentWork.Title
             // Created/UpdatedAt dates is different cause work is created in database
             return actualCurrentWork
         | None ->
@@ -47,7 +47,7 @@ let ``Current Work has not been set`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState
         
-        match sut.MainModel.CurrentWork with
+        match sut.MainModel.CurrentWork.Work with
         | Some actualCurrentWork ->
             assertionExn $"CurrentWork has been set to {actualCurrentWork}."
         | None ->

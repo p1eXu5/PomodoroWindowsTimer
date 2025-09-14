@@ -79,7 +79,7 @@ let ``PreloadTimePoint -> raises TimePointStarted event with None nextTp`` () =
     // assert
     %eventQueue.Should().ContainExactlyOneItemMatching(fun ev -> 
         match ev with
-        | LooperEvent.TimePointStarted args ->
+        | LooperEvent.TimePointStarted (args, _) ->
             args.NewActiveTimePoint.OriginalId = testTimePoints[0].Id && args.OldActiveTimePoint = None
         | _ -> false
     )
@@ -104,7 +104,7 @@ let ``PreloadTimePoint, Next -> raises TimePointStarted event with None nextTp t
     // assert
     %eventQueue.Should().AllSatisfy(fun ev -> 
         match ev with
-        | LooperEvent.TimePointStarted args ->
+        | LooperEvent.TimePointStarted (args, _) ->
             args.NewActiveTimePoint.OriginalId = testTimePoints[0].Id && args.OldActiveTimePoint = None
         | _ -> false
     )

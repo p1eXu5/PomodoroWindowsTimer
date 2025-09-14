@@ -4,12 +4,16 @@ open System
 open System.Threading.Tasks
 open System.Collections.Generic
 open System.Collections.Concurrent
+open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Logging
 
 open NUnit.Framework
+open NSubstitute
 open p1eXu5.AspNetCore.Testing
 open p1eXu5.AspNetCore.Testing.MockRepository
 
 open PomodoroWindowsTimer.Abstractions
+open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.WpfClient
@@ -28,8 +32,7 @@ module Sut =
 
     let run (setupf: ISut -> ISut) =
 
-        let bootstrap =
-            Bootstrap.Build<TestBootstrap>()
+        let bootstrap = Bootstrap.Build<TestBootstrap>()
 
         let testDispatcher = new TestDispatcher()
         let dict = new Dictionary<string, obj>(5)
@@ -41,7 +44,22 @@ module Sut =
 
             // make substitutions:
             let _ = bootstrap.MockRepository.TrySubstitute<IWindowsMinimizer>()
-            let _ = bootstrap.MockRepository.TrySubstitute<IThemeSwitcher>()
+            let themeSwitcherMock = bootstrap.MockRepository.TrySubstitute<IThemeSwitcher>()
+            let themeSwitcherLogger = bootstrap.ServiceProvider.GetRequiredService<ILogger<IThemeSwitcher>>()
+
+            themeSwitcherMock
+                .When(fun m -> m.SwitchTheme(Arg.Any<TimePointKind>()))
+                .Do(
+                    fun callInfo ->
+                        let kind= callInfo.Arg<TimePointKind>()
+                        match kind with
+                        | TimePointKind.Break ->
+                            themeSwitcherLogger.LogDebug("Switching to Break Theme...")
+                        | TimePointKind.Work ->
+                            themeSwitcherLogger.LogDebug("Switching to Work Theme...")
+                        | _ ->
+                            themeSwitcherLogger.LogDebug("Switching to Unknown Theme...")
+                )
 
             let sut =
                 {

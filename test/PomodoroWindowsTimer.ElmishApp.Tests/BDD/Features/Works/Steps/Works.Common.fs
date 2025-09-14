@@ -14,7 +14,7 @@ let ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
     scenario { 
         do! Scenario.msgDispatchedWithin2Sec "SetCurrentWorkIfNone" (fun msg ->
             match msg with
-            | MainModel.Msg.SetCurrentWorkIfNone (Ok work) ->
+            | MainModel.Msg.CurrentWorkModelMsg (CurrentWorkModel.Msg.SetCurrentWorkIfNone (Ok work)) ->
                 work.Number = expectedWork.Number && work.Title = expectedWork.Title
             | _ -> false
         )

@@ -8,8 +8,8 @@
     <!--  Playlist v1  -->
 
     <Style x:Key="st_VerticalStackButtonIcon"
-           TargetType="materialDesign:PackIcon"
            BasedOn="{StaticResource st_IconBase}"
+           TargetType="materialDesign:PackIcon"
            >
         <Setter Property="Margin" Value="0,4,0,0" />
     </Style>
@@ -23,8 +23,8 @@
     </Style>
 
     <Style x:Key="st_UnselectedTimePoint"
-           TargetType="shared:TimePoint"
            BasedOn="{StaticResource st_TimePointBase}"
+           TargetType="shared:TimePoint"
            >
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding TimeSpan}" />
         <Setter Property="ButtonForeground" Value="{StaticResource MaterialDesign.Brush.Primary.Light}" />
@@ -34,8 +34,8 @@
     </Style>
 
     <Style x:Key="st_SelectedTimePoint"
-           TargetType="shared:TimePoint"
            BasedOn="{StaticResource st_TimePointBase}"
+           TargetType="shared:TimePoint"
            >
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}" />
         <Setter Property="ButtonForeground" Value="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}" />
@@ -48,8 +48,8 @@
         <shared:TimePoint Style="{StaticResource st_UnselectedTimePoint}">
             <shared:TimePoint.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Style="{StaticResource st_VerticalStackButtonIcon}"
-                                             Kind="Play"
+                    <materialDesign:PackIcon Kind="Play"
+                                             Style="{StaticResource st_VerticalStackButtonIcon}"
                                              />
                 </ControlTemplate>
             </shared:TimePoint.ButtonIcon>
@@ -61,8 +61,8 @@
         <shared:TimePoint Style="{StaticResource st_SelectedTimePoint}">
             <shared:TimePoint.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Style="{StaticResource st_VerticalStackButtonIcon}"
-                                             Kind="Play"
+                    <materialDesign:PackIcon Kind="Play"
+                                             Style="{StaticResource st_VerticalStackButtonIcon}"
                                              />
                 </ControlTemplate>
             </shared:TimePoint.ButtonIcon>
@@ -74,8 +74,8 @@
         <shared:TimePoint Style="{StaticResource st_SelectedTimePoint}">
             <shared:TimePoint.ButtonIcon>
                 <ControlTemplate>
-                    <materialDesign:PackIcon Style="{StaticResource st_VerticalStackButtonIcon}"
-                                             Kind="Stop"
+                    <materialDesign:PackIcon Kind="Stop"
+                                             Style="{StaticResource st_VerticalStackButtonIcon}"
                                              />
                 </ControlTemplate>
             </shared:TimePoint.ButtonIcon>

@@ -245,6 +245,7 @@ module internal WorkEventRepository =
                 )
 
             try
+                deps.Logger.LogWorkEventInserting(workId, workEvent)
                 return! dbConnection.ExecuteScalarAsync<uint64>(command)
             with ex ->
                 deps.Logger.FailedToInsert(Table.NAME, ex)

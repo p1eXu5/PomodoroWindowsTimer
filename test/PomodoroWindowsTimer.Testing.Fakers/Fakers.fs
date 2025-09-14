@@ -97,12 +97,9 @@ let generateTimePointPrototype () =
 let ``0.5 sec`` = 0.5<sec>
 let ``3 sec`` = 3.0<sec>
 
-let mutable private num = 1
-
 let timePointFaker namePrefix =
     let kind = faker.Random.ArrayElement([| Kind.Work; Kind.Break; Kind.LongBreak |])
-    let id = Guid.Parse($"00000000-0000-0000-0000-000000000" + num.ToString("000"))
-    num <- num + 1
+    let id = faker.Random.Guid()
     {
         Id = id
         Name = (namePrefix, faker.Commerce.ProductName()) ||> sprintf "%s. %s"
@@ -117,6 +114,7 @@ let workTP (timeSpan: float<sec>) =
             with
                 TimeSpan = TimeSpan.FromSeconds(float timeSpan)
                 Kind = Kind.Work
+                KindAlias = Kind.Work |> Kind.alias
     }
 
 let namedWorkTP name (timeSpan: float<sec>) =
@@ -125,6 +123,7 @@ let namedWorkTP name (timeSpan: float<sec>) =
             with
                 TimeSpan = TimeSpan.FromSeconds(float timeSpan)
                 Kind = Kind.Work
+                KindAlias = Kind.Work |> Kind.alias
     }
 
 let breakTP (timeSpan: float<sec>) =
@@ -133,6 +132,7 @@ let breakTP (timeSpan: float<sec>) =
             with
                 TimeSpan = TimeSpan.FromSeconds(float timeSpan)
                 Kind = Kind.Break
+                KindAlias = Kind.Break |> Kind.alias
     }
 
 

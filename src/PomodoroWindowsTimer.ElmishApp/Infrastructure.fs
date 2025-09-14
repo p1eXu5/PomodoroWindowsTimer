@@ -111,6 +111,7 @@ module TelegramBot =
         }
 
     let init (userSettings: IBotSettings) =
+        let mutable skipNext = false
         { new ITelegramBot with
             member _.SendMessage message =
                 match userSettings.BotToken, userSettings.MyChatId with

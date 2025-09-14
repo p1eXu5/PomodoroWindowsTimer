@@ -10,6 +10,7 @@ open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.Storage.Configuration
+open Microsoft.Extensions.Logging
 
 type LooperStub (activeTimePoint: ActiveTimePoint option) =
     member val ResumeCalledTimes : int = 0 with get, set
@@ -89,9 +90,16 @@ module ErrorMessageQueueStub =
 [<RequireQualifiedAccess>]
 module ThemeSwitcherStub =
 
-    let create () =
+    let create (logger: ILogger<IThemeSwitcher>) =
         { new IThemeSwitcher with
-            member _.SwitchTheme _ = ()
+            member _.SwitchTheme kind =
+                match kind with
+                | TimePointKind.Break ->
+                    logger.LogDebug("Switching to Break Theme...")
+                | TimePointKind.Work ->
+                    logger.LogDebug("Switching to Work Theme...")
+                | _ ->
+                    logger.LogDebug("Switching to Unknown Theme...")
         }
 
 
