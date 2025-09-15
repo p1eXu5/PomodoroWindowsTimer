@@ -1,4 +1,7 @@
 ﻿# Release Notes
+## New in v3.2.1 (Released 2025/09/15)
+* Code optimization
+* Small fixes
 ## New in v3.2.0 (Released 2025/06/20)
 * Migrate on .NET 9.
 * Add work tags support.
