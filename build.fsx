@@ -1,4 +1,4 @@
-open System.IO.Compression
+﻿open System.IO.Compression
 
 #r "nuget: Fake.Api.GitHub, 6.1.3"
 #r "nuget: Fake.BuildServer.GitHubActions, 6.1.3"
@@ -39,7 +39,7 @@ Fake.Core.Context.setExecutionContextFromCommandLineArgs __SOURCE_FILE__
 // ------------------
 let [<Literal>] project = "./src/PomodoroWindowsTimer.WpfClient/PomodoroWindowsTimer.WpfClient.csproj"
 
-let [<Literal>] framework = "net8.0-windows"
+let [<Literal>] framework = "net9.0-windows"
 let [<Literal>] runtime = "win-x64"
 
 let [<Literal>] releaseRootDir = "./release"
