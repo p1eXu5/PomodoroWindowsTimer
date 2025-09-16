@@ -99,6 +99,7 @@ module WorkEventFeature =
         }
         |> Scenario.runTestAsync
 
+    // TODO: not stable
     [<Test>]
     let ``UC5-05: Start Work -> Stop Work -> Resume Work -> Next to Break -> Next to Work -> adds 4 events`` () =
         scenario {
