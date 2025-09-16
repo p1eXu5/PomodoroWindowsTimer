@@ -9,7 +9,7 @@
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              d:DataContext="{d:DesignInstance Type=TimePointListModel:Bindings,
                                               IsDesignTimeCreatable=False}"
-             d:DesignHeight="450"
+             d:DesignHeight="150"
              d:DesignWidth="800"
              mc:Ignorable="d"
              >
