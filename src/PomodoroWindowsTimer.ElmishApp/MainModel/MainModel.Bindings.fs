@@ -51,15 +51,15 @@ module Bindings =
         [
             nameof __.Title
                 |> Binding.oneWay (fun _ -> title)
-                |> Binding.addLazy (=)
+                |> Binding.addLazy (fun _ _ -> true)
 
             nameof __.AssemblyVersion
                 |> Binding.oneWay (fun _ -> assemblyVersion)
-                |> Binding.addLazy (=)
+                |> Binding.addLazy (fun _ _ -> true)
 
             nameof __.ErrorMessageQueue 
                 |> Binding.oneWay (fun _ -> mainErrorMessageQueue)
-                |> Binding.addLazy LanguagePrimitives.PhysicalEquality
+                |> Binding.addLazy (fun _ _ -> true)
 
             // -------------------------------------------------------------
     
@@ -67,6 +67,7 @@ module Bindings =
                 |> Binding.SubModel.required (TimePointListModel.Bindings.bindings)
                 |> Binding.mapModel _.TimePointList
                 |> Binding.mapMsg Msg.TimePointListModelMsg
+                // |> Binding.addLazy (fun m1 m2 -> m1.IsTimePointsShown = false && m2.IsTimePointsShown = false)
 
             nameof __.StartTimePointCommand
                 |> Binding.cmdParam (fun id -> (id :?> System.Guid) |> Msg.StartTimePoint)
@@ -76,12 +77,10 @@ module Bindings =
 
             nameof __.IsPlaying
                 |> Binding.oneWay (fun m -> m.Player |> PlayerModel.isPlaying)
-                |> Binding.addLazy (=)
 
             // Binding for selected running time point.
             nameof __.ActiveTime
                 |> Binding.oneWay (fun m -> m.Player |> PlayerModel.getRemainingTimeSpan)
-                |> Binding.addLazy (=)
 
             // ----------------------------------------------------
             // For the test purpose
