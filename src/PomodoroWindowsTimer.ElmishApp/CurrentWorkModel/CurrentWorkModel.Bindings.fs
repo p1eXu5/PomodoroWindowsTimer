@@ -21,8 +21,8 @@ module Bindings =
     let bindings () : Binding<CurrentWorkModel, CurrentWorkModel.Msg> list =
         [
             nameof __.Id |> Binding.oneWayOpt (_.Work >> Option.map _.Id)
-            nameof __.Number |> Binding.oneWay (_.Work >> Option.map _.Number)
-            nameof __.Title |> Binding.oneWay (_.Work >> Option.map _.Title)
+            nameof __.Number |> Binding.oneWayOpt (_.Work >> Option.map _.Number)
+            nameof __.Title |> Binding.oneWayOpt (_.Work >> Option.map _.Title)
             nameof __.LastEventCreatedAt |> Binding.oneWayOpt (_.Work >> Option.bind _.LastEventCreatedAt)
             nameof __.UpdatedAt |> Binding.oneWayOpt (_.Work >> Option.map _.UpdatedAt)
         ]
