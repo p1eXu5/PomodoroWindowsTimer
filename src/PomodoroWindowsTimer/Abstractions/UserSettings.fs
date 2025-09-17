@@ -5,6 +5,31 @@ open System.Collections.Specialized
 open System.Collections.Generic
 open System.Diagnostics.CodeAnalysis
 
+type IPatternSettings =
+    interface
+        abstract Patterns : Pattern list with get, set
+    end
+
+type ITimePointPrototypesSettings =
+    interface
+        abstract TimePointPrototypesSettings : string option with get, set
+    end
+
+type ITimePointSettings =
+    interface
+        abstract TimePointSettings : string option with get, set
+    end
+
+type IDisableSkipBreakSettings =
+    interface
+        abstract DisableSkipBreak : bool with get, set
+    end
+
+type ICurrentWorkItemSettings =
+    interface
+        abstract CurrentWork : Work option with get, set
+    end
+
 type IUserSettings =
     inherit IBotSettings
     inherit IPatternSettings
