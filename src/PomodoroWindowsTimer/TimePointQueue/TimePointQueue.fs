@@ -9,7 +9,7 @@ open Priority_Queue
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
-open PomodoroWindowsTimer
+open LoggingExtensions
 
 type private State =
     {
@@ -37,93 +37,6 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
     let isStarted = ref 0
     let replyTimeout = defaultArg timeout 1000<ms>
     
-    let startHandleMessage =
-        LoggerMessage.Define<string>(
-            LogLevel.Debug,
-            new EventId(0b0_0001_0001, "Start Handle TimePointQueue Message"),
-            "Start handling {TimePointQueueMsgName} message..."
-        )
-
-    let logStartHandle (scopeName: string) =
-        startHandleMessage.Invoke(logger, scopeName, null)
-
-    let messageScope =
-        LoggerMessage.DefineScope<string>(
-            "Scope of message: {TimePointQueueMsgName}"
-        )
-
-    let beginScope (scopeName: string) =
-        let scope = messageScope.Invoke(logger, scopeName)
-        logStartHandle scopeName
-        scope
-
-    let startHandleWithArgMessage =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Trace,
-            new EventId(0b0_0001_0001, "Start Handle TimePointQueue Message"),
-            "Start handling {TimePointQueueMsgName} message with args: {MsgArgs}..."
-        )
-
-    let logStartHandleWithArgs (scopeName: string) (args: 'a) =
-        if logger.IsEnabled(LogLevel.Trace) then
-            let json = JsonHelpers.Serialize args
-            startHandleWithArgMessage.Invoke(logger, scopeName, json, null)
-        else
-            startHandleWithArgMessage.Invoke(logger, scopeName, args.GetType().Name, null)
-
-    let beginScopeWithArgs (scopeName: string) (args: 'a) =
-        let scope = messageScope.Invoke(logger, scopeName)
-        logStartHandleWithArgs scopeName args
-        scope
-
-    //let newStateMessage =
-    //    LoggerMessage.Define<string>(
-    //        LogLevel.Trace,
-    //        new EventId(0b0_0001_0010, "New TimePointQueue State"),
-    //        "New State: {NewState}"
-    //    )
-
-    //let logNewState (state: State) =
-    //    if logger.IsEnabled(LogLevel.Trace) then
-    //        let stateJson = JsonHelpers.Serialize(state)
-    //        newStateMessage.Invoke(logger, stateJson, null)
-
-    let timePointsMessage =
-        LoggerMessage.Define<string>(
-            LogLevel.Trace,
-            new EventId(0b0_0001_0011, "TimePointQueue TimePoint List"),
-            "TimePoint list: {TimePointList}"
-        )
-
-    let logTimePoints l =
-        if logger.IsEnabled(LogLevel.Trace) then
-            let json = JsonHelpers.Serialize(l)
-            timePointsMessage.Invoke(logger, json, null)
-
-    let nextTimePointMessage =
-        LoggerMessage.Define<string, float32>(
-            LogLevel.Trace,
-            new EventId(0b0_0001_0100, "Next TimePointQueue TimePoint"),
-            "Replying with the next TimePoint: {TimePoint} with priority {Priority}"
-        )
-
-    let logNextTimePoint (tp: TimePoint) (priority: float32) =
-        if logger.IsEnabled(LogLevel.Trace) then
-            let json = JsonHelpers.Serialize(tp)
-            nextTimePointMessage.Invoke(logger, json, priority, null)
-
-    let endHandleMessage =
-        LoggerMessage.Define<string>(
-            LogLevel.Debug,
-            new EventId(0b0_0001_1000, "End Handle TimePointQueue Message"),
-            "{TimePointQueueMsgName} has been handled."
-        )
-
-    let closeScope (scope: IDisposable | null) (msgName: string) =
-        endHandleMessage.Invoke(logger, msgName, null)
-        scope
-        |> function NonNull s -> s.Dispose() | _ -> ()
-
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->
             let rec loop state =
@@ -132,13 +45,12 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
                     match msg with
                     | Reset ->
-                        use scope = beginScope (nameof Reset)
+                        use _ = logger.BeginHandle(nameof Reset)
                         let newState = State.Default
-                        closeScope scope (nameof Reset)
                         return! loop newState
 
                     | AddMany (timePoints, reply) ->
-                        use scope = beginScope (nameof AddMany)
+                        use _ = logger.BeginHandle(nameof AddMany)
 
                         let maxPriority =
                             timePoints
@@ -152,33 +64,30 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
                         reply.Reply()
 
-                        closeScope scope (nameof AddMany)
                         return! loop state
 
 
                     | GetAllWithPriority reply ->
-                        use scope = beginScope (nameof GetAllWithPriority)
+                        use _ = logger.BeginHandle(nameof GetAllWithPriority)
                         let xtp =
                             seq {
                                 for tp in state.Queue do
                                     yield (tp, state.Queue.GetPriority(tp))
                             }
                             |> Seq.sortBy snd
-                        logTimePoints xtp
+                        logger.LogTimePoints(xtp)
                         reply.Reply xtp
 
-                        closeScope scope (nameof GetAllWithPriority)
                         return! loop state
 
                     | ScrollTo (id, reply) when state.Queue.Count = 0 ->
-                        use scope = beginScopeWithArgs (nameof ScrollTo) id
+                        use _ = logger.BeginHandle(nameof ScrollTo, id)
                         logger.LogDebug("Queue is empty")
                         reply.Reply(())
-                        closeScope scope (nameof ScrollTo)
                         return! loop state
 
                     | ScrollTo (id, reply) ->
-                        use scope = beginScopeWithArgs (nameof ScrollTo) id
+                        use _ = logger.BeginHandle(nameof ScrollTo, id)
                         let minPriority = -(float32 state.Queue.Count)
 
                         let timePoints =
@@ -216,18 +125,16 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
 
                         reply.Reply(())
 
-                        closeScope scope (nameof ScrollTo)
                         return! loop state
 
                     | GetNext reply when state.Queue.Count = 0 ->
-                        use scope = beginScope (nameof GetNext)
+                        use _ = logger.BeginHandle(nameof GetNext)
                         logger.LogDebug("Queue is empty")
                         reply.Reply(None)
-                        closeScope scope (nameof GetNext)
                         return! loop state
 
                     | GetNext reply ->
-                        use scope = beginScope (nameof GetNext)
+                        use _ = logger.BeginHandle(nameof GetNext)
 
                         let tp = state.Queue.First
                         let priority = state.Queue.GetPriority(tp)
@@ -236,14 +143,13 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                         let state = { state with MaxPriority = state.MaxPriority + 1f }
                         // logNewState state
 
-                        logNextTimePoint tp priority
+                        logger.LogNextTimePoint(tp, priority)
                         reply.Reply(tp |> Some)
 
-                        closeScope scope (nameof GetNext)
                         return! loop state
 
                     | Pick reply ->
-                        use scope = beginScope (nameof Pick)
+                        use _ = logger.BeginHandle(nameof Pick)
 
                         if state.Queue.Count = 0 then
                             logger.LogDebug("Queue is empty")
@@ -251,10 +157,9 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
                         else
                             let tp = state.Queue.First
                             let priority = state.Queue.GetPriority(tp)
-                            logNextTimePoint tp priority
+                            logger.LogNextTimePoint(tp, priority)
                             reply.Reply(tp |> Some)
 
-                        closeScope scope (nameof Pick)
                         return! loop state
 
                     | TryFind (id, reply) ->
@@ -287,7 +192,6 @@ type TimePointQueue(timePoints: TimePoint seq, logger: ILogger<TimePointQueue>, 
         this.AddMany(timePoints)
 
     member _.TryPick() =
-
         _agent.PostAndReply(Pick, int replyTimeout)
 
     member _.ScrollTo(id: Guid) =
