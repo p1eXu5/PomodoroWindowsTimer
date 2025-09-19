@@ -17,14 +17,47 @@
              mc:Ignorable="d"
              >
     <!--  content  -->
-    <DockPanel LastChildFill="True">
-        <!--  PlayerModel flags  -->
-        <local:PlayerSettings DockPanel.Dock="Bottom"
-                              DataContext="{Binding Player}"
-                              />
+    <ContentControl Content="{Binding TimePointsDrawer}">
+        <ContentControl.Style>
+            <Style TargetType="ContentControl">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding TimePointsDrawer.IsRunningTimePointListLoaded}"
+                                 Value="True"
+                                 >
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate DataType="{x:Type TimePointsDrawerModel:IBindings}">
+                                    <DockPanel DataContext="{Binding RunningTimePointList}"
+                                               LastChildFill="True"
+                                               >
+                                        <local:PlayerSettings DockPanel.Dock="Bottom"
+                                                              DataContext="{Binding}"
+                                                              />
 
-        <local:RunningTimePoints DockPanel.Dock="Top"
-                                 DataContext="{Binding TimePointList}"
-                                 />
-    </DockPanel>
+                                        <local:RunningTimePoints DockPanel.Dock="Top"
+                                                                 DataContext="{Binding}"
+                                                                 />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding TimePointsDrawer.IsTimePointsGeneratorLoaded}"
+                                 Value="True"
+                                 >
+                        <Setter Property="ContentTemplate">
+                            <Setter.Value>
+                                <DataTemplate DataType="{x:Type TimePointsDrawerModel:IBindings}">
+                                    <DockPanel LastChildFill="True">
+                                        <local:TimePointsGenerator DataContext="{Binding TimePointsGenerator}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ContentControl.Style>
+    </ContentControl>
+
 </UserControl>
