@@ -86,6 +86,10 @@ internal static class DependencyInjectionExtensions
         services.TryAddSingleton<IDatabaseSettings>(sp =>
             sp.GetRequiredService<IUserSettings>()
         );
+
+        services.TryAddSingleton<ITimePointSettings>(sp =>
+            sp.GetRequiredService<IUserSettings>()
+        );
     }
 
     public static void AddErrorMessageQueue(this IServiceCollection services)
