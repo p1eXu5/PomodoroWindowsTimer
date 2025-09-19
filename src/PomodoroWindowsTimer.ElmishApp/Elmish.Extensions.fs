@@ -103,6 +103,14 @@ module Model =
     let inline mapci get set cmdf intentf updatef model =
         model |> get |> updatef |> fun (m, cmd, intent) -> m |> flip set model, Cmd.batch [ Cmd.map cmdf cmd; intentf intent ]
 
+    /// ('ModelA * 'Cmd) -> ... -> ('ModelB * 'Cmd list)
+    let inline mapmc updatef (model, cmd) =
+        model |> updatef
+        |> fun (model', cmd') -> model', Cmd.batch [ cmd; cmd' ]
+
+    let inline withIntentc intent (model, cmd) =
+        model, cmd, intent
+
 [<AutoOpen>]
 module List =
 
