@@ -33,8 +33,10 @@ internal static class DependencyInjectionExtensions
     public static void AddTimePointQueue(this IServiceCollection services)
         => services.TryAddSingleton<ITimePointQueue>(sp =>
         {
-            ILogger<TimePointQueue> logger = sp.GetRequiredService<ILogger<TimePointQueue>>();
-            return new TimePointQueue(logger);
+            var timePointStore = sp.GetRequiredService<TimePointStore>();
+            var logger = sp.GetRequiredService<ILogger<TimePointQueue>>();
+            var tickMs = Settings.Default.TickMilliseconds;
+            return new TimePointQueue(timePointStore, logger, tickMs, default);
         });
 
     public static void AddLooper(this IServiceCollection services)
