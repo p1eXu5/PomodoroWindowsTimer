@@ -21,6 +21,7 @@ module TimePointPrototypeModel =
 
 namespace PomodoroWindowsTimer.ElmishApp.TimePointPrototypeModel
 
+open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.TimePointPrototypeModel
 
@@ -33,17 +34,26 @@ module Program =
         | SetName v ->
             { model with Prototype.Name = v }
 
+type IBindings =
+    interface
+        abstract Name: string
+        abstract Kind: Kind
+        abstract KindAlias: string // TODO: get rid, move to views
+        abstract TimeSpan: string // TODO: change to TimeSpan
+    end
+
 module Bindings =
 
     open Elmish.WPF
-    open PomodoroWindowsTimer.Types
+
+    let private __ = Unchecked.defaultof<IBindings>
 
     let bindings () : Binding<TimePointPrototypeModel, TimePointPrototypeModel.Msg> list =
         [
-            "Name" |> Binding.oneWay (fun m -> m.Prototype.Name)
-            "Kind" |> Binding.oneWay (fun m -> m.Prototype.Kind)
-            "KindAlias" |> Binding.oneWay (_.Prototype.Alias >> Alias.value)
-            "TimeSpan" |> Binding.twoWay ((fun m -> m.Prototype.TimeSpan.ToString("h':'mm")), Msg.SetTimeSpan)
+            nameof __.Name |> Binding.oneWay (fun m -> m.Prototype.Name)
+            nameof __.Kind |> Binding.oneWay (fun m -> m.Prototype.Kind)
+            nameof __.KindAlias |> Binding.oneWay (_.Prototype.Alias >> Alias.value)
+            nameof __.TimeSpan |> Binding.twoWay ((fun m -> m.Prototype.TimeSpan.ToString("h':'mm")), Msg.SetTimeSpan)
         ]
 
 
