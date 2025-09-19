@@ -33,7 +33,7 @@ let inline private switchThemeCmd (themeSwitcher: IThemeSwitcher) timePointKind 
 
 
 /// Msg.SetDisableSkipBreak handler.
-let private setDisableSkipBreak (settings: IDisableSkipBreakSettings) v (model: PlayerModel) =
+let private setDisableSkipBreak (settings: IPlayerUserSettings) v (model: PlayerModel) =
     model |> withDisableSkipBreak v
     , Cmd.OfFunc.attempt (fun() -> settings.DisableSkipBreak <- v) () Msg.OnExn
     , Intent.None
@@ -164,9 +164,11 @@ let private mapLooperEvent (windowsMinimizer: IWindowsMinimizer) (themeSwitcher:
         , cmd
         , Intent.None
 
-    | LooperEvent.TimePointStopped _ ->
-        // stub
-        model |> withNoCmdAndIntent
+    | LooperEvent.TimePointStopped (atp, _) ->
+        model
+        |> withActiveTimePoint (atp |> Some)
+        |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        , Cmd.none, Intent.None
 
 
 /// Msg.PreChangeActiveTimeSpan handler.
@@ -334,7 +336,7 @@ let update
     (timeProvider: System.TimeProvider)
     (workEventStore: WorkEventStore)
     (themeSwitcher: IThemeSwitcher)
-    (settings: IDisableSkipBreakSettings)
+    (playerUserSettings: IPlayerUserSettings)
     (timePointQueue: ITimePointQueue)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<PlayerModel>)
@@ -345,10 +347,21 @@ let update
     // Settings
     // ------------------
     | Msg.SetDisableSkipBreak v ->
-        model |> setDisableSkipBreak settings v
+        model
+        , Cmd.OfFunc.attempt (fun v' -> playerUserSettings.DisableSkipBreak <- v') v Msg.OnExn
+        , Intent.None
 
     | Msg.SetDisableMinimizeMaximizeWindows v ->
-        model |> withDisableMinimizeMaximizeWindows v |> withNoCmdAndIntent
+        model
+        , Cmd.OfFunc.attempt (fun v' -> playerUserSettings.DisableMinimizeMaximizeWindows <- v') v Msg.OnExn
+        , Intent.None
+
+    | Msg.PlayerUserSettingsChanged ->
+        model
+        |> withDisableSkipBreak playerUserSettings.DisableSkipBreak
+        |> withDisableMinimizeMaximizeWindows playerUserSettings.DisableMinimizeMaximizeWindows
+        , Cmd.none
+        , Intent.None
 
     // ------------------
 

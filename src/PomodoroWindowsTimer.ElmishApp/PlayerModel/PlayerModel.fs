@@ -49,6 +49,7 @@ module PlayerModel =
         | LooperMsg of LooperEvent
         | SetDisableSkipBreak of bool
         | SetDisableMinimizeMaximizeWindows of bool
+        | PlayerUserSettingsChanged
         | StartTimePoint of Operation<Guid, unit>
         | Play
         | Next
@@ -102,6 +103,7 @@ module PlayerModel =
                 |> Option.map (Result.map (fun (deff, list) -> (deff, list, atp)))
             | _ -> None
 
+    // ---------------------------------------------------
 
     [<RequireQualifiedAccess>]
     type Intent =
@@ -115,7 +117,7 @@ module PlayerModel =
 
     // ---------------------------------------------------
 
-    let init (usrSettings: IUserSettings) =
+    let init (playerUserSettings: IPlayerUserSettings) =
         {
             ActiveTimePoint = None
             
@@ -124,8 +126,8 @@ module PlayerModel =
 
             ShiftAndPreShiftTimes = None
 
-            DisableSkipBreak = usrSettings.DisableSkipBreak
-            DisableMinimizeMaximizeWindows = false
+            DisableSkipBreak = playerUserSettings.DisableSkipBreak
+            DisableMinimizeMaximizeWindows = playerUserSettings.DisableMinimizeMaximizeWindows
 
             RetrieveWorkSpentTimesState = AsyncDeferredState.NotRequested
         }
