@@ -263,6 +263,9 @@ type Looper(
         , defaultArg cancellationToken CancellationToken.None
     )
 
+    let timePointQueueSubscriber =
+        timePointQueue.TimePointsChanged.Subscribe(fun _ -> agent.Post(Msg.PreloadTimePoint))
+
     member val private Subscribers = [] with get, set
 
     member val TimePointQueue = timePointQueue with get
@@ -290,11 +293,11 @@ type Looper(
                         agent.Post(Tick)
                     )
 
-            timePointQueue.Start()
             notifierAgent.Start()
             agent.Start()
             do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
             agent.Post(Stop)
+            timePointQueue.Start()
 
     member _.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) =
         ObjectDisposedException.ThrowIf(_isDisposed, this)
@@ -350,6 +353,7 @@ type Looper(
                 notifierAgent.Post(() |> Choice2Of2)
                 (agent :> IDisposable).Dispose()
                 (notifierAgent :> IDisposable).Dispose()
+                timePointQueueSubscriber.Dispose()
                 timePointQueue.Dispose()
 
             _isDisposed <- true
