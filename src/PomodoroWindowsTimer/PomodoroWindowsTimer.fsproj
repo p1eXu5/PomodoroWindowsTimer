@@ -37,6 +37,7 @@
     <Compile Include="Projectors\LinearDiagramProjector.fs" />
     <Compile Include="ExcelExporter.fs" />
     <Compile Include="EventToTestExporter.fs" />
+    <Compile Include="DatabaseSettingsExtensions.fs" />
   </ItemGroup>
 
   <ItemGroup>
