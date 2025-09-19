@@ -14,6 +14,7 @@ using PomodoroWindowsTimer.Looper;
 using PomodoroWindowsTimer.Storage.Configuration;
 using PomodoroWindowsTimer.TimePointQueue;
 using PomodoroWindowsTimer.WpfClient;
+using PomodoroWindowsTimer.WpfClient.Properties;
 using PomodoroWindowsTimer.WpfClient.Services;
 
 namespace DrugRoom.WpfClient;
