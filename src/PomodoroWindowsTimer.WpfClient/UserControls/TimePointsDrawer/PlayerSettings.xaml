@@ -4,13 +4,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DesignHeight="450"
+             d:DesignHeight="95"
              d:DesignWidth="800"
              mc:Ignorable="d"
              >
     <StackPanel>
         <!--  Disable skip break  -->
-        <StackPanel Margin="10,0"
+        <StackPanel Margin="10"
                     Orientation="Horizontal"
                     >
             <ToggleButton Focusable="False"
