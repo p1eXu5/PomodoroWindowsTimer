@@ -39,36 +39,6 @@ module TimePointPrototypeStore =
         }
 
 
-type TimePointStore =
-    {
-        Read: unit -> TimePoint list
-        Write: TimePoint list -> unit
-    }
-
-module TimePointStore =
-
-    let read (timePointSettings : ITimePointSettings) =
-        timePointSettings.TimePointSettings
-        |> Option.map (fun s ->
-            JsonHelpers.Deserialize<TimePoint list>(s)
-        )
-        |> Option.defaultValue TimePoint.defaults
-
-
-    let write (timePointSettings : ITimePointSettings) (timePoints: TimePoint list) =
-        match timePoints with
-        | [] ->
-            timePointSettings.TimePointSettings <- None
-        | _ ->
-            let s = JsonHelpers.Serialize(timePoints)
-            timePointSettings.TimePointSettings <- s |> Some
-
-
-    let initialize (timePointSettings : ITimePointSettings) : TimePointStore =
-        {
-            Read = fun () -> read timePointSettings
-            Write = write timePointSettings
-        }
 
 
 type PatternStore =
