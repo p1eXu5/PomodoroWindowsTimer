@@ -49,7 +49,7 @@ let private endHandleMessage =
 type internal LoggerExtensions () =
 
     [<Extension>]
-    static member BeginHandle(logger: ILogger, msgName: string) =
+    static member BeginHandleScope(logger: ILogger, msgName: string) =
         let scope = messageScope.Invoke(logger, msgName)
         startHandleMessage.Invoke(logger, msgName, null)
         { new System.IDisposable with
@@ -60,7 +60,7 @@ type internal LoggerExtensions () =
         }
 
     [<Extension>]
-    static member BeginHandle(logger: ILogger, msgName: string, args: obj) =
+    static member BeginHandleScope(logger: ILogger, msgName: string, args: obj) =
         let scope = messageScope.Invoke(logger, msgName)
         logger.LogStartHandleMsg(msgName, args)
         { new System.IDisposable with
@@ -83,7 +83,13 @@ type internal LoggerExtensions () =
             startHandleWithArgMessage.Invoke(logger, msgName, args.GetType().Name, null)
 
     [<Extension>]
-    static member LogTimePoints(logger: ILogger, timePoints: (TimePoint * float32) seq) =
+    static member LogTimePointPriorities(logger: ILogger, timePoints: (TimePoint * float32) seq) =
+        if logger.IsEnabled(LogLevel.Trace) then
+            let json = JsonHelpers.Serialize(timePoints)
+            timePointsMessage.Invoke(logger, json, null)
+
+    [<Extension>]
+    static member LogTimePoints(logger: ILogger, timePoints: (TimePoint) seq) =
         if logger.IsEnabled(LogLevel.Trace) then
             let json = JsonHelpers.Serialize(timePoints)
             timePointsMessage.Invoke(logger, json, null)
