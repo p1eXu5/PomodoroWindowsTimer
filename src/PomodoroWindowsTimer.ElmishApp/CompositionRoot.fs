@@ -5,7 +5,6 @@ open Microsoft.Extensions.Logging
 
 open Elmish
 
-open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 
 open PomodoroWindowsTimer.ElmishApp
@@ -32,7 +31,6 @@ let compose
     =
     let patternStore = PatternStore.init userSettings
     let timePointPrototypeStore = TimePointPrototypeStore.initialize userSettings
-    let timePointStore = TimePointStore.initialize userSettings
 
     // TODO: remove
     // let mainModelCfg =
@@ -59,31 +57,46 @@ let compose
         let initCurrentWorkModel () =
             CurrentWorkModel.init userSettings (workEventStore.GetWorkRepository())
 
-        MainModel.init userSettings timePointStore initCurrentWorkModel
+        MainModel.init userSettings initCurrentWorkModel
 
     // update
     let updateMainModel =
+        // -------------------------
+        // BotSettingsModel
+        // -------------------------
         let initBotSettingsModel () =
             BotSettingsModel.init userSettings
 
         let updateBotSettingsModel =
             BotSettingsModel.Program.update userSettings
 
+        // -------------------------
+        // DatabaseSettingsModel
+        // -------------------------
         let initDatabaseSettingsModel () =
             DatabaseSettingsModel.init userSettings
 
         let updateDatabaseSettingsModel =
             DatabaseSettingsModel.Program.update userSettings
 
+        // -------------------------
+        // TimePointsGeneratorModel
+        // -------------------------
         let initTimePointGeneratorModel () =
             TimePointsGeneratorModel.init timePointPrototypeStore patternStore
 
         let updateTimePointGeneratorModel =
             TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore dialogErrorMessageQueue
 
+        // -------------------------
+        // WorkEventListModel
+        // -------------------------
         let updateWorkEventListModel =
             WorkEventListModel.Program.update workEventStore dialogErrorMessageQueue (loggerFactory.CreateLogger<WorkEventListModel>())
 
+        // -------------------------
+        // DailyStatisticModel
+        // -------------------------
         let updateDailyStatisticModel =
             DailyStatisticModel.Program.update
                 timeProvider
@@ -92,6 +105,9 @@ let compose
                 dialogErrorMessageQueue
                 (loggerFactory.CreateLogger<DailyStatisticModel>())
 
+        // -------------------------
+        // DailyStatisticListModel
+        // -------------------------
         let initDailyStatisticListModel =
             fun () ->
                 DailyStatisticListModel.init
@@ -108,12 +124,21 @@ let compose
                 updateDailyStatisticModel
                 updateWorkEventListModel
 
+        // -------------------------
+        // RollbackWorkModel
+        // -------------------------
         let updateRollbackWorkModel =
             RollbackWorkModel.Program.update userSettings
 
+        // -------------------------
+        // RollbackWorkListModel
+        // -------------------------
         let updateRollbackWorkListModel =
             RollbackWorkListModel.Program.update updateRollbackWorkModel
 
+        // -------------------------
+        // AppDialogModel
+        // -------------------------
         let updateAppDialogModel =
             AppDialogModel.Program.update
                 workEventStore
@@ -126,21 +151,41 @@ let compose
                 updateRollbackWorkModel
                 updateRollbackWorkListModel
 
+        // -------------------------
+        // WorkModel
+        // -------------------------
         let updateWorkModel =
             WorkModel.Program.update workEventStore (loggerFactory.CreateLogger<WorkModel>()) mainErrorMessageQueue
 
+        // -------------------------
+        // WorkListModel
+        // -------------------------
         let updateWorkListModel =
-            WorkListModel.Program.update userSettings workEventStore (loggerFactory.CreateLogger<WorkListModel>()) mainErrorMessageQueue updateWorkModel
+            WorkListModel.Program.update
+                userSettings
+                workEventStore
+                (loggerFactory.CreateLogger<WorkListModel>())
+                mainErrorMessageQueue
+                updateWorkModel
 
+        // -------------------------
+        // CreatingWorkModel
+        // -------------------------
         let updateCreatingWorkModel =
             CreatingWorkModel.Program.update workEventStore mainErrorMessageQueue (loggerFactory.CreateLogger<CreatingWorkModel>())
 
+        // -------------------------
+        // WorkSelectorModel
+        // -------------------------
         let initWorkSelectorModel =
             WorkSelectorModel.init userSettings
 
         let updateWorkSelectorModel =
             WorkSelectorModel.Program.update updateWorkListModel updateCreatingWorkModel updateWorkModel (loggerFactory.CreateLogger<WorkSelectorModel>())
 
+        // -------------------------
+        // StatisticMainModel
+        // -------------------------
         let initStatisticMainModel () =
             StatisticMainModel.init userSettings timeProvider
 
@@ -150,9 +195,22 @@ let compose
                 updateWorkListModel
                 (loggerFactory.CreateLogger<StatisticMainModel>())
 
-        let updateTimePointListModel =
-            TimePointListModel.Program.update
+        // -------------------------
+        // RunningTimePointListModel
+        // -------------------------
+        let initRunningTimePointListModel =
+            fun () ->
+                RunningTimePointListModel.init timePointQueue userSettings
 
+        let updateRunningTimePointListModel =
+            RunningTimePointListModel.Program.update
+                userSettings
+                mainErrorMessageQueue
+                (loggerFactory.CreateLogger<RunningTimePointListModel>())
+
+        // -------------------------
+        // CurrentWorkModel
+        // -------------------------
         let updateCurrentWorkModel =
             CurrentWorkModel.Program.update
                 userSettings
@@ -163,6 +221,9 @@ let compose
                 mainErrorMessageQueue
                 (loggerFactory.CreateLogger<CurrentWorkModel>())
 
+        // -------------------------
+        // PlayerModel
+        // -------------------------
         let updatePlayerModel =
             PlayerModel.Program.update
                 looper
@@ -175,16 +236,24 @@ let compose
                 mainErrorMessageQueue 
                 (loggerFactory.CreateLogger<PlayerModel>())
 
+        // -------------------------
+        // TimePointsDrawerModel
+        // -------------------------
+        let updateTimePointsDrawerModel =
+            TimePointsDrawerModel.Program.update
+                (loggerFactory.CreateLogger<TimePointsDrawerModel>())
+                updateRunningTimePointListModel
+                initTimePointGeneratorModel
+                updateTimePointGeneratorModel
+
         MainModel.Program.update
-            looper
-            timePointQueue
-            timePointStore
             telegramBot
             mainErrorMessageQueue
             (loggerFactory.CreateLogger<MainModel>())
             updatePlayerModel
             updateCurrentWorkModel
-            updateTimePointListModel
+            initRunningTimePointListModel
+            updateTimePointsDrawerModel
             updateAppDialogModel
             initWorkSelectorModel
             updateWorkSelectorModel
