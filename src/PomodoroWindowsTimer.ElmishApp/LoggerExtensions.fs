@@ -8,6 +8,7 @@ let private mssageScope = LoggerMessage.DefineScope<string>(
     "Scope of Message: {Msg}."
 )
 
+/// Define LoggerMessage for 'Msg and 'Model string representations.
 let private unprocessedMessage = LoggerMessage.Define<string, string>(
     LogLevel.Warning,
     new EventId(0b0_1111_0001, "Unprocessabele Elmish Message"),
