@@ -10,12 +10,12 @@
         Title="StartupWindow"
         Width="498"
         Height="200"
-        Background="Black"
-        Closing="Window_Closing"
-        ResizeMode="NoResize"
         TextElement.FontSize="13"
         TextElement.FontWeight="Regular"
         TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+        Background="Black"
+        Closing="Window_Closing"
+        ResizeMode="NoResize"
         Topmost="True"
         WindowStartupLocation="CenterScreen"
         WindowStyle="ToolWindow"
@@ -28,45 +28,45 @@
             <shared:DatabaseSelector x:Name="m_DatabaseSelector"
                                      Margin="10"
                                      Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
-                                     Visibility="Collapsed"
                                      ShowCloseButton="false"
+                                     Visibility="Collapsed"
                                      />
 
             <pwt:BlackMirrorSpinner x:Name="m_Spinner"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
+                                    Background="#55000000"
                                     LabelVisibility="Visible"
                                     Radius="30"
                                     Text="Loading Pomodoro Windows Timer ..."
-                                    Background="#55000000"
                                     />
-            <Grid x:Name="m_ErrorGrid"
-                  VerticalAlignment="Center"
-                  Visibility="Collapsed"
-                  >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Label HorizontalAlignment="Center"
-                       Foreground="Red"
+            <DockPanel x:Name="m_ErrorGrid"
+                       VerticalAlignment="Stretch"
+                       Visibility="Collapsed"
+                       >
+
+                <Label DockPanel.Dock="Top"
+                       HorizontalAlignment="Center"
                        FontWeight="Bold"
+                       Foreground="Red"
                        >
                     Error
                 </Label>
-                <TextBlock Grid.Row="1"
-                           x:Name="m_ErrorText"
-                           HorizontalAlignment="Center"
-                           TextWrapping="Wrap"
-                           />
-                <Button Grid.Row="2"
+                <Button DockPanel.Dock="Bottom"
+                        HorizontalAlignment="Center"
+                        Click="ErrorGridOkButtonClick"
                         Content="OK"
                         Style="{StaticResource MaterialDesignFlatDarkButton}"
-                        HorizontalAlignment="Center"
-                        Click="Button_Click"
                         />
-            </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="m_ErrorText"
+                               Grid.Row="1"
+                               Margin="5"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               />
+                </ScrollViewer>
+            </DockPanel>
         </Grid>
     </pwt:GlossOnBase>
 </Window>

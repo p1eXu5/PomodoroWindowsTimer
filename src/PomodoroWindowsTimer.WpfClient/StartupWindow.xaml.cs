@@ -14,6 +14,7 @@ public partial class StartupWindow : Window
     private readonly IMainEntryPoint _mainEntryPoint;
     private IUserSettings? _userSettings;
     private string? _databaseFilePath;
+    private bool _isCritical;
 
     public StartupWindow(IMainEntryPoint mainEntryPoint)
     {
@@ -50,16 +51,23 @@ public partial class StartupWindow : Window
         m_DatabaseSelector.Visibility = Visibility.Visible;
     }
 
-    internal void ShowError(string error)
+    internal void ShowError(string error, bool isCritical)
     {
+        _isCritical = isCritical;
         m_Spinner.Visibility = Visibility.Collapsed;
         m_DatabaseSelector.Visibility = Visibility.Collapsed;
         m_ErrorGrid.Visibility = Visibility.Visible;
         m_ErrorText.Text = error;
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
+    private void ErrorGridOkButtonClick(object sender, RoutedEventArgs e)
     {
+        if (_isCritical)
+        {
+            DialogResult = true;
+            return;
+        }
+
         m_ErrorGrid.Visibility = Visibility.Collapsed;
         m_DatabaseSelector.Visibility = Visibility.Visible;
         m_DatabaseSelector.IsEnabled = true;

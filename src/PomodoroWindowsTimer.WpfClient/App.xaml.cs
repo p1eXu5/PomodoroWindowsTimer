@@ -45,13 +45,32 @@ public partial class App : Application
         {
             Dispatcher.BeginInvoke(() =>
             {
-                startupWindow.Show();
+                if (startupWindow.ShowDialog() == true)
+                {
+                    Shutdown(666);
+                }
             });
         });
 
         Task.Run(async () =>    
         {
-            BootstrapApplication(e);
+            try
+            {
+                BootstrapApplication(e);
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.BeginInvoke(() =>
+                {
+#if DEBUG
+                    startupWindow.ShowError(ex.Message, true);
+#else
+                    startupWindow.ShowError("Critical error!", true);
+#endif
+                });
+
+                return;
+            }
 
             await Dispatcher.BeginInvoke(() =>
             {
@@ -84,7 +103,7 @@ public partial class App : Application
 
                         await Dispatcher.BeginInvoke(() =>
                         {
-                            startupWindow.ShowError(res.ErrorValue);
+                            startupWindow.ShowError(res.ErrorValue, false);
                         });
 
                         continue;
