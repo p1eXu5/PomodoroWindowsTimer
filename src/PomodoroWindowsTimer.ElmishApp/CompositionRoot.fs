@@ -216,7 +216,5 @@ let compose
             }
         [ ["Looper"], looperSubscription ]
 
-    // initialization
-    looper.Start()
     (initMainModel, updateMainModel, mainModelBindings, subscribe)
 

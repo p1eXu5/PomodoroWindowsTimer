@@ -54,3 +54,5 @@ let main
     |> WpfProgram.withSubscription subscribe
     |> WpfProgram.startElmishLoop window
 
+    looper.Start()
+
