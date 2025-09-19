@@ -27,7 +27,7 @@
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Stretch"
                                BorderThickness="0"
-                               IsLeftDrawerOpen="{Binding IsTimePointsShown}"
+                               IsLeftDrawerOpen="{Binding IsTimePointsDrawerShown}"
                                IsRightDrawerOpen="{Binding IsWorkSelectorLoaded}"
                                LeftDrawerBackground="Transparent"
                                LeftDrawerCloseOnClickAway="True"
@@ -54,8 +54,8 @@
         <DockPanel Margin="10,0,10,0"
                    LastChildFill="True"
                    >
-            <local:MainMenu DataContext="{Binding}"
-                            DockPanel.Dock="Top"
+            <local:MainMenu DockPanel.Dock="Top"
+                            DataContext="{Binding}"
                             />
 
             <materialDesign:ColorZone x:Name="m_ColorZone"

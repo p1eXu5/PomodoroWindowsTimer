@@ -44,7 +44,7 @@
         <!--  running time points  -->
         <ToggleButton DockPanel.Dock="Left"
                       Content="{materialDesign:PackIcon TimerPlayOutline}"
-                      IsChecked="{Binding IsTimePointsShown}"
+                      IsChecked="{Binding IsTimePointsDrawerShown}"
                       Style="{StaticResource st_MenuToggleButton}"
                       ToolTip="Playlist"
                       />
