@@ -177,7 +177,7 @@ public abstract class BootstrapBase : IDisposable
         else
         {
             cfg = cfg
-                .MinimumLevel.Information()
+                .MinimumLevel.Verbose()
                 .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
                 .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Verbose)
@@ -215,7 +215,9 @@ public abstract class BootstrapBase : IDisposable
         Log.Logger = cfg.CreateLogger();
 
         // Add Serilog to the logging builder
-        loggingBuilder.AddSerilog(Log.Logger, dispose: true);
+        loggingBuilder
+            .ClearProviders()
+            .AddSerilog(Log.Logger, dispose: true);
     }
 
     /// <summary>
