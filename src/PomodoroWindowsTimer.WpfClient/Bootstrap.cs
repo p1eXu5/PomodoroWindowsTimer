@@ -93,6 +93,7 @@ internal class Bootstrap : BootstrapBase
         services.AddWorkEventStorage(hostBuilderCtx.Configuration);
         services.AddExcelBook();
         services.AddElmishAppServices();
+        services.AddTimePointStore();
 
         if (!hostBuilderCtx.Configuration.GetValue<bool>("InTest"))
         {

@@ -23,6 +23,13 @@ internal static class DependencyInjectionExtensions
     public static void AddTimeProvider(this IServiceCollection services)
         => services.TryAddSingleton(TimeProvider.System);
 
+    public static void AddTimePointStore(this IServiceCollection services)
+        => services.TryAddSingleton(sp => 
+        {
+            var tpSettings = sp.GetRequiredService<IUserSettings>();
+            return TimePointStoreModule.Initialize(tpSettings);
+        });
+
     public static void AddTimePointQueue(this IServiceCollection services)
         => services.TryAddSingleton<ITimePointQueue>(sp =>
         {
