@@ -148,12 +148,12 @@ let update
         model |> mapLooperMsgWithoutWork workEventStore telegramBot levt
 
     | Msg.OnError err ->
-        logger.LogError err
+        logger.LogProgramError err
         errorMessageQueue.EnqueueError err
         model, Cmd.none
 
     | Msg.OnExn ex ->
-        logger.LogError(ex, "Exception has been thrown in PlayerModel Program.")
+        logger.LogProgramExn ex
         errorMessageQueue.EnqueueError ex.Message
         model, Cmd.none
 
