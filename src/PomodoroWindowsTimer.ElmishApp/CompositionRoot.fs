@@ -212,9 +212,25 @@ let compose
                     }
             looper.AddSubscriber(onLooperEvt)
             { new IDisposable with 
-                member _.Dispose() = ()
+                member _.Dispose() =
+                    ()
             }
-        [ ["Looper"], looperSubscription ]
+
+        let timePointQueueSubscription dispatch =
+            let onTimePointChanged timePoints =
+                do dispatch (timePoints |> MainModel.Msg.TimePointQueueMsg)
+            timePointQueue.TimePointsChanged.Subscribe onTimePointChanged
+
+        let playerUserSettingsSubscription dispatch =
+            let onSettingsChanged () =
+                do dispatch (MainModel.Msg.PlayerUserSettingsChanged)
+            userSettings.PlayerUserSettingsChanged.Subscribe onSettingsChanged
+
+        [
+            ["Looper"], looperSubscription
+            ["TimePointQueue"], timePointQueueSubscription
+            ["PlayerUserSettings"], playerUserSettingsSubscription
+        ]
 
     (initMainModel, updateMainModel, mainModelBindings, subscribe)
 
