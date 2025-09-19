@@ -9,6 +9,7 @@ open FsUnitTyped.TopLevelOperators
 open FsToolkit.ErrorHandling
 open p1eXu5.FSharp.Testing.ShouldExtensions
 
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.Testing.Fakers

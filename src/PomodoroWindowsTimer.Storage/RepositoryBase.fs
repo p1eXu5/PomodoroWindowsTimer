@@ -9,6 +9,7 @@ open IcedTasks
 
 open System.Data
 open System.Data.Common
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Abstractions
 
 type OpenDbConnection = CancellableTask<Result<DbConnection, string>>

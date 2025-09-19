@@ -6,6 +6,7 @@ using DbUp.Builder;
 using DbUp.Engine;
 using Microsoft.Extensions.Logging;
 using Microsoft.FSharp.Core;
+using PomodoroWindowsTimer;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.Storage.Migrations.sql;
 

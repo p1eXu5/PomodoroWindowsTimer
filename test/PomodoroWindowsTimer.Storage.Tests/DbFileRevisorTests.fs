@@ -12,6 +12,7 @@ open Faqt.Operators
 open p1eXu5.AspNetCore.Testing
 open p1eXu5.AspNetCore.Testing.Logging
 
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.Storage
 open PomodoroWindowsTimer.Storage.Migrations

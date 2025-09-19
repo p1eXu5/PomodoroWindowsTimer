@@ -11,6 +11,7 @@ open FsToolkit.ErrorHandling
 open Faqt
 open Faqt.Operators
 
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.Storage

@@ -15,6 +15,7 @@ open p1eXu5.AspNetCore.Testing.Logging
 open p1eXu5.FSharp.Testing.ShouldExtensions
 open FsToolkit.ErrorHandling
 
+open PomodoroWindowsTimer
 open PomodoroWindowsTimer.Storage
 open PomodoroWindowsTimer.Storage.Configuration
 open PomodoroWindowsTimer.Testing.Fakers

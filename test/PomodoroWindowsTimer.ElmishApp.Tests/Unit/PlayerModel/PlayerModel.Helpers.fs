@@ -36,7 +36,7 @@ module Sut =
                     timeProvider
                     workEventStore
                     (Substitute.For<IThemeSwitcher>())
-                    (Substitute.For<IDisableSkipBreakSettings>())
+                    (Substitute.For<IPlayerUserSettings>())
                     (Substitute.For<ITimePointQueue>())
                     (Substitute.For<IErrorMessageQueue>())
                     (Substitute.For<ILogger<PlayerModel>>())
