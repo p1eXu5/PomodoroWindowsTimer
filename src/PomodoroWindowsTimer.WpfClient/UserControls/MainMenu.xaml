@@ -11,7 +11,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:settings="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Settings"
              xmlns:works="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works"
-             d:DataContext="{d:DesignInstance Type=MainModel:Bindings,
+             d:DataContext="{d:DesignInstance Type=MainModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="50"
              d:DesignWidth="800"

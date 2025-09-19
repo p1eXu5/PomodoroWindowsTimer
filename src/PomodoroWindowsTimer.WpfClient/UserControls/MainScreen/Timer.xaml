@@ -8,7 +8,7 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.MainScreen"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_TimerRoot"
-             d:DataContext="{d:DesignInstance Type=PlayerModel:Bindings,
+             d:DataContext="{d:DesignInstance Type=PlayerModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="250"
              d:DesignWidth="800"
