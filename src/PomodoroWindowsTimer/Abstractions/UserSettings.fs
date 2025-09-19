@@ -20,9 +20,12 @@ type ITimePointSettings =
         abstract TimePointSettings : string option with get, set
     end
 
-type IDisableSkipBreakSettings =
+type IPlayerUserSettings =
     interface
+        [<CLIEvent>]
+        abstract PlayerUserSettingsChanged: IEvent<unit>
         abstract DisableSkipBreak : bool with get, set
+        abstract DisableMinimizeMaximizeWindows : bool with get, set
     end
 
 type ICurrentWorkItemSettings =
@@ -35,7 +38,7 @@ type IUserSettings =
     inherit IPatternSettings
     inherit ITimePointPrototypesSettings
     inherit ITimePointSettings
-    inherit IDisableSkipBreakSettings
+    inherit IPlayerUserSettings
     inherit ICurrentWorkItemSettings
     inherit IDatabaseSettings
     abstract LastStatisticPeriod : DateOnlyPeriod option with get, set

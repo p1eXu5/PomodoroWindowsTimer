@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.Storage.Configuration;
@@ -29,7 +31,26 @@ internal class UserSettings : IUserSettings
         _workDbOptions = workDbOptions.Value;
     }
 
-    #region IDisableSkipBreakSettings implementation
+
+    #region IPlayerUserSettings implementation
+
+    protected FSharpHandler<Unit>? listEventDelegates;
+
+    public event FSharpHandler<Unit> PlayerUserSettingsChanged
+    {
+        add
+        {
+            listEventDelegates += value;
+        }
+
+        remove
+        {
+            if (listEventDelegates is not null)
+            {
+                listEventDelegates -= value;
+            }
+        }
+    }
 
     public bool DisableSkipBreak
     {
@@ -38,6 +59,18 @@ internal class UserSettings : IUserSettings
         {
             Properties.Settings.Default.DisableSkipBreak = value;
             Properties.Settings.Default.Save();
+            listEventDelegates?.Invoke(this, default!);
+        }
+    }
+
+    public bool DisableMinimizeMaximizeWindows
+    {
+        get => Properties.Settings.Default.DisableMinimizeMaximizeWindows;
+        set
+        {
+            Properties.Settings.Default.DisableMinimizeMaximizeWindows = value;
+            Properties.Settings.Default.Save();
+            listEventDelegates?.Invoke(this, default!);
         }
     }
 
