@@ -21,7 +21,7 @@ let private toTimePoints aliases model =
         | head :: tail ->
             let ind = model.TimePointPrototypes |> List.findIndex (fun p -> p.Prototype.Alias |> (=) head)
             let prototype =
-                (model.TimePointPrototypes |> List.item ind |> _.Prototype |> TimePointPrototype.toTimePoint state[ind] |> TimePointModel.init)
+                (model.TimePointPrototypes |> List.item ind |> _.Prototype |> TimePointPrototype.toTimePoint (ind + 1) state[ind] |> TimePointModel.init)
             do
                 Array.set state ind (state[ind] + 1)
 
