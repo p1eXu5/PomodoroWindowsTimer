@@ -74,9 +74,12 @@
     <Compile Include="CurrentWorkModel\CurrentWorkModel.fs" />
     <Compile Include="CurrentWorkModel\CurrentWorkModel.Program.fs" />
     <Compile Include="CurrentWorkModel\CurrentWorkModel.Bindings.fs" />
-    <Compile Include="TimePointListModel\TimePointListModel.fs" />
-    <Compile Include="TimePointListModel\TimePointListModel.Program.fs" />
-    <Compile Include="TimePointListModel\TimePointListModel.Bindings.fs" />
+    <Compile Include="RunningTimePointListModel\RunningTimePointListModel.fs" />
+    <Compile Include="RunningTimePointListModel\RunningTimePointListModel.Program.fs" />
+    <Compile Include="RunningTimePointListModel\RunningTimePointListModel.Bindings.fs" />
+    <Compile Include="TimePointsDrawerModel\TimePointsDrawerModel.fs" />
+    <Compile Include="TimePointsDrawerModel\TimePointsDrawerModel.Program.fs" />
+    <Compile Include="TimePointsDrawerModel\TimePointsDrawerModel.Bindings.fs" />
     <Compile Include="PlayerModel\PlayerModel.fs" />
     <Compile Include="PlayerModel\PlayerModel.Program.fs" />
     <Compile Include="PlayerModel\PlayerModel.Bindings.fs" />

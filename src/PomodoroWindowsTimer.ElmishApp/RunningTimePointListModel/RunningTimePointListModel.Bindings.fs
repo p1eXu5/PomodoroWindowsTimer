@@ -1,29 +1,20 @@
-﻿namespace PomodoroWindowsTimer.ElmishApp.TimePointListModel
+﻿namespace PomodoroWindowsTimer.ElmishApp.RunningTimePointListModel
 
 open Elmish.WPF
 
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Models
-
-type private Binding = Binding<TimePointListModel, TimePointListModel.Msg>
-
-///// Design time bindings
-//type IBindings =
-//    interface
-//        abstract Id: TimePointId
-//        abstract Name: string
-//        abstract TimeSpan: TimeSpan
-//        abstract Kind: Kind
-//        // TODO: move to presentation
-//        abstract KindAlias: string
-//        abstract IsSelected: bool
-//    end
+open PomodoroWindowsTimer.ElmishApp.Models.RunningTimePointListModel
+open System.Windows.Input
 
 /// Design time bindings
 type IBindings =
     interface
         abstract TimePoints: TimePoint seq
+        abstract DisableSkipBreak : bool with get, set
+        abstract DisableMinimizeMaximizeWindows : bool with get, set
+        abstract RequestTimePointGeneratorCommand: ICommand
     end
 
 
@@ -31,7 +22,7 @@ module Bindings =
 
     let private __ = Unchecked.defaultof<IBindings>
 
-    let bindings () : Binding list =
+    let bindings () : Binding<RunningTimePointListModel, RunningTimePointListModel.Msg> list =
         [
             nameof __.TimePoints
                 |> Binding.subModelSeq (
@@ -46,7 +37,16 @@ module Bindings =
                         "KindAlias" |> Binding.oneWay (fun (_, e) -> e.KindAlias |> Alias.value)
                         "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePointId |> Option.map (fun atpId -> atpId = e.Id) |> Option.defaultValue false)
                     ])
-            )
+                )
+
+            nameof __.DisableSkipBreak
+                |> Binding.twoWay (_.DisableSkipBreak, Msg.SetDisableSkipBreak)
+
+            nameof __.DisableMinimizeMaximizeWindows
+                |> Binding.twoWay (_.DisableMinimizeMaximizeWindows, Msg.SetDisableMinimizeMaximizeWindows)
+
+            nameof __.RequestTimePointGeneratorCommand
+                |> Binding.cmd Msg.RequestTimePointGenerator
         ]
 
 
