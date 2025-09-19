@@ -10,6 +10,7 @@ open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.MainModel
+open System.Windows.Input
 
 type private Binding = Binding<MainModel, MainModel.Msg>
 
@@ -19,21 +20,28 @@ type IBindings =
         abstract Title: string
         abstract AssemblyVersion: string
         abstract ErrorMessageQueue: IErrorMessageQueue
-        abstract TimePointList: Binding
-        abstract StartTimePointCommand: Binding
+
+        abstract StartTimePointCommand: ICommand
         abstract PlayStopCommand: Binding
         abstract IsPlaying: Binding
         abstract ActiveTime: Binding
         abstract SendToChatBotCommand: Binding
-        abstract IsTimePointsShown: Binding
+        
+        abstract Player: Binding
+
         abstract CurrentWork: Binding
         abstract IsCurrentWorkSet: Binding
-        abstract AppDialog: Binding
+
+        abstract IsTimePointsDrawerShown: bool with get, set
+        abstract TimePointsDrawer: TimePointsDrawerModel.IBindings
+
+        abstract IsWorkSelectorLoaded: bool
         abstract WorkSelector: Binding
-        abstract IsWorkSelectorLoaded: Binding
+
+        abstract AppDialog: Binding
+        
         abstract IsWorkStatisticShown: Binding
         abstract WorkStatisticWindow: Binding
-        abstract Player: Binding
     end
 
 module Bindings =
@@ -63,11 +71,6 @@ module Bindings =
 
             // -------------------------------------------------------------
     
-            nameof __.TimePointList
-                |> Binding.SubModel.required (TimePointListModel.Bindings.bindings)
-                |> Binding.mapModel _.TimePointList
-                |> Binding.mapMsg Msg.TimePointListModelMsg
-                // |> Binding.addLazy (fun m1 m2 -> m1.IsTimePointsShown = false && m2.IsTimePointsShown = false)
 
             nameof __.StartTimePointCommand
                 |> Binding.cmdParam (fun id -> (id :?> System.Guid) |> Msg.StartTimePoint)
@@ -104,8 +107,13 @@ Current work is [{wm.Number}] {wm.Title}."""
 
             // ----------------------------------------------------
 
-            nameof __.IsTimePointsShown
-                |> Binding.twoWay (_.IsTimePointsShown, Msg.SetIsTimePointsShown)
+            nameof __.IsTimePointsDrawerShown
+                |> Binding.twoWay (_.IsTimePointsDrawerShown, Msg.SetIsTimePointsDrawerShown)
+
+            nameof __.TimePointsDrawer
+                |> Binding.SubModel.required (TimePointsDrawerModel.Bindings.bindings)
+                |> Binding.mapModel _.TimePointsDrawer
+                |> Binding.mapMsg Msg.TimePointsDrawerMsg
 
             // ------------------------------------------------------
 

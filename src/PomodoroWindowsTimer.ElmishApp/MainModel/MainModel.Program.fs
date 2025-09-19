@@ -19,33 +19,22 @@ open PomodoroWindowsTimer.Abstractions
 
 
 /// Msg.SetIsTimePointsShown handler.
-let private setIsTimePointsShown (v: bool) (model: MainModel) =
+let private setIsTimePointsDrawerShown initRunningTimePoints (v: bool) (model: MainModel) =
     if v then model |> withoutWorkSelectorModel else model
-    |> withIsTimePointsShown v
-    |> withCmdNone
+    |> withIsTimePointsDrawerShown initRunningTimePoints v
+    , Cmd.none
 
 
-/// Msg.LoadTimePoints handler.
-let private loadTimePoints
-    (looper: ILooper)
-    (timePointQueue: ITimePointQueue)
-    (timePointStore: TimePointStore)
-    (timePoints: TimePoint list)
-    (model: MainModel)
-    =
-    looper.Stop()
-    timePointQueue.Reload(timePoints)
-    looper.PreloadTimePoint()
-
-    model |> withInitTimePointListModel timePoints
-    , Cmd.OfFunc.attempt timePointStore.Write timePoints Msg.OnExn
-
+let private mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg (model: MainModel) =
+    let (drawerModel', drawerCmd) = model.TimePointsDrawer |> updateTimePointsDrawerModel smsg
+    model |> withTimePointsDrawer drawerModel'
+    , Cmd.map Msg.TimePointsDrawerMsg drawerCmd
 
 /// SetIsWorkSelectorLoaded handler
-let private setIsWorkSelectorLoaded initWorkSelectorModel (v: bool) (model: MainModel) =
+let private setIsWorkSelectorLoaded initRunningTimePoints initWorkSelectorModel (v: bool) (model: MainModel) =
     if v then
         let (m, cmd) = initWorkSelectorModel (model.CurrentWork.Id)
-        model |> withWorkSelectorModel m |> withIsTimePointsShown false
+        model |> withWorkSelectorModel m |> withIsTimePointsDrawerShown initRunningTimePoints false
         , Cmd.map Msg.WorkSelectorModelMsg cmd
     else
         model |> withoutWorkSelectorModel |> withCmdNone
@@ -81,6 +70,7 @@ let private playerIntentCmd playerIntent (model: MainModel) =
         )
         |> Option.defaultValue Cmd.none
 
+
 /// Msg.PlayerModelMsg handler.
 let private mapPlayerModelMsg updatePlayerModel pmsg (model: MainModel) =
     let (playerModel, playerCmd, playerIntent) = updatePlayerModel pmsg model.Player
@@ -93,29 +83,31 @@ let private mapPlayerModelMsg updatePlayerModel pmsg (model: MainModel) =
 
 
 /// Msg.LooperMsg handler.
-let private mapLooperMsg updatePlayerModel updateCurrentWorkModel updateTimePointListModel lmsg (model: MainModel) =
+let private mapLooperMsg updatePlayerModel updateCurrentWorkModel updateTimePointsDrawerModel lmsg (model: MainModel) =
     let (playerModel, playerCmd, playerIntent) =
         updatePlayerModel (lmsg |> PlayerModel.Msg.LooperMsg) model.Player
 
     let (currentWorkModel, currentWorkCmd) =
         updateCurrentWorkModel (lmsg |> CurrentWorkModel.Msg.LooperMsg) model.CurrentWork
        
-    let (timePointListModel) =
-        updateTimePointListModel (lmsg |> TimePointListModel.Msg.LooperMsg) model.TimePointList
+    let (timePointsDrawerOpt, timePointsDrawerCmd) =
+        model.TimePointsDrawer
+            |> updateTimePointsDrawerModel (lmsg |> TimePointsDrawerModel.Msg.LooperMsg) // TODO: change to RunningTimePointListModel.Msg
 
     model
     |> withPlayerModel playerModel
     |> withCurrentWorkModel currentWorkModel
-    |> withTimePointListModel timePointListModel
+    |> withTimePointsDrawer timePointsDrawerOpt
     , Cmd.batch [
         Cmd.map Msg.PlayerModelMsg playerCmd
         playerIntentCmd playerIntent model
         Cmd.map Msg.CurrentWorkModelMsg currentWorkCmd
+        Cmd.map Msg.TimePointsDrawerMsg timePointsDrawerCmd
     ]
 
 
-/// Maps WorkSelectorModel.Intent to MainModel.Msg
-let workSelectorIntentCmd intent =
+/// Maps WorkSelectorModel.Intent to MainModel.Msg.
+let private workSelectorIntentCmd intent =
     match intent with
     | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
         Cmd.ofMsg (
@@ -171,6 +163,20 @@ let private mapStatisticMainModelMsg updateStatisticMainModel (sm: StatisticMain
     | StatisticMainModel.Intent.CloseWindow ->
         model |> MainModel.withDailyStatisticList None
         , Cmd.none
+
+
+/// Msg.PlayerUserSettingsChanged handler
+let private mapPlayerUserSettingsChangedMsg updatePlayerModel updateTimePointsDrawerModel (model: MainModel) =
+    model
+    |> mapPlayerModelMsg updatePlayerModel PlayerModel.Msg.PlayerUserSettingsChanged
+    |> mapmc (mapTimePointsDrawerMsg updateTimePointsDrawerModel (
+        TimePointsDrawerModel.Msg.RunningTimePointsMsg RunningTimePointListModel.Msg.PlayerUserSettingsChanged))
+
+let private mapTimePointQueueMsg updateTimePointsDrawerModel timePoints (model: MainModel) =
+    model
+    |> mapc _.TimePointsDrawer withTimePointsDrawer Msg.TimePointsDrawerMsg (
+        updateTimePointsDrawerModel (TimePointsDrawerModel.Msg.RunningTimePointsMsg (
+            RunningTimePointListModel.Msg.TimePointQueueMsg timePoints)))
 
     (*
     
@@ -273,15 +279,13 @@ let private mapStatisticMainModelMsg updateStatisticMainModel (sm: StatisticMain
 
 /// MainModel.Program update function.
 let update
-    (looper: ILooper)
-    (timePointQueue: ITimePointQueue)
-    (timePointStore: TimePointStore)
     (telegramBot: ITelegramBot)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<MainModel>)
     updatePlayerModel
     updateCurrentWorkModel
-    updateTimePointListModel
+    initRunningTimePoints
+    updateTimePointsDrawerModel
     updateAppDialogModel
     initWorkSelectorModel
     updateWorkSelectorModel
@@ -294,14 +298,14 @@ let update
     // --------------------
     // Time Points
     // --------------------
-    | Msg.SetIsTimePointsShown v ->
-        model |> setIsTimePointsShown v
+    | Msg.SetIsTimePointsDrawerShown v ->
+        model |> setIsTimePointsDrawerShown initRunningTimePoints v
 
-    | Msg.LoadTimePoints timePoints ->
-        model |> loadTimePoints looper timePointQueue timePointStore timePoints
+    | Msg.TimePointsDrawerMsg smsg ->
+        model |> mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg
 
-    | Msg.TimePointListModelMsg smsg ->
-        model |> map _.TimePointList withTimePointListModel (updateTimePointListModel smsg) |> withCmdNone
+    | Msg.TimePointQueueMsg timePoints ->
+        model |> mapTimePointQueueMsg updateTimePointsDrawerModel timePoints
 
     | Msg.StartTimePoint tpId ->
         model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
@@ -313,10 +317,13 @@ let update
         model, Cmd.ofMsg (model.Player |> PlayerModel.Msg.playStopResume |> Msg.PlayerModelMsg)
 
     | Msg.LooperMsg lmsg ->
-        model |> mapLooperMsg updatePlayerModel updateCurrentWorkModel updateTimePointListModel lmsg
+        model |> mapLooperMsg updatePlayerModel updateCurrentWorkModel updateTimePointsDrawerModel lmsg
 
     | Msg.PlayerModelMsg pmsg ->
         model |> mapPlayerModelMsg updatePlayerModel pmsg
+
+    | Msg.PlayerUserSettingsChanged ->
+        model |> mapPlayerUserSettingsChangedMsg updatePlayerModel updateTimePointsDrawerModel
 
     // --------------------
     // Work
@@ -325,7 +332,7 @@ let update
         model |> mapc _.CurrentWork withCurrentWorkModel Msg.CurrentWorkModelMsg (updateCurrentWorkModel currWorkMsg)
 
     | Msg.SetIsWorkSelectorLoaded v ->
-        model |> setIsWorkSelectorLoaded initWorkSelectorModel v
+        model |> setIsWorkSelectorLoaded initRunningTimePoints initWorkSelectorModel v
 
     | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
         model |> mapWorkSelectorModelMsg updateWorkSelectorModel smsg m

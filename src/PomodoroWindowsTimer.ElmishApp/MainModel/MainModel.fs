@@ -17,8 +17,11 @@ type MainModel =
         // TimePointsGeneratorModel: TimePointsGeneratorModel option
         
         /// Left drawer model
-        TimePointList: TimePointListModel
-        IsTimePointsShown: bool
+        // TimePointList: TimePointListModel
+
+        // Generator can be preserved when drawer is closing
+        IsTimePointsDrawerShown: bool
+        TimePointsDrawer: TimePointsDrawerModel
 
         CurrentWork: CurrentWorkModel
         Player: PlayerModel
@@ -32,55 +35,37 @@ type MainModel =
         AppDialog: AppDialogModel
     }
 
-type MainModeConfig =
-    {
-        UserSettings: IUserSettings
-        TelegramBot: ITelegramBot
-        Looper: ILooper
-        TimePointQueue: ITimePointQueue
-        WindowsMinimizer: IWindowsMinimizer
-        ThemeSwitcher: IThemeSwitcher
-        TimePointStore: TimePointStore
-        WorkEventStore: WorkEventStore
-        TimeProvider: System.TimeProvider
-    }
-    member this.BotSettings = this.UserSettings :> IBotSettings
-    member this.DisableSkipBreakSettings = this.UserSettings :> IDisableSkipBreakSettings
-    member this.CurrentWorkItemSettings = this.UserSettings :> ICurrentWorkItemSettings
-
-
 module MainModel =
 
     [<RequireQualifiedAccess>]
     type Msg =
-        | TimePointListModelMsg of TimePointListModel.Msg
-
+        | SetIsTimePointsDrawerShown of bool
+        | TimePointsDrawerMsg of TimePointsDrawerModel.Msg
+        | TimePointQueueMsg of TimePoint list
         | StartTimePoint of TimePointId
+
         | PlayStopCommand of initiator: TimePointId
-
         | LooperMsg of LooperEvent
-
         | PlayerModelMsg of PlayerModel.Msg
-        | SetDisableMinimizeMaximizeWindows of bool
+        | PlayerUserSettingsChanged
 
-        // | LoadTimePointsFromSettings
-        /// Stores and loads generated timepoints from prototypes.
-        | LoadTimePoints of TimePoint list
-        | SetIsTimePointsShown of bool
-
-        | SendToChatBot of Message
-
-        | AppDialogModelMsg of AppDialogModel.Msg
-
-        // | LoadCurrentWork
         | CurrentWorkModelMsg of CurrentWorkModel.Msg
-
         | SetIsWorkSelectorLoaded of bool
         | WorkSelectorModelMsg of WorkSelectorModel.Msg
 
+        | AppDialogModelMsg of AppDialogModel.Msg
         | SetIsWorkStatisticShown of bool
         | StatisticMainModelMsg of StatisticMainModel.Msg
-        
+
+        | SendToChatBot of Message
+
+
+        // | SetDisableMinimizeMaximizeWindows of bool
+        // | LoadTimePointsFromSettings
+        /// Stores and loads generated timepoints from prototypes.
+        // | LoadTimePoints of TimePoint list
+        // | LoadCurrentWork
+
         | OnError of string
         | OnExn of exn
 
@@ -103,6 +88,12 @@ module MainModel =
                 | _ -> None
             | _ -> None
 
+        //let (|TimePointsDrawerMsg|_|) (model: MainModel) (msg: Msg) =
+        //    match model.TimePointsDrawer, msg with
+        //    | Some subModel, Msg.TimePointsDrawerMsg subMsg ->
+        //        (subMsg, subModel) |> Some
+        //    | _ -> None
+
     //    let (|TimePointsGeneratorMsg|_|) (model: MainModel) (msg: Msg) =
     //        match msg, model.TimePointsGeneratorModel with
     //        | Msg.TimePointsGeneratorMsg smsg, Some sm ->
@@ -119,15 +110,15 @@ module MainModel =
 
     let init
         (userSettings: IUserSettings)
-        (timePointStore: TimePointStore)
         initCurrentWorkModel
         : MainModel * Cmd<Msg>
         =
-        let timePoints = timePointStore.Read()
         let (currentWorkModel, currentWorkCmd) = initCurrentWorkModel ()
         {
-            TimePointList = TimePointListModel.init timePoints
-            IsTimePointsShown = false
+            // TimePointList = TimePointListModel.init timePoints
+            IsTimePointsDrawerShown = false
+
+            TimePointsDrawer = TimePointsDrawerModel.None
 
             Player = PlayerModel.init userSettings
 
@@ -140,19 +131,8 @@ module MainModel =
 
             AppDialog = AppDialogModel.NoDialog
         }
-        , Cmd.batch [
-            Cmd.ofMsg (Msg.LoadTimePoints timePoints)
-            Cmd.map Msg.CurrentWorkModelMsg currentWorkCmd
+        , Cmd.map Msg.CurrentWorkModelMsg currentWorkCmd
 
-            //if currentWork.IsSome then
-            //    Cmd.OfTask.perform
-            //        (workRepo.FindByIdOrCreateAsync currentWork.Value)
-            //        CancellationToken.None
-            //        Msg.SetCurrentWorkIfNone
-         
-            // Cmd.ofMsg Msg.LoadCurrentWork
-            // Cmd.map Msg.TimePointsGeneratorMsg tpSettingsModelCmd
-        ]
 
     // =========
     // accessors
@@ -169,8 +149,17 @@ module MainModel =
     let withoutWorkSelectorModel (model: MainModel) =
          { model with WorkSelector = None }
 
-    let withIsTimePointsShown v (model: MainModel) =
-         { model with IsTimePointsShown = v }
+    let withIsTimePointsDrawerShown initRunningTimePoints v (model: MainModel) =
+        // TODO: clear drower when closed
+        match v, model.TimePointsDrawer with
+        | true, TimePointsDrawerModel.None ->
+            { model with
+                IsTimePointsDrawerShown = v;
+                TimePointsDrawer = initRunningTimePoints () |> TimePointsDrawerModel.RunningTimePoints }
+        | _ -> { model with IsTimePointsDrawerShown = v; }
+
+    let withTimePointsDrawer drawerModelOpt (model: MainModel) =
+         { model with TimePointsDrawer = drawerModelOpt }
 
     let withDailyStatisticList workStatisticListModel (model: MainModel) =
         { model with StatisticMainModel = workStatisticListModel }
@@ -178,11 +167,11 @@ module MainModel =
     let withPlayerModel playerModel (model: MainModel) =
         { model with Player = playerModel }
 
-    let withInitTimePointListModel timePoints (model: MainModel) =
-        { model with TimePointList = TimePointListModel.init timePoints }
+    //let withInitTimePointListModel timePoints (model: MainModel) =
+    //    { model with TimePointList = TimePointListModel.init timePoints }
 
-    let withTimePointListModel timePointListModel (model: MainModel) =
-        { model with TimePointList = timePointListModel }
+    //let withTimePointListModel timePointListModel (model: MainModel) =
+    //    { model with TimePointList = timePointListModel }
 
     // // TODO: add TimePointListModel
     // let withTimePoints timePoints cfg (model: MainModel) =
