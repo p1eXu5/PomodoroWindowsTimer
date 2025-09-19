@@ -102,6 +102,7 @@ let timePointFaker namePrefix =
     let id = faker.Random.Guid()
     {
         Id = id
+        Num = faker.Random.Int(1, 100)
         Name = (namePrefix, faker.Commerce.ProductName()) ||> sprintf "%s. %s"
         TimeSpan = faker.Date.Timespan()
         Kind = kind
@@ -153,6 +154,7 @@ module TimePoint =
         {
             Id = TimePointId.generate ()
             TimeSpan = timeSpan
+            Num = faker.Random.Int(1, 100)
             Name = generateTimePointName ()
             Kind = kind
             KindAlias = kind |> Kind.alias

@@ -18,15 +18,21 @@ open PomodoroWindowsTimer.TimePointQueue
 
 let private testTimePoints =
     [
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"); Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"); Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"); Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
-        { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"); Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"); Num = 1; Name = "1"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"); Num = 2; Name = "2"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000003"); Num = 3; Name = "3"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
+        { Id = Guid.Parse("00000000-0000-0000-0000-000000000004"); Num = 4; Name = "4"; TimeSpan = TimeSpan.FromMilliseconds(100); Kind = Work; KindAlias = Work |> Kind.alias }
     ]
+
+let private emptyTimePointsStore : TimePointStore =
+    {
+        Read = fun () -> []
+        Write = fun _ -> ()
+    }
 
 let private timePointQueue () =
     let cts = new CancellationTokenSource(TimeSpan.FromSeconds(60L))
-    let tpQueue = new TimePointQueue(TestLogger<TimePointQueue>(TestContextWriters.GetInstance<TestContext>(), LogOut.All) :> ILogger<TimePointQueue>, -1<ms>, cts.Token)
+    let tpQueue = new TimePointQueue(emptyTimePointsStore, TestLogger<TimePointQueue>(TestContextWriters.GetInstance<TestContext>(), LogOut.All) :> ILogger<TimePointQueue>, -1<ms>, cts.Token)
     tpQueue.Start()
     tpQueue
 
