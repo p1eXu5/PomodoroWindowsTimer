@@ -40,7 +40,7 @@
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
-    <BitmapImage x:Key="img_Metal"
+    <!--<BitmapImage x:Key="img_Metal"
                  UriSource="metalArtboard-50.png"
                  />
     <BitmapImage x:Key="img_Base"
@@ -66,27 +66,9 @@
                 </DrawingImage.Drawing>
             </DrawingImage>
         </ImageBrush.ImageSource>
-    </ImageBrush>
+    </ImageBrush>-->
 
-    <DataTemplate x:Key="dt_BotSettingsDialog">
-        <settings:BotSettings DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.BotSettingsDialog}" />
-    </DataTemplate>
-
-    <DataTemplate x:Key="dt_DatabaseSettingsDialog">
-        <settings:DatabaseSettings DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.DatabaseSettingsDialog}" />
-    </DataTemplate>
-
-    <DataTemplate x:Key="dt_RollbackWorkDialog">
-        <settings:RollbackWork DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.RollbackWorkDialog}" />
-    </DataTemplate>
-
-    <DataTemplate x:Key="dt_SkipOrApplyMissingTimeDialog">
-        <settings:SkipOrApplyMissingTime DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.AppDialog.SkipOrApplyMissingTimeDialog}" />
-    </DataTemplate>
-
-    <DataTemplate x:Key="dt_WorkStatisticsDialog">
-        <workStatistic:DailyStatisticTableList />
-    </DataTemplate>
+    
 
     <DataTemplate x:Key="dt_WorkList">
         <works:WorkList Width="300" />
