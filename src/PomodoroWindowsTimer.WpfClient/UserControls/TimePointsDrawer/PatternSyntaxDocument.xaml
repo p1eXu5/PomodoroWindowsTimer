@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer.PatternSyntaxDocument"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.TimePointsDrawer"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="280"
+             d:DesignWidth="640"
+             mc:Ignorable="d"
+             >
+    <FlowDocumentScrollViewer>
+        <FlowDocument>
+            <Paragraph FontSize="22"
+                       FontWeight="Bold"
+                       >
+                Pattern Syntax
+            </Paragraph>
+
+            <Table>
+                <Table.Columns>
+                    <TableColumn Width="*" />
+                    <TableColumn Width="1.6*" />
+                </Table.Columns>
+
+                <TableRowGroup>
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph FontWeight="Bold">Pattern</Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph FontWeight="Bold">Result</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">w</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>work time point with default time (25 min)</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">b</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>break time point with default time (5 min)</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">lb</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>long break time point with default time (20 min)</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">w-b</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>work - break</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">w[:15]</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>work time point with 15 min length</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">(w-b)2</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>group with repeat count (work-break-work-break)</Paragraph>
+                        </TableCell>
+                    </TableRow>
+
+                    <TableRow>
+                        <TableCell>
+                            <Paragraph>
+                                <Run FontFamily="Consolas">w[1:15:20, CustomName]</Run>
+                            </Paragraph>
+                        </TableCell>
+                        <TableCell>
+                            <Paragraph>work time point with set length and name</Paragraph>
+                        </TableCell>
+                    </TableRow>
+                </TableRowGroup>
+            </Table>
+        </FlowDocument>
+    </FlowDocumentScrollViewer>
+</UserControl>
