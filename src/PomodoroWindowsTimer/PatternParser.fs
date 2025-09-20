@@ -4,7 +4,6 @@ open System
 open PomodoroWindowsTimer.Types
 
 
-
 module PatternParser =
 
     open FParsec
@@ -70,33 +69,39 @@ module PatternParser =
     let ptimePointSeq (timePointAliases: string seq) =
         sepBy (pitem timePointAliases) (ws >>? skipChar '-' >>? ws >>? nextCharSatisfiesNot ((=) '('))
 
-    let ptimePointGroup (timePointAliases: string seq) =
-        between (skipChar '(' >>? ws ) (ws >>? skipChar ')') (ptimePointSeq timePointAliases)
-
-    let ptimePointGroupMany (timePointAliases: string seq) =
-        (ptimePointGroup timePointAliases)
-        .>> ws
-        .>>. pint32
-        |>> (fun (l, n) ->
-            l |> List.replicate n |> List.concat
-        )
-
-    let ptimePointProgram (timePointAliases: string seq) =
-        ws
-        >>. sepEndBy
-            (choice [
-                (ptimePointGroupMany timePointAliases) |> attempt
-                (ptimePointGroup timePointAliases) |> attempt
-                (ptimePointSeq timePointAliases) |> attempt
-            ])
-            (ws >>? skipChar '-' >>? ws)
-        .>> ws
-        .>> eof
-        |>> List.concat
-
-
     let parse (timePointAliases: Alias seq) input =
-        run (ptimePointProgram (timePointAliases |> Seq.map Alias.value)) input
+
+        let ppatternItemList, ppatternItemListR = createParserForwardedToRef ()
+
+        let ptimePointGroup =
+            between (skipChar '(' >>? ws ) (ws >>? skipChar ')') ppatternItemList
+            |>> List.concat
+
+        let ptimePointGroupMany =
+            ptimePointGroup
+            .>> ws
+            .>>. pint32
+            |>> (fun (l, n) ->
+                l |> List.replicate n |> List.concat
+            )
+
+        let ptimePointProgram =
+            ppatternItemList
+            .>> eof
+            |>> List.concat
+
+        ppatternItemListR.Value <-
+            ws
+            >>. sepEndBy
+                (choice [
+                    ptimePointGroupMany |> attempt
+                    ptimePointGroup |> attempt
+                    (ptimePointSeq (timePointAliases |> Seq.map Alias.value)) |> attempt
+                ])
+                (ws >>? skipChar '-' >>? ws)
+            .>> ws
+
+        run ptimePointProgram input
         |> function
             | Success (ok,_,_) -> Result.Ok (ok)
             | Failure (err,_,_) -> Result.Error err

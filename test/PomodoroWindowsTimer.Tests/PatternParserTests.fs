@@ -102,6 +102,20 @@ let cases : IEnumerable =
                 PatternParsedItem.ofAliasTimeSpanNameOrThrow "b" (TimeSpan(0, 20, 0)) "Test Break"
             ]
         ).SetName("09: parsing b[:20, Test Break] test")
+
+        TestCaseData(
+            "((w-b)2)2",
+            [
+                PatternParsedItem.ofAliasOrThrow "w"
+                PatternParsedItem.ofAliasOrThrow "b"
+                PatternParsedItem.ofAliasOrThrow "w"
+                PatternParsedItem.ofAliasOrThrow "b"
+                PatternParsedItem.ofAliasOrThrow "w"
+                PatternParsedItem.ofAliasOrThrow "b"
+                PatternParsedItem.ofAliasOrThrow "w"
+                PatternParsedItem.ofAliasOrThrow "b"
+            ]
+        ).SetName("10: parsing '((w-b)2)2'")
     ]
 
 [<TestCaseSource(nameof cases)>]
