@@ -19,15 +19,27 @@
                        FontSize="40"
                        FontWeight="Bold"
                        Foreground="#33444444"
-                       Text="{Binding ElementName=m_TimePointPrototypeV2Root, Path=(local:TimePointAssistant.TimePointKind), Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}"
+                       Text="{Binding ElementName=m_TimePointPrototypeV2Root,
+                                      Path=BreakWorkLabel,
+                                      FallbackValue=BREAK}"
                        />
-            <TextBlock Margin="5,5"
+            <!--
+                Text="{Binding ElementName=m_TimePointPrototypeV2Root,
+                Path=(local:TimePointAssistant.TimePointKind),
+                Converter={StaticResource conv_KindToTextConverter},
+                FallbackValue=BREAK}"
+            -->
+            <!--  Top right label BREAK/WORK  -->
+            <TextBlock Margin="5"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Top"
                        FontSize="10"
                        FontWeight="Normal"
                        Foreground="{StaticResource MaterialDesign.Brush.Primary.Light}"
-                       Text="{Binding ElementName=m_TimePointPrototypeV2Root, Path=(local:TimePointAssistant.TimePointKind), Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}"
+                       Text="{Binding ElementName=m_TimePointPrototypeV2Root,
+                                      Path=BreakWorkLabel,
+                                      FallbackValue=BREAK}"
+                       Visibility="Collapsed"
                        />
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
@@ -36,41 +48,60 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+
+                <!--  Left vertical bar  -->
                 <Border Grid.Column="0"
                         Width="2"
                         HorizontalAlignment="Left"
-                        Background="{Binding RelativeSource={RelativeSource Mode=Self}, Path=BorderBrush}"
-                        BorderBrush="{Binding (local:TimePointAssistant.TimePointKind), ElementName=m_TimePointPrototypeV2Root, Converter={StaticResource conv_KindToBrushConverter}, FallbackValue=White}"
+                        Background="{Binding RelativeSource={RelativeSource Mode=Self},
+                                             Path=BorderBrush}"
+                        BorderBrush="{Binding Path=BreakWorkBrush,
+                                              ElementName=m_TimePointPrototypeV2Root,
+                                              FallbackValue=White}"
                         BorderThickness="1"
                         />
+
+                <!--  Alias  -->
                 <TextBox Grid.Column="1"
                          Width="35"
                          Margin="5,0,0,0"
                          VerticalAlignment="Bottom"
                          materialDesign:HintAssist.Hint="Alias"
                          FontSize="16"
+                         Foreground="{Binding Path=BreakWorkBrush,
+                                              ElementName=m_TimePointPrototypeV2Root,
+                                              FallbackValue=White}"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias), ElementName=m_TimePointPrototypeV2Root}"
+                         Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias),
+                                        ElementName=m_TimePointPrototypeV2Root}"
                          TextAlignment="Center"
                          />
+
+                <!--  TimePoint Name  -->
                 <TextBox Grid.Column="2"
                          Margin="5,0"
                          VerticalAlignment="Bottom"
                          materialDesign:HintAssist.Hint="Time point name"
                          FontSize="16"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Text="{Binding Path=(local:TimePointAssistant.TimePointName), ElementName=m_TimePointPrototypeV2Root}"
+                         Text="{Binding Path=(local:TimePointAssistant.TimePointName),
+                                        ElementName=m_TimePointPrototypeV2Root}"
                          />
+
+                <!--  TimePoint TimeSpan  -->
                 <materialDesign:TimePicker Grid.Column="4"
                                            Width="70"
                                            VerticalAlignment="Stretch"
                                            HorizontalContentAlignment="Center"
                                            VerticalContentAlignment="Bottom"
-                                           materialDesign:HintAssist.Hint=""
                                            FontSize="16"
+                                           Foreground="{Binding Path=BreakWorkBrush,
+                                                                ElementName=m_TimePointPrototypeV2Root,
+                                                                FallbackValue=White}"
                                            Is24Hours="True"
                                            IsInvalidTextAllowed="False"
-                                           Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan), ElementName=m_TimePointPrototypeV2Root}"
+                                           Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
+                                                          ElementName=m_TimePointPrototypeV2Root}"
                                            WithSeconds="False"
                                            />
             </Grid>
