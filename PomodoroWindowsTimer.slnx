@@ -10,6 +10,7 @@
     <File Path="fake.cmd" />
     <File Path="README.md" />
     <File Path="RELEASE_NOTES.md" />
+    <File Path="xaml_styler.json" />
   </Folder>
   <Folder Name="/Solution Items/.github/" />
   <Folder Name="/Solution Items/.github/workflows/">

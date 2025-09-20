@@ -40,7 +40,7 @@
     "ReorderVisualStateManager": 2,
 
     "FormatMarkupExtension": true,
-    "NoNewLineMarkupExtensions": "x:Bind, Binding",
+    "NoNewLineMarkupExtensions": "x:Bind",
 
     "CommentPadding": 2,
     "FormatOnSave": true,
