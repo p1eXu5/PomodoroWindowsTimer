@@ -15,7 +15,7 @@
     <Compile Include="JsonHelper.fs" />
     <Compile Include="Types\Types.Common.fs" />
     <Compile Include="Types\Types.TimePoints.fs" />
-    <Compile Include="Types\Types.WorkEvents.fs" />
+    <Compile Include="Types\Types.Works.fs" />
     <Compile Include="Types\Types.Looper.fs" />
     <Compile Include="Types\Types.Statistic.fs" />
     <Compile Include="Types\Types.ExcelReports.fs" />
