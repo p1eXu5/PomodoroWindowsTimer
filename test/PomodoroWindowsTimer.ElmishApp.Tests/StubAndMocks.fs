@@ -31,6 +31,8 @@ type LooperStub (activeTimePoint: ActiveTimePoint option) =
 type UserSettingsStub (workDbOptions: WorkDbOptions) =
     let dict = Dictionary<string, obj>()
 
+    let playerSettingsChangedEvent = new Event<_>()
+
     do
         dict.Add("BotToken", faker.Random.Hash() |> box)
         dict.Add("MyChatId", faker.Numeric(9) |> box)
@@ -44,12 +46,24 @@ type UserSettingsStub (workDbOptions: WorkDbOptions) =
         dict.Add("DatabaseFilePath", workDbOptions.DatabaseFilePath)
 
     interface IUserSettings with
+        [<CLIEvent>]
+        member _.PlayerUserSettingsChanged
+            with get (): IEvent<unit> = playerSettingsChangedEvent.Publish
         member _.BotToken with get () = dict["BotToken"] :?> string option and set v = dict["BotToken"] <- v
         member _.MyChatId with get () = dict["MyChatId"] :?> string option and set v = dict["MyChatId"] <- v
         member _.Patterns with get () = dict["Patterns"] :?> Pattern list and set v = dict["Patterns"] <- v
         member _.TimePointPrototypesSettings with get () = dict["TimePointPrototypesSettings"] :?> string option and set v = dict["TimePointPrototypesSettings"] <- v
         member _.TimePointSettings with get () = dict["TimePointSettings"] :?> string option and set v = dict["TimePointSettings"] <- v
-        member _.DisableSkipBreak with get () = dict["DisableSkipBreak"] :?> bool and set v = dict["DisableSkipBreak"] <- v
+        member _.DisableSkipBreak
+            with get () = dict["DisableSkipBreak"] :?> bool
+            and set v =
+                dict["DisableSkipBreak"] <- v
+                playerSettingsChangedEvent.Trigger ()
+        member _.DisableMinimizeMaximizeWindows
+            with get () = dict["DisableSkipBreak"] :?> bool
+            and set v =
+                dict["DisableSkipBreak"] <- v
+                playerSettingsChangedEvent.Trigger ()
         member _.CurrentWork with get () = dict["CurrentWork"] :?> Work option and set v = dict["CurrentWork"] <- v
         member _.LastStatisticPeriod with get () = dict["LastStatisticPeriod"] :?> DateOnlyPeriod option and set v = dict["LastStatisticPeriod"] <- v
         member _.LastDayCount with get () = dict["LastDayCount"] :?> int and set v = dict["LastDayCount"] <- v
