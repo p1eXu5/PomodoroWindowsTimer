@@ -55,8 +55,8 @@ let update
         , Cmd.none
         , Intent.None
 
-    | Msg.TimePointQueueMsg timePoints ->
-        model |> withTimePoints timePoints
+    | Msg.TimePointQueueMsg (timePoints, timePointIdOpt) ->
+        model |> withTimePoints timePoints timePointIdOpt
         , Cmd.none
         , Intent.None
 

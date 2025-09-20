@@ -44,7 +44,7 @@ type TimePointQueue(
     let isStarted = ref 0
     let replyTimeout = defaultArg timeout 1000<ms>
 
-    let timePointsChangedEvent = new Event<TimePoint list>()
+    let timePointsChangedEvent = new Event<TimePoint list * TimePointId option>()
 
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->
@@ -56,31 +56,40 @@ type TimePointQueue(
                     | Reset ->
                         use _ = logger.BeginHandleScope(nameof Reset)
                         let newState = State.Default
-                        timePointsChangedEvent.Trigger([])
+                        timePointsChangedEvent.Trigger([], None)
                         return! loop newState
 
                     | AddMany (timePoints, reply) ->
                         use _ = logger.BeginHandleScope(nameof AddMany)
 
-                        let maxPriority =
-                            timePoints
-                            |> Seq.fold (fun p tp ->
-                                state.Queue.Enqueue(tp, p)
-                                p + 1f
-                            ) state.MaxPriority
+                        if timePoints |> Seq.isEmpty then
+                            return! loop state
+                        else
+                            let maxPriority =
+                                timePoints
+                                |> Seq.fold (fun p tp ->
+                                    state.Queue.Enqueue(tp, p)
+                                    p + 1f
+                                ) state.MaxPriority
 
-                        let state = { state with MaxPriority = maxPriority }
-                        // logNewState state
+                            let state = { state with MaxPriority = maxPriority }
+                            // logNewState state
 
-                        reply.Reply()
+                            reply.Reply()
 
-                        timePointsChangedEvent.Trigger(
-                            state.Queue
-                            |> Seq.sortBy _.Num
-                            |> Seq.toList
-                        )
+                            timePointsChangedEvent.Trigger(
+                                state.Queue
+                                |> Seq.sortBy _.Num
+                                |> Seq.toList
+                                , (
+                                    if state.Queue.Count > 0 then
+                                        state.Queue.First |> _.Id |> Some
+                                    else
+                                        None
+                                )
+                            )
 
-                        return! loop state
+                            return! loop state
 
                     | GetAllWithPriority reply ->
                         use _ = logger.BeginHandleScope(nameof GetAllWithPriority)

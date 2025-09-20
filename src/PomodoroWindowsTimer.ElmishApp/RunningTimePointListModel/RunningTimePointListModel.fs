@@ -27,7 +27,7 @@ module RunningTimePointListModel =
         | SetDisableSkipBreak of bool
         | SetDisableMinimizeMaximizeWindows of bool
         | PlayerUserSettingsChanged
-        | TimePointQueueMsg of TimePoint list
+        | TimePointQueueMsg of TimePoint list * TimePointId option
         | RequestTimePointGenerator
         | OnExn of exn
 
@@ -59,5 +59,8 @@ module RunningTimePointListModel =
     let withDisableMinimizeMaximizeWindows v (model: RunningTimePointListModel) =
         { model with DisableMinimizeMaximizeWindows = v }
 
-    let withTimePoints timePoints (model: RunningTimePointListModel) =
-        { model with TimePoints = timePoints; ActiveTimePointId = None }
+    let withTimePoints timePoints timePointIdOpt (model: RunningTimePointListModel) =
+        if timePoints = model.TimePoints then
+            { model with ActiveTimePointId = timePointIdOpt }
+        else
+            { model with TimePoints = timePoints; ActiveTimePointId = timePointIdOpt }

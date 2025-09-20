@@ -172,11 +172,11 @@ let private mapPlayerUserSettingsChangedMsg updatePlayerModel updateTimePointsDr
     |> mapmc (mapTimePointsDrawerMsg updateTimePointsDrawerModel (
         TimePointsDrawerModel.Msg.RunningTimePointsMsg RunningTimePointListModel.Msg.PlayerUserSettingsChanged))
 
-let private mapTimePointQueueMsg updateTimePointsDrawerModel timePoints (model: MainModel) =
+let private mapTimePointQueueMsg updateTimePointsDrawerModel (timePointsAndId: TimePoint list * TimePointId option) (model: MainModel) =
     model
     |> mapc _.TimePointsDrawer withTimePointsDrawer Msg.TimePointsDrawerMsg (
         updateTimePointsDrawerModel (TimePointsDrawerModel.Msg.RunningTimePointsMsg (
-            RunningTimePointListModel.Msg.TimePointQueueMsg timePoints)))
+            RunningTimePointListModel.Msg.TimePointQueueMsg timePointsAndId)))
 
     (*
     
@@ -304,8 +304,8 @@ let update
     | Msg.TimePointsDrawerMsg smsg ->
         model |> mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg
 
-    | Msg.TimePointQueueMsg timePoints ->
-        model |> mapTimePointQueueMsg updateTimePointsDrawerModel timePoints
+    | Msg.TimePointQueueMsg (timePoints, timePointIdOpt) ->
+        model |> mapTimePointQueueMsg updateTimePointsDrawerModel (timePoints, timePointIdOpt)
 
     | Msg.StartTimePoint tpId ->
         model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
