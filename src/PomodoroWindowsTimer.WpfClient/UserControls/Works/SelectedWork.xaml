@@ -30,21 +30,26 @@
         <Rectangle Grid.Column="0"
                    Width="1"
                    VerticalAlignment="Stretch"
-                   Fill="{Binding ElementName=m_SelectedWorkRoot, Path=Foreground}"
+                   Fill="{Binding ElementName=m_SelectedWorkRoot,
+                                  Path=Foreground}"
                    />
         <local:WorkCard x:Name="m_WorkCard"
                         Grid.Column="1"
                         VerticalAlignment="Center"
-                        Foreground="{Binding ElementName=m_SelectedWorkRoot, Path=Foreground}"
+                        Foreground="{Binding ElementName=m_SelectedWorkRoot,
+                                             Path=Foreground}"
                         />
 
         <Button x:Name="m_SelectedWorkEditButton"
                 Grid.Column="2"
-                Height="{Binding ElementName=m_WorkCard, Path=ActualHeight}"
-                BorderBrush="{Binding ElementName=m_SelectedWorkRoot, Path=Foreground}"
+                Height="{Binding ElementName=m_WorkCard,
+                                 Path=ActualHeight}"
+                BorderBrush="{Binding ElementName=m_SelectedWorkRoot,
+                                      Path=Foreground}"
                 Command="{Binding EditCommand}"
                 Content="{materialDesign:PackIcon Pencil}"
-                Foreground="{Binding ElementName=m_SelectedWorkRoot, Path=Foreground}"
+                Foreground="{Binding ElementName=m_SelectedWorkRoot,
+                                     Path=Foreground}"
                 Style="{StaticResource st_WorkEditButton}"
                 />
     </Grid>

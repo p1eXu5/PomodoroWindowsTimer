@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works.Statistic"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             d:DataContext="{d:DesignInstance Type=dailyStatisticListModel:Bindings, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance Type=dailyStatisticListModel:Bindings,
+                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d"
@@ -15,12 +16,12 @@
         <ToolBarTray DockPanel.Dock="Top"
                      DataContext="{Binding}"
                      >
-            <ToolBar Style="{StaticResource MaterialDesignToolBar}"
-                     ClipToBounds="False"
+            <ToolBar ClipToBounds="False"
+                     Style="{StaticResource MaterialDesignToolBar}"
                      >
                 <CheckBox x:Name="m_ByDayCheckBox"
-                          Content="By Day"
                           Margin="8,3,16,3"
+                          Content="By Day"
                           IsChecked="{Binding IsByDay}"
                           />
                 <Border VerticalAlignment="Center"
@@ -62,35 +63,35 @@
                 <Separator Margin="5,1" />
                 <Button Command="{Binding LoadDailyStatisticsCommand}"
                         Content="{materialDesign:PackIcon Kind=Refresh}"
-                        ToolTip="Refresh statistic"
                         ToolBar.OverflowMode="AsNeeded"
+                        ToolTip="Refresh statistic"
                         />
                 <Separator Margin="5,1" />
                 <Button Command="{Binding ExportToExcelCommand}"
                         Content="{materialDesign:PackIcon Kind=Export}"
-                        ToolTip="Export statistic"
                         ToolBar.OverflowMode="AsNeeded"
+                        ToolTip="Export statistic"
                         />
                 <Separator Margin="5,1" />
                 <Button Command="{Binding AllocateBreakTimeCommand}"
                         Content="{materialDesign:PackIcon Kind=TimerCheckOutline}"
-                        ToolTip="Allocate break time between works"
                         ToolBar.OverflowMode="AsNeeded"
+                        ToolTip="Allocate break time between works"
                         Visibility="{Binding CanAllocateBreakTime,
                                              Converter={StaticResource conv_BooleanToVisibility}}"
                         />
                 <Button Command="{Binding RedoAllocateBreakTimeCommand}"
                         Content="{materialDesign:PackIcon Kind=TimerRefreshOutline}"
-                        ToolTip="Allocate break time between works"
                         ToolBar.OverflowMode="AsNeeded"
+                        ToolTip="Allocate break time between works"
                         Visibility="{Binding CanRedoAllocateBreakTime,
                                              Converter={StaticResource conv_BooleanToVisibility}}"
                         />
             </ToolBar>
         </ToolBarTray>
 
-        <materialDesign:Snackbar DockPanel.Dock="Bottom"
-                                 x:Name="m_ErrorMessageQueueSnackbar"
+        <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
+                                 DockPanel.Dock="Bottom"
                                  HorizontalAlignment="Stretch"
                                  ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
                                  MessageQueue="{Binding ErrorMessageQueue}"
@@ -124,8 +125,8 @@
                         <ScrollViewer Padding="{TemplateBinding Padding}"
                                       CanContentScroll="False"
                                       Focusable="False"
-                                      VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                                       PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                                      VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                                       >
                             <ItemsPresenter />
                         </ScrollViewer>

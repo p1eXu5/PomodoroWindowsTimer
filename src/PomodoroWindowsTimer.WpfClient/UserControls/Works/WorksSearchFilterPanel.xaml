@@ -50,7 +50,8 @@
                      Padding="0,0,0,5"
                      VerticalAlignment="Bottom"
                      materialDesign:TextFieldAssist.HasClearButton="True"
-                     Text="{Binding LastDayCount, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding LastDayCount,
+                                    UpdateSourceTrigger=PropertyChanged}"
                      TextAlignment="Center"
                      TextChanged="CountTextBox_TextChanged"
                      ToolTip="Filters works by the number of days from the current day to the time of last event or last update"

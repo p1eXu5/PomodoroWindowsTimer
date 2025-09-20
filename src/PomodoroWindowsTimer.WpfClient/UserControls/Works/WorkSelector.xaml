@@ -20,14 +20,16 @@
         <!--  `SELECTED WORK` title. It's not shown if there is no any selected work  -->
         <local:SelectedWorkTitle DockPanel.Dock="Top"
                                  Padding="0"
-                                 Visibility="{Binding HasSelectedWork, Converter={StaticResource conv_BooleanToVisibility}}"
+                                 Visibility="{Binding HasSelectedWork,
+                                                      Converter={StaticResource conv_BooleanToVisibility}}"
                                  />
 
         <!--  `SELECT WORK` title. It's not shown if any work is selected  -->
         <local:NoSelectedWorkTitle DockPanel.Dock="Top"
                                    Margin="0,2,0,0"
                                    Padding="0,10,0,10"
-                                   Visibility="{Binding HasSelectedWork, Converter={StaticResource conv_InverseBooleanToVisibility}}"
+                                   Visibility="{Binding HasSelectedWork,
+                                                        Converter={StaticResource conv_InverseBooleanToVisibility}}"
                                    />
 
         <!--  Search TextBox  -->

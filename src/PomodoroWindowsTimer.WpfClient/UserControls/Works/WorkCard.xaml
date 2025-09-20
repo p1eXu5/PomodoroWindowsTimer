@@ -18,7 +18,8 @@
              >
     <materialDesign:Card Padding="10,5"
                          VerticalAlignment="Center"
-                         Background="{Binding ElementName=m_WorkCardRoot, Path=Background}"
+                         Background="{Binding ElementName=m_WorkCardRoot,
+                                              Path=Background}"
                          >
         <DockPanel VerticalAlignment="Center"
                    LastChildFill="True"
@@ -38,7 +39,9 @@
                            materialDesign:HintAssist.Hint="Number"
                            FontSize="11"
                            FontWeight="Normal"
-                           Text="{Binding Number, Converter={StaticResource conv_NoNumberConverter}, FallbackValue='NO NUMBER'}"
+                           Text="{Binding Number,
+                                          Converter={StaticResource conv_NoNumberConverter},
+                                          FallbackValue='NO NUMBER'}"
                            />
                 <TextBlock Grid.Column="1"
                            HorizontalAlignment="Right"
@@ -46,21 +49,27 @@
                            materialDesign:HintAssist.Hint="Number"
                            FontSize="11"
                            FontWeight="Normal"
-                           Text="{Binding LastEventCreatedAtOrUpdatedAt, Converter={StaticResource conv_DateTimeOffsetToShortDate}, FallbackValue='12.02.2024'}"
+                           Text="{Binding LastEventCreatedAtOrUpdatedAt,
+                                          Converter={StaticResource conv_DateTimeOffsetToShortDate},
+                                          FallbackValue='12.02.2024'}"
                            />
             </Grid>
             <!--  Title  -->
             <TextBlock x:Name="m_TitleTextBlock"
-                       Height="{Binding ElementName=m_WorkCardRoot, Path=TitleHeight}"
-                       Margin="{Binding ElementName=m_WorkCardRoot, Path=TitleMargin}"
+                       Height="{Binding ElementName=m_WorkCardRoot,
+                                        Path=TitleHeight}"
+                       Margin="{Binding ElementName=m_WorkCardRoot,
+                                        Path=TitleMargin}"
                        VerticalAlignment="Top"
                        materialDesign:HintAssist.Hint="Title"
                        FontSize="16"
                        FontWeight="Light"
-                       Text="{Binding Title, FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                       Text="{Binding Title,
+                                      FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
                        TextAlignment="Justify"
                        TextTrimming="CharacterEllipsis"
-                       TextWrapping="{Binding ElementName=m_WorkCardRoot, Path=TitleWrapping}"
+                       TextWrapping="{Binding ElementName=m_WorkCardRoot,
+                                              Path=TitleWrapping}"
                        ToolTip="{Binding Title}"
                        />
         </DockPanel>

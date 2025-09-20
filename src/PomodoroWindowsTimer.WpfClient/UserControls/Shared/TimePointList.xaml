@@ -102,7 +102,8 @@
             <!--  ItemTemplate is set through binding property TimePointListBoxItemTemplate in code behind  -->
             <ItemsControl x:Name="m_TimePointListBox"
                           Grid.IsSharedSizeScope="True"
-                          ItemsSource="{Binding DataContext, ElementName=m_TimePointListContainer}"
+                          ItemsSource="{Binding DataContext,
+                                                ElementName=m_TimePointListContainer}"
                           />
             <!--<ListBox x:Name="m_TimePointListBox"
                  Grid.IsSharedSizeScope="True"

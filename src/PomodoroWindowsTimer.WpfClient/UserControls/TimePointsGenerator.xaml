@@ -47,7 +47,8 @@
                               IsTextSearchEnabled="True"
                               ItemsSource="{Binding Patterns}"
                               SelectedIndex="{Binding SelectedPatternIndex}"
-                              Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged}"
+                              Text="{Binding SelectedPattern,
+                                             UpdateSourceTrigger=PropertyChanged}"
                               />
                 </StackPanel>
             </Border>
@@ -72,7 +73,8 @@
 
             <!--  buttons  -->
             <Border DockPanel.Dock="Bottom"
-                    Height="{Binding ElementName=m_PatternsSection, Path=ActualHeight}"
+                    Height="{Binding ElementName=m_PatternsSection,
+                                     Path=ActualHeight}"
                     Margin="0,10,0,0"
                     >
                 <StackPanel HorizontalAlignment="Center"

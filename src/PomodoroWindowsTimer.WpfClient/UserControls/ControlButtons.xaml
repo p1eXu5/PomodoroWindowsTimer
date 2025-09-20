@@ -63,7 +63,8 @@
                                                 Background="{TemplateBinding Background}"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius), RelativeSource={RelativeSource TemplatedParent}}"
+                                                CornerRadius="{Binding Path=(materialDesign:ButtonAssist.CornerRadius),
+                                                                       RelativeSource={RelativeSource TemplatedParent}}"
                                                 />
 
                                         <ContentPresenter x:Name="MyContentPresenter"
@@ -89,7 +90,8 @@
         </StackPanel.Resources>
 
         <pwt:Lcd Style="{StaticResource st_MediaButtonLcd}"
-                 Visibility="{Binding LooperIsRunning, Converter={StaticResource conv_BooleanToVisibility}}"
+                 Visibility="{Binding LooperIsRunning,
+                                      Converter={StaticResource conv_BooleanToVisibility}}"
                  >
             <Button Command="{Binding ReplayCommand}"
                     Content="Replay"
@@ -102,14 +104,16 @@
                  Style="{StaticResource st_MediaButtonLcd}"
                  >
             <Button Command="{Binding PlayStopCommand}"
-                    Content="{Binding PlayPauseButtonText, FallbackValue=Resume}"
+                    Content="{Binding PlayPauseButtonText,
+                                      FallbackValue=Resume}"
                     Style="{StaticResource st_MediaButton}"
                     />
         </pwt:Lcd>
 
         <pwt:Lcd Margin="20,0,0,0"
                  Style="{StaticResource st_MediaButtonLcd}"
-                 Visibility="{Binding LooperIsRunning, Converter={StaticResource conv_BooleanToVisibility}}"
+                 Visibility="{Binding LooperIsRunning,
+                                      Converter={StaticResource conv_BooleanToVisibility}}"
                  >
             <Button Command="{Binding NextCommand}"
                     Content="Next"

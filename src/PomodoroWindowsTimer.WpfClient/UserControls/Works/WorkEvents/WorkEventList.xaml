@@ -6,10 +6,11 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:workEventListModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkEventListModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             d:DataContext="{d:DesignInstance Type=workEventListModel:Bindings, IsDesignTimeCreatable=False}"
              Width="950"
              Height="330"
              Padding="20,20,20,10"
+             d:DataContext="{d:DesignInstance Type=workEventListModel:Bindings,
+                                              IsDesignTimeCreatable=False}"
              d:Foreground="#AAAAAA"
              Loaded="UserControl_Loaded"
              mc:Ignorable="d"
@@ -29,26 +30,16 @@
                >
 
         <Border DockPanel.Dock="Top"
-                BorderThickness="0,1,0,1"
                 BorderBrush="#5E5E5E"
+                BorderThickness="0,1,0,1"
                 >
             <Grid Margin="0,10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="250"
-                                      SharedSizeGroup="gr_EventName"
-                                      />
-                    <ColumnDefinition Width="150"
-                                      SharedSizeGroup="gr_WorkTime"
-                                      />
-                    <ColumnDefinition Width="150"
-                                      SharedSizeGroup="gr_WorkOffset"
-                                      />
-                    <ColumnDefinition Width="150"
-                                      SharedSizeGroup="gr_BreakTime"
-                                      />
-                    <ColumnDefinition Width="150"
-                                      SharedSizeGroup="gr_BreakOffset"
-                                      />
+                    <ColumnDefinition Width="250" SharedSizeGroup="gr_EventName" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_WorkTime" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_WorkOffset" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_BreakTime" />
+                    <ColumnDefinition Width="150" SharedSizeGroup="gr_BreakOffset" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0"
                            Text="EventName"
@@ -66,8 +57,8 @@
             </Grid>
         </Border>
         <ListBox VerticalAlignment="Top"
-                 ItemsSource="{Binding WorkEvents}"
                  ItemTemplateSelector="{StaticResource sel_WorkListItemTemplate}"
+                 ItemsSource="{Binding WorkEvents}"
                  />
     </DockPanel>
 </UserControl>

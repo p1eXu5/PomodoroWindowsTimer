@@ -33,7 +33,8 @@
                                    materialDesign:HintAssist.Hint="Validates"
                                    Is24Hours="True"
                                    IsInvalidTextAllowed="False"
-                                   Text="{Binding TimeSpan, UpdateSourceTrigger=PropertyChanged}"
+                                   Text="{Binding TimeSpan,
+                                                  UpdateSourceTrigger=PropertyChanged}"
                                    WithSeconds="False"
                                    />
     </Grid>

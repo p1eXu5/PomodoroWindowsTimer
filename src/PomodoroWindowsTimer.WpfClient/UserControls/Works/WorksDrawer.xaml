@@ -23,7 +23,10 @@
     </UserControl.Resources>
     <Grid>
         <local:WorkSelector DataContext="{Binding WorkListModel}"
-                            Visibility="{Binding DataContext.SubModelId, ElementName=m_WorksDrawerRoot, Converter={StaticResource conv_SubModelIdToVisibility}, ConverterParameter='WorkListId'}"
+                            Visibility="{Binding DataContext.SubModelId,
+                                                 ElementName=m_WorksDrawerRoot,
+                                                 Converter={StaticResource conv_SubModelIdToVisibility},
+                                                 ConverterParameter='WorkListId'}"
                             />
         <!--  CreatingWorkModel  -->
         <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
@@ -34,7 +37,11 @@
                             DataContext="{Binding CreatingWorkModel}"
                             OkCommand="{Binding CreateCommand}"
                             OkCommandContent="CREATE"
-                            Visibility="{Binding DataContext.SubModelId, ElementName=m_WorksDrawerRoot, Converter={StaticResource conv_SubModelIdToVisibility}, ConverterParameter='CreatingWorkId', FallbackValue=Collapsed}"
+                            Visibility="{Binding DataContext.SubModelId,
+                                                 ElementName=m_WorksDrawerRoot,
+                                                 Converter={StaticResource conv_SubModelIdToVisibility},
+                                                 ConverterParameter='CreatingWorkId',
+                                                 FallbackValue=Collapsed}"
                             />
 
         <!--  WorkModel  -->
@@ -46,7 +53,11 @@
                             DataContext="{Binding UpdatingWorkModel}"
                             OkCommand="{Binding UpdateCommand}"
                             OkCommandContent="UPDATE"
-                            Visibility="{Binding DataContext.SubModelId, ElementName=m_WorksDrawerRoot, Converter={StaticResource conv_SubModelIdToVisibility}, ConverterParameter='UpdatingWorkId', FallbackValue=Collapsed}"
+                            Visibility="{Binding DataContext.SubModelId,
+                                                 ElementName=m_WorksDrawerRoot,
+                                                 Converter={StaticResource conv_SubModelIdToVisibility},
+                                                 ConverterParameter='UpdatingWorkId',
+                                                 FallbackValue=Collapsed}"
                             />
     </Grid>
 </UserControl>

@@ -16,14 +16,17 @@
                    FontSize="11"
                    FontWeight="Normal"
                    Foreground="#EEEEEE"
-                   Text="{Binding Number, Converter={StaticResource conv_NoNumberConverter}, FallbackValue='DEV-0001'}"
+                   Text="{Binding Number,
+                                  Converter={StaticResource conv_NoNumberConverter},
+                                  FallbackValue='DEV-0001'}"
                    />
         <TextBlock MaxWidth="500"
                    MaxHeight="350"
                    Margin="0,0,0,14"
                    FontSize="18"
                    Foreground="#EEEEEE"
-                   Text="{Binding Title, FallbackValue='[DEV-0001] Task title and description multilined'}"
+                   Text="{Binding Title,
+                                  FallbackValue='[DEV-0001] Task title and description multilined'}"
                    TextTrimming="WordEllipsis"
                    TextWrapping="Wrap"
                    />

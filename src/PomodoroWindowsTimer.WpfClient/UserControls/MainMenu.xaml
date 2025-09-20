@@ -36,7 +36,8 @@
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
                        Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
-                       Text="{Binding AssemblyVersion, FallbackValue=v 1.0.1.0}"
+                       Text="{Binding AssemblyVersion,
+                                      FallbackValue=v 1.0.1.0}"
                        />
         </StackPanel>
 
@@ -99,7 +100,8 @@
                     DataContext="{Binding AppDialog}"
                     Style="{StaticResource st_MenuButton}"
                     ToolTip="Database settings"
-                    Visibility="{Binding ShowOpenDatabaseSettingsDialogCommand, Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding ShowOpenDatabaseSettingsDialogCommand,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
                     />
         </StackPanel>
 

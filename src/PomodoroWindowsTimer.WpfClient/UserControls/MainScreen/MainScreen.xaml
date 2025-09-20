@@ -13,7 +13,8 @@
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="350"
              d:DesignWidth="600"
-             d:Foreground="{Binding ActiveTimeKind, Converter={StaticResource conv_KindToBrushConverter}}"
+             d:Foreground="{Binding ActiveTimeKind,
+                                    Converter={StaticResource conv_KindToBrushConverter}}"
              mc:Ignorable="d"
              >
 
@@ -25,11 +26,15 @@
         <local:CurrentWorkInfo DockPanel.Dock="Top"
                                MinHeight="54"
                                DataContext="{Binding CurrentWork}"
-                               Visibility="{Binding DataContext.IsCurrentWorkSet, ElementName=m_MainScreenRoot, Converter={StaticResource conv_BooleanToVisibilityHidden}}"
+                               Visibility="{Binding DataContext.IsCurrentWorkSet,
+                                                    ElementName=m_MainScreenRoot,
+                                                    Converter={StaticResource conv_BooleanToVisibilityHidden}}"
                                />
         <local:Timer DataContext="{Binding Player}"
-                     DigitBackground="{Binding ElementName=m_MainScreenRoot, Path=DigitBackground}"
-                     Foreground="{Binding ElementName=m_MainScreenRoot, Path=Foreground}"
+                     DigitBackground="{Binding ElementName=m_MainScreenRoot,
+                                               Path=DigitBackground}"
+                     Foreground="{Binding ElementName=m_MainScreenRoot,
+                                          Path=Foreground}"
                      />
     </DockPanel>
 </UserControl>

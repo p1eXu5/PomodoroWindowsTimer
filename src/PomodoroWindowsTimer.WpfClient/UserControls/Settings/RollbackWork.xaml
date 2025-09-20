@@ -31,14 +31,17 @@
                    materialDesign:HintAssist.Hint="Number"
                    FontSize="11"
                    FontWeight="Normal"
-                   Text="{Binding Number, Converter={StaticResource conv_NoNumberConverter}, FallbackValue='NO NUMBER'}"
+                   Text="{Binding Number,
+                                  Converter={StaticResource conv_NoNumberConverter},
+                                  FallbackValue='NO NUMBER'}"
                    />
         <TextBlock Margin="10,5"
                    VerticalAlignment="Top"
                    materialDesign:HintAssist.Hint="Title"
                    FontSize="16"
                    FontWeight="Normal"
-                   Text="{Binding Title, FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
+                   Text="{Binding Title,
+                                  FallbackValue='[Dev-001] Lorem ipsum dolor sit amet, consectetur adipiscing elit'}"
                    TextTrimming="CharacterEllipsis"
                    TextWrapping="Wrap"
                    ToolTip="{Binding Title}"
@@ -46,46 +49,52 @@
         <TextBlock Margin="0,20"
                    HorizontalAlignment="Center"
                    FontSize="20"
-                   Text="{Binding Difference, Converter={StaticResource conv_TimeSpanToMinutes}, FallbackValue='20 mimutes'}"
+                   Text="{Binding Difference,
+                                  Converter={StaticResource conv_TimeSpanToMinutes},
+                                  FallbackValue='20 mimutes'}"
                    TextAlignment="Center"
                    TextWrapping="Wrap"
                    />
         <StackPanel HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     >
-            <Button Command="{Binding InterpretAsBreakAndCloseCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding InterpretAsBreakAndCloseCommand}"
                     Content="AS BREAK"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsWorkKind, Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsWorkKind,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
                     />
 
-            <Button Command="{Binding InterpretAsWorkAndCloseCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding InterpretAsWorkAndCloseCommand}"
                     Content="AS WORK"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsBreakKind, Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsBreakKind,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
                     />
 
 
-            <Button Command="{Binding EraseCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding EraseCommand}"
                     Content="ERASE"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
                     />
 
-            <Button Command="{Binding CloseCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding CloseCommand}"
                     Content="LEAVE AS WORK"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsWorkKind, Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsWorkKind,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
                     />
 
-            <Button Command="{Binding CloseCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding CloseCommand}"
                     Content="LEAVE AS BREAK"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroDialogButton}"
-                    Visibility="{Binding IsBreakKind, Converter={StaticResource conv_BooleanToVisibility}}"
+                    Visibility="{Binding IsBreakKind,
+                                         Converter={StaticResource conv_BooleanToVisibility}}"
                     />
         </StackPanel>
 

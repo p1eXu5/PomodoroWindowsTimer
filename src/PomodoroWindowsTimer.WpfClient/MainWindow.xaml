@@ -14,13 +14,13 @@
         Height="520"
         MinWidth="800"
         MinHeight="595"
+        TextElement.FontSize="13"
+        TextElement.FontWeight="Regular"
+        TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         d:DataContext="{d:DesignInstance Type=mainModel:IBindings,
                                          IsDesignTimeCreatable=False}"
         Background="Black"
         Style="{StaticResource MaterialDesignWindow}"
-        TextElement.FontSize="13"
-        TextElement.FontWeight="Regular"
-        TextElement.Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
         WindowStartupLocation="CenterScreen"
         mc:Ignorable="d"
         >
@@ -36,31 +36,35 @@
                                DialogTheme="Inherit"
                                Identifier="RootDialog"
                                IsOpen="{Binding IsDialogOpened}"
-                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar, Path=MessageQueue}"
+                               SnackbarMessageQueue="{Binding ElementName=m_ErrorMessageQueueSnackbar,
+                                                              Path=MessageQueue}"
                                >
 
         <pwt:GlossOnBase>
             <DockPanel d:DataContext="{d:DesignInstance Type=mainModel:IBindings}"
-                       DataContext="{Binding ElementName=m_Root, Path=DataContext}"
+                       DataContext="{Binding ElementName=m_Root,
+                                             Path=DataContext}"
                        >
                 <materialDesign:Snackbar x:Name="m_ErrorMessageQueueSnackbar"
+                                         DockPanel.Dock="Bottom"
                                          HorizontalAlignment="Stretch"
                                          ActionButtonStyle="{StaticResource MaterialDesignSnackbarActionDarkButton}"
-                                         DockPanel.Dock="Bottom"
                                          MessageQueue="{Binding ErrorMessageQueue}"
                                          />
 
-                <userControls:ControlButtons VerticalAlignment="Top"
+                <userControls:ControlButtons DockPanel.Dock="Bottom"
+                                             VerticalAlignment="Top"
                                              DataContext="{Binding Player}"
-                                             DockPanel.Dock="Bottom"
                                              />
 
                 <!--  LCD container  -->
                 <pwt:Lcd x:Name="m_MainContentContainer"
                          Margin="40,30,40,0"
                          >
-                    <userControls:MainContent Width="{Binding ElementName=m_MainContentContainer, Path=ActualWidth}"
-                                              Height="{Binding ElementName=m_MainContentContainer, Path=ActualHeight}"
+                    <userControls:MainContent Width="{Binding ElementName=m_MainContentContainer,
+                                                              Path=ActualWidth}"
+                                              Height="{Binding ElementName=m_MainContentContainer,
+                                                               Path=ActualHeight}"
                                               DataContext="{Binding}"
                                               />
                 </pwt:Lcd>

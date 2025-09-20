@@ -5,10 +5,11 @@
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Works.WorkEvents"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:workEventDetailsModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkEventDetailsModel;assembly=PomodoroWindowsTimer.ElmishApp"
-             DataContext="{Binding Work}"
-             d:DataContext="{d:DesignInstance Type=workEventDetailsModel:Bindings, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance Type=workEventDetailsModel:Bindings,
+                                              IsDesignTimeCreatable=False}"
              d:DesignHeight="50"
              d:DesignWidth="800"
+             DataContext="{Binding Work}"
              mc:Ignorable="d"
              >
     <Grid>
@@ -23,8 +24,13 @@
                    Text="{Binding EventName}"
                    TextWrapping="Wrap"
                    />
-        <TextBlock Grid.Column="1" Text="{Binding CreatedAt, Converter={StaticResource conv_DateTimeOffsetToShortLocalDateTime}}" />
-        <StackPanel Grid.Column="2" Orientation="Horizontal">
+        <TextBlock Grid.Column="1"
+                   Text="{Binding CreatedAt,
+                                  Converter={StaticResource conv_DateTimeOffsetToShortLocalDateTime}}"
+                   />
+        <StackPanel Grid.Column="2"
+                    Orientation="Horizontal"
+                    >
             <TextBlock Text="{Binding OffsetTime, Converter={StaticResource conv_TimeSpanToMnemonicStringS}}" />
             <TextBlock Visibility="{Binding HasOffsetTime, Converter={StaticResource conv_BooleanToVisibility}}">
                 <Run Text=" (" /><Run Text="{Binding RunningTime, Converter={StaticResource conv_TimeSpanToMnemonicStringS}}" /><Run Text=")" />

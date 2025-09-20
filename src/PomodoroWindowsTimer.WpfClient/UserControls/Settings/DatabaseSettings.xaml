@@ -37,15 +37,15 @@
         <StackPanel HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     >
-            <Button Command="{Binding ApplyCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding ApplyCommand}"
                     Content="APPLY"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroOkDialogButton}"
                     />
 
-            <Button Command="{Binding CancelCommand}"
+            <Button DockPanel.Dock="Bottom"
+                    Command="{Binding CancelCommand}"
                     Content="CANCEL"
-                    DockPanel.Dock="Bottom"
                     Style="{StaticResource PomodoroCancelDialogButton}"
                     />
         </StackPanel>

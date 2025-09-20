@@ -1,10 +1,10 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Shared.Spinner"
-             x:Name="m_SpinnerRoot"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="m_SpinnerRoot"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
              d:DesignHeight="200"
@@ -15,15 +15,15 @@
         <Border HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 d:Background="Black"
-                Opacity="0.4"
                 Background="Black"
+                Opacity="0.4"
                 />
         <Viewbox Height="200"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center"
                  >
-            <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
-                         IsIndeterminate="True"
+            <ProgressBar IsIndeterminate="True"
+                         Style="{StaticResource MaterialDesignCircularProgressBar}"
                          Value="35"
                          />
         </Viewbox>

@@ -45,7 +45,12 @@
 
         <!--  WorksDrawer  -->
         <materialDesign:DrawerHost.RightDrawerContent>
-            <works:WorksDrawer Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=ActualWidth, Converter={StaticResource conv_DrawerWidth}, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+            <works:WorksDrawer Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                              AncestorType=UserControl},
+                                               Path=ActualWidth,
+                                               Converter={StaticResource conv_DrawerWidth},
+                                               Mode=OneWay,
+                                               UpdateSourceTrigger=PropertyChanged}"
                                DataContext="{Binding WorkSelector}"
                                />
         </materialDesign:DrawerHost.RightDrawerContent>

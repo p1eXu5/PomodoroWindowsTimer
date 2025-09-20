@@ -25,7 +25,8 @@
                        Foreground="{StaticResource MaterialDesign.Brush.Primary.Dark}"
                        Text="SELECT WORK"
                        TextAlignment="Center"
-                       Visibility="{Binding Path=HasSelectedWork, Converter={StaticResource conv_InverseBooleanToVisibility}}"
+                       Visibility="{Binding Path=HasSelectedWork,
+                                            Converter={StaticResource conv_InverseBooleanToVisibility}}"
                        />
             <materialDesign:PopupBox Grid.Row="0"
                                      Grid.Column="1"
