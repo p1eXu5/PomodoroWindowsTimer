@@ -1,4 +1,8 @@
 ﻿# Release Notes
+## New in v3.3.0 (Released 2025/09/20)
+* Include Time Point Generator feature
+* Code optimization
+* Small fixes
 ## New in v3.2.1 (Released 2025/09/15)
 * Code optimization
 * Small fixes
