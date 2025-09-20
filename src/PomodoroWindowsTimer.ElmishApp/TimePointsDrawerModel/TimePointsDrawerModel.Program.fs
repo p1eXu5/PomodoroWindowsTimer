@@ -14,10 +14,11 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.TimePointsDrawerModel
 
-let runningTimePointListIntentCmd runningTimePointListIntent =
+let private runningTimePointListIntentCmd runningTimePointListIntent =
     match runningTimePointListIntent with
     | RunningTimePointListModel.Intent.None -> Cmd.none
     | RunningTimePointListModel.Intent.RequestTimePointGenerator ->
+        // we need msg because sub model can emit message too.
         Cmd.ofMsg Msg.InitTimePointGenerator
 
 /// Msg.RunningTimePointsMsg handler
@@ -30,13 +31,23 @@ let private mapRunningTimePointsMsg updateRtpListModel smsg rtpListModel =
             intent |> runningTimePointListIntentCmd
         ]
 
+let private timePointsGeneratorIntentCmd runningTimePointListIntent =
+    match runningTimePointListIntent with
+    | TimePointsGeneratorModel.Intent.None -> Cmd.none
+    | TimePointsGeneratorModel.Intent.ApplyGeneratedTimePoints
+    | TimePointsGeneratorModel.Intent.CancelTimePointGeneration ->
+        // we need msg because sub model can emit message too.
+        Cmd.ofMsg Msg.InitRunningTimePoints
 
 /// Msg.TimePointGeneratorMsg handler
 let private mapTimePointsGeneratorMsg updateGenModel smsg genModel =
     genModel |> updateGenModel smsg
-    |> fun (genModel', cmd) ->
+    |> fun (genModel', cmd, intent) ->
         genModel' |> TimePointsDrawerModel.TimePointsGenerator
-        , Cmd.map Msg.TimePointsGeneratorMsg cmd
+        , Cmd.batch [
+            Cmd.map Msg.TimePointsGeneratorMsg cmd
+            intent |> timePointsGeneratorIntentCmd
+        ]
 
 let update
     (logger: ILogger<TimePointsDrawerModel>)

@@ -27,18 +27,21 @@ module TimePointsGeneratorModel =
         | TimePointPrototypeMsg of id: Kind * TimePointPrototypeModel.Msg
         | TimePointMsg of id: Guid * TimePointModel.Msg
         | ApplyTimePoints
+        | OnExn of exn
     and
         TimePointMsg =
             | SetName of string
 
     [<RequireQualifiedAccess>]
+    [<Struct>]
     type Intent =
         | None
         | ApplyGeneratedTimePoints
+        | CancelTimePointGeneration
 
     [<AutoOpen>]
     module Helpers =
-        let withNoIntent (model, cmd) = (model, cmd, Intent.None)
+        let inline withNoIntent (model, cmd) = (model, cmd, Intent.None)
 
     open Elmish
     open Elmish.Extensions

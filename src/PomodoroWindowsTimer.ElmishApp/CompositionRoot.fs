@@ -82,11 +82,16 @@ let compose
         // -------------------------
         // TimePointsGeneratorModel
         // -------------------------
-        let initTimePointGeneratorModel () =
+        let initTimePointsGeneratorModel () =
             TimePointsGeneratorModel.init timePointPrototypeStore patternStore
 
-        let updateTimePointGeneratorModel =
-            TimePointsGeneratorModel.Program.update patternStore timePointPrototypeStore dialogErrorMessageQueue
+        let updateTimePointsGeneratorModel =
+            TimePointsGeneratorModel.Program.update
+                patternStore
+                timePointPrototypeStore
+                timePointQueue
+                dialogErrorMessageQueue
+                (loggerFactory.CreateLogger<TimePointsGeneratorModel>())
 
         // -------------------------
         // WorkEventListModel
@@ -243,8 +248,8 @@ let compose
             TimePointsDrawerModel.Program.update
                 (loggerFactory.CreateLogger<TimePointsDrawerModel>())
                 updateRunningTimePointListModel
-                initTimePointGeneratorModel
-                updateTimePointGeneratorModel
+                initTimePointsGeneratorModel
+                updateTimePointsGeneratorModel
 
         MainModel.Program.update
             telegramBot

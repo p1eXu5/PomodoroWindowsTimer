@@ -18,6 +18,8 @@ module TimePointsDrawerModel =
         | TimePointsGeneratorMsg of TimePointsGeneratorModel.Msg
         | LooperMsg of LooperEvent
         | InitTimePointGenerator
+        | InitRunningTimePoints
+
 
     [<RequireQualifiedAccess>]
     module MsgWith =
