@@ -62,6 +62,13 @@ type PatternParsedItem =
     | AliasTimeSpan of Alias * TimeSpan
     | AliasTimeSpanName of Alias * TimeSpan * Name
 
+[<Struct>]
+type TimePointsTime =
+    {
+        WorkTime: TimeSpan
+        BreakTime: TimeSpan
+    }
+
 // ------------------------------- modules
 
 module Alias =
@@ -132,11 +139,11 @@ module TimePointPrototype =
             { Name = "Long break"; Kind = Kind.LongBreak; Alias = Kind.LongBreak |> Kind.alias; TimeSpan = TimeSpan.FromMinutes(20L) }
         ]
 
-    let toTimePoint num ind (prototype: TimePointPrototype) =
+    let toTimePoint num nameInd (prototype: TimePointPrototype) =
         {
             Id = Guid.NewGuid()
             Num = num
-            Name = sprintf "%s %i" prototype.Name ind
+            Name = sprintf "%s %i" prototype.Name nameInd
             TimeSpan = prototype.TimeSpan
             Kind = prototype.Kind
             KindAlias = prototype.Alias
@@ -235,20 +242,58 @@ module PatternParsedItem =
                 |> List.map (fun p -> (p.Alias, p))
                 |> Map.ofList
 
+            let nameMap =
+                prototypeList
+                |> List.map (fun p -> (p.Name, 0))
+                |> Map.ofList
+
+            let addTime (tp: TimePoint) (times: TimePointsTime) =
+                match tp.Kind with
+                | Kind.Work -> { times with WorkTime = times.WorkTime + tp.TimeSpan }
+                | Kind.Break | Kind.LongBreak -> { times with BreakTime = times.BreakTime + tp.TimeSpan }
+
             patternParsedItems
-            |> List.mapi (fun idx item ->
+            |> List.fold (fun (s: {| Ind: int; NameMap: Map<string, int>; Times: TimePointsTime; Result: TimePoint list |}) item ->
+                let idx = s.Ind + 1
                 match item with
                 | PatternParsedItem.Alias alias ->
                     let prototype = prototypeMap[alias]
-                    prototype |> TimePointPrototype.toTimePoint (idx + 1) (idx + 1)
+                    let nameInd = s.NameMap[prototype.Name] + 1
+                    let tp = prototype |> TimePointPrototype.toTimePoint idx nameInd
+                    {| s with
+                        Ind = idx + 1
+                        NameMap = s.NameMap |> Map.add prototype.Name nameInd
+                        Result = tp :: s.Result
+                        Times = s.Times |> addTime tp
+                    |}
 
                 | PatternParsedItem.AliasTimeSpan (alias, ts) ->
                     let prototype = prototypeMap[alias]
-                    let tp = prototype |> TimePointPrototype.toTimePoint (idx + 1) (idx + 1)
-                    { tp with TimeSpan = ts }
+                    let nameInd = s.NameMap[prototype.Name] + 1
+                    let tp = 
+                        prototype |> TimePointPrototype.toTimePoint idx nameInd
+                        |> fun t -> { t with TimeSpan = ts }
+                    {| s with
+                        Ind = idx + 1
+                        NameMap = s.NameMap |> Map.add prototype.Name nameInd
+                        Result = tp :: s.Result
+                        Times = s.Times |> addTime tp
+                    |}
 
                 | PatternParsedItem.AliasTimeSpanName (alias, ts, name) ->
                     let prototype = prototypeMap[alias]
-                    let tp = prototype |> TimePointPrototype.toTimePoint (idx + 1) (idx + 1)
-                    { tp with TimeSpan = ts; Name = sprintf "%s %i" name (idx + 1) }
-            )
+                    let nameInd = s.NameMap[prototype.Name] + 1
+                    let tp =
+                        prototype |> TimePointPrototype.toTimePoint idx nameInd
+                        |> fun t -> { t with TimeSpan = ts; Name = sprintf "%s %i" name (idx) }
+                    {| s with
+                        Ind = idx + 1
+                        NameMap = s.NameMap |> Map.add prototype.Name nameInd
+                        Result = tp :: s.Result
+                        Times = s.Times |> addTime tp
+                    |}
+
+            ) {| Ind = 0; NameMap = nameMap; Times = { WorkTime = TimeSpan.Zero; BreakTime = TimeSpan.Zero }; Result = [] |}
+            |> fun s ->
+                (s.Result |> List.rev, s.Times)
+

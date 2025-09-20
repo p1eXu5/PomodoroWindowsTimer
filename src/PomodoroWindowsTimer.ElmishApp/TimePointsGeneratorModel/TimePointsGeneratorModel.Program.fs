@@ -20,24 +20,6 @@ open PomodoroWindowsTimer.Abstractions
 let private parsePattern pattern model =
     PatternParser.parse (model.TimePointPrototypes |> List.map _.Prototype.Alias) pattern
 
-let private toTimePoints aliases model =
-    let rec running l (state: int array) res =
-        match l with
-        | [] -> res |> List.rev
-        | head :: tail ->
-            let ind = model.TimePointPrototypes |> List.findIndex (fun p -> p.Prototype.Alias |> (=) head)
-            let prototype =
-                (model.TimePointPrototypes |> List.item ind |> _.Prototype |> TimePointPrototype.toTimePoint (ind + 1) state[ind] |> TimePointModel.init)
-            do
-                Array.set state ind (state[ind] + 1)
-
-            (prototype :: res) |> running tail state
-
-    let counts =
-        model.TimePointPrototypes |> List.mapi (fun _ _ -> 1) |> List.toArray
-
-    running aliases counts []
-
 let private toTimePointModels (patternParsedItems: PatternParsedItem list) model =
     let prototypeList =
         model.TimePointPrototypes
@@ -45,7 +27,9 @@ let private toTimePointModels (patternParsedItems: PatternParsedItem list) model
 
     patternParsedItems
     |> PatternParsedItem.List.timePoints prototypeList
-    |> List.map TimePointModel.init
+    |> fun (l, times) ->
+        l |> List.map TimePointModel.init
+        , times
 
 let update
     (patternStore: PatternStore)
@@ -72,10 +56,13 @@ let update
             , Intent.None
         | Error err ->
             errorMessageQueue.EnqueueError(err)
-            model |> setIsPatternWrong, Cmd.none, Intent.None
+            model
+            |> setIsPatternWrong
+            |> clearTimePoints
+            , Cmd.none, Intent.None
 
-    | Msg.SetGeneratedTimePoints tpList ->
-        model |> setTimePoints tpList
+    | Msg.SetGeneratedTimePoints (tpList, times) ->
+        model |> setTimePoints tpList |> setTimes times
         , Cmd.none, Intent.None
 
     | SetSelectedPattern None ->
@@ -122,6 +109,9 @@ let update
     | ApplyTimePoints ->
         logger.LogUnprocessedMessage(msg, model)
         model, Cmd.none, Intent.None
+
+    | RequestCancelling ->
+        model, Cmd.none, Intent.CancelTimePointGeneration
 
     | Msg.OnExn ex ->
         logger.LogProgramExn ex

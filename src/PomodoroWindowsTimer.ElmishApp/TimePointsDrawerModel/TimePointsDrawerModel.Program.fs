@@ -51,6 +51,7 @@ let private mapTimePointsGeneratorMsg updateGenModel smsg genModel =
 
 let update
     (logger: ILogger<TimePointsDrawerModel>)
+    initRtpListModel
     updateRtpListModel
     initGenModel
     updateGenModel
@@ -75,6 +76,12 @@ let update
         |> fun (genModel, cmd) ->
             genModel |> TimePointsDrawerModel.TimePointsGenerator
             , Cmd.map Msg.TimePointsGeneratorMsg cmd
+
+    | Msg.InitRunningTimePoints ->
+        initRtpListModel ()
+        |> fun (rtlListModel) ->
+            rtlListModel |> TimePointsDrawerModel.RunningTimePoints
+            , Cmd.none
 
     | _ ->
         logger.LogUnprocessedMessage(msg, model)

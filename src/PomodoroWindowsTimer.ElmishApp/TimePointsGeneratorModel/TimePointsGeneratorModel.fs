@@ -13,6 +13,7 @@ type TimePointsGeneratorModel =
         SelectedPattern: string option
         SelectedPatternIndex: int
         IsPatternWrong: bool
+        TimePointsTime: TimePointsTime voption
     }
 
 
@@ -21,12 +22,13 @@ module TimePointsGeneratorModel =
     type Msg =
         | SetPatterns of string list
         | ProcessParsingResult of Result<PatternParsedItem list, string>
-        | SetGeneratedTimePoints of TimePointModel list
+        | SetGeneratedTimePoints of (TimePointModel list * TimePointsTime)
         | SetSelectedPatternIndex of int
         | SetSelectedPattern of Pattern option
         | TimePointPrototypeMsg of id: Kind * TimePointPrototypeModel.Msg
         | TimePointMsg of id: Guid * TimePointModel.Msg
         | ApplyTimePoints
+        | RequestCancelling
         | OnExn of exn
     and
         TimePointMsg =
@@ -61,6 +63,7 @@ module TimePointsGeneratorModel =
                 SelectedPatternIndex = 0
                 TimePoints = []
                 IsPatternWrong = false
+                TimePointsTime = ValueNone
             }
         model, cmd
 
@@ -96,7 +99,7 @@ module TimePointsGeneratorModel =
         { m with TimePoints = tpx }
 
     let clearTimePoints m =
-        { m with TimePoints = [] }
+        { m with TimePoints = []; TimePointsTime = ValueNone }
 
     let setIsPatternWrong m =
         { m with IsPatternWrong = true }
@@ -104,9 +107,5 @@ module TimePointsGeneratorModel =
     let unsetIsPatternWrong m =
         { m with IsPatternWrong = false }
 
-    let applyMsg (m: TimePointsGeneratorModel) =
-        if not m.IsPatternWrong then
-            match m.TimePoints with
-            | [] -> None
-            | _ -> Some Msg.ApplyTimePoints
-        else None
+    let setTimes times (m: TimePointsGeneratorModel) =
+        { m with TimePointsTime = times |> ValueSome }

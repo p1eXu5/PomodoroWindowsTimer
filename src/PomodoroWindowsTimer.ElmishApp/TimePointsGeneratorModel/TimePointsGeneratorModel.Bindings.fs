@@ -15,7 +15,9 @@ type IBindings =
         abstract SelectedPattern: string option with get, set
         abstract SelectedPatternIndex: int with get, set
         abstract IsPatternCorrect: bool
+        abstract TimePointsTime: obj
         abstract ApplyCommand: ICommand
+        abstract CancelCommand: ICommand
     end
 
 module Bindings =
@@ -43,6 +45,24 @@ module Bindings =
             nameof __.SelectedPatternIndex |> Binding.twoWay (getSelectedPatternIndex, SetSelectedPatternIndex)
             nameof __.IsPatternCorrect |> Binding.oneWay (fun m -> m.IsPatternWrong |> not)
 
-            nameof __.ApplyCommand |> Binding.cmdIf applyMsg
+            nameof __.TimePointsTime
+                |> Binding.SubModel.vopt (fun () -> [
+                    "WorkTime" |> Binding.oneWay _.WorkTime
+                    "BreakTime" |> Binding.oneWay _.BreakTime
+                    "TotalTime" |> Binding.oneWay (fun (m: TimePointsTime) -> m.WorkTime + m.BreakTime)
+                ])
+                |> Binding.mapModel _.TimePointsTime
+
+            nameof __.ApplyCommand
+                |> Binding.cmdIf (fun m ->
+                    if not m.IsPatternWrong then
+                        match m.TimePoints with
+                        | [] -> None
+                        | _ -> Some Msg.ApplyTimePoints
+                    else None
+                )
+
+            nameof __.CancelCommand
+                |> Binding.cmd Msg.RequestCancelling
         ]
 

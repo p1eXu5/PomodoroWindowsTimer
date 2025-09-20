@@ -59,5 +59,5 @@ module Bindings =
             nameof __.Name      |> Binding.twoWay (_.TimePoint.Name, Msg.SetName)
             nameof __.TimeSpan  |> Binding.oneWay _.TimePoint.TimeSpan.ToString("h':'mm")
             nameof __.Kind      |> Binding.oneWay _.TimePoint.Kind
-            nameof __.KindAlias |> Binding.oneWay _.TimePoint.KindAlias
+            nameof __.KindAlias |> Binding.oneWay (_.TimePoint.KindAlias >> Alias.value)
         ]

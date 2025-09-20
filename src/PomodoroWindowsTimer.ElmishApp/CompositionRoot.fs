@@ -247,6 +247,7 @@ let compose
         let updateTimePointsDrawerModel =
             TimePointsDrawerModel.Program.update
                 (loggerFactory.CreateLogger<TimePointsDrawerModel>())
+                initRunningTimePointListModel
                 updateRunningTimePointListModel
                 initTimePointsGeneratorModel
                 updateTimePointsGeneratorModel
