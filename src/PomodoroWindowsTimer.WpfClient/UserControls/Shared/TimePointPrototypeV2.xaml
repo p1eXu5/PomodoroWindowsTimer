@@ -1,40 +1,33 @@
 ﻿<UserControl x:Class="PomodoroWindowsTimer.WpfClient.UserControls.Shared.TimePointPrototypeV2"
-             x:Name="m_TimePointPrototypeV2Root"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             d:Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             x:Name="m_TimePointPrototypeV2Root"
              d:DesignHeight="56"
              d:DesignWidth="280"
+             d:Foreground="{StaticResource MaterialDesign.Brush.Foreground}"
              mc:Ignorable="d"
              >
-    <Border BorderThickness="0,0,0,1"
-            >
+    <Border BorderThickness="0,0,0,1">
         <Grid>
             <TextBlock Margin="10,0"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Center"
-                       Text="{Binding ElementName=m_TimePointPrototypeV2Root,
-                                      Path=(local:TimePointAssistant.TimePointKind),
-                                      Converter={StaticResource conv_KindToTextConverter},
-                                      FallbackValue=BREAK}"
                        FontSize="40"
                        FontWeight="Bold"
                        Foreground="#33444444"
+                       Text="{Binding ElementName=m_TimePointPrototypeV2Root, Path=(local:TimePointAssistant.TimePointKind), Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}"
                        />
             <TextBlock Margin="5,5"
                        HorizontalAlignment="Right"
                        VerticalAlignment="Top"
-                       Text="{Binding ElementName=m_TimePointPrototypeV2Root,
-                                      Path=(local:TimePointAssistant.TimePointKind),
-                                      Converter={StaticResource conv_KindToTextConverter},
-                                      FallbackValue=BREAK}"
                        FontSize="10"
                        FontWeight="Normal"
                        Foreground="{StaticResource MaterialDesign.Brush.Primary.Light}"
+                       Text="{Binding ElementName=m_TimePointPrototypeV2Root, Path=(local:TimePointAssistant.TimePointKind), Converter={StaticResource conv_KindToTextConverter}, FallbackValue=BREAK}"
                        />
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
@@ -46,33 +39,27 @@
                 <Border Grid.Column="0"
                         Width="2"
                         HorizontalAlignment="Left"
-                        BorderBrush="{Binding (local:TimePointAssistant.TimePointKind),
-                                              ElementName=m_TimePointPrototypeV2Root,
-                                              Converter={StaticResource conv_KindToBrushConverter},
-                                              FallbackValue=White}"
-                        Background="{Binding RelativeSource={RelativeSource Mode=Self},
-                                             Path=BorderBrush}"
+                        Background="{Binding RelativeSource={RelativeSource Mode=Self}, Path=BorderBrush}"
+                        BorderBrush="{Binding (local:TimePointAssistant.TimePointKind), ElementName=m_TimePointPrototypeV2Root, Converter={StaticResource conv_KindToBrushConverter}, FallbackValue=White}"
                         BorderThickness="1"
                         />
                 <TextBox Grid.Column="1"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                          Width="35"
                          Margin="5,0,0,0"
                          VerticalAlignment="Bottom"
                          materialDesign:HintAssist.Hint="Alias"
                          FontSize="16"
-                         Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias),
-                                        ElementName=m_TimePointPrototypeV2Root}"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding Path=(local:TimePointAssistant.TimePointKindAlias), ElementName=m_TimePointPrototypeV2Root}"
                          TextAlignment="Center"
                          />
                 <TextBox Grid.Column="2"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                          Margin="5,0"
                          VerticalAlignment="Bottom"
                          materialDesign:HintAssist.Hint="Time point name"
                          FontSize="16"
-                         Text="{Binding Path=(local:TimePointAssistant.TimePointName),
-                                        ElementName=m_TimePointPrototypeV2Root}"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding Path=(local:TimePointAssistant.TimePointName), ElementName=m_TimePointPrototypeV2Root}"
                          />
                 <materialDesign:TimePicker Grid.Column="4"
                                            Width="70"
@@ -83,8 +70,7 @@
                                            FontSize="16"
                                            Is24Hours="True"
                                            IsInvalidTextAllowed="False"
-                                           Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan),
-                                                          ElementName=m_TimePointPrototypeV2Root}"
+                                           Text="{Binding Path=(local:TimePointAssistant.TimePointTimeSpan), ElementName=m_TimePointPrototypeV2Root}"
                                            WithSeconds="False"
                                            />
             </Grid>

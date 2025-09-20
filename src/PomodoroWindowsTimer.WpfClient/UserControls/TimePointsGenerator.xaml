@@ -8,9 +8,9 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
+             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              d:DesignHeight="450"
              d:DesignWidth="600"
-             TextElement.Foreground="{StaticResource MaterialDesignBody}"
              mc:Ignorable="d"
              >
     <Grid>
@@ -37,8 +37,8 @@
                 <StackPanel>
                     <TextBlock DockPanel.Dock="Top"
                                VerticalAlignment="Center"
-                               Style="{StaticResource MaterialDesignOverlineTextBlock}"
                                FontSize="12"
+                               Style="{StaticResource MaterialDesignOverlineTextBlock}"
                                Text="Pattern:"
                                />
                     <ComboBox DockPanel.Dock="Bottom"
@@ -47,8 +47,7 @@
                               IsTextSearchEnabled="True"
                               ItemsSource="{Binding Patterns}"
                               SelectedIndex="{Binding SelectedPatternIndex}"
-                              Text="{Binding SelectedPattern,
-                                             UpdateSourceTrigger=PropertyChanged}"
+                              Text="{Binding SelectedPattern, UpdateSourceTrigger=PropertyChanged}"
                               />
                 </StackPanel>
             </Border>
@@ -58,9 +57,9 @@
                                   HorizontalAlignment="Stretch"
                                   DataContext="{Binding TimePointPrototypes}"
                                   Header="PROTOTYPES"
+                                  SearchToolbarVisibility="Collapsed"
                                   TimePointListBoxItemTemplate="{StaticResource dt_TimePointPrototype}"
                                   TimePointListBoxScrollBarVisibility="Hidden"
-                                  SearchToolbarVisibility="Collapsed"
                                   />
         </DockPanel>
 
@@ -73,25 +72,24 @@
 
             <!--  buttons  -->
             <Border DockPanel.Dock="Bottom"
-                    Height="{Binding ElementName=m_PatternsSection,
-                                     Path=ActualHeight}"
+                    Height="{Binding ElementName=m_PatternsSection, Path=ActualHeight}"
                     Margin="0,10,0,0"
                     >
                 <StackPanel HorizontalAlignment="Center"
                             Orientation="Horizontal"
                             >
                     <!--  CLOSE button  -->
-                    <Button Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
-                            CommandParameter="{x:Static Dock.Right}"
-                            HorizontalAlignment="Center"
+                    <Button HorizontalAlignment="Center"
                             VerticalAlignment="Center"
+                            Command="{x:Static materialDesign:DrawerHost.CloseDrawerCommand}"
+                            CommandParameter="{x:Static Dock.Right}"
                             Content="CLOSE"
                             Style="{StaticResource MaterialDesignFlatButton}"
                             />
                     <!--  APPLY button  -->
-                    <Button Command="{Binding ApplyCommand}"
-                            HorizontalAlignment="Center"
+                    <Button HorizontalAlignment="Center"
                             VerticalAlignment="Center"
+                            Command="{Binding ApplyCommand}"
                             Content="APPLY"
                             Style="{StaticResource MaterialDesignFlatButton}"
                             >
