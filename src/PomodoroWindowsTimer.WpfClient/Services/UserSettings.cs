@@ -205,10 +205,15 @@ internal class UserSettings : IUserSettings
         }
         set
         {
-            string currentWork = JsonHelpers.Serialize(value);
-            Properties.Settings.Default.CurrentWork = currentWork;
-            Properties.Settings.Default.Save();
+            StoreCurrentWork(value);
         }
+    }
+
+    internal static void StoreCurrentWork(FSharpOption<Work> work)
+    {
+        string currentWork = JsonHelpers.Serialize(work);
+        Properties.Settings.Default.CurrentWork = currentWork;
+        Properties.Settings.Default.Save();
     }
 
     #endregion

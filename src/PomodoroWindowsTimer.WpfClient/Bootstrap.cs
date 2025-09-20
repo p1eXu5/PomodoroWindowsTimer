@@ -64,7 +64,10 @@ internal class Bootstrap : BootstrapBase
         => Host.Services.GetRequiredService<ILooper>();
 
     internal IWorkEventRepository GetWorkEventRepository()
-        => Host.Services.GetRequiredService<IWorkEventRepository>();
+        => Host.Services.GetRequiredService<IRepositoryFactory>().GetWorkEventRepository();
+
+    internal IRepositoryFactory GetRepositoryFactory()
+        => Host.Services.GetRequiredService<IRepositoryFactory>();
 
     internal IUserSettings GetUserSettings()
         => Host.Services.GetRequiredService<IUserSettings>();

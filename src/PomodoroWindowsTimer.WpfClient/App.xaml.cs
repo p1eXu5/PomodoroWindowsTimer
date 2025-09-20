@@ -6,9 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using MaterialDesignThemes.Wpf;
+using Microsoft.CSharp.RuntimeBinder;
 using Microsoft.Extensions.Logging;
+using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer.ElmishApp.Abstractions;
 using PomodoroWindowsTimer.Types;
+using PomodoroWindowsTimer.WpfClient.Services;
 
 namespace PomodoroWindowsTimer.WpfClient;
 
@@ -171,16 +174,37 @@ public partial class App : Application
                 {
                     object player = ((dynamic)_mainWindow.DataContext).Player;
                     bool isPlaying = ((dynamic)player).IsPlaying;
-                    object currentWork = ((dynamic)_mainWindow.DataContext).CurrentWork;
+                    bool isCurrentWork = ((dynamic)_mainWindow.DataContext).IsCurrentWorkSet;
 
-                    if (isPlaying && currentWork is not null)
+                    try
                     {
-                        UInt64 workId = ((dynamic)currentWork).Id;
-                        var timeProvider = _bootstrap.GetTimerProvider();
-                        var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
+                        if (isPlaying && isCurrentWork)
+                        {
+                            object currentWork = ((dynamic)_mainWindow.DataContext).CurrentWork;
+                            UInt64 workId = ((dynamic)currentWork).Id;
 
-                        var workEventRepository = _bootstrap.GetWorkEventRepository();
-                        await workEventRepository.InsertAsync(workId, workEvent, default);
+                            var repoFactory = _bootstrap.GetRepositoryFactory();
+                            var work = await repoFactory.GetWorkRepository().FindByIdAsync(workId, default);
+
+                            if (work.IsOk)
+                            {
+                                UserSettings.StoreCurrentWork(work.ResultValue!);
+                            }
+
+                            // store work event
+                            var timeProvider = _bootstrap.GetTimerProvider();
+                            var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
+                            var workEventRepository = repoFactory.GetWorkEventRepository();
+                            await workEventRepository.InsertAsync(workId, workEvent, default);
+                        }
+                    }
+                    catch (RuntimeBinderException ex)
+                    {
+#if DEBUG
+                        _logger?.LogError(ex, "Failed to get current work from data context.");
+#else
+                        _logger?.LogError("Failed to get current work from data context.");
+#endif
                     }
                 }
 
