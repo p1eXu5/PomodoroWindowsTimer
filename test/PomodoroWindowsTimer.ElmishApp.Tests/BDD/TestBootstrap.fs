@@ -230,3 +230,5 @@ type TestBootstrap () =
             |> Program.withTermination ((=) MainModel.Msg.Terminate) (fun _ -> ())
             |> Program.run
 
+            factory.Looper.Start()
+
