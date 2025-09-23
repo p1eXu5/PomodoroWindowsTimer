@@ -26,6 +26,7 @@ type private State =
 type private Msg =
     | AddMany of TimePoint seq * AsyncReplyChannel<unit>
     | GetAllWithPriority of AsyncReplyChannel<(TimePoint * float32) seq>
+    /// Returns time points sorted by TimePoint.Num and first queued time point identificator.
     | GetAll of AsyncReplyChannel<(TimePoint list * TimePointId option)>
     | GetNext of AsyncReplyChannel<TimePoint option>
     | Pick of AsyncReplyChannel<TimePoint option>
@@ -229,9 +230,12 @@ type TimePointQueue(
     member _.AddMany(timePoints: TimePoint seq) =
         _agent.PostAndReply(fun r -> AddMany (timePoints, r))
 
-    member this.Reload(timePoints: TimePoint seq) =
-        _agent.Post(Reset)
-        this.AddMany(timePoints)
+    member this.Reload(timePoints: TimePoint list) =
+        let (tpList, _) = _agent.PostAndReply(GetAll, int replyTimeout)
+        if tpList <> timePoints then
+            _agent.Post(Reset)
+            this.AddMany(timePoints)
+            timePointStore.Write(timePoints)
 
     member _.TryPick() =
         _agent.PostAndReply(Pick, int replyTimeout)

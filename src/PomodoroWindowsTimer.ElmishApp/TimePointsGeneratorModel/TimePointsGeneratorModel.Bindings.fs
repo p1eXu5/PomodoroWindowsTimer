@@ -12,7 +12,7 @@ type IBindings =
         abstract TimePointPrototypes: TimePointPrototypeModel.IBindings list
         abstract TimePoints: TimePointModel.IBindings list
         abstract Patterns: string list
-        abstract SelectedPattern: string option with get, set
+        abstract PatternText: string option with get, set
         abstract SelectedPatternIndex: int with get, set
         abstract IsPatternCorrect: bool
         abstract TimePointsTime: obj
@@ -38,8 +38,8 @@ module Bindings =
 
             // TODO: copy from LogParser
             nameof __.Patterns |> Binding.oneWaySeq (getPatterns, (=), id)
-            nameof __.SelectedPattern
-                |> Binding.twoWayOpt ((fun m -> m.SelectedPattern), SetSelectedPattern)
+            nameof __.PatternText
+                |> Binding.twoWayOpt ((fun m -> m.Pattern), SetPattern)
                 |> Binding.addValidation (fun m -> if m.IsPatternWrong then ["Wrong pattern"] else [])
 
             nameof __.SelectedPatternIndex |> Binding.twoWay (getSelectedPatternIndex, SetSelectedPatternIndex)
@@ -55,7 +55,7 @@ module Bindings =
 
             nameof __.ApplyCommand
                 |> Binding.cmdIf (fun m ->
-                    if not m.IsPatternWrong then
+                    if not m.IsPatternWrong && m.Pattern.IsSome then
                         match m.TimePoints with
                         | [] -> None
                         | _ -> Some Msg.ApplyTimePoints
