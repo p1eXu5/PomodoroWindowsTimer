@@ -7,11 +7,10 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_WorksSearchFilterPanelRoot"
-             d:DataContext="{d:DesignInstance Type=WorkListModel:Bindings,
+             d:DataContext="{d:DesignInstance Type=WorkListModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="40"
              d:DesignWidth="350"
-             DataContext="{Binding WorkListModel}"
              mc:Ignorable="d"
              >
     <!--  TODO: get scrollbar width to set right margin  -->

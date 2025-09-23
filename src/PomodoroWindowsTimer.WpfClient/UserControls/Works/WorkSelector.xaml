@@ -8,7 +8,7 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              x:Name="m_WorkSelectorRoot"
-             d:DataContext="{d:DesignInstance Type=WorkListModel:Bindings,
+             d:DataContext="{d:DesignInstance Type=WorkListModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="300"
              d:DesignWidth="480"
