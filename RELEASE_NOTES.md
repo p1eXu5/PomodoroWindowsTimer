@@ -1,4 +1,7 @@
 ﻿# Release Notes
+## New in v3.3.2 (Released 2025/09/23)
+* Fix bug when generted time points pattern not stored
+* Fix set generated time point name and time span
 ## New in v3.3.1 (Released 2025/09/23)
 * Fix Telegram bot settings dialog closing bug
 ## New in v3.3.0 (Released 2025/09/20)
