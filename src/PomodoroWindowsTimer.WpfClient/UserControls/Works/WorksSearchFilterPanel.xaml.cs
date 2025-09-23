@@ -25,50 +25,56 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
             InitializeComponent();
         }
 
-        // Register a custom routed event using the Bubble routing strategy.
-        public static readonly RoutedEvent SearchTextChangedEvent = EventManager.RegisterRoutedEvent(
-            name: "SearchTextChanged",
-            routingStrategy: RoutingStrategy.Bubble,
-            handlerType: typeof(TextChangedEventHandler),
-            ownerType: typeof(WorksSearchFilterPanel));
-
         // Provide CLR accessors for assigning an event handler.
-        public event TextChangedEventHandler SearchTextChanged
+        internal event SearchTextChangedEventHandler SearchTextChanged
         {
             add { AddHandler(SearchTextChangedEvent, value); }
             remove { RemoveHandler(SearchTextChangedEvent, value); }
         }
 
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            // Create a RoutedEventArgs instance.
-            TextChangedEventArgs routedEventArgs = new(SearchTextChangedEvent, e.UndoAction, e.Changes);
-
-            // Raise the event, which will bubble up through the element tree.
-            RaiseEvent(routedEventArgs);
-        }
-
         // Register a custom routed event using the Bubble routing strategy.
-        public static readonly RoutedEvent CountChangedEvent = EventManager.RegisterRoutedEvent(
-            name: "CountChanged",
+        internal static readonly RoutedEvent SearchTextChangedEvent = EventManager.RegisterRoutedEvent(
+            name: "SearchTextChanged",
             routingStrategy: RoutingStrategy.Bubble,
-            handlerType: typeof(TextChangedEventHandler),
+            handlerType: typeof(SearchTextChangedEventHandler),
             ownerType: typeof(WorksSearchFilterPanel));
 
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox tb)
+            {
+                // Create a RoutedEventArgs instance.
+                SearchTextChangedEventArgs routedEventArgs = new(SearchTextChangedEvent, tb.Text);
+
+                // Raise the event, which will bubble up through the element tree.
+                RaiseEvent(routedEventArgs);
+            }
+        }
+
         // Provide CLR accessors for assigning an event handler.
-        public event TextChangedEventHandler CountChanged
+        internal event CountChangedEventHandler CountChanged
         {
             add { AddHandler(CountChangedEvent, value); }
             remove { RemoveHandler(CountChangedEvent, value); }
         }
 
+        // Register a custom routed event using the Bubble routing strategy.
+        internal static readonly RoutedEvent CountChangedEvent = EventManager.RegisterRoutedEvent(
+            name: "CountChanged",
+            routingStrategy: RoutingStrategy.Bubble,
+            handlerType: typeof(CountChangedEventHandler),
+            ownerType: typeof(WorksSearchFilterPanel));
+
         private void CountTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            // Create a RoutedEventArgs instance.
-            TextChangedEventArgs routedEventArgs = new(CountChangedEvent, e.UndoAction, e.Changes);
+            if (sender is TextBox tb)
+            {
+                // Create a RoutedEventArgs instance.
+                CountChangedEventArgs routedEventArgs = new(CountChangedEvent, tb.Text);
 
-            // Raise the event, which will bubble up through the element tree.
-            RaiseEvent(routedEventArgs);
+                // Raise the event, which will bubble up through the element tree.
+                RaiseEvent(routedEventArgs);
+            }
         }
     }
 }

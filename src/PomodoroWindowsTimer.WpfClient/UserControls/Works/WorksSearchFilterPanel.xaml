@@ -28,8 +28,7 @@
                                      Foreground="{StaticResource MaterialDesign.Brush.Primary}"
                                      Kind="Magnify"
                                      />
-            <TextBox x:Name="m_Search"
-                     MinWidth="230"
+            <TextBox MinWidth="230"
                      Margin="0,0,2,0"
                      Padding="25,0,0,5"
                      HorizontalAlignment="Stretch"
@@ -39,22 +38,18 @@
                      />
         </Grid>
 
-        <!--  filter  -->
-        <StackPanel Grid.Column="1"
-                    Orientation="Horizontal"
-                    >
-            <TextBox x:Name="m_Count"
-                     Width="45"
-                     Margin="2,0,0,0"
-                     Padding="0,0,0,5"
-                     VerticalAlignment="Bottom"
-                     materialDesign:TextFieldAssist.HasClearButton="True"
-                     Text="{Binding LastDayCount,
-                                    UpdateSourceTrigger=PropertyChanged}"
-                     TextAlignment="Center"
-                     TextChanged="CountTextBox_TextChanged"
-                     ToolTip="Filters works by the number of days from the current day to the time of last event or last update"
-                     />
-        </StackPanel>
+        <!--  count filter  -->
+        <TextBox Grid.Column="1"
+                 Width="45"
+                 Margin="2,0,0,0"
+                 Padding="0,0,0,5"
+                 VerticalAlignment="Bottom"
+                 materialDesign:TextFieldAssist.HasClearButton="True"
+                 Text="{Binding LastDayCount,
+                                UpdateSourceTrigger=PropertyChanged}"
+                 TextAlignment="Center"
+                 TextChanged="CountTextBox_TextChanged"
+                 ToolTip="Filters works by the number of days from the current day to the time of last event or last update"
+                 />
     </Grid>
 </UserControl>

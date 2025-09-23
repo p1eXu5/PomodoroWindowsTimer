@@ -57,56 +57,49 @@ public partial class WorkSelector : UserControl
 
     private DateTimeOffset NowDate { get; set; }
 
-    private void WorksSearchFilterPanel_TextChanged(object sender, TextChangedEventArgs e)
+    private void WorksSearchFilterPanel_TextChanged(object sender, SearchTextChangedEventArgs e)
     {
-        if (e.Source is WorksSearchFilterPanel tb)
+        e.Handled = true;
+
+        string searchText = e.SearchText;
+
+        if (String.IsNullOrEmpty(searchText) && DayCount == TimeSpan.Zero)
         {
-            e.Handled = true;
+            SearchText = "";
+            ResetFilter();
+            return;
+        }
 
-            string searchText = tb.m_Search.Text;
+        if (String.Equals(SearchText, searchText, StringComparison.Ordinal))
+        {
+            return;
+        }
 
-            if (String.IsNullOrEmpty(searchText) && DayCount == TimeSpan.Zero)
+        SearchText = searchText;
+        SetFilter();
+    }
+
+    private void WorksSearchFilterPanel_CountChanged(object sender, CountChangedEventArgs e)
+    {
+        e.Handled = true;
+
+        int? count = e.Count;
+
+        if (!count.HasValue)
+        {
+            if (DayCount != TimeSpan.Zero && String.IsNullOrEmpty(SearchText))
             {
-                SearchText = "";
+                DayCount = TimeSpan.Zero;
                 ResetFilter();
-                return;
             }
 
-            if (String.Equals(SearchText, searchText, StringComparison.Ordinal))
-            {
-                return;
-            }
-
-            SearchText = searchText;
-            SetFilter();
+            return;
         }
+
+        NowDate = DateTimeOffset.UtcNow;
+        DayCount = TimeSpan.FromDays(count.Value);
+        SetFilter();
     }
-
-    private void WorksSearchFilterPanel_CountChanged(object sender, TextChangedEventArgs e)
-    {
-        if (e.Source is WorksSearchFilterPanel tb)
-        {
-            e.Handled = true;
-
-            string countStr = tb.m_Count.Text;
-
-            if (String.IsNullOrEmpty(countStr) || !Int32.TryParse(countStr, out int count) || count < 0)
-            {
-                if (DayCount != TimeSpan.Zero && String.IsNullOrEmpty(SearchText))
-                {
-                    DayCount = TimeSpan.Zero;
-                    ResetFilter();
-                }
-
-                return;
-            }
-
-            NowDate = DateTimeOffset.UtcNow;
-            DayCount = TimeSpan.FromDays(count);
-            SetFilter();
-        }
-    }
-
 
     private void ResetFilter()
     {
@@ -132,32 +125,32 @@ public partial class WorkSelector : UserControl
         collView.Filter = Filter;
     }
 
-    private void SetWorksFilter(WorksSearchFilterPanel tb)
-    {
-        var collView = (CollectionView)CollectionViewSource.GetDefaultView(m_WorkList.m_WorkList.ItemsSource);
+    //private void SetWorksFilter(WorksSearchFilterPanel tb)
+    //{
+    //    var collView = (CollectionView)CollectionViewSource.GetDefaultView(m_WorkList.m_WorkList.ItemsSource);
 
-        if (!collView.CanFilter)
-        {
-            return;
-        }
+    //    if (!collView.CanFilter)
+    //    {
+    //        return;
+    //    }
 
-        string searchText = tb.m_Search.Text;
-        Int32.TryParse(tb.m_Count.Text, out int countText);
+    //    string searchText = tb.m_Search.Text;
+    //    Int32.TryParse(tb.m_Count.Text, out int countText);
 
-        if (String.IsNullOrEmpty(searchText) && countText < 1)
-        {
-            collView.Filter = null;
-        }
-        else
-        {
-            collView.Filter = new Predicate<object>(o =>
-            {
-                string number = ((dynamic)o).Number;
-                string title = ((dynamic)o).Title;
-                return
-                    number.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                    || title.Contains(searchText, StringComparison.OrdinalIgnoreCase);
-            });
-        }
-    }
+    //    if (String.IsNullOrEmpty(searchText) && countText < 1)
+    //    {
+    //        collView.Filter = null;
+    //    }
+    //    else
+    //    {
+    //        collView.Filter = new Predicate<object>(o =>
+    //        {
+    //            string number = ((dynamic)o).Number;
+    //            string title = ((dynamic)o).Title;
+    //            return
+    //                number.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+    //                || title.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+    //        });
+    //    }
+    //}
 }
