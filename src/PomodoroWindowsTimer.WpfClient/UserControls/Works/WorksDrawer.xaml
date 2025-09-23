@@ -26,7 +26,8 @@
                             Visibility="{Binding DataContext.SubModelId,
                                                  ElementName=m_WorksDrawerRoot,
                                                  Converter={StaticResource conv_SubModelIdToVisibility},
-                                                 ConverterParameter='WorkListId'}"
+                                                 ConverterParameter='WorkListId',
+                                                 FallbackValue=Collapsed}"
                             />
         <!--  CreatingWorkModel  -->
         <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
