@@ -80,6 +80,9 @@ module TimePointsGeneratorModel =
         model
         , Cmd.batch [ prototypeCmd; patternCmd ]
 
+    // -------
+    // accessors
+    // -------
     let withTimePointPrototypes prototypes (model: TimePointsGeneratorModel) =
         { model with TimePointPrototypes = prototypes }
 
@@ -92,9 +95,6 @@ module TimePointsGeneratorModel =
     let mapTimePoint id f =
         map _.TimePoints withTimePoints (mapFirst (_.TimePoint >> _.Id >> (=) id) f)
 
-    // -------
-    // helpers
-    // -------
     let getPatterns m = m.Patterns
 
     let getSelectedPatternIndex m = m.SelectedPatternIndex
