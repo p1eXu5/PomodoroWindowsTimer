@@ -36,7 +36,7 @@ type Bindings(dialogErrorMessageQueue: IErrorMessageQueue) =
 
     member val WorkList : Binding =
         nameof __.WorkList
-            |> Binding.SubModel.opt (fun () -> WorkListModel.Bindings.ToList())
+            |> Binding.SubModel.opt WorkListModel.Bindings.bindings
             |> Binding.mapModel _.WorkListModel
             |> Binding.mapMsg Msg.WorkListModelMsg
 

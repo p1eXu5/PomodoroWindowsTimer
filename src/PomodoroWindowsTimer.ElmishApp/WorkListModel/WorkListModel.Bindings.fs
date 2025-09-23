@@ -9,54 +9,49 @@ open PomodoroWindowsTimer.ElmishApp.Models.WorkListModel
 
 type private Binding = Binding<WorkListModel, WorkListModel.Msg>
 
-[<Sealed>]
-type Bindings() =
-    static let props = Utils.bindingProperties typeof<Bindings>
-    static let mutable __ = Unchecked.defaultof<Bindings>
-    static member Instance() =
-        if System.Object.ReferenceEquals(__, null) then
-            __ <- Bindings()
-            __
-        else __
+type IBindings =
+    interface
+        abstract WorkModelList: WorkModel.IBindings seq
+        abstract WorkListDeff: AsyncDeferred<WorkModel list>
+        abstract SelectedWorkModel: WorkModel.IBindings option
+        abstract HasSelectedWork: bool
+        abstract CreateWorkCommand: unit -> unit
+        abstract UnselectWorkCommand: unit -> unit
+        abstract LastDayCount: string
+        abstract SelectedWorkId: int option
+    end
 
-    static member ToList () =
-        Utils.bindings<Binding>
-            (Bindings.Instance())
-            props
+module Bindings =
 
-    member val WorkModelList : Binding =
-        nameof __.WorkModelList
-            |> Binding.subModelSeq (WorkModel.Bindings.bindings, _.Work >> _.Id)
-            |> Binding.mapModel (fun m  ->
-                m.Works
-                |> AsyncDeferred.chooseRetrieved
-                |> Option.defaultValue List.empty
-                : WorkModel list
-            )
-            |> Binding.mapMsg Msg.WorkModelMsg
+    let private __ = Unchecked.defaultof<IBindings>
 
-    member val WorkListDeff : Binding =
-        nameof __.WorkListDeff |> Binding.oneWay _.Works
+    let bindings () =
+        [
+            nameof __.WorkModelList
+                |> Binding.subModelSeq (WorkModel.Bindings.bindings, _.Work >> _.Id)
+                |> Binding.mapModel (fun m  ->
+                    m.Works
+                    |> AsyncDeferred.chooseRetrieved
+                    |> Option.defaultValue List.empty
+                    : WorkModel list
+                )
+                |> Binding.mapMsg Msg.WorkModelMsg
 
-    member val SelectedWorkModel : Binding =
-        nameof __.SelectedWorkModel
-            |> Binding.SubModel.opt WorkModel.Bindings.bindings
-            |> Binding.mapModel selectedWorkModel
-            |> Binding.mapMsgWithModel (fun msg model -> Msg.WorkModelMsg (model.SelectedWorkId.Value, msg))
+            nameof __.WorkListDeff |> Binding.oneWay _.Works
 
-    member val HasSelectedWork : Binding =
-        nameof __.HasSelectedWork |> Binding.oneWay (selectedWorkModel >> Option.isSome)
+            nameof __.SelectedWorkModel
+                |> Binding.SubModel.opt WorkModel.Bindings.bindings
+                |> Binding.mapModel selectedWorkModel
+                |> Binding.mapMsgWithModel (fun msg model -> Msg.WorkModelMsg (model.SelectedWorkId.Value, msg))
 
-    member val CreateWorkCommand : Binding =
-        nameof __.CreateWorkCommand |> Binding.cmd Msg.CreateWork
+            nameof __.HasSelectedWork |> Binding.oneWay (selectedWorkModel >> Option.isSome)
 
-    member val UnselectWorkCommand : Binding =
-        nameof __.UnselectWorkCommand |> Binding.cmd Msg.UnselectWork
+            nameof __.CreateWorkCommand |> Binding.cmd Msg.CreateWork
 
-    member val LastDayCount : Binding =
-        nameof __.LastDayCount |> Binding.twoWay (lastDayCountText, Msg.SetLastDayCount)
+            nameof __.UnselectWorkCommand |> Binding.cmd Msg.UnselectWork
 
-    member val SelectedWorkId : Binding =
-        nameof __.SelectedWorkId |> Binding.oneWayOpt _.SelectedWorkId
+            nameof __.LastDayCount |> Binding.twoWay (lastDayCountText, Msg.SetLastDayCount)
 
+            nameof __.SelectedWorkId |> Binding.oneWayOpt _.SelectedWorkId
+        ]
 

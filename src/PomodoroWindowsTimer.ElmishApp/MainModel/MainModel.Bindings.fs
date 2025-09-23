@@ -133,7 +133,7 @@ Current work is [{wm.Number}] {wm.Title}."""
                 |> Binding.mapMsg Msg.AppDialogModelMsg
 
             nameof __.WorkSelector
-                |> Binding.SubModel.opt (WorkSelectorModel.Bindings.ToList)
+                |> Binding.SubModel.opt (WorkSelectorModel.Bindings.bindings)
                 |> Binding.mapModel _.WorkSelector
                 |> Binding.mapMsg Msg.WorkSelectorModelMsg
 

@@ -11,7 +11,7 @@
              x:Name="m_WorksDrawerRoot"
              MinWidth="350"
              Margin="1,0,0,0"
-             d:DataContext="{d:DesignInstance Type=WorkSelectorModel:Bindings,
+             d:DataContext="{d:DesignInstance Type=WorkSelectorModel:IBindings,
                                               IsDesignTimeCreatable=False}"
              d:DesignHeight="300"
              d:DesignWidth="350"
@@ -26,7 +26,8 @@
                             Visibility="{Binding DataContext.SubModelId,
                                                  ElementName=m_WorksDrawerRoot,
                                                  Converter={StaticResource conv_SubModelIdToVisibility},
-                                                 ConverterParameter='WorkListId'}"
+                                                 ConverterParameter='WorkListId',
+                                                 FallbackValue=Collapsed}"
                             />
         <!--  CreatingWorkModel  -->
         <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"

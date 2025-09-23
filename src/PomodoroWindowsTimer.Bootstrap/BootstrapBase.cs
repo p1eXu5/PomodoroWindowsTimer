@@ -206,8 +206,7 @@ public abstract class BootstrapBase : IDisposable
                 )
                 .WriteTo.Debug(
                     formatter: new ExpressionTemplate(
-                        template,
-                        theme: Serilog.Templates.Themes.TemplateTheme.Code
+                        template
                     )
                 );
         }
