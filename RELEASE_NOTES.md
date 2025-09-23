@@ -1,4 +1,6 @@
 ﻿# Release Notes
+## New in v3.3.1 (Released 2025/09/23)
+* Fix Telegram bot settings dialog closing bug
 ## New in v3.3.0 (Released 2025/09/20)
 * Include Time Point Generator feature
 * Code optimization
