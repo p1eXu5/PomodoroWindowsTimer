@@ -11,6 +11,7 @@ module TimePointModel =
 
     type Msg =
         | SetName of string
+        | SetTimeSpan of string
 
     let init timePoint =
         {
@@ -29,8 +30,9 @@ module Program =
 
     let update msg model =
         match msg with
-        | SetName v ->
-            { model with TimePoint.Name = v }
+        | SetName v -> { model with TimePoint.Name = v }
+        | SetTimeSpan v -> 
+            { model with TimePoint.TimeSpan = TimeSpan.ParseExact(v, "h':'mm", null) }
 
 
 open PomodoroWindowsTimer.Types
@@ -57,7 +59,7 @@ module Bindings =
         [
             nameof __.Id        |> Binding.oneWay _.TimePoint.Id
             nameof __.Name      |> Binding.twoWay (_.TimePoint.Name, Msg.SetName)
-            nameof __.TimeSpan  |> Binding.oneWay _.TimePoint.TimeSpan.ToString("h':'mm")
+            nameof __.TimeSpan  |> Binding.twoWay (_.TimePoint.TimeSpan.ToString("h':'mm"), Msg.SetTimeSpan)
             nameof __.Kind      |> Binding.oneWay _.TimePoint.Kind
             nameof __.KindAlias |> Binding.oneWay (_.TimePoint.KindAlias >> Alias.value)
         ]

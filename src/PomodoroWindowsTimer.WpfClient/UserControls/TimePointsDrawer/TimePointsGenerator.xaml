@@ -37,6 +37,7 @@
                 </StackPanel>
             </StackPanel>
         </materialDesign:DialogHost.DialogContent>
+
         <!--  Prototype section  -->
         <DockPanel Grid.Row="0"
                    Grid.Column="0"
@@ -50,6 +51,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+
                 <Button Grid.Column="0"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
@@ -58,22 +60,19 @@
                         Content="{materialDesign:PackIcon ArrowLeft}"
                         Style="{StaticResource MaterialDesignIconButton}"
                         />
-                <StackPanel Grid.Column="1"
-                            HorizontalAlignment="Center"
-                            Orientation="Horizontal"
-                            >
-                    <TextBlock Margin="10,16"
-                               HorizontalAlignment="Center"
-                               Style="{StaticResource MaterialDesignButtonTextBlock}"
-                               Text="TIME POINTS GENERATOR"
-                               />
-                </StackPanel>
+
+                <TextBlock Grid.Column="1"
+                           Margin="10,16,10,0"
+                           HorizontalAlignment="Center"
+                           Style="{StaticResource MaterialDesignButtonTextBlock}"
+                           Text="TIME POINTS GENERATOR"
+                           />
             </Grid>
 
             <!--  Patterns combo box  -->
             <DockPanel x:Name="m_PatternsSection"
                        DockPanel.Dock="Top"
-                       Margin="0,10"
+                       Margin="0,0,0,16"
                        >
                 <Button DockPanel.Dock="Right"
                         Margin="0,0,0,0"
@@ -91,7 +90,7 @@
                           IsTextSearchEnabled="True"
                           ItemsSource="{Binding Patterns}"
                           SelectedIndex="{Binding SelectedPatternIndex}"
-                          Text="{Binding SelectedPattern,
+                          Text="{Binding PatternText,
                                          UpdateSourceTrigger=PropertyChanged}"
                           />
             </DockPanel>
@@ -155,8 +154,12 @@
                     <DataTemplate>
                         <shared:TimePointPrototypeV2 shared:TimePointAssistant.TimePointKind="{Binding Kind}"
                                                      shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
-                                                     shared:TimePointAssistant.TimePointName="{Binding Name}"
-                                                     shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                                                     shared:TimePointAssistant.TimePointName="{Binding Name,
+                                                                                                       Mode=TwoWay,
+                                                                                                       UpdateSourceTrigger=PropertyChanged}"
+                                                     shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan,
+                                                                                                           Mode=TwoWay,
+                                                                                                           UpdateSourceTrigger=PropertyChanged}"
                                                      />
                     </DataTemplate>
                 </shared:TimePointList.TimePointListBoxItemTemplate>
