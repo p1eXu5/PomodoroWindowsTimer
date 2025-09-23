@@ -27,11 +27,6 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.8" />
   </ItemGroup>
 
-  <!-- dbup-sqlite 5.0.40 vulnerabilities -->
-  <ItemGroup>
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PomodoroWindowsTimer\PomodoroWindowsTimer.fsproj" />
   </ItemGroup>
