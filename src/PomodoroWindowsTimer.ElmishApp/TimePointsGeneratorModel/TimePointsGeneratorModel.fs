@@ -30,9 +30,6 @@ module TimePointsGeneratorModel =
         | ApplyTimePoints
         | RequestCancelling
         | OnExn of exn
-    and
-        TimePointMsg =
-            | SetName of string
 
     [<RequireQualifiedAccess>]
     [<Struct>]
