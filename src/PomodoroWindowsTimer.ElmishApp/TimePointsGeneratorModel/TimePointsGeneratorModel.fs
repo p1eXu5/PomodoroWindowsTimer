@@ -10,7 +10,7 @@ type TimePointsGeneratorModel =
         TimePointPrototypes: TimePointPrototypeModel list
         TimePoints: TimePointModel list
         Patterns: string list
-        SelectedPattern: string option
+        Pattern: string option
         SelectedPatternIndex: int
         IsPatternWrong: bool
         TimePointsTime: TimePointsTime voption
@@ -21,18 +21,15 @@ module TimePointsGeneratorModel =
 
     type Msg =
         | SetPatterns of string list
-        | ProcessParsingResult of Result<PatternParsedItem list, string>
-        | SetGeneratedTimePoints of (TimePointModel list * TimePointsTime)
+        | SetPrototypes of TimePointPrototypeModel list
+        | SetGeneratedTimePoints of Result<(TimePointModel list * TimePointsTime * TimePointPrototypeModel list * Pattern), (string * TimePointPrototypeModel list * Pattern)>
         | SetSelectedPatternIndex of int
-        | SetSelectedPattern of Pattern option
+        | SetPattern of Pattern option
         | TimePointPrototypeMsg of id: Kind * TimePointPrototypeModel.Msg
         | TimePointMsg of id: Guid * TimePointModel.Msg
         | ApplyTimePoints
         | RequestCancelling
         | OnExn of exn
-    and
-        TimePointMsg =
-            | SetName of string
 
     [<RequireQualifiedAccess>]
     [<Struct>]
@@ -50,23 +47,39 @@ module TimePointsGeneratorModel =
     open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
     let init (timePointPrototypeStore: TimePointPrototypeStore) (patternStore: PatternStore) =
-        let (patterns, cmd) =
-            match patternStore.Read () with
-            | [] -> ([], Cmd.none)
-            | l -> (l, Cmd.ofMsg (Msg.SetSelectedPattern (l |> List.head |> Some)))
+        let prototypeCmd =
+            Cmd.OfFunc.either
+                (fun () ->
+                    timePointPrototypeStore.Read ()
+                    |> List.map TimePointPrototypeModel.init
+                )
+                ()
+                Msg.SetPrototypes
+                Msg.OnExn
+
+        let patternCmd =
+            Cmd.OfFunc.either
+                (fun () -> patternStore.Read ())
+                ()
+                Msg.SetPatterns
+                Msg.OnExn
 
         let model =
             {
-                TimePointPrototypes = timePointPrototypeStore.Read () |> List.map TimePointPrototypeModel.init
-                Patterns = patterns
-                SelectedPattern = None
+                TimePointPrototypes = []
+                Patterns = []
+                Pattern = None
                 SelectedPatternIndex = 0
                 TimePoints = []
                 IsPatternWrong = false
                 TimePointsTime = ValueNone
             }
-        model, cmd
+        model
+        , Cmd.batch [ prototypeCmd; patternCmd ]
 
+    // -------
+    // accessors
+    // -------
     let withTimePointPrototypes prototypes (model: TimePointsGeneratorModel) =
         { model with TimePointPrototypes = prototypes }
 
@@ -79,21 +92,18 @@ module TimePointsGeneratorModel =
     let mapTimePoint id f =
         map _.TimePoints withTimePoints (mapFirst (_.TimePoint >> _.Id >> (=) id) f)
 
-    // -------
-    // helpers
-    // -------
     let getPatterns m = m.Patterns
 
     let getSelectedPatternIndex m = m.SelectedPatternIndex
 
     let setSelectedPattern pattern m =
-        { m with SelectedPattern = pattern |> Some }
+        { m with Pattern = pattern |> Some }
 
     let setSelectedPatternIndex ind m =
         { m with SelectedPatternIndex = ind }
 
     let unsetSelectedPattern m =
-        { m with SelectedPattern = None }
+        { m with Pattern = None }
 
     let setTimePoints tpx m =
         { m with TimePoints = tpx }
@@ -109,3 +119,14 @@ module TimePointsGeneratorModel =
 
     let setTimes times (m: TimePointsGeneratorModel) =
         { m with TimePointsTime = times |> ValueSome }
+
+    let withPrototypes prototypes (m: TimePointsGeneratorModel) =
+        match prototypes with
+        | [] ->
+            {
+                m with
+                    TimePointPrototypes = prototypes
+                    TimePoints = []
+                    TimePointsTime = ValueNone
+            }
+        | l -> { m with TimePointPrototypes = l }

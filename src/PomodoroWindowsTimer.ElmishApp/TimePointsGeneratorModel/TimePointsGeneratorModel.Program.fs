@@ -17,12 +17,9 @@ open PomodoroWindowsTimer.ElmishApp.Models.TimePointsGeneratorModel
 open PomodoroWindowsTimer.Abstractions
 
 
-let private parsePattern pattern model =
-    PatternParser.parse (model.TimePointPrototypes |> List.map _.Prototype.Alias) pattern
-
-let private toTimePointModels (patternParsedItems: PatternParsedItem list) model =
+let private toTimePointModels timePointPrototypes (patternParsedItems: PatternParsedItem list) =
     let prototypeList =
-        model.TimePointPrototypes
+        timePointPrototypes
         |> List.map (fun tp -> tp.Prototype)
 
     patternParsedItems
@@ -30,6 +27,13 @@ let private toTimePointModels (patternParsedItems: PatternParsedItem list) model
     |> fun (l, times) ->
         l |> List.map TimePointModel.init
         , times
+
+let private parsePattern pattern timePointPrototypes =
+    PatternParser.parse (timePointPrototypes |> List.map _.Prototype.Alias) pattern
+    |> Result.map (toTimePointModels timePointPrototypes)
+    |> Result.map (fun (tpList, times) -> (tpList, times, timePointPrototypes, pattern))
+    |> Result.mapError (fun err -> (err, timePointPrototypes, pattern))
+
 
 let update
     (patternStore: PatternStore)
@@ -41,39 +45,67 @@ let update
     =
     match msg with
     | SetPatterns patternList ->
-        { model with Patterns = patternList }, Cmd.none, Intent.None
-
-    | SetSelectedPattern (Some p) ->
-        model |> setSelectedPattern p
-        , Cmd.OfFunc.perform (parsePattern p) model ProcessParsingResult 
+        { model with Patterns = patternList }
+        , (
+            match patternList with
+            | [] -> Cmd.none
+            | head :: _ -> Cmd.ofMsg (SetPattern (Some head))
+        )
         , Intent.None
 
-    | Msg.ProcessParsingResult res ->
-        match res with
-        | Ok parsedAliases ->
-            model |> unsetIsPatternWrong
-            , Cmd.OfFunc.perform (toTimePointModels parsedAliases) model SetGeneratedTimePoints
+    | Msg.SetPrototypes prototypes ->
+        model
+        |> withPrototypes prototypes
+        |> fun m ->
+            m
+            , Cmd.batch [
+                (
+                    match prototypes, m.Pattern with
+                    | l, Some p -> Cmd.OfFunc.perform (parsePattern p) l SetGeneratedTimePoints
+                    | _ -> Cmd.none
+                )
+                Cmd.OfFunc.attempt (fun p -> timePointPrototypeStore.Write(p |> List.map _.Prototype)) prototypes Msg.OnExn
+            ]
             , Intent.None
-        | Error err ->
+
+    | SetPattern (Some p) ->
+        model |> setSelectedPattern p
+        , (
+            match model.TimePointPrototypes with
+            | [] -> Cmd.none
+            | l -> Cmd.OfFunc.perform (parsePattern p) l SetGeneratedTimePoints 
+        )
+        , Intent.None
+
+    | SetPattern None ->
+        model |> unsetSelectedPattern |> unsetIsPatternWrong |> clearTimePoints, Cmd.none, Intent.None
+
+    | Msg.SetGeneratedTimePoints res ->
+        match res with
+        | Ok (tpList, times, prototypes, pattern) when model.TimePointPrototypes = prototypes && model.Pattern |> Option.map (fun p -> p = pattern) |> Option.defaultValue false ->
+            model
+            |> unsetIsPatternWrong
+            |> setTimePoints tpList
+            |> setTimes times
+            , Cmd.none
+            , Intent.None
+        | Error (err, prototypes, pattern) when model.TimePointPrototypes = prototypes && model.Pattern |> Option.map (fun p -> p = pattern) |> Option.defaultValue false ->
             errorMessageQueue.EnqueueError(err)
             model
             |> setIsPatternWrong
             |> clearTimePoints
             , Cmd.none, Intent.None
 
-    | Msg.SetGeneratedTimePoints (tpList, times) ->
-        model |> setTimePoints tpList |> setTimes times
-        , Cmd.none, Intent.None
-
-    | SetSelectedPattern None ->
-        model |> unsetSelectedPattern |> unsetIsPatternWrong |> clearTimePoints, Cmd.none, Intent.None
+        | _ ->
+            logger.LogUnprocessedMessage(msg, model)
+            model, Cmd.none, Intent.None
 
     | SetSelectedPatternIndex ind ->
         model |> setSelectedPatternIndex ind, Cmd.none, Intent.None
 
     | TimePointPrototypeMsg (kind, ptMsg) ->
         ptMsg |> TimePointPrototypeModel.Program.update |> flip (mapPrototype kind) model
-        , Cmd.ofMsg (SetSelectedPattern model.SelectedPattern)
+        , Cmd.ofMsg (SetPattern model.Pattern)
         , Intent.None
 
     | TimePointMsg (id, tpMsg) ->
@@ -81,28 +113,31 @@ let update
         , Cmd.none
         , Intent.None
 
-    | ApplyTimePoints when not model.IsPatternWrong ->
+    | ApplyTimePoints when not model.IsPatternWrong && model.Pattern.IsSome ->
         model
         , Cmd.batch [
             Cmd.OfFunc.attempt
-                (fun (timePoints) -> timePointQueue.Reload timePoints )
+                (fun (timePoints) ->
+                    timePointQueue.Reload timePoints
+                )
                 (model.TimePoints |> List.map _.TimePoint)
                 Msg.OnExn
 
-            Cmd.OfFunc.attempt
-                (fun (selectedPattern, patterns) ->
-                    let patterns = selectedPattern |> Option.get |> (fun p -> p :: patterns) |> List.distinct
-                    patternStore.Write(patterns)
-                )
-                (model.SelectedPattern, model.Patterns)
-                Msg.OnExn
-
-            Cmd.OfFunc.attempt
-                (fun (timePointPrototypes) ->
-                    timePointPrototypeStore.Write(timePointPrototypes |> List.map _.Prototype)
-                )
-                (model.TimePointPrototypes)
-                Msg.OnExn
+            (
+                let pattern = model.Pattern |> Option.get
+                match model.Patterns |> List.tryFindIndex ((=) pattern) with
+                | Some ind ->
+                    Cmd.OfFunc.attempt
+                        (fun (patterns, ind) ->
+                            patternStore.Write((patterns |> List.item ind) :: (patterns |> List.removeAt ind)))
+                        (model.Patterns, ind)
+                        Msg.OnExn
+                | None ->
+                    Cmd.OfFunc.attempt
+                        (fun (patterns) -> patternStore.Write(patterns))
+                        (pattern :: model.Patterns)
+                        Msg.OnExn
+            )
         ]
         , Intent.ApplyGeneratedTimePoints
 

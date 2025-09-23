@@ -152,7 +152,7 @@ type Looper(
                     logger.LogLooperCurrentState(state)
 
                     match msg with
-                    | PreloadTimePoint when state.IsStopped && state.ActiveTimePoint |> Option.isNone ->
+                    | PreloadTimePoint when state.IsStopped ->
                         use scope = beginScope (nameof PreloadTimePoint)
 
                         let atpOpt = timePointQueue.TryPick() |> Option.map TimePoint.toActiveTimePoint
