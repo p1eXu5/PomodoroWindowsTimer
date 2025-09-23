@@ -154,8 +154,12 @@
                     <DataTemplate>
                         <shared:TimePointPrototypeV2 shared:TimePointAssistant.TimePointKind="{Binding Kind}"
                                                      shared:TimePointAssistant.TimePointKindAlias="{Binding KindAlias}"
-                                                     shared:TimePointAssistant.TimePointName="{Binding Name}"
-                                                     shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan}"
+                                                     shared:TimePointAssistant.TimePointName="{Binding Name,
+                                                                                                       Mode=TwoWay,
+                                                                                                       UpdateSourceTrigger=PropertyChanged}"
+                                                     shared:TimePointAssistant.TimePointTimeSpan="{Binding TimeSpan,
+                                                                                                           Mode=TwoWay,
+                                                                                                           UpdateSourceTrigger=PropertyChanged}"
                                                      />
                     </DataTemplate>
                 </shared:TimePointList.TimePointListBoxItemTemplate>
