@@ -33,7 +33,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <Target Name="Rename" AfterTargets="AfterBuild">
+  <Target Name="Rename" AfterTargets="AfterBuild" Condition="'$(Configuration)|$(Platform)' != 'Debug|AnyCPU'">
     <Move SourceFiles="$(OUTDIR)\$(MSBuildProjectName).exe" DestinationFiles="$(OUTDIR)\Pwt.exe" />
     <Message Text="Renamed executable file." Importance="high" />
   </Target>
