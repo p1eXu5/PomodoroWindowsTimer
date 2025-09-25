@@ -7,6 +7,8 @@ type ITimePointQueue =
     inherit IDisposable
     [<CLIEvent>]
     abstract TimePointsChanged : IEvent<TimePoint list * TimePointId option>
+    [<CLIEvent>]
+    abstract TimePointsLoopCompletted : IEvent<unit>
     abstract AddMany : TimePoint seq -> unit
     abstract Start : unit -> unit
     abstract TryGetNext : unit -> TimePoint option

@@ -296,6 +296,11 @@ let compose
                 do dispatch (timePoints |> MainModel.Msg.TimePointQueueMsg)
             timePointQueue.TimePointsChanged.Subscribe onTimePointChanged
 
+        let timePointQueueTimePointsLoopComplettedSubscription dispatch =
+            let onTimePointChanged () =
+                do dispatch MainModel.Msg.TimePointsLoopComplettedQueueMsg
+            timePointQueue.TimePointsLoopCompletted.Subscribe onTimePointChanged
+
         let playerUserSettingsSubscription dispatch =
             let onSettingsChanged () =
                 do dispatch (MainModel.Msg.PlayerUserSettingsChanged)
@@ -304,6 +309,7 @@ let compose
         [
             ["Looper"], looperSubscription
             ["TimePointQueue"], timePointQueueSubscription
+            ["TimePointQueue.TimePointsLoopCompletted"], timePointQueueTimePointsLoopComplettedSubscription
             ["PlayerUserSettings"], playerUserSettingsSubscription
         ]
 

@@ -28,6 +28,7 @@ module RunningTimePointListModel =
         | SetDisableMinimizeMaximizeWindows of bool
         | PlayerUserSettingsChanged
         | TimePointQueueMsg of TimePoint list * TimePointId option
+        | TimePointsLoopComplettedQueueMsg
         | RequestTimePointGenerator
         | OnExn of exn
 

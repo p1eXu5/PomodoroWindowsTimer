@@ -57,6 +57,9 @@ let update
 
     | Msg.TimePointQueueMsg (timePoints, timePointIdOpt) ->
         model |> withTimePoints timePoints timePointIdOpt
+
+    | Msg.TimePointsLoopComplettedQueueMsg ->
+        model |> withNotPlayedTimePoints
         , Cmd.none
         , Intent.None
 

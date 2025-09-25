@@ -42,6 +42,7 @@ module MainModel =
         | SetIsTimePointsDrawerShown of bool
         | TimePointsDrawerMsg of TimePointsDrawerModel.Msg
         | TimePointQueueMsg of TimePoint list * TimePointId option
+        | TimePointsLoopComplettedQueueMsg
         | StartTimePoint of TimePointId
 
         | PlayStopCommand of initiator: TimePointId

@@ -14,11 +14,13 @@ open LoggingExtensions
 
 type private State =
     {
+        FirstTimePointId: TimePointId voption
         Queue : SimplePriorityQueue<TimePoint>
         MaxPriority : float32
     }
     static member Default =
         {
+            FirstTimePointId = ValueNone
             Queue = SimplePriorityQueue<TimePoint>()
             MaxPriority = 0f
         }
@@ -46,6 +48,7 @@ type TimePointQueue(
     let replyTimeout = defaultArg timeout 1000<ms>
 
     let timePointsChangedEvent = new Event<TimePoint list * TimePointId option>()
+    let timePointsLoopComlettedEvent = new Event<unit>()
 
     let _agent = new MailboxProcessor<Msg>(
         (fun inbox ->
@@ -73,8 +76,14 @@ type TimePointQueue(
                                     p + 1f
                                 ) state.MaxPriority
 
-                            let state = { state with MaxPriority = maxPriority }
-                            // logNewState state
+                            let state =
+                                match state.FirstTimePointId with
+                                | ValueNone ->
+                                    { state with
+                                        MaxPriority = maxPriority;
+                                        FirstTimePointId = timePoints |> Seq.tryHead |> function Some tp -> tp.Id |> ValueSome | _ -> ValueNone
+                                    }
+                                | _ -> { state with MaxPriority = maxPriority }
 
                             reply.Reply()
 
@@ -182,11 +191,16 @@ type TimePointQueue(
                         let priority = state.Queue.GetPriority(tp)
                         let _ = state.Queue.Dequeue()
                         state.Queue.Enqueue(tp, state.MaxPriority)
+
                         let state = { state with MaxPriority = state.MaxPriority + 1f }
+                        
                         // logNewState state
 
                         logger.LogNextTimePoint(tp, priority)
                         reply.Reply(tp |> Some)
+
+                        if state.FirstTimePointId |> ValueOption.map (fun ftpId -> ftpId = tp.Id) |> ValueOption.defaultValue false then
+                            timePointsLoopComlettedEvent.Trigger ()
 
                         return! loop state
 
@@ -217,6 +231,9 @@ type TimePointQueue(
 
     [<CLIEvent>]
     member _.TimePointsChanged = timePointsChangedEvent.Publish
+
+    [<CLIEvent>]
+    member _.TimePointsLoopCompletted = timePointsLoopComlettedEvent.Publish
 
     member this.Start() =
         if Interlocked.CompareExchange(isStarted, 1, 0) = 1 then
@@ -267,6 +284,10 @@ type TimePointQueue(
     interface ITimePointQueue with
         [<CLIEvent>]
         member this.TimePointsChanged = this.TimePointsChanged
+
+        [<CLIEvent>]
+        member this.TimePointsLoopCompletted = this.TimePointsLoopCompletted
+
         member this.AddMany(timePointSeq) = this.AddMany(timePointSeq)
         member this.Start() = this.Start()
         member this.TryGetNext() = this.TryGetNext()

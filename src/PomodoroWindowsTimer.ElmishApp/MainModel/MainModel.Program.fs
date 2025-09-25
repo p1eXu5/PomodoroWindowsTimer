@@ -30,6 +30,19 @@ let private mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg (model: Main
     model |> withTimePointsDrawer drawerModel'
     , Cmd.map Msg.TimePointsDrawerMsg drawerCmd
 
+
+
+
+/// Msg.TimePointsLoopComplettedQueueMsg handler
+let private mapTimePointsLoopComplettedQueueMsg updateTimePointsDrawerModel (model: MainModel) =
+    model
+    |> mapc _.TimePointsDrawer withTimePointsDrawer Msg.TimePointsDrawerMsg (
+        updateTimePointsDrawerModel (TimePointsDrawerModel.Msg.RunningTimePointsMsg (
+            RunningTimePointListModel.Msg.TimePointsLoopComplettedQueueMsg
+        ))
+    )
+
+
 /// SetIsWorkSelectorLoaded handler
 let private setIsWorkSelectorLoaded initRunningTimePoints initWorkSelectorModel (v: bool) (model: MainModel) =
     if v then
@@ -306,6 +319,9 @@ let update
 
     | Msg.TimePointQueueMsg (timePoints, timePointIdOpt) ->
         model |> mapTimePointQueueMsg updateTimePointsDrawerModel (timePoints, timePointIdOpt)
+
+    | Msg.TimePointsLoopComplettedQueueMsg  ->
+        model |> mapTimePointsLoopComplettedQueueMsg updateTimePointsDrawerModel
 
     | Msg.StartTimePoint tpId ->
         model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
