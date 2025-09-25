@@ -12,6 +12,7 @@ open System.Windows.Input
 type IBindings =
     interface
         abstract TimePoints: TimePoint seq
+        abstract SelectedTimePointId: TimePointId option
         abstract DisableSkipBreak : bool with get, set
         abstract DisableMinimizeMaximizeWindows : bool with get, set
         abstract RequestTimePointGeneratorCommand: ICommand
@@ -27,17 +28,14 @@ module Bindings =
             nameof __.TimePoints
                 |> Binding.subModelSeq (
                     (fun m -> m.TimePoints),
+                    snd,
                     (fun tp -> tp.Id),
-                    (fun () -> [
-                        "Id" |> Binding.oneWay (fun (_, e) -> e.Id)
-                        "Name" |> Binding.oneWay (fun (_, e) -> e.Name)
-                        // TODO: move conversion to presentation
-                        "TimeSpan" |> Binding.oneWay (fun (_, e) -> e.TimeSpan.ToString("h':'mm"))
-                        "Kind" |> Binding.oneWay (fun (_, e) -> e.Kind)
-                        "KindAlias" |> Binding.oneWay (fun (_, e) -> e.KindAlias |> Alias.value)
-                        "IsSelected" |> Binding.oneWay (fun (m, e) -> m.ActiveTimePointId |> Option.map (fun atpId -> atpId = e.Id) |> Option.defaultValue false)
-                    ])
+                    Msg.TimePointModelMsg,
+                    TimePointModel.Bindings.bindings
                 )
+
+            // Do not use in running time point cause it's not controlled by ItemsControl but Looper
+            nameof __.SelectedTimePointId |> Binding.subModelSelectedItem ((nameof __.TimePoints), _.ActiveTimePointId, Msg.SetActiveTimePointId)
 
             nameof __.DisableSkipBreak
                 |> Binding.twoWay (_.DisableSkipBreak, Msg.SetDisableSkipBreak)

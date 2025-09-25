@@ -14,6 +14,7 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.RunningTimePointListModel
 
+/// Msg.LooperMsg handler.
 let private mapLooperMsg levt (model: RunningTimePointListModel) =
     match levt with
     | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp }, _)
@@ -23,17 +24,31 @@ let private mapLooperMsg levt (model: RunningTimePointListModel) =
         , Cmd.none
         , Intent.None
 
+
+/// Msg.TimePointModelMsg handler.
+let private mapTimePointModelMsg updateTimePointModel tpId tpMsg (model: RunningTimePointListModel) =
+    model.TimePoints
+    |> List.mapFirstCmd (_.Id >> (=) tpId) (updateTimePointModel tpMsg)
+    |> fun (listModel, cmd) ->
+        { model with TimePoints = listModel }
+        , Cmd.map (fun smsg -> Msg.TimePointModelMsg (tpId, smsg)) cmd
+        , Intent.None
+
 let update
     (playerUserSettings: IPlayerUserSettings)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<RunningTimePointListModel>)
+    updateTimePointModel
     msg model
     =
     match msg with
-    | Msg.SetActiveTimePointId tpId ->
+    | Msg.SetActiveTimePointId tpId when tpId <> model.ActiveTimePointId ->
         model |> withActiveTimePointId tpId
         , Cmd.none
         , Intent.None
+
+    | Msg.TimePointModelMsg (tpId, tpMsg) ->
+        model |> mapTimePointModelMsg updateTimePointModel tpId tpMsg
 
     | Msg.LooperMsg levt ->
         model |> mapLooperMsg levt
@@ -55,8 +70,10 @@ let update
         , Cmd.none
         , Intent.None
 
-    | Msg.TimePointQueueMsg (timePoints, timePointIdOpt) ->
-        model |> withTimePoints timePoints timePointIdOpt
+    | Msg.TimePointsChangedQueueMsg (timePoints, timePointIdOpt) ->
+        model |> withTimePointQueueTimePoints timePoints timePointIdOpt
+        , Cmd.none
+        , Intent.None
 
     | Msg.TimePointsLoopComplettedQueueMsg ->
         model |> withNotPlayedTimePoints
