@@ -201,6 +201,16 @@ let compose
                 (loggerFactory.CreateLogger<StatisticMainModel>())
 
         // -------------------------
+        // TimePointModel
+        // -------------------------
+        let updateTimePointModel =
+            TimePointModel.Program.update
+                timePointQueue
+                looper
+                mainErrorMessageQueue
+                (loggerFactory.CreateLogger<TimePointModel>())
+
+        // -------------------------
         // RunningTimePointListModel
         // -------------------------
         let initRunningTimePointListModel =
@@ -212,6 +222,7 @@ let compose
                 userSettings
                 mainErrorMessageQueue
                 (loggerFactory.CreateLogger<RunningTimePointListModel>())
+                updateTimePointModel
 
         // -------------------------
         // CurrentWorkModel
@@ -244,6 +255,9 @@ let compose
         // -------------------------
         // TimePointsDrawerModel
         // -------------------------
+        let initWithTimePointsDrawerModel =
+            TimePointsDrawerModel.initWithRunningTimePoints initRunningTimePointListModel
+
         let updateTimePointsDrawerModel =
             TimePointsDrawerModel.Program.update
                 (loggerFactory.CreateLogger<TimePointsDrawerModel>())
@@ -258,7 +272,7 @@ let compose
             (loggerFactory.CreateLogger<MainModel>())
             updatePlayerModel
             updateCurrentWorkModel
-            initRunningTimePointListModel
+            initWithTimePointsDrawerModel
             updateTimePointsDrawerModel
             updateAppDialogModel
             initWorkSelectorModel
@@ -291,9 +305,9 @@ let compose
                     ()
             }
 
-        let timePointQueueSubscription dispatch =
+        let timePointQueueTimePointsChangedSubscription dispatch =
             let onTimePointChanged timePoints =
-                do dispatch (timePoints |> MainModel.Msg.TimePointQueueMsg)
+                do dispatch (timePoints |> MainModel.Msg.TimePointsChangedQueueMsg)
             timePointQueue.TimePointsChanged.Subscribe onTimePointChanged
 
         let timePointQueueTimePointsLoopComplettedSubscription dispatch =
@@ -308,7 +322,7 @@ let compose
 
         [
             ["Looper"], looperSubscription
-            ["TimePointQueue"], timePointQueueSubscription
+            ["TimePointQueue.TimePointsChanged"], timePointQueueTimePointsChangedSubscription
             ["TimePointQueue.TimePointsLoopCompletted"], timePointQueueTimePointsLoopComplettedSubscription
             ["PlayerUserSettings"], playerUserSettingsSubscription
         ]
