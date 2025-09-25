@@ -41,6 +41,7 @@ let update
     (timePointQueue: ITimePointQueue)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<TimePointsGeneratorModel>)
+    updateTimePointModel
     msg model
     =
     match msg with
