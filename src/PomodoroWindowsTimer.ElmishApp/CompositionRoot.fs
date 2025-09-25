@@ -80,20 +80,6 @@ let compose
             DatabaseSettingsModel.Program.update userSettings
 
         // -------------------------
-        // TimePointsGeneratorModel
-        // -------------------------
-        let initTimePointsGeneratorModel () =
-            TimePointsGeneratorModel.init timePointPrototypeStore patternStore
-
-        let updateTimePointsGeneratorModel =
-            TimePointsGeneratorModel.Program.update
-                patternStore
-                timePointPrototypeStore
-                timePointQueue
-                dialogErrorMessageQueue
-                (loggerFactory.CreateLogger<TimePointsGeneratorModel>())
-
-        // -------------------------
         // WorkEventListModel
         // -------------------------
         let updateWorkEventListModel =
@@ -209,6 +195,21 @@ let compose
                 looper
                 mainErrorMessageQueue
                 (loggerFactory.CreateLogger<TimePointModel>())
+
+        // -------------------------
+        // TimePointsGeneratorModel
+        // -------------------------
+        let initTimePointsGeneratorModel () =
+            TimePointsGeneratorModel.init timePointPrototypeStore patternStore
+
+        let updateTimePointsGeneratorModel =
+            TimePointsGeneratorModel.Program.update
+                patternStore
+                timePointPrototypeStore
+                timePointQueue
+                dialogErrorMessageQueue
+                (loggerFactory.CreateLogger<TimePointsGeneratorModel>())
+                updateTimePointModel
 
         // -------------------------
         // RunningTimePointListModel
