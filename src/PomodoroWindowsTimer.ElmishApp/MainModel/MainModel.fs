@@ -41,7 +41,7 @@ module MainModel =
     type Msg =
         | SetIsTimePointsDrawerShown of bool
         | TimePointsDrawerMsg of TimePointsDrawerModel.Msg
-        | TimePointQueueMsg of TimePoint list * TimePointId option
+        | TimePointsChangedQueueMsg of TimePoint list * TimePointId option
         | TimePointsLoopComplettedQueueMsg
         | StartTimePoint of TimePointId
 
@@ -59,7 +59,6 @@ module MainModel =
         | StatisticMainModelMsg of StatisticMainModel.Msg
 
         | SendToChatBot of Message
-
 
         // | SetDisableMinimizeMaximizeWindows of bool
         // | LoadTimePointsFromSettings
@@ -119,7 +118,7 @@ module MainModel =
             // TimePointList = TimePointListModel.init timePoints
             IsTimePointsDrawerShown = false
 
-            TimePointsDrawer = TimePointsDrawerModel.None
+            TimePointsDrawer = TimePointsDrawerModel.None []
 
             Player = PlayerModel.init userSettings
 
@@ -150,14 +149,11 @@ module MainModel =
     let withoutWorkSelectorModel (model: MainModel) =
          { model with WorkSelector = None }
 
-    let withIsTimePointsDrawerShown initRunningTimePoints v (model: MainModel) =
-        // TODO: clear drower when closed
-        match v, model.TimePointsDrawer with
-        | true, TimePointsDrawerModel.None ->
-            { model with
-                IsTimePointsDrawerShown = v;
-                TimePointsDrawer = initRunningTimePoints () |> TimePointsDrawerModel.RunningTimePoints }
-        | _ -> { model with IsTimePointsDrawerShown = v; }
+    let withTimePointsDrawerModel drawerModel (model: MainModel) =
+        { model with TimePointsDrawer = drawerModel }
+
+    let withIsTimePointsDrawerShown v (model: MainModel) =
+        { model with IsTimePointsDrawerShown = v }
 
     let withTimePointsDrawer drawerModelOpt (model: MainModel) =
          { model with TimePointsDrawer = drawerModelOpt }
