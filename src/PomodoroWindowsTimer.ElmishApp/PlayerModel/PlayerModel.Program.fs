@@ -44,11 +44,20 @@ let private setDisableSkipBreak (settings: IPlayerUserSettings) v (model: Player
 /// Starts ITimePointQueue.ScrollTo operation and finishes it with Msg.Play.
 let private startTimePoint (timePointQueue: ITimePointQueue) op (model: PlayerModel) =
     match op with
-    | Operation.Start id ->
+    | Operation.Start timePointId ->
         model
         , Cmd.batch [
             Cmd.ofMsg Msg.Stop
-            Cmd.OfFunc.either timePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn
+            Cmd.OfFunc.either
+                (fun tpId ->
+                    if timePointQueue.ScrollTo tpId then
+                        () |> Operation.Finish |> Msg.StartTimePoint
+                    else
+                        Msg.OnError $"Time point {tpId} has not been found in ITimePointQueue"
+                )
+                timePointId
+                id
+                Msg.OnExn
         ]
         , Intent.None
 

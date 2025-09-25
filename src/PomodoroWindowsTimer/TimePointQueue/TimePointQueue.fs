@@ -32,7 +32,7 @@ type private Msg =
     | GetAll of AsyncReplyChannel<(TimePoint list * TimePointId option)>
     | GetNext of AsyncReplyChannel<TimePoint option>
     | Pick of AsyncReplyChannel<TimePoint option>
-    | ScrollTo of TimePointId * AsyncReplyChannel<unit>
+    | ScrollTo of TimePointId * AsyncReplyChannel<bool>
     | Reset
     | TryFind of TimePointId * AsyncReplyChannel<TimePoint option>
 
@@ -134,49 +134,55 @@ type TimePointQueue(
                     | ScrollTo (id, reply) when state.Queue.Count = 0 ->
                         use _ = logger.BeginHandleScope(nameof ScrollTo, id)
                         logger.LogDebug("Queue is empty")
-                        reply.Reply(())
+                        reply.Reply(false)
                         return! loop state
 
+                    // Reorder state.Queue that interested time point priority becomes lower. Returns True if time point exists.
                     | ScrollTo (id, reply) ->
                         use _ = logger.BeginHandleScope(nameof ScrollTo, id)
-                        let minPriority = -(float32 state.Queue.Count)
 
-                        let timePoints =
-                            seq {
-                                for _ in 1 .. state.Queue.Count do
-                                    yield state.Queue.Dequeue()
-                            }
-                            |> Seq.toList
+                        if state.Queue |> (not << Seq.exists (fun tp -> tp.Id = id)) then
+                            reply.Reply(false)
+                            return! loop state
+                        else
+                            let minPriority = -(float32 state.Queue.Count)
 
-                        state.Queue.Clear()
+                            let timePoints =
+                                seq {
+                                    for _ in 1 .. state.Queue.Count do
+                                        yield state.Queue.Dequeue()
+                                }
+                                |> Seq.toList
 
-                        let rec move minPriority (queue: TimePoint list) priority =
-                            match queue with
-                            | [] ->
-                                logger.LogWarning("Scroll is failed, time point with target id {TimePointId} has not been found in queue", id)
-                                priority
-                            | tp :: tail when tp.Id = id ->
-                                state.Queue.Enqueue(tp, minPriority)
-                                tail
-                                |> List.fold (fun (p: float32) tp ->
-                                    state.Queue.Enqueue(tp, p)
-                                    p + 1.0f
-                                ) (minPriority + 1f)
-                                |> ignore
-                                priority
+                            state.Queue.Clear()
 
-                            | tp :: tail ->
-                                state.Queue.Enqueue(tp, priority)
-                                move minPriority tail (priority + 1.0f)
+                            let rec move minPriority (queue: TimePoint list) priority =
+                                match queue with
+                                | [] ->
+                                    logger.LogWarning("Scroll is failed, time point with target id {TimePointId} has not been found in queue", id)
+                                    (priority, false)
+                                | tp :: tail when tp.Id = id ->
+                                    state.Queue.Enqueue(tp, minPriority)
+                                    tail
+                                    |> List.fold (fun (p: float32) tp ->
+                                        state.Queue.Enqueue(tp, p)
+                                        p + 1.0f
+                                    ) (minPriority + 1f)
+                                    |> ignore
+                                    (priority, true)
 
-                        let maxPriority = move minPriority timePoints 0f
+                                | tp :: tail ->
+                                    state.Queue.Enqueue(tp, priority)
+                                    move minPriority tail (priority + 1.0f)
 
-                        let state = { state with MaxPriority = maxPriority }
-                        // logNewState state
+                            let (maxPriority, tpExists) = move minPriority timePoints 0f
 
-                        reply.Reply(())
+                            let state = { state with MaxPriority = maxPriority }
+                            // logNewState state
 
-                        return! loop state
+                            reply.Reply(tpExists)
+
+                            return! loop state
 
                     | GetNext reply when state.Queue.Count = 0 ->
                         use _ = logger.BeginHandleScope(nameof GetNext)
@@ -257,7 +263,7 @@ type TimePointQueue(
     member _.TryPick() =
         _agent.PostAndReply(Pick, int replyTimeout)
 
-    member _.ScrollTo(id: Guid) =
+    member _.ScrollTo(id: TimePointId) =
         _agent.PostAndReply(fun reply -> ScrollTo (id, reply))
 
     member _.TryGetNext() =
@@ -292,9 +298,9 @@ type TimePointQueue(
         member this.Start() = this.Start()
         member this.TryGetNext() = this.TryGetNext()
         member this.TryPick() = this.TryPick()
-        member this.ScrollTo(id: Guid) = this.ScrollTo(id)
+        member this.ScrollTo(id: TimePointId) = this.ScrollTo(id)
         member this.Reload timePoints = this.Reload(timePoints)
-        member this.TryFind(id: Guid) = this.TryFind(id)
+        member this.TryFind(id: TimePointId) = this.TryFind(id)
         member this.GetTimePoints (): (TimePoint list * TimePointId option) = 
             this.GetAll()
 

@@ -14,7 +14,8 @@ type ITimePointQueue =
     abstract TryGetNext : unit -> TimePoint option
     abstract Reload : TimePoint list -> unit
     abstract TryPick : unit -> TimePoint option
-    abstract ScrollTo : Guid -> unit
+    /// Reorders queue that interested time point priority becomes lower. Returns True if time point exists.
+    abstract ScrollTo : TimePointId -> bool
     abstract TryFind : TimePointId -> TimePoint option
     abstract GetTimePoints : unit -> (TimePoint list * TimePointId option)
 
