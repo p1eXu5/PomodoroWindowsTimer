@@ -4,6 +4,15 @@
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
                     >
+    <Style x:Key="st_IconBase"
+           TargetType="materialDesign:PackIcon"
+           >
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
     <Style x:Key="st_HorizontalStackButtonIcon"
            BasedOn="{StaticResource st_IconBase}"
            TargetType="materialDesign:PackIcon"
