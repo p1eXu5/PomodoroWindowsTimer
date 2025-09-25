@@ -17,6 +17,8 @@ module TimePointModel =
         | SetName of string
         | SetTimeSpan of string
         | SetIsSelected of bool
+        | SetIsSelectedNotPlaying
+        | SetIsSelectedIsPlaying
         | SetIsPlayed of bool
         | SetIsPlaying of bool
         | Play

@@ -44,11 +44,17 @@ module Program =
         | SetIsSelected v ->
             { model with IsSelected = v }, Cmd.none
 
+        | SetIsSelectedNotPlaying ->
+            { model with IsSelected = true; IsPlaying = false; IsPlayed = false }, Cmd.none
+
+        | SetIsSelectedIsPlaying ->
+            { model with IsSelected = true; IsPlaying = true; IsPlayed = false }, Cmd.none
+
         | SetIsPlayed v ->
-            { model with IsSelected = v }, Cmd.none
+            { model with IsPlayed = v }, Cmd.none
 
         | SetIsPlaying v ->
-            { model with IsPlaying = v }, Cmd.none
+            { model with IsPlaying = v; IsPlayed = false }, Cmd.none
 
         | Play ->
             model |> mapPlayMsg timePointQueue looper

@@ -15,14 +15,63 @@ open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.RunningTimePointListModel
 
 /// Msg.LooperMsg handler.
-let private mapLooperMsg levt (model: RunningTimePointListModel) =
+let private mapLooperMsg updateTimePointModel levt (model: RunningTimePointListModel) =
     match levt with
-    | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp }, _)
+    // preload, stopped
     | LooperEvent.TimePointStopped (atp, _)
-    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp }, _) ->
-        model |> withActiveTimePointId (atp.OriginalId |> Some)
-        , Cmd.none
-        , Intent.None
+    | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp; OldActiveTimePoint = None }, _) ->
+        model.TimePoints
+        |> List.mapFirstCmd
+            (fun tp -> tp.Id = atp.Id && not (tp.IsSelected && not tp.IsPlaying))
+            (updateTimePointModel (TimePointModel.Msg.SetIsSelectedNotPlaying))
+        |> fun (tpList, tpCmd) ->
+            match model.ActiveTimePointId with
+            | Some oldTpId when oldTpId <> atp.Id ->
+                tpList
+                |> List.mapFirstCmd
+                    (fun tp -> tp.Id = oldTpId && tp.IsSelected)
+                    (updateTimePointModel (TimePointModel.Msg.SetIsSelected false))
+                |> fun (tpList', tpCmd') ->
+                    { model with TimePoints = tpList' }
+                    |> withActiveTimePointId (atp.OriginalId |> Some)
+                    , Cmd.batch [
+                        Cmd.map (fun m -> Msg.TimePointModelMsg (atp.Id, m)) tpCmd
+                        Cmd.map (fun m -> Msg.TimePointModelMsg (oldTpId, m)) tpCmd'
+                    ]
+                    , Intent.None
+            | _ ->
+                { model with TimePoints = tpList }
+                |> withActiveTimePointId (atp.OriginalId |> Some)
+                , Cmd.map (fun m -> Msg.TimePointModelMsg (atp.Id, m)) tpCmd
+                , Intent.None
+
+    // started
+    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp }, _)
+    | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp; }, _) ->
+        model.TimePoints
+        |> List.mapFirstCmd
+            (fun tp -> tp.Id = atp.Id && not (tp.IsSelected && tp.IsPlaying))
+            (updateTimePointModel (TimePointModel.Msg.SetIsSelectedIsPlaying))
+        |> fun (tpList, tpCmd) ->
+            match model.ActiveTimePointId with
+            | Some oldTpId when oldTpId <> atp.Id ->
+                tpList
+                |> List.mapFirstCmd
+                    (fun tp -> tp.Id = oldTpId && tp.IsSelected)
+                    (updateTimePointModel (TimePointModel.Msg.SetIsSelected false))
+                |> fun (tpList', tpCmd') ->
+                    { model with TimePoints = tpList' }
+                    |> withActiveTimePointId (atp.OriginalId |> Some)
+                    , Cmd.batch [
+                        Cmd.map (fun m -> Msg.TimePointModelMsg (atp.Id, m)) tpCmd
+                        Cmd.map (fun m -> Msg.TimePointModelMsg (oldTpId, m)) tpCmd'
+                    ]
+                    , Intent.None
+            | _ ->
+                { model with TimePoints = tpList }
+                |> withActiveTimePointId (atp.OriginalId |> Some)
+                , Cmd.map (fun m -> Msg.TimePointModelMsg (atp.Id, m)) tpCmd
+                , Intent.None
 
 
 /// Msg.TimePointModelMsg handler.
@@ -51,7 +100,7 @@ let update
         model |> mapTimePointModelMsg updateTimePointModel tpId tpMsg
 
     | Msg.LooperMsg levt ->
-        model |> mapLooperMsg levt
+        model |> mapLooperMsg updateTimePointModel levt
 
     | Msg.SetDisableSkipBreak v ->
         model
