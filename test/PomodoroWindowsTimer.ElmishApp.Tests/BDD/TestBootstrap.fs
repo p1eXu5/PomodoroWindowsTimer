@@ -2,32 +2,33 @@
 
 open System
 open System.Collections.Generic
+open System.Collections.Concurrent
+open System.Threading
 open Microsoft.Data.Sqlite
-open Microsoft.Extensions.Hosting
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.DependencyInjection.Extensions
+open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Options
 
 open Elmish
+
 open NUnit.Framework
+open NSubstitute
 open p1eXu5.AspNetCore.Testing
 open p1eXu5.AspNetCore.Testing.Logging
 open p1eXu5.AspNetCore.Testing.MockRepository
+open PomodoroWindowsTimer.ElmishApp.Tests.LoggerExtensions
 
+open PomodoroWindowsTimer.Abstractions
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.ElmishApp.Abstractions
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Infrastructure
-
-open PomodoroWindowsTimer.WpfClient
-open System.Collections.Concurrent
-open PomodoroWindowsTimer.Abstractions
-open NSubstitute
-open System.Threading
 open PomodoroWindowsTimer.Storage.Configuration
-open NPOI.XSSF.Streaming.Values
-open Microsoft.Extensions.Options
-open Microsoft.Extensions.Configuration
+open PomodoroWindowsTimer.WpfClient
+
 
 type TestBootstrap () =
     inherit Bootstrap()
@@ -49,6 +50,8 @@ type TestBootstrap () =
         let connectionString = $"Data Source={dbFilePath};Mode=Memory;Cache=Shared;"
         inMemoryConnection <- new SqliteConnection(connectionString)
         inMemoryConnection.Open()
+
+    let _lockObj = new Lock()
 
     // ------------------
     //    properties
@@ -129,25 +132,28 @@ type TestBootstrap () =
 
         services.AddSingleton<ITelegramBot>(new TelegramBotStub()) |> ignore
 
-
-
+    /// <summary>
+    /// Configures test logging.
+    /// </summary>
     override _.ConfigureLogging(_: HostBuilderContext, loggingBuilder: ILoggingBuilder) =
         loggingBuilder
-            .SetMinimumLevel(LogLevel.Debug)
             .ClearProviders()
             .AddTestLogger(TestContextWriters.GetInstance<TestContext>(), LogOut.All)
-            .AddFilter(fun category logLevel ->
-                if
-                    category.StartsWith("DbUp", StringComparison.Ordinal)
-                    || category.StartsWith("PomodoroWindowsTimer.Looper", StringComparison.Ordinal)
-                    || category.StartsWith("PomodoroWindowsTimer.TimePointQueue", StringComparison.Ordinal)
-                then false
-                else logLevel >= LogLevel.Debug
-            )
+            .SetMinimumLevel(LogLevel.Trace)
+            .AddFilter("Microsoft", LogLevel.Warning)
+            .AddFilter("DbUp", LogLevel.Warning)
+            .AddFilter("PomodoroWindowsTimer.Storage", LogLevel.Warning)
+            .AddFilter("PomodoroWindowsTimer.TimePointQueue.TimePointQueue", LogLevel.Debug)
+            .AddFilter("PomodoroWindowsTimer.Looper.Looper", LogLevel.Debug)
+            .AddFilter("PomodoroWindowsTimer.ElmishApp.Models", LogLevel.Debug)
+            .AddFilter("TestElmishProgram", LogLevel.Debug)
             |> ignore
 
-
+    /// <summary>
+    /// Adds MockRepository.
+    /// </summary>
     override _.PostConfigureHost(builder: IHostBuilder) =
+        base.PostConfigureHost(builder)
         builder.AddMockRepository(
             [ 
                 Service<IThemeSwitcher>();
@@ -157,7 +163,13 @@ type TestBootstrap () =
             (fun mr -> mockRepository <- mr)
         )
 
-
+    /// <summary>
+    /// 1. Calls base.StartHost()
+    ///
+    /// 1. Obtains IDbSeeder and seeds database
+    ///
+    /// 2. Applies DB migrations through IDbMigrator
+    /// </summary>
     override _.StartHost (): unit = 
         base.StartHost()
 
@@ -184,51 +196,100 @@ type TestBootstrap () =
             raise (InvalidOperationException(err))
         | _ -> ()
 
-
-    member _.StartTestElmishApp (outMainModel: ref<MainModel>, msgStack: ConcurrentStack<MainModel.Msg>, testDispatcher: TestDispatcher) =
+    /// 
+    member _.StartTestElmishApp (
+        outMainModel: ref<MainModel>,
+        msgStack: ConcurrentStack<MainModel.Msg>,
+        testDispatcher: TestDispatcher
+    ) =
         // do this.WaitDbSeeding()
 
         let factory = base.GetElmishProgramFactory()
-        let (initMainModel, updateMainModel, _, subscribe) =
+
+        let looper = factory.Looper
+        let timePointQueue = factory.TimePointQueue
+        let userSettings = factory.UserSettings
+
+        let (initMainModel, updateMainModel, _, _) =
             CompositionRoot.compose
                 "Pomodoro Windows Timer under tests"
                 (Func<System.Windows.Window>(fun () -> Unchecked.defaultof<System.Windows.Window>))
-                factory.Looper
-                factory.TimePointQueue
+                looper
+                timePointQueue
                 factory.WorkEventStore
                 factory.TelegramBot
                 factory.WindowsMinimizer
                 factory.ThemeSwitcher
-                factory.UserSettings
+                userSettings
                 factory.MainErrorMessageQueue
                 factory.DialogErrorMessageQueue
                 factory.TimeProvider
                 factory.ExcelBook
                 factory.LoggerFactory
 
-        let subscribe' mainModel : (SubId * Subscribe<_>) list =
+        let logger = base.GetLoggerFactory().CreateLogger("TestElmishProgram");
+
+        // subscriptions
+        let subscribe _ : (SubId * Subscribe<_>) list =
+            let looperSubscription dispatch =
+                let onLooperEvt =
+                    fun evt ->
+                        logger.LogDebug($"Dispatching LooperEvent:\n{evt}...")
+                        do dispatch (evt |> MainModel.Msg.LooperMsg)
+                looper.AddSubscriber(onLooperEvt)
+                { new IDisposable with 
+                    member _.Dispose() =
+                        ()
+                }
+
+            let timePointQueueTimePointsChangedSubscription dispatch =
+                let onTimePointChanged timePoints =
+                    do dispatch (timePoints |> MainModel.Msg.TimePointsChangedQueueMsg)
+                timePointQueue.TimePointsChanged.Subscribe onTimePointChanged
+
+            let timePointQueueTimePointsLoopComplettedSubscription dispatch =
+                let onTimePointChanged () =
+                    do dispatch MainModel.Msg.TimePointsLoopComplettedQueueMsg
+                timePointQueue.TimePointsLoopCompletted.Subscribe onTimePointChanged
+
+            let playerUserSettingsSubscription dispatch =
+                let onSettingsChanged () =
+                    do dispatch (MainModel.Msg.PlayerUserSettingsChanged)
+                userSettings.PlayerUserSettingsChanged.Subscribe onSettingsChanged
+
             let dispatchMsgFromScenario dispatch =
                 let dispatcherSubscription =
                     testDispatcher.DispatchRequested.Subscribe(fun msg -> dispatch msg)
                 { new IDisposable with member _.Dispose() = dispatcherSubscription.Dispose() }
 
-            let l = mainModel |> subscribe
-            (["dispatchMsgFromScenario"], dispatchMsgFromScenario) :: l
+            [
+                ["Looper"], looperSubscription
+                ["TimePointQueue.TimePointsChanged"], timePointQueueTimePointsChangedSubscription
+                ["TimePointQueue.TimePointsLoopCompletted"], timePointQueueTimePointsLoopComplettedSubscription
+                ["PlayerUserSettings"], playerUserSettingsSubscription
+                ["dispatchMsgFromScenario"], dispatchMsgFromScenario
+            ]
 
-        do
-            Program.mkProgram 
-                initMainModel 
-                (fun (msg: MainModel.Msg) mainModel ->
-                    let mainModel', mainModelCmd = mainModel |> updateMainModel msg
-                    outMainModel.Value <- mainModel'
-                    msgStack.Push(msg)
-                    mainModel', mainModelCmd
-                )
-                (fun _ _ -> ())
-            |> Program.withSubscription subscribe'
-            |> Program.withTrace (fun msg _ _ -> TestContext.WriteLine(sprintf "trace: Program\n       Dispatched msg is:\n  %A" msg))
-            |> Program.withTermination ((=) MainModel.Msg.Terminate) (fun _ -> ())
-            |> Program.run
+        let syncDispatch dispatch msg =
+            lock _lockObj (fun() ->
+                msgStack.Push(msg)
+                dispatch msg
+            )
 
-            factory.Looper.Start()
+
+        async {
+            do
+                Program.mkProgram 
+                    initMainModel 
+                    updateMainModel
+                    (fun m _ -> outMainModel.Value <- m )
+                |> Program.withSubscription subscribe
+                |> Program.withTrace (fun msg _ _ -> logger.LogMsg(msg))
+                |> Program.withTermination ((=) MainModel.Msg.Terminate) (fun _ -> ())
+                |> Program.withErrorHandler (fun (err, ex) -> logger.LogError(ex, err))
+                |> Program.runWithDispatch syncDispatch ()
+        }
+        |> Async.Start
+
+        factory.Looper.Start()
 

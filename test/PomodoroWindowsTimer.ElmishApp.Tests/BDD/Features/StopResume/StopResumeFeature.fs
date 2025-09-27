@@ -13,7 +13,6 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps
 
-
 module StopResumeFeature =
 
     [<Test>]
