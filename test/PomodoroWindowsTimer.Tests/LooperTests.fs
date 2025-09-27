@@ -48,9 +48,7 @@ let testLooper (timePoints: TimePoint list) (setupTime: System.TimeProvider -> S
     let looper = new Looper(tpQueue, setupTime timeProvider, 200<ms>, TestLogger<Looper>(TestContextWriters.GetInstance<TestContext>(), LogOut.All) :> ILogger<Looper>, cts.Token)
     let eventQueue = Queue<LooperEvent>()
     let subscriber looperEvent =
-        async {
-            eventQueue.Enqueue(looperEvent)
-        }
+        eventQueue.Enqueue(looperEvent)
     looper.Start([ subscriber ])
     (
         looper,

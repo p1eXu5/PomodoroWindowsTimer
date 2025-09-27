@@ -15,7 +15,7 @@ type private State =
     {
         ActiveTimePoint: ActiveTimePoint option
         StartTime: DateTime
-        Subscribers: (LooperEvent -> Async<unit>) list
+        Subscribers: (LooperEvent -> unit) list
         IsStopped: bool
     }
     static member Init(startDateTime) =
@@ -29,8 +29,8 @@ type private State =
 type private Msg =
     | PreloadTimePoint
     | Tick
-    | Subscribe of (LooperEvent -> Async<unit>)
-    | SubscribeMany of (LooperEvent -> Async<unit>) list * AsyncReplyChannel<unit>
+    | Subscribe of (LooperEvent -> unit)
+    | SubscribeMany of (LooperEvent -> unit) list * AsyncReplyChannel<unit>
     | Stop
     | Resume
     | Next
@@ -81,7 +81,10 @@ type Looper(
 
     let tryPostEvent (state: State) event =
         if state.Subscribers |> (not << List.isEmpty) then
-            notifierAgent.Post(Choice1Of2 (state.Subscribers |> List.map (fun f -> f event)))
+            state.Subscribers
+            |> List.iter (fun f -> f event)
+        else
+            ()
 
     
     let tryNextTimePoint (state: State) =
@@ -285,7 +288,7 @@ type Looper(
 
 
     /// Starts Looper in Stop state
-    member _.Start(subscribers: (LooperEvent -> Async<unit>) list) =
+    member _.Start(subscribers: (LooperEvent -> unit) list) =
         if Interlocked.CompareExchange(started, 1 ,0) = 0 then
             if box timer = null then
                 timer <-
@@ -293,13 +296,14 @@ type Looper(
                         agent.Post(Tick)
                     )
 
-            notifierAgent.Start()
+            // notifierAgent.Start()
             agent.Start()
-            do agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
+            if subscribers |> (not << List.isEmpty) then
+                agent.PostAndReply(fun reply -> SubscribeMany (subscribers, reply))
             agent.Post(Stop)
             timePointQueue.Start()
 
-    member _.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) =
+    member _.AddSubscriber(subscriber: (LooperEvent -> unit)) =
         ObjectDisposedException.ThrowIf(_isDisposed, this)
         if started.Value = 0 then
             this.Subscribers <- subscriber :: this.Subscribers
@@ -350,9 +354,9 @@ type Looper(
                     timer.Dispose()
 
                 agent.Post(Stop)
-                notifierAgent.Post(() |> Choice2Of2)
+                // notifierAgent.Post(() |> Choice2Of2)
                 (agent :> IDisposable).Dispose()
-                (notifierAgent :> IDisposable).Dispose()
+                // (notifierAgent :> IDisposable).Dispose()
                 timePointQueueSubscriber.Dispose()
                 timePointQueue.Dispose()
 
@@ -376,7 +380,7 @@ type Looper(
         member this.Shift(seconds: float<sec>) = this.Shift(seconds)
         member this.ShiftAck(seconds: float<sec>) = this.ShiftAck(seconds)
         member this.Resume() = this.Resume()
-        member this.AddSubscriber(subscriber: (LooperEvent -> Async<unit>)) = this.AddSubscriber(subscriber)
+        member this.AddSubscriber(subscriber: (LooperEvent -> unit)) = this.AddSubscriber(subscriber)
         /// Tries to pick TimePoint from queue, if it present
         /// emits TimePointStarted event and sets ActiveTimePoint.
         member this.PreloadTimePoint() = this.PreloadTimePoint()

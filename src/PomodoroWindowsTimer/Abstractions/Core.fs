@@ -29,7 +29,7 @@ type ILooper =
         abstract Shift : float<sec> -> unit
         abstract ShiftAck : float<sec> -> unit
         abstract Resume : unit -> unit
-        abstract AddSubscriber : (LooperEvent -> Async<unit>) -> unit
+        abstract AddSubscriber : (LooperEvent -> unit) -> unit
         /// Tryes to pick TimePoint from queue, if it present
         /// emits TimePointStarted event and sets ActiveTimePoint.
         abstract PreloadTimePoint : unit -> unit

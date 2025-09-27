@@ -297,7 +297,6 @@ let compose
         let looperSubscription dispatch =
             let onLooperEvt =
                 fun evt ->
-                    async {
                         do dispatch (evt |> MainModel.Msg.LooperMsg)
                     }
             looper.AddSubscriber(onLooperEvt)
