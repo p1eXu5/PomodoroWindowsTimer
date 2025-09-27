@@ -9,6 +9,8 @@ open PomodoroWindowsTimer.ElmishApp
 
 type [<Measure>] times
 
+exception CurrentWorkNotSetException
+
 module MainModel =
 
     open PomodoroWindowsTimer.ElmishApp.Models

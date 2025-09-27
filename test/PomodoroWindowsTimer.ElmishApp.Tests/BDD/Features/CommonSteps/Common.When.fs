@@ -26,10 +26,10 @@ let rec ``Spent`` (seconds: float<sec>) =
 
 
 let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
-    Common.``Looper TimePointStarted event has been despatched with`` newTimePointId oldTimePointId
+    Common.``Looper TimePointStarted event has been dispatched with`` newTimePointId oldTimePointId
     |> Scenario.log (
         sprintf "When.``%s new TimePoint Id - %A and %s``."
-            (nameof Common.``Looper TimePointStarted event has been despatched with``)
+            (nameof Common.``Looper TimePointStarted event has been dispatched with``)
             newTimePointId
             (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
         )

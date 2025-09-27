@@ -1,14 +1,12 @@
 ﻿[<RequireQualifiedAccess>]
 module rec PomodoroWindowsTimer.ElmishApp.Tests.Features.Works.Steps.Common
 
-open System
+open Elmish.Extensions
+
 open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp.Models
-open PomodoroWindowsTimer.ElmishApp.Models.MainModel
-open PomodoroWindowsTimer.ElmishApp.Tests
 open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.Helpers
-open Elmish.Extensions
 
 let ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
     scenario { 
@@ -19,6 +17,7 @@ let ``SetCurrentWorkIfNone msg has been dispatched with`` (expectedWork: Work) =
             | _ -> false
         )
     }
+    |> Scenario.log "Common.``SetCurrentWorkIfNone msg has been dispatched with``"
 
 let ``CreatingWork sub model has been shown`` () =
     scenario {
@@ -31,6 +30,7 @@ let ``CreatingWork sub model has been shown`` () =
             | _ -> false
         )
     }
+    |> Scenario.log "Common.``CreatingWork sub model has been shown``"
 
 let ``WorkList sub model has been shown`` (times: int<times>) =
     scenario {
@@ -51,6 +51,7 @@ let ``WorkList sub model has been shown`` (times: int<times>) =
             | _ -> false
         )
     }
+    |> Scenario.log "Common.``WorkList sub model has been shown``"
 
 
 let ``UpdatingWork sub model has been shown`` () =
@@ -64,3 +65,4 @@ let ``UpdatingWork sub model has been shown`` () =
             | _ -> false
         )
     }
+    |> Scenario.log "Common.``UpdatingWork sub model has been shown``"
