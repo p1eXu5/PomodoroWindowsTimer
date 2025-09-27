@@ -58,15 +58,19 @@ type TimePointQueue(
 
                     match msg with
                     | Reset ->
-                        use _ = logger.BeginHandleScope(nameof Reset)
+                        use d = logger.BeginHandleScope(nameof Reset)
                         let newState = State.Default
                         timePointsChangedEvent.Trigger([], None)
+
+                        d.Dispose()
+
                         return! loop newState
 
                     | AddMany (timePoints, reply) ->
-                        use _ = logger.BeginHandleScope(nameof AddMany)
+                        use d = logger.BeginHandleScope(nameof AddMany)
 
                         if timePoints |> Seq.isEmpty then
+                            d.Dispose()
                             return! loop state
                         else
                             let maxPriority =
@@ -99,10 +103,12 @@ type TimePointQueue(
                                 )
                             )
 
+                            d.Dispose()
+
                             return! loop state
 
                     | GetAllWithPriority reply ->
-                        use _ = logger.BeginHandleScope(nameof GetAllWithPriority)
+                        use d = logger.BeginHandleScope(nameof GetAllWithPriority)
                         let xtp =
                             seq {
                                 for tp in state.Queue do
@@ -112,10 +118,12 @@ type TimePointQueue(
                         logger.LogTimePointPriorities(xtp)
                         reply.Reply xtp
 
+                        d.Dispose()
+
                         return! loop state
 
                     | GetAll reply ->
-                        use _ = logger.BeginHandleScope(nameof GetAll)
+                        use d = logger.BeginHandleScope(nameof GetAll)
                         if state.Queue.Count = 0 then
                             logger.LogDebug("Queue is empty")
                             reply.Reply([], None)
@@ -129,20 +137,27 @@ type TimePointQueue(
                         logger.LogTimePoints(xtp)
                         reply.Reply (xtp, state.Queue.First |> _.Id |> Some)
 
+                        d.Dispose()
+
                         return! loop state
 
                     | ScrollTo (id, reply) when state.Queue.Count = 0 ->
-                        use _ = logger.BeginHandleScope(nameof ScrollTo, id)
+                        use d = logger.BeginHandleScope(nameof ScrollTo, id)
                         logger.LogDebug("Queue is empty")
                         reply.Reply(false)
+
+                        d.Dispose()
+
                         return! loop state
 
                     // Reorder state.Queue that interested time point priority becomes lower. Returns True if time point exists.
                     | ScrollTo (id, reply) ->
-                        use _ = logger.BeginHandleScope(nameof ScrollTo, id)
+                        use d = logger.BeginHandleScope(nameof ScrollTo, id)
 
                         if state.Queue |> (not << Seq.exists (fun tp -> tp.Id = id)) then
                             reply.Reply(false)
+                            d.Dispose()
+
                             return! loop state
                         else
                             let minPriority = -(float32 state.Queue.Count)
@@ -182,16 +197,22 @@ type TimePointQueue(
 
                             reply.Reply(tpExists)
 
+                            d.Dispose()
+
                             return! loop state
 
                     | GetNext reply when state.Queue.Count = 0 ->
-                        use _ = logger.BeginHandleScope(nameof GetNext)
+                        use d = logger.BeginHandleScope(nameof GetNext)
+
                         logger.LogDebug("Queue is empty")
                         reply.Reply(None)
+
+                        d.Dispose()
+
                         return! loop state
 
                     | GetNext reply ->
-                        use _ = logger.BeginHandleScope(nameof GetNext)
+                        use d = logger.BeginHandleScope(nameof GetNext)
 
                         let tp = state.Queue.First
                         let priority = state.Queue.GetPriority(tp)
@@ -202,16 +223,18 @@ type TimePointQueue(
                         
                         // logNewState state
 
-                        logger.LogNextTimePoint(tp, priority)
+                        logger.LogNextTimePoint("Next", tp, priority)
                         reply.Reply(tp |> Some)
 
                         if state.FirstTimePointId |> ValueOption.map (fun ftpId -> ftpId = tp.Id) |> ValueOption.defaultValue false then
                             timePointsLoopComlettedEvent.Trigger ()
 
+                        d.Dispose()
+
                         return! loop state
 
                     | Pick reply ->
-                        use _ = logger.BeginHandleScope(nameof Pick)
+                        use d = logger.BeginHandleScope(nameof Pick)
 
                         if state.Queue.Count = 0 then
                             logger.LogDebug("Queue is empty")
@@ -219,13 +242,17 @@ type TimePointQueue(
                         else
                             let tp = state.Queue.First
                             let priority = state.Queue.GetPriority(tp)
-                            logger.LogNextTimePoint(tp, priority)
+                            logger.LogNextTimePoint("Picked", tp, priority)
                             reply.Reply(tp |> Some)
+
+                        d.Dispose()
 
                         return! loop state
 
                     | TryFind (id, reply) ->
+                        use d = logger.BeginHandleScope(nameof TryFind)
                         reply.Reply(state.Queue |> Seq.tryFind (fun tp -> tp.Id = id))
+                        d.Dispose()
                         return! loop state
                 }
 

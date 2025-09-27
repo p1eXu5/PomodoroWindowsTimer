@@ -23,7 +23,7 @@ type private State =
             ActiveTimePoint = None
             StartTime = startDateTime
             Subscribers = []
-            IsStopped = false
+            IsStopped = true
         }
 
 type private Msg =
@@ -57,27 +57,27 @@ type Looper(
     let now () =
         timeProvider.GetLocalNow().DateTime
 
-    let notifierAgent = new MailboxProcessor<Choice<Async<unit> list, unit>>(
-        (fun inbox ->
-            let rec loop () =
-                async {
-                    let! msg = inbox.Receive()
-                    match msg with
-                    | Choice1Of2 subscribers ->
-                        do!
-                            subscribers
-                            |> Async.Parallel
-                            |> Async.Ignore
+    //let notifierAgent = new MailboxProcessor<Choice<Async<unit> list, unit>>(
+    //    (fun inbox ->
+    //        let rec loop () =
+    //            async {
+    //                let! msg = inbox.Receive()
+    //                match msg with
+    //                | Choice1Of2 subscribers ->
+    //                    do!
+    //                        subscribers
+    //                        |> Async.Parallel
+    //                        |> Async.Ignore
 
-                        return! loop ()
-                    | _ ->
-                        return! loop ()
-                }
+    //                    return! loop ()
+    //                | _ ->
+    //                    return! loop ()
+    //            }
 
-            loop ()
-        )
-        , defaultArg cancellationToken CancellationToken.None
-    )
+    //        loop ()
+    //    )
+    //    , defaultArg cancellationToken CancellationToken.None
+    //)
 
     let tryPostEvent (state: State) event =
         if state.Subscribers |> (not << List.isEmpty) then
@@ -86,7 +86,6 @@ type Looper(
         else
             ()
 
-    
     let tryNextTimePoint (state: State) =
         // in first time next time point is equal to preloaded timepoint
         match timePointQueue.TryGetNext(), state.ActiveTimePoint with
@@ -139,37 +138,42 @@ type Looper(
         (fun inbox ->
             let rec loop (state: State) =
                 let beginScope (looperMsgName: string) =
-                    let scope = logger.BeginMessageScope(looperMsgName)
-                    logger.LogStartHandleMessage(looperMsgName)
-                    scope
+                    logger.LogStartHandleMessage(looperMsgName, state.IsStopped, state.ActiveTimePoint |> Option.map _.Name)
+                    looperMsgName
 
-                let endScope (scope: IDisposable | null) =
-                    match scope with
-                    | NonNull s -> s.Dispose()
-                    | _ -> ()
+                let inline tryPostEvent evt = tryPostEvent state evt
 
-                let tryPostEvent = tryPostEvent state
+                let inline endScopeLoop (scopeName: string) newState =
+                    do
+                        logger.LogEndHandleMessage(scopeName)
+                    loop newState
 
                 async {
                     let! msg = inbox.Receive()
-                    logger.LogLooperCurrentState(state)
 
                     match msg with
                     | PreloadTimePoint when state.IsStopped ->
-                        use scope = beginScope (nameof PreloadTimePoint)
+                        let scope = beginScope (nameof PreloadTimePoint)
 
                         let atpOpt = timePointQueue.TryPick() |> Option.map TimePoint.toActiveTimePoint
-                        atpOpt
-                        |> Option.iter (fun atp ->
-                            tryPostEvent
-                            <| LooperEvent.TimePointStarted (
-                                TimePointStartedEventArgs.init atp None false TimePointSwitchingMode.Auto, timeProvider.GetUtcNow())
-                        )
 
-                        scope |> endScope
-                        return! loop { state with ActiveTimePoint = atpOpt }
+                        match atpOpt with
+                        | Some atp when state.Subscribers.Length > 0 ->
+                            let timePointStartedEventArgs = TimePointStartedEventArgs.init atp None (not state.IsStopped) TimePointSwitchingMode.Auto
+                            tryPostEvent (
+                                LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow())
+                            )
+                        | _ ->
+                            logger.LogWarning("No TimePoint has been picked or have no subscribers!!!")
+
+                        return! endScopeLoop scope { state with ActiveTimePoint = atpOpt }
+
+                    | PreloadTimePoint ->
+                        logger.LogUnprocessedMessage(nameof PreloadTimePoint, "Looper is not stopped")
+                        return! loop state
 
                     | Resume when state.IsStopped && state.ActiveTimePoint |> Option.isSome ->
+                        let scope = beginScope (nameof Resume)
                         let dt = now ()
                         do
                             state.ActiveTimePoint
@@ -180,18 +184,25 @@ type Looper(
                             )
 
                         timer.Change(int tickMilliseconds, 0) |> ignore
-                        return! loop { state with StartTime = dt; IsStopped = false }
+
+                        return! endScopeLoop scope { state with StartTime = dt; IsStopped = false }
+
+                    | Resume ->
+                        logger.LogUnprocessedMessage(nameof Resume, "Looper is not stopped or has no active TimePoint")
+                        return! loop state
 
                     | Next ->
-                        use scope = beginScope (nameof Next)
+                        let scope = beginScope (nameof Next)
                         let newState =  state |> initialize TimePointSwitchingMode.Manual
-                        scope |> endScope
-                        return! loop newState
+                        return! endScopeLoop scope newState
 
                     | Tick when not state.IsStopped && state.ActiveTimePoint |> Option.isNone ->
-                        return! loop (state |> initialize TimePointSwitchingMode.Auto)
+                        let scope = beginScope (nameof Tick)
+                        let newState = (state |> initialize TimePointSwitchingMode.Auto)
+                        return! endScopeLoop scope newState
 
                     | Tick when not state.IsStopped ->
+                        let scope = beginScope (nameof Tick)
                         let atp = state.ActiveTimePoint |> Option.get
                         let dt = now ()
                         let atp = { atp with RemainingTimeSpan = atp.RemainingTimeSpan - (dt - state.StartTime) }
@@ -206,7 +217,8 @@ type Looper(
                                     )
                                 )
                                 timer.Change(int tickMilliseconds, 0) |> ignore
-                                return! loop { state with StartTime = dt; ActiveTimePoint = None }
+
+                                return! endScopeLoop scope { state with StartTime = dt; ActiveTimePoint = None }
 
                             | Some tp ->
                                 let newAtp = { tp with RemainingTimeSpan = tp.RemainingTimeSpan + atp.RemainingTimeSpan }
@@ -216,7 +228,8 @@ type Looper(
                                     )
                                 )
                                 timer.Change(int tickMilliseconds, 0) |> ignore
-                                return! loop { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
+
+                                return! endScopeLoop scope { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
                         else
                             tryPostEvent (
                                 LooperEvent.TimePointTimeReduced (
@@ -224,41 +237,64 @@ type Looper(
                                 )
                             )
                             timer.Change(int tickMilliseconds, 0) |> ignore
-                            return! loop { state with ActiveTimePoint = atp |> Some; StartTime = dt }
+
+                            return! endScopeLoop scope { state with ActiveTimePoint = atp |> Some; StartTime = dt }
+
+                    | Tick ->
+                        logger.LogUnprocessedMessage(nameof Tick, "Looper is stopped")
+                        return! loop state
 
                     | Subscribe subscriber ->
-                        return! loop { state with Subscribers = subscriber :: state.Subscribers }
+                        let scope = beginScope (nameof Subscribe)
+                        do
+                            if state.IsStopped && state.ActiveTimePoint.IsSome then
+                                subscriber (LooperEvent.TimePointStopped (state.ActiveTimePoint.Value, timeProvider.GetUtcNow()))
+                            else
+                                ()
+
+                        return! endScopeLoop scope { state with Subscribers = subscriber :: state.Subscribers }
 
                     | SubscribeMany (subscribers, reply) ->
+                        let scope = beginScope (nameof SubscribeMany)
                         reply.Reply(())
-                        return! loop { state with Subscribers = subscribers @ state.Subscribers }
+                        return! endScopeLoop scope { state with Subscribers = subscribers @ state.Subscribers }
 
                     | Stop when not state.IsStopped ->
+                        let scope = beginScope (nameof Stop)
                         do
                             state.ActiveTimePoint
                             |> Option.iter (fun atp ->
                                 tryPostEvent (LooperEvent.TimePointStopped (atp, timeProvider.GetUtcNow()))
                             )
-                        return! loop { state with IsStopped = true; StartTime = timeProvider.GetLocalNow().DateTime }
+                        return! endScopeLoop scope { state with IsStopped = true; StartTime = timeProvider.GetLocalNow().DateTime }
 
-                    | Shift seconds when state.IsStopped ->
-                        use scope = beginScope (nameof Next)
-                        let newState = state |> withActiveTimePointTimeSpan seconds
-                        scope |> endScope
-                        return! loop newState
-
-                    | ShiftAck (seconds, reply) when state.IsStopped ->
-                        use scope = beginScope (nameof Next)
-                        let newState = state |> withActiveTimePointTimeSpan seconds
-                        reply.Reply ()
-                        scope |> endScope
-                        return! loop newState
-
-                    | GetActiveTimePoint reply ->
-                        reply.Reply(state.ActiveTimePoint)
+                    | Stop ->
+                        logger.LogUnprocessedMessage(nameof Stop, "Looper is stopped")
                         return! loop state
 
-                    | _ -> return! loop state
+                    | Shift seconds when state.IsStopped ->
+                        let scope = beginScope (nameof Next)
+                        let newState = state |> withActiveTimePointTimeSpan seconds
+                        return! endScopeLoop scope newState
+
+                    | Shift _ ->
+                        logger.LogUnprocessedMessage(nameof Shift, "Looper is not stopped")
+                        return! loop state
+
+                    | ShiftAck (seconds, reply) when state.IsStopped ->
+                        let scope = beginScope (nameof Next)
+                        let newState = state |> withActiveTimePointTimeSpan seconds
+                        reply.Reply ()
+                        return! endScopeLoop scope newState
+
+                    | ShiftAck _ ->
+                        logger.LogUnprocessedMessage(nameof ShiftAck, "Looper is not stopped")
+                        return! loop state
+
+                    | GetActiveTimePoint reply ->
+                        let scope = beginScope (nameof GetActiveTimePoint)
+                        reply.Reply(state.ActiveTimePoint)
+                        return! endScopeLoop scope state
                 }
 
             loop (State.Init(timeProvider.GetLocalNow().DateTime))

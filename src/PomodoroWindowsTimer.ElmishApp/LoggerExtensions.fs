@@ -9,10 +9,16 @@ let private mssageScope = LoggerMessage.DefineScope<string>(
 )
 
 /// Define LoggerMessage for 'Msg and 'Model string representations.
-let private unprocessedMessage = LoggerMessage.Define<string, string>(
-    LogLevel.Debug,
+let private unprocessedTraceMessage = LoggerMessage.Define<string, string>(
+    LogLevel.Trace,
     new EventId(0b0_1111_0001, "Unprocessabele Elmish Message"),
     "Unprocessabele message: {Msg}. Model: {Model}."
+)
+
+let private unprocessedDebugMessage = LoggerMessage.Define<string>(
+    LogLevel.Debug,
+    new EventId(0b0_1111_0001, "Unprocessabele Elmish Message"),
+    "Unprocessabele message: {Msg}."
 )
 
 let private modelProgramError = LoggerMessage.Define<string>(
@@ -35,14 +41,14 @@ type LoggerExtensions () =
     [<Extension>]
     static member LogUnprocessedMessage<'Msg,'Model when 'Msg: not null and 'Model: not null>(logger: ILogger, msg: 'Msg, model: 'Model) =
         if logger.IsEnabled(LogLevel.Trace) then
-            unprocessedMessage.Invoke(
+            unprocessedTraceMessage.Invoke(
                 logger,
                 (JsonHelpers.Serialize msg),
                 (JsonHelpers.Serialize model),
                 null
             )
         else
-            unprocessedMessage.Invoke(logger, typedefof<'Msg>.Name, typedefof<'Model>.Name, null)
+            unprocessedDebugMessage.Invoke(logger, msg.GetType().FullName.Replace("PomodoroWindowsTimer.ElmishApp.Models.", "").Replace("+", "."), null)
 
     [<Extension>]
     static member LogProgramError(logger: ILogger, err: string) =

@@ -4,6 +4,7 @@ open System.Runtime.CompilerServices
 open Microsoft.Extensions.Logging
 
 open PomodoroWindowsTimer
+open Microsoft.FSharp.Reflection
 
 
 let private beginMessageScope =
@@ -14,7 +15,13 @@ let private beginMessageScope =
 let private startHandleMessage = LoggerMessage.Define<string>(
     LogLevel.Debug,
     new EventId(0b0_0010_0001, "Start Handle Looper Message"),
-    "Start handle Looper message: {LooperMsgName}"
+    "Start Looper message handling: {LooperMsgName}..."
+)
+
+let private startHandleWithStateMessage = LoggerMessage.Define<string, bool, string option>(
+    LogLevel.Debug,
+    new EventId(0b0_0010_0001, "Start Handle Looper Message"),
+    "Start handling message: {LooperMsgName}...\n     (Looper IsStopped: {IsStopped}, active TimePoint name: {ActiveTimePointName})."
 )
 
 let private looperNewState = LoggerMessage.Define<string>(
@@ -23,16 +30,34 @@ let private looperNewState = LoggerMessage.Define<string>(
     "Looper state updated to {LooperNewState}"
 )
 
-let private looperCurrentState = LoggerMessage.Define<string>(
+let private looperCurrentStateTraceMessage = LoggerMessage.Define<string>(
     LogLevel.Trace,
-    new EventId(0b0_0010_0011, "Looper State Updated"),
-    "Looper current state: {LooperCurrentState}"
+    new EventId(0b0_0010_0011, "Looper Msg Read"),
+    "Looper current state:\n    {LooperCurrentState}."
+)
+
+let private looperCurrentStateDebugMessage = LoggerMessage.Define<bool, string option>(
+    LogLevel.Debug,
+    new EventId(0b0_0010_0011, "Looper Msg Read"),
+    "Looper IsStopped: {IsStopped}, active TimePoint name: {ActiveTimePointName}."
 )
 
 let private looperStateUpdated = LoggerMessage.Define(
     LogLevel.Debug,
     new EventId(0b0_0010_0100, "Looper State Updated"),
     "Looper state updated"
+)
+
+let private endHandleMessage = LoggerMessage.Define<string>(
+    LogLevel.Debug,
+    new EventId(0b0_0010_0101, "End Handle Looper Message"),
+    "Looper message has been handled: {LooperMsgName}."
+)
+
+let private unprocessedMsgMessage = LoggerMessage.Define<string, string>(
+    LogLevel.Warning,
+    new EventId(0b0_0010_0101, "Looper Unhandled Message"),
+    "Looper message has been unprocessed: {LooperMsgName}, because {Reason}."
 )
 
 type internal LoggerExtensions () =
@@ -44,6 +69,14 @@ type internal LoggerExtensions () =
     [<Extension>]
     static member LogStartHandleMessage(logger: ILogger, looperMsgName: string) =
         startHandleMessage.Invoke(logger, looperMsgName, null)
+
+    [<Extension>]
+    static member LogStartHandleMessage(logger: ILogger, looperMsgName: string, isLooperStopoped: bool, activeTimePointName: string option) =
+        startHandleWithStateMessage.Invoke(logger, looperMsgName, isLooperStopoped, activeTimePointName, null)
+
+    [<Extension>]
+    static member LogEndHandleMessage(logger: ILogger, looperMsgName: string) =
+        endHandleMessage.Invoke(logger, looperMsgName, null)
 
     [<Extension>]
     static member LogLooperStateUpdated(logger: ILogger, state: obj) =
@@ -58,5 +91,13 @@ type internal LoggerExtensions () =
 
     [<Extension>]
     static member LogLooperCurrentState(logger: ILogger, state: obj) =
-        looperCurrentState.Invoke(logger, (JsonHelpers.Serialize state), null)
+        looperCurrentStateTraceMessage.Invoke(logger, (JsonHelpers.Serialize state), null)
+
+    [<Extension>]
+    static member LogLooperCurrentState(logger: ILogger, isLooperStopoped: bool, activeTimePointName: string option) =
+        looperCurrentStateDebugMessage.Invoke(logger, isLooperStopoped, activeTimePointName, null)
+
+    [<Extension>]
+    static member LogUnprocessedMessage(logger: ILogger, msgName: string, reason: string) =
+        unprocessedMsgMessage.Invoke(logger, msgName, reason, null)
 
