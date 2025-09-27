@@ -103,6 +103,9 @@ public abstract class BootstrapBase : IDisposable
         return bootstrap;
     }
 
+    /// <summary>
+    /// Calls <see cref="Host"/> <see cref="HostingAbstractionsHostExtensions.Start(IHost)"/>.
+    /// </summary>
     public virtual void StartHost()
     {
         Host.Start();
@@ -149,9 +152,8 @@ public abstract class BootstrapBase : IDisposable
     }
 
     /// <summary>
-    /// Does nothind.
+    /// Configures <see cref="Serilog.ILogger"/>.
     /// </summary>
-    /// <param name="loggingBuilder"></param>
     protected virtual void ConfigureLogging(HostBuilderContext hostBuilderContext, ILoggingBuilder loggingBuilder)
     {
         // Configure Serilog
@@ -220,9 +222,12 @@ public abstract class BootstrapBase : IDisposable
     }
 
     /// <summary>
-    /// Sets Serilog using from configurations.
+    /// Does nothing. Invoked in <see cref="Build{TBootstrap}(string[])"/> right before
+    /// <see cref="IHostBuilder.Build"/> is called.
+    /// <para>
+    /// Using in tests.
+    /// </para>
     /// </summary>
-    /// <param name="hostBuilder"></param>
     protected virtual void PostConfigureHost(IHostBuilder hostBuilder)
     {
     }
