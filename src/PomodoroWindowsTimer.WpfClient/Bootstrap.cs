@@ -72,6 +72,9 @@ internal class Bootstrap : BootstrapBase
     internal IUserSettings GetUserSettings()
         => Host.Services.GetRequiredService<IUserSettings>();
 
+    internal ILoggerFactory GetLoggerFactory()
+        => Host.Services.GetRequiredService<ILoggerFactory>();
+
     internal ILogger<T> GetLogger<T>()
         => Host.Services.GetRequiredService<ILogger<T>>();
 
