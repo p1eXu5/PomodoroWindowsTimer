@@ -272,10 +272,9 @@ type TestBootstrap () =
 
         let syncDispatch dispatch msg =
             lock _lockObj (fun() ->
-                msgStack.Push(msg)
                 dispatch msg
+                msgStack.Push(msg)
             )
-
 
         async {
             do
