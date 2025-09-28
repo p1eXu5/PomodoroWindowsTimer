@@ -196,6 +196,10 @@ let private mapPlayerUserSettingsChangedMsg updatePlayerModel updateTimePointsDr
         TimePointsDrawerModel.Msg.RunningTimePointsMsg RunningTimePointListModel.Msg.PlayerUserSettingsChanged))
 
 
+let private mapCurentWorkModelMsg updateCurrentWorkModel msg (model: MainModel) =
+    model |> mapc _.CurrentWork withCurrentWorkModel Msg.CurrentWorkModelMsg (updateCurrentWorkModel msg)
+
+
 /// MainModel.Program update function.
 let update
     (telegramBot: ITelegramBot)
@@ -251,7 +255,7 @@ let update
     // Work
     // --------------------
     | Msg.CurrentWorkModelMsg currWorkMsg ->
-        model |> mapc _.CurrentWork withCurrentWorkModel Msg.CurrentWorkModelMsg (updateCurrentWorkModel currWorkMsg)
+        model |> mapCurentWorkModelMsg updateCurrentWorkModel currWorkMsg
 
     | Msg.SetIsWorkSelectorLoaded v ->
         model |> setIsWorkSelectorLoaded initTimePointsDrawerModel initWorkSelectorModel v
