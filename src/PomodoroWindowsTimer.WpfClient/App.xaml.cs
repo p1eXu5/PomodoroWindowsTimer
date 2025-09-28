@@ -174,11 +174,11 @@ public partial class App : Application
                 {
                     object player = ((dynamic)_mainWindow.DataContext).Player;
                     bool isPlaying = ((dynamic)player).IsPlaying;
-                    bool isCurrentWork = ((dynamic)_mainWindow.DataContext).IsCurrentWorkSet;
+                    bool isCurrentWorkSet = ((dynamic)_mainWindow.DataContext).IsCurrentWorkSet;
 
                     try
                     {
-                        if (isPlaying && isCurrentWork)
+                        if (isCurrentWorkSet)
                         {
                             object currentWork = ((dynamic)_mainWindow.DataContext).CurrentWork;
                             UInt64 workId = ((dynamic)currentWork).Id;
@@ -191,11 +191,14 @@ public partial class App : Application
                                 UserSettings.StoreCurrentWork(work.ResultValue!);
                             }
 
-                            // store work event
-                            var timeProvider = _bootstrap.GetTimerProvider();
-                            var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
-                            var workEventRepository = repoFactory.GetWorkEventRepository();
-                            await workEventRepository.InsertAsync(workId, workEvent, default);
+                            if (isPlaying)
+                            {
+                                // store work event
+                                var timeProvider = _bootstrap.GetTimerProvider();
+                                var workEvent = WorkEvent.NewStopped(timeProvider.GetUtcNow());
+                                var workEventRepository = repoFactory.GetWorkEventRepository();
+                                await workEventRepository.InsertAsync(workId, workEvent, default);
+                            }
                         }
                     }
                     catch (RuntimeBinderException ex)
