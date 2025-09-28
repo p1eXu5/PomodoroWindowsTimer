@@ -183,7 +183,7 @@ type Looper(
                         return! endScopeLoop scope newState
 
                     | InnerPreloadTimePoint (l, tpIdOpt) ->
-                        let scope = beginScope (nameof PreloadTimePoint)
+                        let scope = beginScope (nameof InnerPreloadTimePoint)
                         let newState =
                             match l, tpIdOpt with
                             | [], _ -> state
