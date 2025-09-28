@@ -11,6 +11,8 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.Abstractions
 open LoggingExtensions
 
+exception InvalidTimePointQueueTimePointsChangedArgs of string
+
 type private State = 
     {
         ActiveTimePoint: ActiveTimePoint option
@@ -188,14 +190,23 @@ type Looper(
                             | [], _ ->
                                 logger.LogDebug("In InnerPreloadTimePoint handling TimePoint list is empty.")
                                 state
+
                             | _, None ->
-                                logger.LogWarning("In InnerPreloadTimePoint handling TimePoint list is not empty but has not first TimePoint Id.")
-                                state
+                                let err = "In InnerPreloadTimePoint handling TimePoint list is not empty but first TimePoint Id is None."
+                                logger.LogError(err)
+                                raise (InvalidTimePointQueueTimePointsChangedArgs err)
+
                             | _, Some tpId ->
-                                l
-                                |> List.tryFind (_.Id >> (=) tpId)
-                                |> Option.map TimePoint.toActiveTimePoint
-                                |> preloadActiveTimePoint
+                                match l |> List.tryFind (_.Id >> (=) tpId) with
+                                | Some tp ->
+                                    tp
+                                    |> TimePoint.toActiveTimePoint
+                                    |> Some
+                                    |> preloadActiveTimePoint
+                                | None ->
+                                    let err = "In InnerPreloadTimePoint handling TimePoint list is not empty but has not first TimePoint."
+                                    logger.LogError(err)
+                                    raise (InvalidTimePointQueueTimePointsChangedArgs err)
 
                         return! endScopeLoop scope newState
 
