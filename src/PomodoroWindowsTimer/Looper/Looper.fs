@@ -346,8 +346,10 @@ type Looper(
         else
             agent.Post(Subscribe subscriber)
 
+    /// <summary>
     /// Tries to pick TimePoint from queue, if it present
     /// emits TimePointStarted event and sets ActiveTimePoint.
+    /// </summary>
     member _.PreloadTimePoint() =
         this.ThrowIfNotRunOrDisposed()
         agent.Post(PreloadTimePoint)
@@ -417,8 +419,6 @@ type Looper(
         member this.ShiftAck(seconds: float<sec>) = this.ShiftAck(seconds)
         member this.Resume() = this.Resume()
         member this.AddSubscriber(subscriber: (LooperEvent -> unit)) = this.AddSubscriber(subscriber)
-        /// Tries to pick TimePoint from queue, if it present
-        /// emits TimePointStarted event and sets ActiveTimePoint.
         member this.PreloadTimePoint() = this.PreloadTimePoint()
         member this.GetActiveTimePoint() = this.GetActiveTimePoint()
 

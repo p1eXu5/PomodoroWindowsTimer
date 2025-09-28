@@ -30,9 +30,13 @@ type ILooper =
         abstract ShiftAck : float<sec> -> unit
         abstract Resume : unit -> unit
         abstract AddSubscriber : (LooperEvent -> unit) -> unit
-        /// Tryes to pick TimePoint from queue, if it present
+
+        /// <summary>
+        /// Tries to pick TimePoint from queue, if it present
         /// emits TimePointStarted event and sets ActiveTimePoint.
+        /// </summary>
         abstract PreloadTimePoint : unit -> unit
+
         abstract GetActiveTimePoint : unit -> ActiveTimePoint option
     end
 
