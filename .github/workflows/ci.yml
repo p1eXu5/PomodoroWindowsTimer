@@ -13,6 +13,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# https://stackoverflow.com/questions/78542282/setting-permissions-for-github-token-in-workflow-doesnt-work
 permissions: read-all
 
 env:
