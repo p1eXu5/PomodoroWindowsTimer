@@ -13,14 +13,14 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: read-all
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest]
-    permissions:
-      issues: write
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +36,6 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-    permissions:
-      issues: write
     if: github.ref != 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
