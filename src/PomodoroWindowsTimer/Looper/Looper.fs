@@ -28,6 +28,7 @@ type private State =
 
 type private Msg =
     | PreloadTimePoint
+    | InnerPreloadTimePoint of (TimePoint list * TimePointId option)
     | Tick
     | Subscribe of (LooperEvent -> unit)
     | SubscribeMany of (LooperEvent -> unit) list * AsyncReplyChannel<unit>
@@ -148,29 +149,52 @@ type Looper(
                         logger.LogEndHandleMessage(scopeName)
                     loop newState
 
+                let inline preloadActiveTimePoint atpOpt =
+                    let atpOpt = timePointQueue.TryPick() |> Option.map TimePoint.toActiveTimePoint
+                    match atpOpt with
+                    | Some atp when state.Subscribers.Length > 0 ->
+                        let timePointStartedEventArgs =
+                            TimePointStartedEventArgs.init
+                                atp
+                                (if state.IsStopped then None else state.ActiveTimePoint)
+                                (not state.IsStopped)
+                                TimePointSwitchingMode.Auto
+
+                        tryPostEvent (
+                            LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow())
+                        )
+                    | _ ->
+                        logger.LogWarning("No TimePoint has been picked or have no subscribers!!!")
+                    { state with ActiveTimePoint = atpOpt }
+
+
                 async {
                     let! msg = inbox.Receive()
 
                     match msg with
-                    | PreloadTimePoint when state.IsStopped ->
+                    | PreloadTimePoint ->
                         let scope = beginScope (nameof PreloadTimePoint)
 
-                        let atpOpt = timePointQueue.TryPick() |> Option.map TimePoint.toActiveTimePoint
+                        let newState =
+                            timePointQueue.TryPick()
+                            |> Option.map TimePoint.toActiveTimePoint
+                            |> preloadActiveTimePoint
 
-                        match atpOpt with
-                        | Some atp when state.Subscribers.Length > 0 ->
-                            let timePointStartedEventArgs = TimePointStartedEventArgs.init atp None (not state.IsStopped) TimePointSwitchingMode.Auto
-                            tryPostEvent (
-                                LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow())
-                            )
-                        | _ ->
-                            logger.LogWarning("No TimePoint has been picked or have no subscribers!!!")
+                        return! endScopeLoop scope newState
 
-                        return! endScopeLoop scope { state with ActiveTimePoint = atpOpt }
+                    | InnerPreloadTimePoint (l, tpIdOpt) ->
+                        let scope = beginScope (nameof PreloadTimePoint)
+                        let newState =
+                            match l, tpIdOpt with
+                            | [], _ -> state
+                            | _, None -> state
+                            | _, Some tpId ->
+                                l
+                                |> List.tryFind (_.Id >> (=) tpId)
+                                |> Option.map TimePoint.toActiveTimePoint
+                                |> preloadActiveTimePoint
 
-                    | PreloadTimePoint ->
-                        logger.LogUnprocessedMessage(nameof PreloadTimePoint, "Looper is not stopped")
-                        return! loop state
+                        return! endScopeLoop scope newState
 
                     | Resume when state.IsStopped && state.ActiveTimePoint |> Option.isSome ->
                         let scope = beginScope (nameof Resume)
@@ -303,7 +327,11 @@ type Looper(
     )
 
     let timePointQueueSubscriber =
-        timePointQueue.TimePointsChanged.Subscribe(fun _ -> agent.Post(Msg.PreloadTimePoint))
+        timePointQueue.TimePointsChanged.Subscribe(fun (timePoints, firstTimePointId) ->
+            agent.Post(
+                Msg.InnerPreloadTimePoint (timePoints, firstTimePointId)
+            )
+        )
 
     member val private Subscribers = [] with get, set
 
