@@ -150,7 +150,6 @@ type Looper(
                     loop newState
 
                 let inline preloadActiveTimePoint atpOpt =
-                    let atpOpt = timePointQueue.TryPick() |> Option.map TimePoint.toActiveTimePoint
                     match atpOpt with
                     | Some atp when state.Subscribers.Length > 0 ->
                         let timePointStartedEventArgs =
