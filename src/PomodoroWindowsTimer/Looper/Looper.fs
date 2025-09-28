@@ -185,8 +185,12 @@ type Looper(
                         let scope = beginScope (nameof InnerPreloadTimePoint)
                         let newState =
                             match l, tpIdOpt with
-                            | [], _ -> state
-                            | _, None -> state
+                            | [], _ ->
+                                logger.LogDebug("In InnerPreloadTimePoint handling TimePoint list is empty.")
+                                state
+                            | _, None ->
+                                logger.LogWarning("In InnerPreloadTimePoint handling TimePoint list is not empty but has not first TimePoint Id.")
+                                state
                             | _, Some tpId ->
                                 l
                                 |> List.tryFind (_.Id >> (=) tpId)
