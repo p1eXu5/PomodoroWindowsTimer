@@ -44,6 +44,10 @@ public abstract class BootstrapBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Disposes <see cref="Host"/>.
+    /// </summary>
+    /// <param name="disposing"></param>
     protected virtual void Dispose(bool disposing)
     {
         if (!_isDisposed)
@@ -59,11 +63,17 @@ public abstract class BootstrapBase : IDisposable
 
     #endregion
 
-    #region public_methods
-
     /// <summary>
-    /// Adds configuration, registers services (<see cref="RegisterServices(IServiceCollection, IConfiguration)"/>)
-    /// if <see cref="Bootstrap"/> instance has not been created. 
+    /// <list type="number">
+    /// <item> Instantiates <typeparamref name="TBootstrap"/> </item>
+    /// <item> Instantiates default <see cref="IHostBuilder"/> </item>
+    /// <item> Suppresses status messages (<see cref="ConsoleLifetimeOptions.SuppressStatusMessages"/>) </item>
+    /// <item> Invokes <see cref="ConfigureLogging(HostBuilderContext, ILoggingBuilder)"/> </item>
+    /// <item> Invokes <see cref="ConfigureServices(HostBuilderContext, IServiceCollection)"/> </item>
+    /// <item> Invokes <see cref="PostConfigureHost(IHostBuilder)"/> </item>
+    /// <item> Built <see cref="IHost"/> </item>
+    /// <item> Sets <see cref="BootstrapBase.Host"/> </item>
+    /// </list> 
     /// </summary>
     public static TBootstrap Build<TBootstrap>(params string[] args)
         where TBootstrap : BootstrapBase
@@ -111,18 +121,24 @@ public abstract class BootstrapBase : IDisposable
         Host.Start();
     }
 
+    /// <summary>
+    /// Invokes <see cref="IHost.StopAsync(CancellationToken)"/>.
+    /// </summary>
+    /// <returns></returns>
     public Task StopHostAsync() => Host.StopAsync();
 
-    #endregion
+    #region service accessors: GetTimerProvider
 
-    #region service_accessors
-
+    /// <summary>
+    /// Obtains <see cref="System.TimeProvider"/> from <see cref="IHost.Services"/>.
+    /// </summary>
+    /// <returns></returns>
     public TimeProvider GetTimerProvider()
        => Host.Services.GetRequiredService<System.TimeProvider>();
 
     #endregion
 
-    #region protected_methods
+    #region protected methods: PreConfigureServices, ConfigureServices, ConfigureLogging, PostConfigureHost
 
     /// <summary>
     /// Does nothing. Introduced for test setup.
@@ -183,8 +199,8 @@ public abstract class BootstrapBase : IDisposable
                 .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", Serilog.Events.LogEventLevel.Information)
                 .MinimumLevel.Override("Elmish.WPF.Update", Serilog.Events.LogEventLevel.Verbose)
-                .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Verbose)
-                .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Verbose);
+                .MinimumLevel.Override("Elmish.WPF.Bindings", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Elmish.WPF.Performance", Serilog.Events.LogEventLevel.Warning);
         }
 
         if (!hostBuilderContext.HostingEnvironment.IsDevelopment())
