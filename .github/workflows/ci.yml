@@ -45,7 +45,7 @@ jobs:
         run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
       # Test for PRs and non-master branches
-      - name: Fake Test target (master push)
+      - name: Fake Test target (PRs and non-master)
         if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master') }}
         run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -t Test
 
