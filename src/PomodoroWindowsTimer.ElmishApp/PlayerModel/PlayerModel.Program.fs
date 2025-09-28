@@ -124,6 +124,7 @@ let private mapLooperEvent (windowsMinimizer: IWindowsMinimizer) (themeSwitcher:
         model
         |> withActiveTimePoint (atp |> Some)
         |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState LooperState.Playing
         , Cmd.none, Intent.None
 
     | LooperEvent.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }, _) ->
@@ -170,6 +171,7 @@ let private mapLooperEvent (windowsMinimizer: IWindowsMinimizer) (themeSwitcher:
         model
         |> withActiveTimePoint (nextTp |> Some)
         |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState (if oldTp.IsNone then LooperState.Stopped else LooperState.Playing)
         , cmd
         , Intent.None
 
@@ -177,6 +179,7 @@ let private mapLooperEvent (windowsMinimizer: IWindowsMinimizer) (themeSwitcher:
         model
         |> withActiveTimePoint (atp |> Some)
         |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState LooperState.Stopped
         , Cmd.none, Intent.None
 
 

@@ -135,7 +135,10 @@ module PlayerModel =
     // ---------------------------------------------------
 
     let withLooperState looperState (model: PlayerModel) =
-        { model with LooperState = looperState }
+        if looperState <> model.LooperState then
+            { model with LooperState = looperState }
+        else
+            model
 
     let withNotRequestedRetrieveWorkSpentTimesState (model: PlayerModel) =
         { model with
