@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -17,10 +17,10 @@ jobs:
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET 8
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-            dotnet-version: '8.0.x'
+            dotnet-version: '9.0.x'
       - name: Fake
         run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
@@ -32,9 +32,9 @@ jobs:
     if: github.ref != 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET 8
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-            dotnet-version: '8.0.x'
+            dotnet-version: '9.0.x'
       - name: Fake
         run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -t Test
