@@ -165,7 +165,7 @@ type Looper(
                             LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow())
                         )
                     | _ ->
-                        logger.LogWarning("No TimePoint has been picked or have no subscribers!!!")
+                        logger.LogWarning("Skipping TimePointStarted event sending, no ActiveTimePoint is selected or no subscribers are set.")
                     { state with ActiveTimePoint = atpOpt }
 
 
@@ -286,7 +286,13 @@ type Looper(
                         let scope = beginScope (nameof Subscribe)
                         do
                             if state.IsStopped && state.ActiveTimePoint.IsSome then
-                                subscriber (LooperEvent.TimePointStopped (state.ActiveTimePoint.Value, timeProvider.GetUtcNow()))
+                                let timePointStartedEventArgs =
+                                    TimePointStartedEventArgs.init
+                                        state.ActiveTimePoint.Value
+                                        None
+                                        (not state.IsStopped)
+                                        TimePointSwitchingMode.Auto
+                                subscriber (LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow()))
                             else
                                 ()
 
