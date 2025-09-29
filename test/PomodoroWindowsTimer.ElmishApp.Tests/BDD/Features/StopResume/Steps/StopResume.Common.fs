@@ -16,11 +16,13 @@ let ``Looper TimePointReduced event has been despatched with`` (timePointId: Sys
         do! Scenario.msgDispatchedWithin2Sec "TimePointReduced" (fun msg ->
             match msg with
             | MainModel.Msg.LooperMsg (LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp }, _)) ->
-                atp.OriginalId = timePointId
-                && (
-                    float (expectedSeconds - tolerance) <= atp.RemainingTimeSpan.TotalSeconds
-                    && atp.RemainingTimeSpan.TotalSeconds <= float (expectedSeconds + tolerance)
-                )
+                let res =
+                    atp.OriginalId = timePointId
+                    && (
+                        float (expectedSeconds - tolerance) <= atp.RemainingTimeSpan.TotalSeconds
+                        && atp.RemainingTimeSpan.TotalSeconds <= float (expectedSeconds + tolerance)
+                    )
+                res
 
             | _ -> false
         )

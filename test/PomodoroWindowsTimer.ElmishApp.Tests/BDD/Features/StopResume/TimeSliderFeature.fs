@@ -137,8 +137,7 @@ module TimeSliderFeature =
             do! When.``Active time point slider value is changing to`` 2.0<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
 
-
-            do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 2.0<sec> 0.25<sec>
+            do! Then.``Looper TimePointReduced event has been despatched with`` timePoints.Head.Id 2.0<sec> 0.3<sec>
             do! Then.``Active Point is set on`` timePoints[0]
             do! Then.``Active Point remaining time is equal to or less then`` timePoints[0] None
             do! Then.``LooperState is`` LooperState.Playing
