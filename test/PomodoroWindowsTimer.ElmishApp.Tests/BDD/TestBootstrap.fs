@@ -143,10 +143,13 @@ type TestBootstrap () =
             .AddFilter("Microsoft", LogLevel.Warning)
             .AddFilter("DbUp", LogLevel.Warning)
             .AddFilter("PomodoroWindowsTimer.Storage", LogLevel.Warning)
+            .AddFilter("PomodoroWindowsTimer.Storage.WorkEventRepository", LogLevel.Debug)
             .AddFilter("PomodoroWindowsTimer.TimePointQueue.TimePointQueue", LogLevel.Debug)
             .AddFilter("PomodoroWindowsTimer.Looper.Looper", LogLevel.Debug)
             .AddFilter("PomodoroWindowsTimer.ElmishApp.Models", LogLevel.Debug)
             .AddFilter("TestElmishProgram", LogLevel.Debug)
+            .AddFilter("TestElmishProgram.LooperEventSubscription", LogLevel.None)
+            .AddFilter("TestElmishProgram.Trace", LogLevel.None)
             |> ignore
 
     /// <summary>
@@ -227,14 +230,19 @@ type TestBootstrap () =
                 factory.ExcelBook
                 factory.LoggerFactory
 
-        let logger = base.GetLoggerFactory().CreateLogger("TestElmishProgram");
+        let loggerFactory = base.GetLoggerFactory()
+
+        let logger = loggerFactory.CreateLogger("TestElmishProgram");
+        let looperLogger = loggerFactory.CreateLogger("TestElmishProgram.LooperEventSubscription");
+        let dispatcherLogger = loggerFactory.CreateLogger("TestElmishProgram.Dispatcher");
+        let traceLogger = loggerFactory.CreateLogger("TestElmishProgram.Trace");
 
         // subscriptions
         let subscribe _ : (SubId * Subscribe<_>) list =
             let looperSubscription dispatch =
                 let onLooperEvt =
                     fun evt ->
-                        logger.LogDebug($"Dispatching LooperEvent:\n{evt}...")
+                        looperLogger.LogDebug($"Dispatching LooperEvent:\n{evt}...")
                         do dispatch (evt |> MainModel.Msg.LooperMsg)
                 looper.AddSubscriber(onLooperEvt)
                 { new IDisposable with 
@@ -272,6 +280,7 @@ type TestBootstrap () =
 
         let syncDispatch dispatch msg =
             lock _lockObj (fun() ->
+                dispatcherLogger.LogDispatchingMsg(msg)
                 dispatch msg
                 msgStack.Push(msg)
             )
@@ -283,7 +292,7 @@ type TestBootstrap () =
                     updateMainModel
                     (fun m _ -> outMainModel.Value <- m )
                 |> Program.withSubscription subscribe
-                |> Program.withTrace (fun msg _ _ -> logger.LogMsg(msg))
+                |> Program.withTrace (fun msg _ _ -> traceLogger.LogDispatchedMsg(msg))
                 |> Program.withTermination ((=) MainModel.Msg.Terminate) (fun _ -> ())
                 |> Program.withErrorHandler (fun (err, ex) -> logger.LogError(ex, err))
                 |> Program.runWithDispatch syncDispatch ()

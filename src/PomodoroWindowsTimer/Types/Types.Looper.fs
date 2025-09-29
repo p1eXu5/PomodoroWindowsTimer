@@ -3,6 +3,7 @@
 open System
 
 type LooperEvent =
+    | TimePointReady of ActiveTimePoint * sentTime: DateTimeOffset
     | TimePointStarted of TimePointStartedEventArgs * sentTime: DateTimeOffset
     | TimePointTimeReduced of TimePointTimeReducedEventArgs * sentTime: DateTimeOffset
     | TimePointStopped of ActiveTimePoint * sentTime: DateTimeOffset
@@ -11,7 +12,6 @@ and
         {
             NewActiveTimePoint: ActiveTimePoint
             OldActiveTimePoint: ActiveTimePoint option
-            IsPlaying: bool
             SwitchingMode: TimePointSwitchingMode
         }
 and
@@ -31,19 +31,17 @@ and
 
 module TimePointStartedEventArgs =
 
-    let init newActiveTimePoint oldActiveTimePoint isPlaying switchingMode : TimePointStartedEventArgs =
+    let init newActiveTimePoint oldActiveTimePoint switchingMode : TimePointStartedEventArgs =
         {
             NewActiveTimePoint = newActiveTimePoint
             OldActiveTimePoint = oldActiveTimePoint
-            IsPlaying = isPlaying
             SwitchingMode = switchingMode
         }
 
-    let ofActiveTimePoint activeTimePoint isPlaying switchingMode : TimePointStartedEventArgs =
+    let ofActiveTimePoint activeTimePoint switchingMode : TimePointStartedEventArgs =
         {
             NewActiveTimePoint = activeTimePoint
             OldActiveTimePoint = activeTimePoint |> Some
-            IsPlaying = isPlaying
             SwitchingMode = switchingMode
         }
 

@@ -30,14 +30,15 @@ let private setCurrentWorkIfNone (userSettings: ICurrentWorkItemSettings) (workR
         if model.Work.IsNone then userSettings.CurrentWork <- None
         model, Cmd.ofMsg (Msg.OnError err)
 
+
 /// Msg.LooperMsg handler. When Work is Some.
 let private mapLooperMsgWithWork (workEventStore: WorkEventStore) (telegramBot: ITelegramBot) (levt: LooperEvent) (model: CurrentWorkModel) =
     match levt with
-    | LooperEvent.TimePointStarted ({ IsPlaying = false; OldActiveTimePoint = None; NewActiveTimePoint = atp }, _) ->
+    | LooperEvent.TimePointReady (atp, _) ->
         model |> withIsPlaying false
         , Cmd.OfTask.attempt workEventStore.StoreActiveTimePointTask atp Msg.OnExn
 
-    | LooperEvent.TimePointStarted ({ IsPlaying = true; NewActiveTimePoint = atp; SwitchingMode = switchinMode }, sentTime) ->
+    | LooperEvent.TimePointStarted ({  NewActiveTimePoint = atp; SwitchingMode = switchinMode }, sentTime) ->
         let currentWork = model.Work.Value
 
         model |> withIsPlaying true
@@ -52,7 +53,6 @@ Current work is [{currentWork.Number}] {currentWork.Title}."""
                 Cmd.OfTask.attempt telegramBot.SendMessage telegramMsg Msg.OnExn
         ]
 
-    | LooperEvent.TimePointStarted ({ IsPlaying = isPlaying }, _)
     | LooperEvent.TimePointTimeReduced ({ IsPlaying = isPlaying }, _) ->
         model |> withIsPlaying isPlaying, Cmd.none
 
@@ -63,18 +63,17 @@ Current work is [{currentWork.Number}] {currentWork.Title}."""
 /// Msg.LooperMsg handler. When Work is Some.
 let private mapLooperMsgWithoutWork (workEventStore: WorkEventStore) (telegramBot: ITelegramBot) (levt: LooperEvent) (model: CurrentWorkModel) =
     match levt with
-    | LooperEvent.TimePointStarted ({ IsPlaying = false; OldActiveTimePoint = None; NewActiveTimePoint = atp }, _) ->
+    | LooperEvent.TimePointReady (atp, _) ->
         model |> withIsPlaying false
         , Cmd.OfTask.attempt workEventStore.StoreActiveTimePointTask atp Msg.OnExn
 
-    | LooperEvent.TimePointStarted ({ IsPlaying = true; NewActiveTimePoint = atp; SwitchingMode = switchinMode }, _) ->
+    | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp; SwitchingMode = switchinMode }, _) ->
         model |> withIsPlaying true
         , Cmd.batch [
             if atp.Kind = Kind.Work && switchinMode = TimePointSwitchingMode.Auto then
                 Cmd.OfTask.attempt telegramBot.SendMessage $"It's time to {atp.Name}!!" Msg.OnExn
         ]
 
-    | LooperEvent.TimePointStarted ({ IsPlaying = isPlaying }, _)
     | LooperEvent.TimePointTimeReduced ({ IsPlaying = isPlaying }, _) ->
         model |> withIsPlaying isPlaying, Cmd.none
 

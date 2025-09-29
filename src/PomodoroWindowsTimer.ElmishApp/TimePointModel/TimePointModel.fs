@@ -19,6 +19,8 @@ module TimePointModel =
         | SetIsSelected of bool
         | SetIsSelectedNotPlaying
         | SetIsSelectedIsPlaying
+        | SetIsSelectedIsStopped
+        | SetIsNotSelectedIsPlayed
         | SetIsPlayed of bool
         | SetIsPlaying of bool
         | Play

@@ -50,6 +50,12 @@ module Program =
         | SetIsSelectedIsPlaying ->
             { model with IsSelected = true; IsPlaying = true; IsPlayed = false }, Cmd.none
 
+        | SetIsSelectedIsStopped ->
+            { model with IsSelected = true; IsPlaying = false; IsPlayed = false }, Cmd.none
+
+        | SetIsNotSelectedIsPlayed ->
+            { model with IsSelected = false; IsPlaying = false; IsPlayed = true }, Cmd.none
+
         | SetIsPlayed v ->
             { model with IsPlayed = v }, Cmd.none
 

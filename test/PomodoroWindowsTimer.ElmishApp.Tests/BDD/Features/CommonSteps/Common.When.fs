@@ -34,6 +34,14 @@ let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: 
             (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
         )
 
+let ``Looper TimePointReady event has been despatched with`` (timePointId: Guid) =
+    Common.``Looper TimePointReady event has been dispatched with`` timePointId
+    |> Scenario.log (
+        sprintf "When.``%s new TimePoint Id - %A``."
+            (nameof Common.``Looper TimePointReady event has been dispatched with``)
+            timePointId
+        )
+
 let rec ``Play msg has been dispatched with 2.5 ticks timeout`` () =
     scenario {
         let! (sut: ISut) = Scenario.getState

@@ -35,6 +35,14 @@ let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: 
             (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
         )
 
+let ``Looper TimePointReady event has been despatched with`` (newTimePointId: Guid) =
+    Common.``Looper TimePointReady event has been dispatched with`` newTimePointId
+    |> Scenario.log (
+        sprintf "Then.``%s new TimePoint Id - %A``."
+            (nameof Common.``Looper TimePointReady event has been dispatched with``)
+            newTimePointId
+        )
+
 let ``Looper TimePointReduced event has been despatched with`` (timePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =
     Common.``Looper TimePointReduced event has been despatched with`` timePointId expectedSeconds tolerance
     |> Scenario.log (

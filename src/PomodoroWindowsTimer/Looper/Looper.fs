@@ -90,7 +90,7 @@ type Looper(
             ()
 
     let tryNextTimePoint (state: State) =
-        // in first time next time point is equal to preloaded timepoint
+        // in first time next time point is equal to preloaded TimePoint
         match timePointQueue.TryGetNext(), state.ActiveTimePoint with
         | Some nextTp, Some actTp ->
             if nextTp.Id = actTp.OriginalId && actTp.RemainingTimeSpan = TimeSpan.Zero then
@@ -116,7 +116,7 @@ type Looper(
 
                 tryPostEvent state (
                     LooperEvent.TimePointStarted (
-                        TimePointStartedEventArgs.init newAtp oldAtp true switchinMode, timeProvider.GetUtcNow()
+                        TimePointStartedEventArgs.init newAtp oldAtp switchinMode, timeProvider.GetUtcNow()
                     )
                 )
 
@@ -154,16 +154,19 @@ type Looper(
                 let inline preloadActiveTimePoint atpOpt =
                     match atpOpt with
                     | Some atp when state.Subscribers.Length > 0 ->
-                        let timePointStartedEventArgs =
-                            TimePointStartedEventArgs.init
-                                atp
-                                (if state.IsStopped then None else state.ActiveTimePoint)
-                                (not state.IsStopped)
-                                TimePointSwitchingMode.Auto
+                        let looperEvent =
+                            if state.IsStopped
+                            then
+                                LooperEvent.TimePointReady (atp, timeProvider.GetUtcNow())
+                            else
+                                let timePointStartedEventArgs =
+                                    TimePointStartedEventArgs.init
+                                        atp
+                                        state.ActiveTimePoint
+                                        TimePointSwitchingMode.Auto
+                                LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow())
 
-                        tryPostEvent (
-                            LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow())
-                        )
+                        tryPostEvent looperEvent
                     | _ ->
                         logger.LogWarning("Skipping TimePointStarted event sending, no ActiveTimePoint is selected or no subscribers are set.")
                     { state with ActiveTimePoint = atpOpt }
@@ -218,7 +221,7 @@ type Looper(
                             |> Option.iter (fun atp ->
                                 tryPostEvent
                                 <| LooperEvent.TimePointStarted (
-                                    TimePointStartedEventArgs.ofActiveTimePoint atp true TimePointSwitchingMode.Manual, timeProvider.GetUtcNow())
+                                    TimePointStartedEventArgs.ofActiveTimePoint atp TimePointSwitchingMode.Manual, timeProvider.GetUtcNow())
                             )
 
                         timer.Change(int tickMilliseconds, 0) |> ignore
@@ -262,7 +265,7 @@ type Looper(
                                 let newAtp = { tp with RemainingTimeSpan = tp.RemainingTimeSpan + atp.RemainingTimeSpan }
                                 tryPostEvent (
                                     LooperEvent.TimePointStarted (
-                                        TimePointStartedEventArgs.init newAtp (atp |> Some) true TimePointSwitchingMode.Auto, timeProvider.GetUtcNow()
+                                        TimePointStartedEventArgs.init newAtp (atp |> Some) TimePointSwitchingMode.Auto, timeProvider.GetUtcNow()
                                     )
                                 )
                                 timer.Change(int tickMilliseconds, 0) |> ignore
@@ -286,13 +289,7 @@ type Looper(
                         let scope = beginScope (nameof Subscribe)
                         do
                             if state.IsStopped && state.ActiveTimePoint.IsSome then
-                                let timePointStartedEventArgs =
-                                    TimePointStartedEventArgs.init
-                                        state.ActiveTimePoint.Value
-                                        None
-                                        (not state.IsStopped)
-                                        TimePointSwitchingMode.Auto
-                                subscriber (LooperEvent.TimePointStarted (timePointStartedEventArgs, timeProvider.GetUtcNow()))
+                                subscriber (LooperEvent.TimePointReady (state.ActiveTimePoint.Value, timeProvider.GetUtcNow()))
                             else
                                 ()
 
@@ -317,7 +314,7 @@ type Looper(
                         return! loop state
 
                     | Shift seconds when state.IsStopped ->
-                        let scope = beginScope (nameof Next)
+                        let scope = beginScope (nameof Shift)
                         let newState = state |> withActiveTimePointTimeSpan seconds
                         return! endScopeLoop scope newState
 
@@ -326,7 +323,7 @@ type Looper(
                         return! loop state
 
                     | ShiftAck (seconds, reply) when state.IsStopped ->
-                        let scope = beginScope (nameof Next)
+                        let scope = beginScope (nameof ShiftAck)
                         let newState = state |> withActiveTimePointTimeSpan seconds
                         reply.Reply ()
                         return! endScopeLoop scope newState

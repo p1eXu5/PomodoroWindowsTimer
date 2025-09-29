@@ -130,18 +130,27 @@ let workSpentTimeListTask
         match res with
         | Error err -> return raise (InvalidOperationException $"Failed to obtain work events. {err}")
         | Ok workEventLists ->
-            let spentTimes =
+            return
                 match workEventLists with
-                | [] -> Map.empty
-                | head :: tail ->
-                    projectSpentTime
-                        head
-                        tail
-                        (TimeSpan.FromSeconds(float diff))
-                        Map.empty
-                |> Map.values
-                |> Seq.filter (_.SpentTime >> fun t -> t > TimeSpan.Zero)
-                |> List.ofSeq
+                | [] -> []
+                | _ ->
+                    workEventLists
+                    |> List.groupBy (fun t -> fst t |> _.Id)
+                    |> List.map (fun (_, l) ->
+                        match l with
+                        | [] -> []
+                        | head :: tail ->
+                            let spentTimes =
+                                projectSpentTime
+                                    head
+                                    tail
+                                    (TimeSpan.FromSeconds(float diff))
+                                    Map.empty
+                                |> Map.values
+                                |> Seq.filter (_.SpentTime >> fun t -> t > TimeSpan.Zero)
+                                |> List.ofSeq
 
-            return spentTimes
+                            spentTimes
+                    )
+                    |> List.concat
     }

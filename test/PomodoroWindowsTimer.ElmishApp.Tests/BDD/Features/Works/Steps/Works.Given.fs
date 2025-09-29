@@ -28,7 +28,7 @@ let ``Program has been initialized without CurrentWork`` (timePoints: TimePoint 
         do! Given.``Stored TimePoints`` timePoints
         do! Given.``Initialized Program`` ()
 
-        do! Common.``Looper TimePointStarted event has been dispatched with`` timePoints[0].Id None
+        do! Common.``Looper TimePointReady event has been dispatched with`` timePoints[0].Id
 
         return ()
     }
@@ -54,7 +54,7 @@ let ``Program has been initialized with CurrentWork`` (timePoints: TimePoint lis
         do! Given.``CurrentWork in UserSettings`` currentWork
         do! Given.``Initialized Program`` ()
 
-        do! Common.``Looper TimePointStarted event has been dispatched with`` timePoints[0].Id None
+        do! Common.``Looper TimePointReady event has been dispatched with`` timePoints[0].Id
         do! Common.``SetCurrentWorkIfNone msg has been dispatched with`` currentWork
 
         let! (sut: ISut) = Scenario.getState
