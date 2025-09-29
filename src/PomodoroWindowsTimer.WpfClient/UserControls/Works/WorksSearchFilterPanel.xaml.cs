@@ -26,14 +26,14 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
         }
 
         // Provide CLR accessors for assigning an event handler.
-        internal event SearchTextChangedEventHandler SearchTextChanged
+        public event SearchTextChangedEventHandler SearchTextChanged
         {
             add { AddHandler(SearchTextChangedEvent, value); }
             remove { RemoveHandler(SearchTextChangedEvent, value); }
         }
 
         // Register a custom routed event using the Bubble routing strategy.
-        internal static readonly RoutedEvent SearchTextChangedEvent = EventManager.RegisterRoutedEvent(
+        public static readonly RoutedEvent SearchTextChangedEvent = EventManager.RegisterRoutedEvent(
             name: "SearchTextChanged",
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(SearchTextChangedEventHandler),
@@ -52,14 +52,14 @@ namespace PomodoroWindowsTimer.WpfClient.UserControls.Works
         }
 
         // Provide CLR accessors for assigning an event handler.
-        internal event CountChangedEventHandler CountChanged
+        public event CountChangedEventHandler CountChanged
         {
             add { AddHandler(CountChangedEvent, value); }
             remove { RemoveHandler(CountChangedEvent, value); }
         }
 
         // Register a custom routed event using the Bubble routing strategy.
-        internal static readonly RoutedEvent CountChangedEvent = EventManager.RegisterRoutedEvent(
+        public static readonly RoutedEvent CountChangedEvent = EventManager.RegisterRoutedEvent(
             name: "CountChanged",
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(CountChangedEventHandler),
