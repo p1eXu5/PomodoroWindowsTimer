@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.FSharp.Core;
 using PomodoroWindowsTimer;
 using PomodoroWindowsTimer.Abstractions;
 using PomodoroWindowsTimer.ElmishApp;
@@ -14,7 +15,6 @@ using PomodoroWindowsTimer.Looper;
 using PomodoroWindowsTimer.Storage.Configuration;
 using PomodoroWindowsTimer.TimePointQueue;
 using PomodoroWindowsTimer.WpfClient;
-using PomodoroWindowsTimer.WpfClient.Properties;
 using PomodoroWindowsTimer.WpfClient.Services;
 
 namespace DrugRoom.WpfClient;
@@ -25,7 +25,7 @@ internal static class DependencyInjectionExtensions
         => services.TryAddSingleton(TimeProvider.System);
 
     public static void AddTimePointStore(this IServiceCollection services)
-        => services.TryAddSingleton(sp => 
+        => services.TryAddSingleton(sp =>
         {
             var tpSettings = sp.GetRequiredService<IUserSettings>();
             return TimePointStoreModule.Initialize(tpSettings);
@@ -36,8 +36,7 @@ internal static class DependencyInjectionExtensions
         {
             var timePointStore = sp.GetRequiredService<TimePointStore>();
             var logger = sp.GetRequiredService<ILogger<TimePointQueue>>();
-            var tickMs = Settings.Default.TickMilliseconds;
-            return new TimePointQueue(timePointStore, logger, tickMs, default);
+            return new TimePointQueue(timePointStore, logger, FSharpOption<int>.Some(2000), default);
         });
 
     public static void AddLooper(this IServiceCollection services)

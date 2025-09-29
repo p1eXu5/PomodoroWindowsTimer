@@ -1,4 +1,4 @@
-name: CI
+﻿name: CI
 
 on:
   push:
@@ -7,34 +7,46 @@ on:
   pull_request:
     branches:
       - '**'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# https://stackoverflow.com/questions/78542282/setting-permissions-for-github-token-in-workflow-doesnt-work
+permissions: read-all
+
+env:
+  DOTNET_VERSION: 9.0.x
 
 jobs:
-  build:
+  ci:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-latest]
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
-      - name: Setup .NET 8
+  
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
         uses: actions/setup-dotnet@v4
         with:
-            dotnet-version: '8.0.x'
-      - name: Fake
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: |
+            **/*.csproj
+            **/*.fsproj
+            **/packages.lock.json
+            **/paket.lock
+            **/global.json
+
+      # Build only when pushing to master
+      - name: Fake default target (master push)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [windows-latest]
-    if: github.ref != 'refs/heads/master'
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET 8
-        uses: actions/setup-dotnet@v4
-        with:
-            dotnet-version: '8.0.x'
-      - name: Fake
+      # Test for PRs and non-master branches
+      - name: Fake Test target (PRs and non-master)
+        if: ${{ !(github.event_name == 'push' && github.ref == 'refs/heads/master') }}
         run: dotnet fsi build.fsx -e FAKE_DETAILED_ERRORS=true -e GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} -t Test
+

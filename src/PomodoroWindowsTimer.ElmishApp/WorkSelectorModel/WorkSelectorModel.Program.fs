@@ -89,5 +89,5 @@ let update updateWorkListModel updateCreatingWorkModel updateWorkModel (logger: 
             , Intent.None
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model |> withCmdNone |> withNoIntent

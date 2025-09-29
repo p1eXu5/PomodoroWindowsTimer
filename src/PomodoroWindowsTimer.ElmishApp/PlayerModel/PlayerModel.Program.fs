@@ -44,11 +44,20 @@ let private setDisableSkipBreak (settings: IPlayerUserSettings) v (model: Player
 /// Starts ITimePointQueue.ScrollTo operation and finishes it with Msg.Play.
 let private startTimePoint (timePointQueue: ITimePointQueue) op (model: PlayerModel) =
     match op with
-    | Operation.Start id ->
+    | Operation.Start timePointId ->
         model
         , Cmd.batch [
             Cmd.ofMsg Msg.Stop
-            Cmd.OfFunc.either timePointQueue.ScrollTo id (Operation.Finish >> Msg.StartTimePoint) Msg.OnExn
+            Cmd.OfFunc.either
+                (fun tpId ->
+                    if timePointQueue.ScrollTo tpId then
+                        () |> Operation.Finish |> Msg.StartTimePoint
+                    else
+                        Msg.OnError $"Time point {tpId} has not been found in ITimePointQueue"
+                )
+                timePointId
+                id
+                Msg.OnExn
         ]
         , Intent.None
 
@@ -110,18 +119,10 @@ let private replay (model: PlayerModel) =
 
 /// Msg.LooperMsg handler.
 let private mapLooperEvent (windowsMinimizer: IWindowsMinimizer) (themeSwitcher: IThemeSwitcher) levt (model: PlayerModel) =
-    match levt with
-    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp }, _) ->
-        model
-        |> withActiveTimePoint (atp |> Some)
-        |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
-        , Cmd.none, Intent.None
-
-    | LooperEvent.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }, _) ->
+    let cmd nextTp oldTp =
         let nextTimePointKind = nextTp |> TimePointKind.ofActiveTimePoint
 
-        let cmd =
-            match nextTimePointKind with
+        match nextTimePointKind with
             | TimePointKind.Break when model.LooperState <> LooperState.Playing ->
                 switchThemeCmd themeSwitcher nextTimePointKind
 
@@ -158,16 +159,47 @@ let private mapLooperEvent (windowsMinimizer: IWindowsMinimizer) (themeSwitcher:
 
             | _ -> Cmd.none
 
+    match levt with
+    | LooperEvent.TimePointReady (atp, _)  ->
+        let cmd = cmd atp model.ActiveTimePoint
+        model
+        |> withActiveTimePoint (atp |> Some)
+        |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState LooperState.Initialized
+        , cmd, Intent.None
+
+    | LooperEvent.TimePointStarted ({NewActiveTimePoint = nextTp; OldActiveTimePoint = oldTp }, _) ->
+        let cmd = cmd nextTp model.ActiveTimePoint
         model
         |> withActiveTimePoint (nextTp |> Some)
         |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState LooperState.Playing
         , cmd
         , Intent.None
+
+    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp; IsPlaying = true }, _)  ->
+        model
+        |> withActiveTimePoint (atp |> Some)
+        |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState LooperState.Playing
+        , Cmd.none, Intent.None
+
+    // shifting
+    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp; IsPlaying = false }, _)  ->
+        model
+        |> withActiveTimePoint (atp |> Some)
+        , Cmd.none
+        , Intent.None
+
+    // after shifting is started
+    | LooperEvent.TimePointStopped _ when model.LooperState |> LooperState.isTimeShifting ->
+        model, Cmd.none, Intent.None
 
     | LooperEvent.TimePointStopped (atp, _) ->
         model
         |> withActiveTimePoint (atp |> Some)
         |> withNoneLastAtpWhenPlayOrNextIsManuallyPressed
+        |> withLooperState LooperState.Stopped
         , Cmd.none, Intent.None
 
 
@@ -420,6 +452,6 @@ let update
         model, Cmd.none, Intent.None
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none, Intent.None
 

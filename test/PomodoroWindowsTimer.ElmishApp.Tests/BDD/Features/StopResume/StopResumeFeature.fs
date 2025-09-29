@@ -13,7 +13,6 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps
 
-
 module StopResumeFeature =
 
     [<Test>]
@@ -24,7 +23,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! Then.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``LooperState is`` LooperState.Initialized
             do! Then.``Windows should not be minimized`` ()
@@ -41,7 +40,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
@@ -62,7 +61,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
 
@@ -83,7 +82,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Resume msg has been dispatched with 2.5 ticks timeout`` ()
@@ -105,7 +104,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
 
@@ -128,7 +127,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
@@ -151,7 +150,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
 
@@ -174,7 +173,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Replay msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.Spent 1.0<sec>
@@ -197,7 +196,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` () // Work
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
 
@@ -230,7 +229,7 @@ module StopResumeFeature =
             do! Given.``Initialized Program`` ()
             do! When.``Spent 2.5 ticks`` ()
 
-            do! Then.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! Then.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! Then.``Active Point is set on`` timePoints.Head
             do! Then.``LooperState is`` LooperState.Initialized
             do! Then.``Windows should not be minimized`` ()
@@ -247,7 +246,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
 
             do! Then.``Active Point is set on`` timePoints.Head
@@ -267,7 +266,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
 
@@ -288,7 +287,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Resume msg has been dispatched with 2.5 ticks timeout`` ()
@@ -310,7 +309,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
 
@@ -332,7 +331,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Stop msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Next msg has been dispatched with 2.5 ticks timeout`` 1<times>
@@ -356,7 +355,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
             do! When.``Looper TimePointStarted event has been despatched with`` timePoints[1].Id (timePoints[0].Id |> Some)
@@ -380,7 +379,7 @@ module StopResumeFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Replay msg has been dispatched with 2.5 ticks timeout`` ()
 

@@ -22,6 +22,12 @@
     <File Path="docs/design/time-shifting-with-slider.md" />
     <File Path="projects.md" />
   </Folder>
+  <Folder Name="/Solution Items/utils/" />
+  <Folder Name="/Solution Items/utils/scripts/">
+    <File Path="utils/scripts/increase_versionf.fsx" />
+    <File Path="utils/scripts/pack.fsx" />
+    <File Path="utils/scripts/project_file_versions.fsx" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/PomodoroWindowsTimer.ElmishApp/PomodoroWindowsTimer.ElmishApp.fsproj" />
     <Project Path="src/PomodoroWindowsTimer.WpfClient/PomodoroWindowsTimer.WpfClient.csproj" />

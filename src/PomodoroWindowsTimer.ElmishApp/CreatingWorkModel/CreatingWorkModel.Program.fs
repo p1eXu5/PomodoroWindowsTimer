@@ -41,5 +41,5 @@ let update (workEventStore: WorkEventStore) (errorMessageQueue: IErrorMessageQue
         model |> withCmdNone |> withCancelIntent
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model |> withCmdNone |> withNoIntent

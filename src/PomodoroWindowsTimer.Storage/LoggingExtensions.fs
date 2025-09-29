@@ -78,10 +78,10 @@ type LoggingExtensions () =
         new EventId(8, nameof LoggingExtensions.FailedToFindByActiveTimePointIdByDate),
         "Failed to find work events by active time point id {ActiveTimePointId} and created not after {NotAfterDate}.")
 
-    static let workEventInsertingMessage = LoggerMessage.Define<WorkId, string>(
+    static let workEventInsertingMessage = LoggerMessage.Define<WorkId, string, int64>(
         LogLevel.Debug,
         new EventId(9, "Work Event Inserting"),
-        "'{WorkNumber}' work event '{EventName}' is inserting..."
+        "'{WorkNumber}' work event '{EventName}' is inserting. Create date: {CreatedAtMs}..."
     )
 
     static let activeTimePointInsertingMessage = LoggerMessage.Define<Name, Kind>(
@@ -90,11 +90,9 @@ type LoggingExtensions () =
         "'{TimePointNumber}' active time point of '{Kind}' is inserting..."
     )
 
-   
-
     [<Extension>]
-    static member LogWorkEventInserting(logger: ILogger, workId: WorkId, workEvent: WorkEvent) =
-        workEventInsertingMessage.Invoke(logger, workId, workEvent |> WorkEvent.name, null)
+    static member LogWorkEventInserting(logger: ILogger, workId: WorkId, workEventName: string, createdAt: int64) =
+        workEventInsertingMessage.Invoke(logger, workId, workEventName, createdAt, null)
 
     [<Extension>]
     static member LogActiveTimePointInserting(logger: ILogger, atp: ActiveTimePoint) =

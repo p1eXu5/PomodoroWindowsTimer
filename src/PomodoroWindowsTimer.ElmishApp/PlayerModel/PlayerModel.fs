@@ -6,7 +6,6 @@ open PomodoroWindowsTimer.Types
 open PomodoroWindowsTimer.ElmishApp
 open PomodoroWindowsTimer.Abstractions
 
-// TODO: move to Player entity
 type PlayerModel =
     {
         ActiveTimePoint: ActiveTimePoint option
@@ -22,7 +21,6 @@ type PlayerModel =
         RetrieveWorkSpentTimesState: AsyncDeferredState
     }
 and
-    // TODO: rename to Player State
     /// Player state.
     LooperState =
         | Initialized
@@ -41,6 +39,12 @@ and
             PreShiftActiveRemainingSeconds: float<sec>
             NewActiveRemainingSeconds: float<sec>
         }
+
+module LooperState =
+
+    let isTimeShifting = function
+        | LooperState.TimeShifting _ -> true
+        | _ -> false
 
 module PlayerModel =
 
@@ -135,7 +139,10 @@ module PlayerModel =
     // ---------------------------------------------------
 
     let withLooperState looperState (model: PlayerModel) =
-        { model with LooperState = looperState }
+        if looperState <> model.LooperState then
+            { model with LooperState = looperState }
+        else
+            model
 
     let withNotRequestedRetrieveWorkSpentTimesState (model: PlayerModel) =
         { model with
@@ -153,14 +160,22 @@ module PlayerModel =
         )
         |> Option.defaultValue TimePointKind.Undefined
 
-    let withActiveTimePoint atp (model: PlayerModel) =
-       { model with ActiveTimePoint = atp; }
+    let withActiveTimePoint atpOpt (model: PlayerModel) =
+        match atpOpt, model.ActiveTimePoint with
+        | Some atp, Some matp when atp = matp -> model
+        | None, None -> model
+        | _ ->
+           { model with ActiveTimePoint = atpOpt; }
+
 
     let zipTimePointKindEnum (model: PlayerModel) =
         (model, model |> timePointKindEnum)
 
     let withNoneLastAtpWhenPlayOrNextIsManuallyPressed (model: PlayerModel) =
-        { model with LastAtpWhenPlayOrNextIsManuallyPressed = None }
+        if model.LastAtpWhenPlayOrNextIsManuallyPressed.IsSome then
+            { model with LastAtpWhenPlayOrNextIsManuallyPressed = None }
+        else
+            model
 
     let withLastAtpWhenPlayOrNextIsManuallyPressed (model: PlayerModel) =
         model.ActiveTimePoint

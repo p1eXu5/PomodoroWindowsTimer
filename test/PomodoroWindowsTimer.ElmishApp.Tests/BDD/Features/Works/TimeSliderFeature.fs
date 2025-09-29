@@ -27,7 +27,6 @@ module TimeSliderFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -49,7 +48,6 @@ module TimeSliderFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -76,7 +74,7 @@ module TimeSliderFeature =
             // do! Given.``WorkEventStore substitution`` ()
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -100,7 +98,7 @@ module TimeSliderFeature =
             // do! Given.``WorkEventStore substitution`` ()
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -124,8 +122,6 @@ module TimeSliderFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -151,8 +147,6 @@ module TimeSliderFeature =
             let! currentWork =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
-            
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -183,7 +177,6 @@ module TimeSliderFeature =
             let! work1 =
                 Given.``Program has been initialized with CurrentWork`` timePoints
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent`` 1.0<sec>
 
@@ -203,7 +196,7 @@ module TimeSliderFeature =
             do! Then.``MainModel WorkSelector becomes None`` ()
             let! work2 = Then.``Current Work has been set to`` work2 // update work2 Id
 
-            // resum playing
+            // resume playing
             do! When.``Spent`` 1.0<sec>
 
             // moving backward

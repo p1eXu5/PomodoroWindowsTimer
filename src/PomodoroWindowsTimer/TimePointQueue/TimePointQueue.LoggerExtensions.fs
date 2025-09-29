@@ -32,11 +32,18 @@ let private timePointsMessage =
         "TimePoint list: {TimePointList}"
     )
 
-let private nextTimePointMessage =
-    LoggerMessage.Define<string, float32>(
+let private nextTimePointTraceMessage =
+    LoggerMessage.Define<string, string, float32>(
         LogLevel.Trace,
         new EventId(0b0_0001_0100, "Next TimePointQueue TimePoint"),
-        "Replying with the next TimePoint: {TimePoint} with priority {Priority}"
+        "{Action} TimePoint: {TimePoint} with priority {Priority}"
+    )
+
+let private nextTimePointDebugMessage =
+    LoggerMessage.Define<string, string, float32>(
+        LogLevel.Debug,
+        new EventId(0b0_0001_0100, "Next TimePointQueue TimePoint"),
+        "{Action} TimePoint: {TimePointName} with priority {Priority}"
     )
 
 let private endHandleMessage =
@@ -95,7 +102,9 @@ type internal LoggerExtensions () =
             timePointsMessage.Invoke(logger, json, null)
 
     [<Extension>]
-    static member LogNextTimePoint(logger: ILogger, tp: TimePoint, priority: float32) =
+    static member LogNextTimePoint(logger: ILogger, action: string, tp: TimePoint, priority: float32) =
         if logger.IsEnabled(LogLevel.Trace) then
             let json = JsonHelpers.Serialize(tp)
-            nextTimePointMessage.Invoke(logger, json, priority, null)
+            nextTimePointTraceMessage.Invoke(logger, action, json, priority, null)
+        else
+            nextTimePointDebugMessage.Invoke(logger, action, tp.Name, priority, null)

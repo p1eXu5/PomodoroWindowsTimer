@@ -11,7 +11,7 @@ open PomodoroWindowsTimer.ElmishApp.Infrastructure
 
 type RunningTimePointListModel =
     {
-        TimePoints: TimePoint list
+        TimePoints: TimePointModel list
         ActiveTimePointId: TimePointId option
         DisableSkipBreak: bool
         DisableMinimizeMaximizeWindows: bool
@@ -21,13 +21,14 @@ type RunningTimePointListModel =
 module RunningTimePointListModel =
 
     type Msg =
-        | TimePointModelMsg of TimePointModel.Msg // Preserved message
+        | TimePointModelMsg of TimePointId * TimePointModel.Msg
         | SetActiveTimePointId of TimePointId option
         | LooperMsg of LooperEvent
         | SetDisableSkipBreak of bool
         | SetDisableMinimizeMaximizeWindows of bool
         | PlayerUserSettingsChanged
-        | TimePointQueueMsg of TimePoint list * TimePointId option
+        | TimePointsChangedQueueMsg of TimePoint list * TimePointId option
+        | TimePointsLoopComplettedQueueMsg
         | RequestTimePointGenerator
         | OnExn of exn
 
@@ -41,17 +42,54 @@ module RunningTimePointListModel =
 
     // ---------------------------------------------------
 
+    let withTimePointQueueTimePoints timePoints timePointIdOpt (model: RunningTimePointListModel) =
+        { model with
+            ActiveTimePointId = timePointIdOpt
+            TimePoints =
+                match timePointIdOpt with
+                | Some activeTpId ->
+                    (timePoints, (false, []))
+                    ||> List.foldBack (fun tp (isSelected, res) ->
+                        let tpModel = TimePointModel.init tp
+                        if not isSelected && tp.Id = activeTpId then
+                            (true, { tpModel with IsSelected = true } :: res)
+                        else
+                            (isSelected, tpModel :: res)
+                    )
+                    |> snd
+                | None -> []
+        }
+
     let init (timePointQueue: ITimePointQueue) (playerUserSettings: IPlayerUserSettings) =
-        let (timePoints, timePointId) = timePointQueue.GetTimePoints()
+        let (timePoints, timePointIdOpt) = timePointQueue.GetTimePoints()
         {
-            TimePoints = timePoints
-            ActiveTimePointId = timePointId
+            TimePoints = []
+            ActiveTimePointId = None
             DisableSkipBreak = playerUserSettings.DisableSkipBreak
             DisableMinimizeMaximizeWindows = playerUserSettings.DisableMinimizeMaximizeWindows
         }
+        |> withTimePointQueueTimePoints timePoints timePointIdOpt
 
-    let withActiveTimePointId timePointId (model: RunningTimePointListModel) =
-        { model with ActiveTimePointId = timePointId }
+    let withActiveTimePointId timePointIdOpt (model: RunningTimePointListModel) =
+        { model with
+            ActiveTimePointId = timePointIdOpt
+            TimePoints =
+                match timePointIdOpt with
+                | Some activeTpId ->
+                    let oldActiveTpId = model.ActiveTimePointId
+
+                    (model.TimePoints, (false, oldActiveTpId.IsNone, []))
+                    ||> List.foldBack (fun tpModel (isSelected, isUnselected, res) ->
+                        if not isSelected && tpModel.Id = activeTpId then
+                            (true, isUnselected, { tpModel with IsSelected = true; IsPlayed = false } :: res)
+                        elif not isUnselected && tpModel.IsSelected && tpModel.Id = oldActiveTpId.Value then
+                            (isSelected, true, { tpModel with IsSelected = false; IsPlayed = true } :: res)
+                        else
+                            (isSelected, isUnselected, tpModel :: res)
+                    )
+                    |> fun (_, _, tpModels) -> tpModels
+                | None -> []
+        }
 
     let withDisableSkipBreak v (model: RunningTimePointListModel) =
         { model with DisableSkipBreak = v }
@@ -59,8 +97,14 @@ module RunningTimePointListModel =
     let withDisableMinimizeMaximizeWindows v (model: RunningTimePointListModel) =
         { model with DisableMinimizeMaximizeWindows = v }
 
-    let withTimePoints timePoints timePointIdOpt (model: RunningTimePointListModel) =
-        if timePoints = model.TimePoints then
-            { model with ActiveTimePointId = timePointIdOpt }
-        else
-            { model with TimePoints = timePoints; ActiveTimePointId = timePointIdOpt }
+    let withNotPlayedTimePoints (model: RunningTimePointListModel) =
+        { model with
+            TimePoints =
+                model.TimePoints
+                |> List.map (fun tp ->
+                    if tp.IsPlayed then
+                        { tp with IsPlayed = false }
+                    else
+                        tp
+                )
+        }

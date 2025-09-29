@@ -230,6 +230,8 @@ module internal WorkEventRepository =
             let! ct = CancellableTask.getCancellationToken ()
 
             let eventJson = JsonHelpers.SerializeNoIndent(workEvent)
+            let createdAt = workEvent |> WorkEvent.createdAt |> _.ToUnixTimeMilliseconds()
+            let eventName = workEvent |> WorkEvent.name
 
             let command =
                 CommandDefinition(
@@ -237,15 +239,15 @@ module internal WorkEventRepository =
                     parameters = {|
                         WorkId = workId
                         EventJson = eventJson
-                        CreatedAt = WorkEvent.createdAt(workEvent).ToUnixTimeMilliseconds()
+                        CreatedAt = createdAt
                         ActiveTimePointId = workEvent |> WorkEvent.activeTimePointId |> Option.map _.ToString() |> Option.defaultValue null
-                        EventName = workEvent |> WorkEvent.name
+                        EventName = eventName
                     |},
                     cancellationToken = ct
                 )
 
             try
-                deps.Logger.LogWorkEventInserting(workId, workEvent)
+                deps.Logger.LogWorkEventInserting(workId, eventName, createdAt)
                 return! dbConnection.ExecuteScalarAsync<uint64>(command)
             with ex ->
                 deps.Logger.FailedToInsert(Table.NAME, ex)

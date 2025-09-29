@@ -28,6 +28,8 @@ type ISut =
     abstract MockRepository: MockRepository with get
 
 
+
+
 module Sut =
 
     let run (setupf: ISut -> ISut) =
@@ -35,7 +37,7 @@ module Sut =
         let bootstrap = Bootstrap.Build<TestBootstrap>()
 
         let testDispatcher = new TestDispatcher()
-        let dict = new Dictionary<string, obj>(5)
+        let dict = new Dictionary<string, obj>()
         let mainModel = ref Unchecked.defaultof<MainModel>
         let msgStack = ConcurrentStack<MainModel.Msg>()
 
@@ -70,6 +72,7 @@ module Sut =
                         member _.ServiceProvider with get() = bootstrap.ServiceProvider
                         member _.MockRepository with get() =
                             bootstrap.MockRepository
+
                     interface IScenarioContext with
                         member _.ScenarioContext with get() = dict
                     

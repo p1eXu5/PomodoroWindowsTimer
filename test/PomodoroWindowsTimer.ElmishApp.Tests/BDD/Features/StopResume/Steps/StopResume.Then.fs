@@ -27,12 +27,20 @@ open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 
 
 let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
-    Common.``Looper TimePointStarted event has been despatched with`` newTimePointId oldTimePointId
+    Common.``Looper TimePointStarted event has been dispatched with`` newTimePointId oldTimePointId
     |> Scenario.log (
         sprintf "Then.``%s new TimePoint Id - %A and %s``."
-            (nameof Common.``Looper TimePointStarted event has been despatched with``)
+            (nameof Common.``Looper TimePointStarted event has been dispatched with``)
             newTimePointId
             (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
+        )
+
+let ``Looper TimePointReady event has been despatched with`` (newTimePointId: Guid) =
+    Common.``Looper TimePointReady event has been dispatched with`` newTimePointId
+    |> Scenario.log (
+        sprintf "Then.``%s new TimePoint Id - %A``."
+            (nameof Common.``Looper TimePointReady event has been dispatched with``)
+            newTimePointId
         )
 
 let ``Looper TimePointReduced event has been despatched with`` (timePointId: System.Guid) (expectedSeconds: float<sec>) (tolerance: float<sec>) =

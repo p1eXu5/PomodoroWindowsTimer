@@ -113,7 +113,8 @@ let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logge
         , Intent.None
 
     | Msg.LoadLastDayCount ->
-        model |> withLastDayCount userSettings.LastDayCount |> withCmdNone |> withNoIntent
+        model |> withLastDayCount userSettings.LastDayCount
+        , Cmd.none, Intent.None
 
     | Msg.OnExn ex ->
         logger.LogError(ex, "Exception has been thrown in WorkListModel Program.")
@@ -121,6 +122,6 @@ let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logge
         model |> withCmdNone |> withNoIntent
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model |> withCmdNone |> withNoIntent
 

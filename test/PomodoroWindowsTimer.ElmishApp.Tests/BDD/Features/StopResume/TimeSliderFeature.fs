@@ -13,7 +13,6 @@ open PomodoroWindowsTimer.ElmishApp.Tests.ScenarioCE
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.CommonSteps
 open PomodoroWindowsTimer.ElmishApp.Tests.Features.StopResume.Steps
 
-
 module TimeSliderFeature =
 
     [<Test>]
@@ -24,7 +23,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
             do! When.``PostChangeActiveTimeSpan Start msg has been dispatched`` 1<times>
@@ -46,7 +45,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 1.5<sec>
@@ -74,7 +73,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 3.0<sec>
@@ -102,7 +101,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
 
             do! When.``PreChangeActiveTimeSpan msg has been dispatched`` 1<times>
             do! When.``Active time point slider value is changing to`` 3.0<sec>
@@ -130,7 +129,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
@@ -156,7 +155,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 
@@ -187,7 +186,7 @@ module TimeSliderFeature =
             do! Given.``Stored TimePoints`` timePoints
             do! Given.``Initialized Program`` ()
 
-            do! When.``Looper TimePointStarted event has been despatched with`` timePoints[0].Id None
+            do! When.``Looper TimePointReady event has been despatched with`` timePoints[0].Id
             do! When.``Play msg has been dispatched with 2.5 ticks timeout`` ()
             do! When.``Spent 2.5 ticks`` ()
 

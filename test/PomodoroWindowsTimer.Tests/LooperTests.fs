@@ -48,9 +48,7 @@ let testLooper (timePoints: TimePoint list) (setupTime: System.TimeProvider -> S
     let looper = new Looper(tpQueue, setupTime timeProvider, 200<ms>, TestLogger<Looper>(TestContextWriters.GetInstance<TestContext>(), LogOut.All) :> ILogger<Looper>, cts.Token)
     let eventQueue = Queue<LooperEvent>()
     let subscriber looperEvent =
-        async {
-            eventQueue.Enqueue(looperEvent)
-        }
+        eventQueue.Enqueue(looperEvent)
     looper.Start([ subscriber ])
     (
         looper,
@@ -70,7 +68,7 @@ let date = DateOnly(2024, 01, 01)
 let startTime = TimeOnly(8, 0, 0)
 
 [<Test>]
-let ``PreloadTimePoint -> raises TimePointStarted event with None nextTp`` () =
+let ``PreloadTimePoint -> raises TimePointREady event with None nextTp`` () =
     let (looper, eventQueue, disp) =
         testLooper testTimePoints (fun mock ->
             %mock.LocalTimeZone.Returns(TimeZoneInfo.Utc)
@@ -86,8 +84,8 @@ let ``PreloadTimePoint -> raises TimePointStarted event with None nextTp`` () =
     // assert
     %eventQueue.Should().ContainExactlyOneItemMatching(fun ev -> 
         match ev with
-        | LooperEvent.TimePointStarted (args, _) ->
-            args.NewActiveTimePoint.OriginalId = testTimePoints[0].Id && args.OldActiveTimePoint = None
+        | LooperEvent.TimePointReady (atp, _) ->
+            atp.OriginalId = testTimePoints[0].Id
         | _ -> false
     )
 

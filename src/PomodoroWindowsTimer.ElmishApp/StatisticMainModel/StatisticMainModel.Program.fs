@@ -61,6 +61,6 @@ let update
         model, cmd, Intent.CloseWindow
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none, Intent.None
 

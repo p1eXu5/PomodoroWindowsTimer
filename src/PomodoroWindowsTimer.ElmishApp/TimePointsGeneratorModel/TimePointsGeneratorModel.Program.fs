@@ -41,6 +41,7 @@ let update
     (timePointQueue: ITimePointQueue)
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<TimePointsGeneratorModel>)
+    updateTimePointModel
     msg model
     =
     match msg with
@@ -97,7 +98,7 @@ let update
             , Cmd.none, Intent.None
 
         | _ ->
-            logger.LogUnprocessedMessage(msg, model)
+            logger.LogNonProcessedMessage(msg, model)
             model, Cmd.none, Intent.None
 
     | SetSelectedPatternIndex ind ->
@@ -108,10 +109,13 @@ let update
         , Cmd.ofMsg (SetPattern model.Pattern)
         , Intent.None
 
-    | TimePointMsg (id, tpMsg) ->
-        tpMsg |> TimePointModel.Program.update |> flip (mapTimePoint id) model
-        , Cmd.none
-        , Intent.None
+    | TimePointMsg (tpId, tpMsg) ->
+        model.TimePoints
+        |> List.mapFirstCmd (_.Id >> (=) tpId) (updateTimePointModel tpMsg)
+        |> fun (tpList, tpCmd) ->
+            { model with TimePoints = tpList }
+            , Cmd.map (fun m -> Msg.TimePointMsg (tpId, m)) tpCmd
+            , Intent.None
 
     | ApplyTimePoints when not model.IsPatternWrong && model.Pattern.IsSome ->
         model
@@ -142,7 +146,7 @@ let update
         , Intent.ApplyGeneratedTimePoints
 
     | ApplyTimePoints ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none, Intent.None
 
     | RequestCancelling ->

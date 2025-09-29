@@ -4,6 +4,15 @@
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:shared="clr-namespace:PomodoroWindowsTimer.WpfClient.UserControls.Shared"
                     >
+    <Style x:Key="st_IconBase"
+           TargetType="materialDesign:PackIcon"
+           >
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
     <Style x:Key="st_HorizontalStackButtonIcon"
            BasedOn="{StaticResource st_IconBase}"
            TargetType="materialDesign:PackIcon"
@@ -26,7 +35,7 @@
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding TimeSpan}" />
         <Setter Property="ButtonForeground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
         <Setter Property="NameForeground" Value="{StaticResource MaterialDesign.Brush.Primary}" />
-        <Setter Property="PlayStopCommand" Value="{Binding DataContext.StartTimePointCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+        <Setter Property="PlayStopCommand" Value="{Binding PlayCommand}" />
         <Setter Property="PlayStopCommandParameter" Value="{Binding Id}" />
     </Style>
 
@@ -37,13 +46,29 @@
         <Setter Property="shared:TimePointAssistant.TimePointTimeSpan" Value="{Binding DataContext.ActiveTime, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, StringFormat=h\\:mm}" />
         <Setter Property="ButtonForeground" Value="{Binding Kind, Converter={StaticResource conv_KindToBrushConverter}}" />
         <Setter Property="NameForeground" Value="White" />
-        <Setter Property="PlayStopCommand" Value="{Binding DataContext.PlayStopCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" />
+        <Setter Property="PlayStopCommand" Value="{Binding PlayCommand}" />
         <Setter Property="PlayStopCommandParameter" Value="{Binding Id}" />
     </Style>
 
     <!--  unselected time point  -->
     <ControlTemplate x:Key="ct_UnselectedTimePointNewV2">
         <shared:TimePointV2 Style="{StaticResource st_UnselectedTimePointV2}">
+            <shared:TimePointV2.ButtonIcon>
+                <ControlTemplate>
+                    <materialDesign:PackIcon Kind="Play"
+                                             Style="{StaticResource st_HorizontalStackButtonIcon}"
+                                             />
+                </ControlTemplate>
+            </shared:TimePointV2.ButtonIcon>
+        </shared:TimePointV2>
+    </ControlTemplate>
+
+    <!--  unselected time point  -->
+    <ControlTemplate x:Key="ct_UnselectedPlayedTimePointNewV2">
+        <shared:TimePointV2 ButtonForeground="#445862"
+                            NameForeground="#445862"
+                            Style="{StaticResource st_UnselectedTimePointV2}"
+                            >
             <shared:TimePointV2.ButtonIcon>
                 <ControlTemplate>
                     <materialDesign:PackIcon Kind="Play"
@@ -91,16 +116,30 @@
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
                     <!--  TODO: source of true is Player, need to add dependency to the list view model  -->
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.IsPlaying}" Value="True" />
+                    <Condition Binding="{Binding IsPlaying}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_SelectedPlayingTimePointNewV2}" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsSelected}" Value="True" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.IsPlaying}" Value="False" />
+                    <Condition Binding="{Binding IsPlaying}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_SelectedStoppedTimePointNewV2}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSelected}" Value="False" />
+                    <Condition Binding="{Binding IsPlayed}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_UnselectedTimePointNewV2}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSelected}" Value="False" />
+                    <Condition Binding="{Binding IsPlayed}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="theControl" Property="Template" Value="{StaticResource ct_UnselectedPlayedTimePointNewV2}" />
             </MultiDataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>

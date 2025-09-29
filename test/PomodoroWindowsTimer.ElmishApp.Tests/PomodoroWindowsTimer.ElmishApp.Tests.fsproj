@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Include="..\ShouldExtensions.fs" Link="ShouldExtensions.fs" />
     <Compile Include="FakerExtensions.fs" />
+    <Compile Include="LoggerExtensions.fs" />
     <Compile Include="StubAndMocks.fs" />
     <Compile Include="Unit\PlayerModel\PlayerModel.Helpers.fs" />
     <Compile Include="Unit\PlayerModel\PlayerModel.OtherMessagesTests.fs" />

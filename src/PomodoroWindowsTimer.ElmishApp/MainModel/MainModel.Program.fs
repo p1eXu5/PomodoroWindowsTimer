@@ -19,22 +19,45 @@ open PomodoroWindowsTimer.Abstractions
 
 
 /// Msg.SetIsTimePointsShown handler.
-let private setIsTimePointsDrawerShown initRunningTimePoints (v: bool) (model: MainModel) =
-    if v then model |> withoutWorkSelectorModel else model
-    |> withIsTimePointsDrawerShown initRunningTimePoints v
+let private setIsTimePointsDrawerShown initDrawerModel (v: bool) (model: MainModel) =
+    if v
+    then
+        model |> withTimePointsDrawerModel (model.TimePointsDrawer |> initDrawerModel)
+    else model
+    |> withIsTimePointsDrawerShown v
     , Cmd.none
 
 
+/// Msg.TimePointsDrawerMsg handler
 let private mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg (model: MainModel) =
     let (drawerModel', drawerCmd) = model.TimePointsDrawer |> updateTimePointsDrawerModel smsg
     model |> withTimePointsDrawer drawerModel'
     , Cmd.map Msg.TimePointsDrawerMsg drawerCmd
 
+
+/// Msg.TimePointsChangedQueueMsg handler
+let private mapTimePointsChangedQueueMsg updateTimePointsDrawerModel (timePointsAndId: TimePoint list * TimePointId option) (model: MainModel) =
+    model
+    |> mapc _.TimePointsDrawer withTimePointsDrawer Msg.TimePointsDrawerMsg (
+        updateTimePointsDrawerModel (TimePointsDrawerModel.Msg.RunningTimePointsMsg (
+            RunningTimePointListModel.Msg.TimePointsChangedQueueMsg timePointsAndId)))
+
+
+/// Msg.TimePointsLoopComplettedQueueMsg handler
+let private mapTimePointsLoopComplettedQueueMsg updateTimePointsDrawerModel (model: MainModel) =
+    model
+    |> mapc _.TimePointsDrawer withTimePointsDrawer Msg.TimePointsDrawerMsg (
+        updateTimePointsDrawerModel (TimePointsDrawerModel.Msg.RunningTimePointsMsg (
+            RunningTimePointListModel.Msg.TimePointsLoopComplettedQueueMsg
+        ))
+    )
+
+
 /// SetIsWorkSelectorLoaded handler
 let private setIsWorkSelectorLoaded initRunningTimePoints initWorkSelectorModel (v: bool) (model: MainModel) =
     if v then
         let (m, cmd) = initWorkSelectorModel (model.CurrentWork.Id)
-        model |> withWorkSelectorModel m |> withIsTimePointsDrawerShown initRunningTimePoints false
+        model |> withWorkSelectorModel m |> withIsTimePointsDrawerShown false
         , Cmd.map Msg.WorkSelectorModelMsg cmd
     else
         model |> withoutWorkSelectorModel |> withCmdNone
@@ -172,110 +195,10 @@ let private mapPlayerUserSettingsChangedMsg updatePlayerModel updateTimePointsDr
     |> mapmc (mapTimePointsDrawerMsg updateTimePointsDrawerModel (
         TimePointsDrawerModel.Msg.RunningTimePointsMsg RunningTimePointListModel.Msg.PlayerUserSettingsChanged))
 
-let private mapTimePointQueueMsg updateTimePointsDrawerModel (timePointsAndId: TimePoint list * TimePointId option) (model: MainModel) =
-    model
-    |> mapc _.TimePointsDrawer withTimePointsDrawer Msg.TimePointsDrawerMsg (
-        updateTimePointsDrawerModel (TimePointsDrawerModel.Msg.RunningTimePointsMsg (
-            RunningTimePointListModel.Msg.TimePointQueueMsg timePointsAndId)))
 
-    (*
-    
-    let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m
-        let cmd =  Cmd.map Msg.WorkSelectorModelMsg workSelectorCmd
+let private mapCurentWorkModelMsg updateCurrentWorkModel msg (model: MainModel) =
+    model |> mapc _.CurrentWork withCurrentWorkModel Msg.CurrentWorkModelMsg (updateCurrentWorkModel msg)
 
-        match intent with
-        | WorkSelectorModel.Intent.None ->
-            model |> withWorkSelectorModel workSelectorModel |> withCmd cmd
-
-        | WorkSelectorModel.Intent.SelectCurrentWork workModel ->
-            cfg.CurrentWorkItemSettings.CurrentWork <- workModel.Work |> Some
-            
-            let (currWorkModel', currWorkCmd) =
-                match model.Player.LooperState, model.CurrentWork with
-                | LooperState.Playing, Some currWorkModel ->
-                    currWorkModel
-                    |> updateCurrentWorkModel
-                        (CurrentWorkModel.Msg.SetPlayingWork (workModel.Work, model.Player.ActiveTimePoint.Value)) 
-
-                | LooperState.Playing, None ->
-                    initPlayingCurrentWorkModel workModel.Work
-
-                | _, Some currWorkModel ->
-                    currWorkModel
-                    |> updateCurrentWorkModel
-                        (CurrentWorkModel.Msg.SetWork workModel.Work)
-                        
-                | _, None ->
-                    CurrentWorkModel.init workModel.Work
-
-            model
-            |> withWorkSelectorModel workSelectorModel
-            |> withCurrentWorkModel currWorkModel'
-            , Cmd.batch [
-                cmd
-                Cmd.map Msg.CurrentWorkModelMsg currWorkCmd
-            ]
-
-            (*
-            let currentWorkModel = workModel.Work |> CurrentWorkModel.init
-
-            if model.Player.LooperState = LooperState.Playing then
-                let time = cfg.TimeProvider.GetUtcNow()
-                match model.CurrentWork with
-                | Some currWork when currWork.Id <> workModel.Id ->
-                    model
-                    |> withWorkSelectorModel workSelectorModel
-                    |> withCurrentWorkModel currentWorkModel
-                    , Cmd.batch [
-                        cmd
-                        Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time.AddMilliseconds(-1), model.Player.ActiveTimePoint.Value) Msg.OnExn
-                        Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (workModel.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
-                    ]
-                | Some _ ->
-                    model
-                    |> withWorkSelectorModel workSelectorModel
-                    |> withCurrentWorkModel currentWorkModel
-                    , cmd
-                | None ->
-                    model
-                    |> withWorkSelectorModel workSelectorModel
-                    |> withCurrentWorkModel currentWorkModel
-                    , Cmd.batch [
-                        cmd
-                        Cmd.OfTask.attempt workEventStore.StoreStartedWorkEventTask (workModel.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
-                    ]
-            else
-                model
-                |> withWorkSelectorModel workSelectorModel
-                |> withCurrentWorkModel currentWorkModel
-                , cmd
-            *)  
-
-        | WorkSelectorModel.Intent.UnselectCurrentWork ->
-            cfg.CurrentWorkItemSettings.CurrentWork <- None
-
-            if model.Player.LooperState = LooperState.Playing then
-                match model.CurrentWork with
-                | Some currWork ->
-                    let time = cfg.TimeProvider.GetUtcNow()
-                    model
-                    |> withWorkSelectorModel workSelectorModel
-                    |> withoutCurrentWorkModel
-                    , Cmd.batch [
-                        cmd
-                        Cmd.OfTask.attempt workEventStore.StoreStoppedWorkEventTask (currWork.Id, time, model.Player.ActiveTimePoint.Value) Msg.OnExn
-                    ]
-                | None ->
-                    model |> withWorkSelectorModel workSelectorModel |> withoutCurrentWorkModel
-                    , cmd
-            else
-                model |> withWorkSelectorModel workSelectorModel |> withoutCurrentWorkModel
-                , cmd
-
-        | WorkSelectorModel.Intent.Close ->
-            model |> withoutWorkSelectorModel |> withCmdNone
-
-    *)
 
 /// MainModel.Program update function.
 let update
@@ -284,7 +207,7 @@ let update
     (logger: ILogger<MainModel>)
     updatePlayerModel
     updateCurrentWorkModel
-    initRunningTimePoints
+    initTimePointsDrawerModel
     updateTimePointsDrawerModel
     updateAppDialogModel
     initWorkSelectorModel
@@ -299,13 +222,16 @@ let update
     // Time Points
     // --------------------
     | Msg.SetIsTimePointsDrawerShown v ->
-        model |> setIsTimePointsDrawerShown initRunningTimePoints v
+        model |> setIsTimePointsDrawerShown initTimePointsDrawerModel v
 
     | Msg.TimePointsDrawerMsg smsg ->
         model |> mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg
 
-    | Msg.TimePointQueueMsg (timePoints, timePointIdOpt) ->
-        model |> mapTimePointQueueMsg updateTimePointsDrawerModel (timePoints, timePointIdOpt)
+    | Msg.TimePointsChangedQueueMsg (timePoints, timePointIdOpt) ->
+        model |> mapTimePointsChangedQueueMsg updateTimePointsDrawerModel (timePoints, timePointIdOpt)
+
+    | Msg.TimePointsLoopComplettedQueueMsg  ->
+        model |> mapTimePointsLoopComplettedQueueMsg updateTimePointsDrawerModel
 
     | Msg.StartTimePoint tpId ->
         model, Cmd.ofMsg (tpId |> Operation.Start |> PlayerModel.Msg.StartTimePoint |> Msg.PlayerModelMsg)
@@ -329,10 +255,10 @@ let update
     // Work
     // --------------------
     | Msg.CurrentWorkModelMsg currWorkMsg ->
-        model |> mapc _.CurrentWork withCurrentWorkModel Msg.CurrentWorkModelMsg (updateCurrentWorkModel currWorkMsg)
+        model |> mapCurentWorkModelMsg updateCurrentWorkModel currWorkMsg
 
     | Msg.SetIsWorkSelectorLoaded v ->
-        model |> setIsWorkSelectorLoaded initRunningTimePoints initWorkSelectorModel v
+        model |> setIsWorkSelectorLoaded initTimePointsDrawerModel initWorkSelectorModel v
 
     | MsgWith.WorkSelectorModelMsg model (smsg, m) ->
         model |> mapWorkSelectorModelMsg updateWorkSelectorModel smsg m
@@ -367,24 +293,5 @@ let update
         model, Cmd.none
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none
-
-    // TODO: remove
-    // old:
-    // 
-    // | Msg.LoadTimePointsFromSettings ->
-    //    let timePoints = cfg.TimePointStore.Read()
-    //    cfg.TimePointQueue.Reload(timePoints)
-    //    cfg.Looper.PreloadTimePoint()
-    //
-    //    model |> withInitTimePointListModel timePoints |> withCmdNone
-    //
-    // | Msg.LoadCurrentWork ->
-    //    match cfg.CurrentWorkItemSettings.CurrentWork with
-    //    | None -> model, Cmd.none
-    //    | Some work ->
-    //        model, Cmd.OfTask.perform findWorkByIdOrCreateTask work Msg.SetCurrentWorkIfNone
-    //
-    // | Msg.SetCurrentWorkIfNone res ->
-    //    model |> setCurrentWorkIfNone cfg.UserSettings res

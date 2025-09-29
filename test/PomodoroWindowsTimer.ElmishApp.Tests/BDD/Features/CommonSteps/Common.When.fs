@@ -26,12 +26,20 @@ let rec ``Spent`` (seconds: float<sec>) =
 
 
 let ``Looper TimePointStarted event has been despatched with`` (newTimePointId: Guid) (oldTimePointId: Guid option) =
-    Common.``Looper TimePointStarted event has been despatched with`` newTimePointId oldTimePointId
+    Common.``Looper TimePointStarted event has been dispatched with`` newTimePointId oldTimePointId
     |> Scenario.log (
         sprintf "When.``%s new TimePoint Id - %A and %s``."
-            (nameof Common.``Looper TimePointStarted event has been despatched with``)
+            (nameof Common.``Looper TimePointStarted event has been dispatched with``)
             newTimePointId
             (oldTimePointId |> Option.map (sprintf "old TimmePoint Id - %A") |> Option.defaultValue "no old TimePoint")
+        )
+
+let ``Looper TimePointReady event has been despatched with`` (timePointId: Guid) =
+    Common.``Looper TimePointReady event has been dispatched with`` timePointId
+    |> Scenario.log (
+        sprintf "When.``%s new TimePoint Id - %A``."
+            (nameof Common.``Looper TimePointReady event has been dispatched with``)
+            timePointId
         )
 
 let rec ``Play msg has been dispatched with 2.5 ticks timeout`` () =
