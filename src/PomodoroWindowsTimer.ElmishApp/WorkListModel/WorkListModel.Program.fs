@@ -121,6 +121,6 @@ let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logge
         model |> withCmdNone |> withNoIntent
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model |> withCmdNone |> withNoIntent
 

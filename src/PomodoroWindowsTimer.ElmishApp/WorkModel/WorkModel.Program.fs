@@ -70,5 +70,5 @@ let update (workEventStore: WorkEventStore) (logger: ILogger<WorkModel>) (errorM
             model |> withCreatedWork id createdAt |> withCreateNewState (AsyncDeferred.NotRequested) |> withCmdNone |> withNoIntent
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model |> withCmdNone |> withNoIntent

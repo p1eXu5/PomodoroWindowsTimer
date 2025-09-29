@@ -32,6 +32,6 @@ module Program =
                 model |> withWorkEvents deff |> withCmdNone
 
         | _ ->
-            logger.LogUnprocessedMessage(msg, model)
+            logger.LogNonProcessedMessage(msg, model)
             model |> withCmdNone
 

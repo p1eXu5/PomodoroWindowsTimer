@@ -19,7 +19,7 @@ let private mapLooperMsg updateTimePointModel levt (model: RunningTimePointListM
     match levt with
     // preload, stopped
     | LooperEvent.TimePointStopped (atp, _)
-    | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp; OldActiveTimePoint = None }, _) ->
+    | LooperEvent.TimePointReady (atp, _) ->
         model.TimePoints
         |> List.mapFirstCmd
             (fun tp -> tp.Id = atp.Id && not (tp.IsSelected && not tp.IsPlaying))
@@ -46,7 +46,6 @@ let private mapLooperMsg updateTimePointModel levt (model: RunningTimePointListM
                 , Intent.None
 
     // started
-    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp }, _)
     | LooperEvent.TimePointStarted ({ NewActiveTimePoint = atp; }, _) ->
         model.TimePoints
         |> List.mapFirstCmd
@@ -58,7 +57,7 @@ let private mapLooperMsg updateTimePointModel levt (model: RunningTimePointListM
                 tpList
                 |> List.mapFirstCmd
                     (fun tp -> tp.Id = oldTpId && tp.IsSelected)
-                    (updateTimePointModel (TimePointModel.Msg.SetIsSelected false))
+                    (updateTimePointModel (TimePointModel.Msg.SetIsNotSelectedIsPlayed))
                 |> fun (tpList', tpCmd') ->
                     { model with TimePoints = tpList' }
                     |> withActiveTimePointId (atp.OriginalId |> Some)
@@ -73,6 +72,25 @@ let private mapLooperMsg updateTimePointModel levt (model: RunningTimePointListM
                 , Cmd.map (fun m -> Msg.TimePointModelMsg (atp.Id, m)) tpCmd
                 , Intent.None
 
+    | LooperEvent.TimePointTimeReduced ({ ActiveTimePoint = atp; IsPlaying = isPlaying }, _) when model.ActiveTimePointId.IsNone ->
+        if isPlaying then
+            model.TimePoints
+            |> List.mapFirstCmd
+                (fun tp -> tp.Id = atp.Id && not (tp.IsSelected && tp.IsPlaying))
+                (updateTimePointModel (TimePointModel.Msg.SetIsSelectedIsPlaying))
+        else
+            model.TimePoints
+            |> List.mapFirstCmd
+                (fun tp -> tp.Id = atp.Id && not (tp.IsSelected && not tp.IsPlaying))
+                (updateTimePointModel (TimePointModel.Msg.SetIsSelectedIsStopped))
+        |> fun (tpList, tpCmd) ->
+            { model with TimePoints = tpList }
+            |> withActiveTimePointId (atp.OriginalId |> Some)
+            , Cmd.map (fun m -> Msg.TimePointModelMsg (atp.Id, m)) tpCmd
+            , Intent.None
+
+    | LooperEvent.TimePointTimeReduced _ ->
+        model, Cmd.none, Intent.None
 
 /// Msg.TimePointModelMsg handler.
 let private mapTimePointModelMsg updateTimePointModel tpId tpMsg (model: RunningTimePointListModel) =
@@ -138,6 +156,6 @@ let update
         model, Cmd.none, Intent.None
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none, Intent.None
 

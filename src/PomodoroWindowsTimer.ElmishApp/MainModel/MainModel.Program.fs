@@ -293,5 +293,5 @@ let update
         model, Cmd.none
 
     | _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none

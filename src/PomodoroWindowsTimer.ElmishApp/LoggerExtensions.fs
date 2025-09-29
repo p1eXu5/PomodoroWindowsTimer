@@ -11,14 +11,14 @@ let private mssageScope = LoggerMessage.DefineScope<string>(
 /// Define LoggerMessage for 'Msg and 'Model string representations.
 let private unprocessedTraceMessage = LoggerMessage.Define<string, string>(
     LogLevel.Trace,
-    new EventId(0b0_1111_0001, "Unprocessabele Elmish Message"),
-    "Unprocessabele message: {Msg}. Model: {Model}."
+    new EventId(0b0_1111_0001, "Non-processed Elmish Message"),
+    "Non-processed message: {Msg}. Model: {Model}."
 )
 
 let private unprocessedDebugMessage = LoggerMessage.Define<string>(
     LogLevel.Debug,
-    new EventId(0b0_1111_0001, "Unprocessabele Elmish Message"),
-    "Unprocessabele message: {Msg}."
+    new EventId(0b0_1111_0001, "Non-processed Elmish Message"),
+    "Non-processed message: {Msg}."
 )
 
 let private modelProgramError = LoggerMessage.Define<string>(
@@ -39,7 +39,7 @@ type LoggerExtensions () =
         mssageScope.Invoke(logger, typedefof<'Msg>.Name)
 
     [<Extension>]
-    static member LogUnprocessedMessage<'Msg,'Model when 'Msg: not null and 'Model: not null>(logger: ILogger, msg: 'Msg, model: 'Model) =
+    static member LogNonProcessedMessage<'Msg,'Model when 'Msg: not null and 'Model: not null>(logger: ILogger, msg: 'Msg, model: 'Model) =
         if logger.IsEnabled(LogLevel.Trace) then
             unprocessedTraceMessage.Invoke(
                 logger,

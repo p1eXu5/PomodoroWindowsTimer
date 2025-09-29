@@ -131,14 +131,14 @@ let update
         model |> setWork looper workEventStore timeProvider w
 
     | Msg.SetWork _ ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none
 
     | Msg.UnsetWork when model.Work.IsSome ->
         model |> unsetWork looper workEventStore timeProvider
 
     | Msg.UnsetWork ->
-        logger.LogUnprocessedMessage(msg, model)
+        logger.LogNonProcessedMessage(msg, model)
         model, Cmd.none
 
     | Msg.LooperMsg levt when model.Work.IsSome ->
