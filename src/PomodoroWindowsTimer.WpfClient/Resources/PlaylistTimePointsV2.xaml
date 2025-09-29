@@ -65,7 +65,8 @@
 
     <!--  unselected time point  -->
     <ControlTemplate x:Key="ct_UnselectedPlayedTimePointNewV2">
-        <shared:TimePointV2 NameForeground="#666666"
+        <shared:TimePointV2 ButtonForeground="#445862"
+                            NameForeground="#445862"
                             Style="{StaticResource st_UnselectedTimePointV2}"
                             >
             <shared:TimePointV2.ButtonIcon>
