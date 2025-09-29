@@ -2,7 +2,7 @@
 
 namespace PomodoroWindowsTimer.WpfClient.UserControls.Works;
 
-internal sealed class SearchTextChangedEventArgs : RoutedEventArgs
+public sealed class SearchTextChangedEventArgs : RoutedEventArgs
 {
     public SearchTextChangedEventArgs(RoutedEvent routedEvent, string searchText)
         : base(routedEvent)
@@ -13,4 +13,4 @@ internal sealed class SearchTextChangedEventArgs : RoutedEventArgs
     public string SearchText { get; }
 }
 
-internal delegate void SearchTextChangedEventHandler(object sender, SearchTextChangedEventArgs e);
+public delegate void SearchTextChangedEventHandler(object sender, SearchTextChangedEventArgs e);

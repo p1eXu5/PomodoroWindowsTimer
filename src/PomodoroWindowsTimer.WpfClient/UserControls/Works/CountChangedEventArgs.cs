@@ -2,7 +2,7 @@
 
 namespace PomodoroWindowsTimer.WpfClient.UserControls.Works;
 
-internal sealed class CountChangedEventArgs : RoutedEventArgs
+public sealed class CountChangedEventArgs : RoutedEventArgs
 {
     public CountChangedEventArgs(RoutedEvent routedEvent, string countText)
         : base(routedEvent)
@@ -18,4 +18,4 @@ internal sealed class CountChangedEventArgs : RoutedEventArgs
     public int? Count { get; }
 }
 
-internal delegate void CountChangedEventHandler(object sender, CountChangedEventArgs e);
+public delegate void CountChangedEventHandler(object sender, CountChangedEventArgs e);
