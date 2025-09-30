@@ -19,6 +19,7 @@ type private State =
         StartTime: DateTime
         Subscribers: (LooperEvent -> unit) list
         IsStopped: bool
+        PlayedTimePoints: Set<TimePointId>
     }
     static member Init(startDateTime) =
         {
@@ -26,6 +27,7 @@ type private State =
             StartTime = startDateTime
             Subscribers = []
             IsStopped = true
+            PlayedTimePoints = Set.empty
         }
 
 type private Msg =
@@ -40,6 +42,9 @@ type private Msg =
     | Shift of float<sec>
     | ShiftAck of float<sec> * AsyncReplyChannel<unit>
     | GetActiveTimePoint of AsyncReplyChannel<ActiveTimePoint option>
+    | GetActiveTimePointAndPlayingState of AsyncReplyChannel<ActiveTimePointAndPlayingState option>
+    | GetActiveAndPlayedTimePoints of AsyncReplyChannel<ActiveAndPlayedTimePoints option>
+    | ClearPlayedTimePoints
 
 
 /// 1. Start looper
@@ -101,30 +106,36 @@ type Looper(
 
 
     let initialize (switchinMode: TimePointSwitchingMode) (state: State) =
-        let nextTpOpt = state |> tryNextTimePoint
+        match state |> tryNextTimePoint with
+        | Some nextTp ->
+            let (newAtp, oldAtpOpt) =
+                state.ActiveTimePoint
+                |> Option.filter (fun atp -> atp.OriginalId = nextTp.Id)
+                |> Option.map (fun atp -> (atp, None))
+                |> Option.defaultValue (nextTp |> TimePoint.toActiveTimePoint, state.ActiveTimePoint)
 
-        let dt = now ()
-
-        let newAtpOpt =
-            nextTpOpt
-            |> Option.map (fun nextTp ->
-                let (newAtp, oldAtp) =
-                    state.ActiveTimePoint
-                    |> Option.filter (fun atp -> atp.OriginalId = nextTp.Id)
-                    |> Option.map (fun atp -> (atp, None))
-                    |> Option.defaultValue (nextTp |> TimePoint.toActiveTimePoint, state.ActiveTimePoint)
-
-                tryPostEvent state (
-                    LooperEvent.TimePointStarted (
-                        TimePointStartedEventArgs.init newAtp oldAtp switchinMode, timeProvider.GetUtcNow()
-                    )
+            tryPostEvent state (
+                LooperEvent.TimePointStarted (
+                    TimePointStartedEventArgs.init newAtp oldAtpOpt switchinMode, timeProvider.GetUtcNow()
                 )
-
-                newAtp
             )
 
-        timer.Change(int tickMilliseconds, 0) |> ignore
-        { state with ActiveTimePoint = newAtpOpt; StartTime = dt; IsStopped = false }
+            timer.Change(int tickMilliseconds, 0) |> ignore
+
+            { state with
+                ActiveTimePoint = newAtp |> Some
+                StartTime = now ()
+                IsStopped = false
+                PlayedTimePoints =
+                    oldAtpOpt
+                    |> function
+                        | Some oldAtp -> state.PlayedTimePoints |> Set.add oldAtp.Id
+                        | None -> state.PlayedTimePoints
+            }
+
+        | None ->
+            timer.Change(int tickMilliseconds, 0) |> ignore
+            { state with ActiveTimePoint = None; StartTime = now (); IsStopped = false }
 
 
     let withActiveTimePointTimeSpan (seconds: float<sec>) (state: State) =
@@ -270,7 +281,7 @@ type Looper(
                                 )
                                 timer.Change(int tickMilliseconds, 0) |> ignore
 
-                                return! endScopeLoop scope { state with ActiveTimePoint = newAtp |> Some; StartTime = dt }
+                                return! endScopeLoop scope { state with ActiveTimePoint = newAtp |> Some; StartTime = dt; PlayedTimePoints = state.PlayedTimePoints |> Set.add atp.Id }
                         else
                             tryPostEvent (
                                 LooperEvent.TimePointTimeReduced (
@@ -336,6 +347,32 @@ type Looper(
                         let scope = beginScope (nameof GetActiveTimePoint)
                         reply.Reply(state.ActiveTimePoint)
                         return! endScopeLoop scope state
+
+                    | GetActiveTimePointAndPlayingState reply ->
+                        let scope = beginScope (nameof GetActiveTimePointAndPlayingState)
+
+                        let (replyModel: ActiveTimePointAndPlayingState option) =
+                            state.ActiveTimePoint
+                            |> Option.map (fun atp -> { ActiveTimePoint = atp; IsPlaying = not state.IsStopped })
+
+                        reply.Reply(replyModel)
+                        
+                        return! endScopeLoop scope state
+
+                    | GetActiveAndPlayedTimePoints reply ->
+                        let scope = beginScope (nameof GetActiveAndPlayedTimePoints)
+                        let replyModel =
+                            state.ActiveTimePoint
+                            |> Option.map (fun atp ->
+                                { ActiveTimePoint = atp; PlayedTimePoints = state.PlayedTimePoints; IsPlaying = not state.IsStopped }
+                            )
+                        reply.Reply(replyModel)
+                        return! endScopeLoop scope state
+
+                    | ClearPlayedTimePoints ->
+                        let scope = beginScope (nameof ClearPlayedTimePoints)
+                        let newState = { state with PlayedTimePoints = Set.empty }
+                        return! endScopeLoop scope state
                 }
 
             loop (State.Init(timeProvider.GetLocalNow().DateTime))
@@ -344,11 +381,23 @@ type Looper(
     )
 
     let timePointQueueSubscriber =
-        timePointQueue.TimePointsChanged.Subscribe(fun (timePoints, firstTimePointId) ->
-            agent.Post(
-                Msg.InnerPreloadTimePoint (timePoints, firstTimePointId)
+        let d1 =
+            timePointQueue.TimePointsChanged.Subscribe(fun (timePoints, firstTimePointId) ->
+                agent.Post(
+                    Msg.InnerPreloadTimePoint (timePoints, firstTimePointId)
+                )
             )
-        )
+        let d2 =
+            timePointQueue.TimePointsLoopCompletted.Subscribe(fun () ->
+                agent.Post(
+                    Msg.ClearPlayedTimePoints
+                )
+            )
+        { new IDisposable with
+            member _.Dispose() =
+                d1.Dispose()
+                d2.Dispose()
+        }
 
     member val private Subscribers = [] with get, set
 
@@ -429,6 +478,14 @@ type Looper(
         this.ThrowIfNotRunOrDisposed()
         agent.PostAndReply(Msg.GetActiveTimePoint)
 
+    member _.GetActiveTimePointAndPlayingState() =
+        this.ThrowIfNotRunOrDisposed()
+        agent.PostAndReply(Msg.GetActiveTimePointAndPlayingState)
+
+    member _.GetActiveAndPlayedTimePoints() =
+        this.ThrowIfNotRunOrDisposed()
+        agent.PostAndReply(Msg.GetActiveAndPlayedTimePoints)
+
     member private _.Dispose(isDisposing: bool) =
         if _isDisposed then ()
         else
@@ -466,6 +523,8 @@ type Looper(
         member this.AddSubscriber(subscriber: (LooperEvent -> unit)) = this.AddSubscriber(subscriber)
         member this.PreloadTimePoint() = this.PreloadTimePoint()
         member this.GetActiveTimePoint() = this.GetActiveTimePoint()
+        member this.GetActiveTimePointAndPlayingState() = this.GetActiveTimePointAndPlayingState()
+        member this.GetActiveAndPlayedTimePoints() = this.GetActiveAndPlayedTimePoints()
 
     interface IDisposable with
         member this.Dispose() = this.Dispose(true)
