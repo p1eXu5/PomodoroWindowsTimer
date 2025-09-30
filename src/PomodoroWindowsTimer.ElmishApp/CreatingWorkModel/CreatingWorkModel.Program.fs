@@ -21,8 +21,8 @@ let update (workEventStore: WorkEventStore) (errorMessageQueue: IErrorMessageQue
         }
 
     match msg with
-    | Msg.SetNumber n -> model |> withNumber n |> withCmdNone |> withNoIntent
-    | Msg.SetTitle t -> model |> withTitle t |> withCmdNone |> withNoIntent
+    | Msg.SetNumber n -> model |> withNumber n, Cmd.none, Intent.None
+    | Msg.SetTitle t -> model |> withTitle t, Cmd.none, Intent.None
 
     | MsgWith.``Start of CreateWork`` model (deff, cts) ->
         model |> withCreatingState deff
@@ -33,13 +33,13 @@ let update (workEventStore: WorkEventStore) (errorMessageQueue: IErrorMessageQue
         match res with
         | Error err ->
             do errorMessageQueue.EnqueueError err
-            model |> withCreatingState AsyncDeferred.NotRequested |> withCmdNone |> withNoIntent
+            model |> withCreatingState AsyncDeferred.NotRequested, Cmd.none, Intent.None
         | Ok (deff, id) ->
-            model |> withCreatingState deff |> withCmdNone |> withSwitchToWorkListIntent id
+            model |> withCreatingState deff, Cmd.none, Intent.SwitchToWorkList id
 
     | Msg.Cancel ->
-        model |> withCmdNone |> withCancelIntent
+        model, Cmd.none, (if model.CanBeCancelling then Intent.Cancel else Intent.Close)
 
     | _ ->
         logger.LogNonProcessedMessage(msg, model)
-        model |> withCmdNone |> withNoIntent
+        model, Cmd.none, Intent.Cancel

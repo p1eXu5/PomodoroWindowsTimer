@@ -14,6 +14,7 @@ type IBindings =
         abstract EditTitle: string with get, set
         abstract CreateCommand: ICommand
         abstract CancelCommand: ICommand
+        abstract CanBeCancelling: bool
     end
 
 module Bindings =
@@ -31,5 +32,6 @@ module Bindings =
                     | _ -> None
                 )
             nameof __.CancelCommand |> Binding.cmd Msg.Cancel
+            nameof __.CanBeCancelling |> Binding.oneWay _.CanBeCancelling
         ]
 

@@ -11,6 +11,7 @@ open PomodoroWindowsTimer.ElmishApp.Logging
 open PomodoroWindowsTimer.ElmishApp.Models
 open PomodoroWindowsTimer.ElmishApp.Models.WorkListModel
 open PomodoroWindowsTimer.ElmishApp
+open System.Diagnostics
 
 let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logger: ILogger<WorkListModel>) (errorMessageQueue: IErrorMessageQueue) updateWorkModel msg model =
     let loadWorksTask ct =
@@ -51,7 +52,7 @@ let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logge
                     Cmd.ofMsg (Msg.SetSelectedWorkId None)
                     Cmd.ofMsg (Msg.SetLastDayCount "")
                 ]
-                , Intent.SwitchToCreateWork
+                , Intent.SwitchToCreateWork false
             | _ ->
                 match model.SelectedWorkId with
                 | Some selId ->
@@ -100,7 +101,7 @@ let update (userSettings: IUserSettings) (workEventStore: WorkEventStore) (logge
         | _ -> model |> withCmdNone |> withNoIntent
 
     | Msg.CreateWork ->
-        model |> withCmdNone |> withSwitchToCreateWorkIntent
+        model, Cmd.none, Intent.SwitchToCreateWork true
 
     | Msg.UnselectWork ->
         model |> withSelectedWorkId None |> withCmdNone |> withSelectIntent

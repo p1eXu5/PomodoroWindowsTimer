@@ -152,15 +152,17 @@ let private workSelectorIntentCmd intent =
 let private mapWorkSelectorModelMsg updateWorkSelectorModel smsg m (model: MainModel) =
     let (workSelectorModel, workSelectorCmd, intent) = updateWorkSelectorModel smsg m
 
-    let cmd =  Cmd.map Msg.WorkSelectorModelMsg workSelectorCmd
-    let intentCmd = workSelectorIntentCmd intent
-
     intent
     |> function
-        | WorkSelectorModel.Intent.Close -> model |> withoutWorkSelectorModel
-        | _ -> model
-    |> withWorkSelectorModel workSelectorModel
-    , Cmd.batch [ cmd; intentCmd ]
+        | WorkSelectorModel.Intent.Close ->
+            model |> withoutWorkSelectorModel, Cmd.none
+        | _ ->
+            let cmd =  Cmd.map Msg.WorkSelectorModelMsg workSelectorCmd
+            let intentCmd = workSelectorIntentCmd intent
+
+            model
+            |> withWorkSelectorModel workSelectorModel
+            , Cmd.batch [ cmd; intentCmd ]
 
 
 /// Msg.SetIsWorkStatisticShown handler.
