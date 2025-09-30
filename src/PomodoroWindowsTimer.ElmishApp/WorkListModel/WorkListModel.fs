@@ -45,7 +45,7 @@ module WorkListModel =
     [<RequireQualifiedAccess; Struct>]
     type Intent =
         | None
-        | SwitchToCreateWork
+        | SwitchToCreateWork of canBeCancelling: bool
         | Select
         | Unselect
         | Edit of workModel: WorkModel * selectedWorkId: uint64 option

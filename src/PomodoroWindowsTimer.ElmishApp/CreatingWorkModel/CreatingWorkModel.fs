@@ -7,6 +7,7 @@ type CreatingWorkModel =
         Number: string
         Title: string
         CreatingState: AsyncDeferred<uint64>
+        CanBeCancelling: bool
     }
 
 module CreatingWorkModel =
@@ -22,6 +23,7 @@ module CreatingWorkModel =
         | None
         | SwitchToWorkList of id: uint64
         | Cancel
+        | Close
 
     module MsgWith =
 
@@ -50,11 +52,12 @@ module CreatingWorkModel =
             (model, cmd, Intent.Cancel)
 
 
-    let init () =
+    let init (canBeCancalling: bool) =
         {
             Number = "PERSONAL"
             Title = "New Work"
             CreatingState = AsyncDeferred.NotRequested
+            CanBeCancelling = canBeCancalling
         }
 
     let withCreatingState deff (model: CreatingWorkModel) =

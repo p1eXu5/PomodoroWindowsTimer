@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PomodoroWindowsTimer.WpfClient.UserControls.Works;
 /// <summary>
@@ -25,7 +14,6 @@ public partial class EditableWork : UserControl
     }
 
 
-
     public ICommand OkCommand
     {
         get { return (ICommand)GetValue(OkCommandProperty); }
@@ -35,7 +23,6 @@ public partial class EditableWork : UserControl
     // Using a DependencyProperty as the backing store for OkCommand.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty OkCommandProperty =
         DependencyProperty.Register("OkCommand", typeof(ICommand), typeof(EditableWork), new PropertyMetadata(null));
-
 
 
     public string OkCommandContent
@@ -49,7 +36,6 @@ public partial class EditableWork : UserControl
         DependencyProperty.Register("OkCommandContent", typeof(string), typeof(EditableWork), new PropertyMetadata("OK"));
 
 
-
     public ICommand CancelCommand
     {
         get { return (ICommand)GetValue(CancelCommandProperty); }
@@ -61,8 +47,6 @@ public partial class EditableWork : UserControl
         DependencyProperty.Register("CancelCommand", typeof(ICommand), typeof(EditableWork), new PropertyMetadata(null));
 
 
-
-
     public string Title
     {
         get { return (string)GetValue(TitleProperty); }
@@ -72,6 +56,4 @@ public partial class EditableWork : UserControl
     // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register("Title", typeof(string), typeof(EditableWork), new PropertyMetadata("WORK"));
-
-
 }

@@ -32,7 +32,7 @@
         <!--  CreatingWorkModel  -->
         <local:EditableWork xmlns:CreatingWorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.CreatingWorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             Title="CREATE WORK"
-                            d:DataContext="{d:DesignInstance Type=CreatingWorkModel:Bindings,
+                            d:DataContext="{d:DesignInstance Type=CreatingWorkModel:IBindings,
                                                              IsDesignTimeCreatable=False}"
                             CancelCommand="{Binding CancelCommand}"
                             DataContext="{Binding CreatingWorkModel}"
@@ -48,7 +48,7 @@
         <!--  WorkModel  -->
         <local:EditableWork xmlns:WorkModel="clr-namespace:PomodoroWindowsTimer.ElmishApp.WorkModel;assembly=PomodoroWindowsTimer.ElmishApp"
                             Title="EDIT WORK"
-                            d:DataContext="{d:DesignInstance Type=WorkModel:Bindings,
+                            d:DataContext="{d:DesignInstance Type=WorkModel:IBindings,
                                                              IsDesignTimeCreatable=False}"
                             CancelCommand="{Binding CancelEditCommand}"
                             DataContext="{Binding UpdatingWorkModel}"
