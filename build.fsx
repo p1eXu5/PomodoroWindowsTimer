@@ -88,6 +88,8 @@ let gitName = getVarOrDefaultFromVault "REPOSITORY_NAME_GITHUB" "PomodoroWindows
 let githubToken = releaseSecret "<githubtoken>" "GITHUB_TOKEN"
 // let githubNugetToken = releaseSecret "<githubtoken>" "GITHUB_NUGET_TOKEN"
 
+
+
 do Environment.setEnvironVar "COREHOST_TRACE" "0"
 
 // https://fake.build/guide/buildserver.html
@@ -101,10 +103,11 @@ BuildServer.install [
 // ------------------
 //    Privates
 // ------------------
-/// publishRootDir/versionString/runtime
+/// ./release/publish/versionString/runtime
 let private publishDir versionString =
     publishRootDir </> versionString </> runtime
 
+/// ./release/upload/versionString
 let private uploadDir versionString =
     uploadRootDir </> versionString
 
@@ -162,7 +165,7 @@ Target.create "Clean" (fun _ ->
     let publishDir = versionString |> publishDir
     let uploadDir = versionString |> uploadDir
 
-    !! "src/**/bin" ++ "src/**/obj" ++ publishDir ++ uploadDir
+    !! "src/**/bin/Release" ++ "src/**/obj/Release" ++ publishDir ++ uploadDir
     |> Shell.cleanDirs
 )
 
@@ -295,9 +298,9 @@ else
 "Publish" ==> "Compress"
 "Compress" =?> ("GitHubRelease", isGitHubActions)
 
-"Build" ==> "Build_Debug"
+//"Build" ==> "Build_Debug"
 
-"Build_Debug" ==> "Local"
+//"Build_Debug" ==> "Local"
 "Compress" ==> "Local"
 
 Target.runOrDefaultWithArguments "Publish"
