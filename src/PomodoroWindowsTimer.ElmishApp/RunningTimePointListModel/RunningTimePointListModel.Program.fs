@@ -103,6 +103,7 @@ let private mapTimePointModelMsg updateTimePointModel tpId tpMsg (model: Running
 
 let update
     (playerUserSettings: IPlayerUserSettings)
+    (looper: ILooper) // TODO: for changing TimePointsChangedQueueMsg logic
     (errorMessageQueue: IErrorMessageQueue)
     (logger: ILogger<RunningTimePointListModel>)
     updateTimePointModel

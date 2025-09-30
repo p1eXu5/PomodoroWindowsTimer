@@ -216,11 +216,12 @@ let compose
         // -------------------------
         let initRunningTimePointListModel =
             fun () ->
-                RunningTimePointListModel.init timePointQueue userSettings
+                RunningTimePointListModel.init timePointQueue looper userSettings
 
         let updateRunningTimePointListModel =
             RunningTimePointListModel.Program.update
                 userSettings
+                looper
                 mainErrorMessageQueue
                 (loggerFactory.CreateLogger<RunningTimePointListModel>())
                 updateTimePointModel

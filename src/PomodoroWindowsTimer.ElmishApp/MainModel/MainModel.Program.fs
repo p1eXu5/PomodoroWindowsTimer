@@ -18,25 +18,6 @@ open PomodoroWindowsTimer.ElmishApp.Models.MainModel
 open PomodoroWindowsTimer.Abstractions
 
 /// <summary>
-/// Msg.SetIsTimePointsShown handler.
-/// </summary>
-let private setIsTimePointsDrawerShown initDrawerModel (v: bool) (model: MainModel) =
-    if v
-    then
-        model |> withTimePointsDrawerModel (model.TimePointsDrawer |> initDrawerModel)
-    else model
-    |> withIsTimePointsDrawerShown v
-    , Cmd.none
-
-/// <summary>
-/// Msg.TimePointsDrawerMsg handler.
-/// </summary>
-let private mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg (model: MainModel) =
-    let (drawerModel', drawerCmd) = model.TimePointsDrawer |> updateTimePointsDrawerModel smsg
-    model |> withTimePointsDrawer drawerModel'
-    , Cmd.map Msg.TimePointsDrawerMsg drawerCmd
-
-/// <summary>
 /// Msg.TimePointsChangedQueueMsg handler.
 /// </summary>
 let private mapTimePointsChangedQueueMsg updateTimePointsDrawerModel (timePointsAndId: TimePoint list * TimePointId option) (model: MainModel) =
@@ -68,7 +49,34 @@ let private setIsWorkSelectorLoaded initWorkSelectorModel (v: bool) (model: Main
         |> withIsTimePointsDrawerShown false
         , Cmd.map Msg.WorkSelectorModelMsg cmd
     else
-        model |> withoutWorkSelectorModel |> withCmdNone
+        model |> withoutWorkSelectorModel
+        , Cmd.none
+
+/// <summary>
+/// Msg.SetIsTimePointsShown handler.
+/// </summary>
+let private setIsTimePointsDrawerShown initTimePointsDrawerModel (v: bool) (model: MainModel) =
+    (
+        if v then
+            match model.TimePointsDrawer with
+            | TimePointsDrawerModel.None _ ->
+                model
+                |> withTimePointsDrawerModel (model.TimePointsDrawer |> initTimePointsDrawerModel)
+            | _ -> model
+            |> withoutWorkSelectorModel
+        else
+            model
+    )
+    |> withIsTimePointsDrawerShown v
+    , Cmd.none
+
+/// <summary>
+/// Msg.TimePointsDrawerMsg handler.
+/// </summary>
+let private mapTimePointsDrawerMsg updateTimePointsDrawerModel smsg (model: MainModel) =
+    let (drawerModel', drawerCmd) = model.TimePointsDrawer |> updateTimePointsDrawerModel smsg
+    model |> withTimePointsDrawer drawerModel'
+    , Cmd.map Msg.TimePointsDrawerMsg drawerCmd
 
 /// <summary>
 /// Maps PlayerModel.Intent to MainModel.Msg.

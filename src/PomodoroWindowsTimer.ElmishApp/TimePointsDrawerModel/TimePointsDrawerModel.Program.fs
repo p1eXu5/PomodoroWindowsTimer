@@ -40,10 +40,10 @@ let private timePointsGeneratorIntentCmd runningTimePointListIntent =
         Cmd.ofMsg Msg.InitRunningTimePoints
 
 /// Msg.TimePointGeneratorMsg handler
-let private mapTimePointsGeneratorMsg updateGenModel smsg (genModel, tpStates) =
+let private mapTimePointsGeneratorMsg updateGenModel smsg genModel =
     genModel |> updateGenModel smsg
     |> fun (genModel', cmd, intent) ->
-        (genModel', tpStates) |> TimePointsDrawerModel.TimePointsGenerator
+        genModel' |> TimePointsDrawerModel.TimePointsGenerator
         , Cmd.batch [
             Cmd.map Msg.TimePointsGeneratorMsg cmd
             intent |> timePointsGeneratorIntentCmd
@@ -64,8 +64,8 @@ let update
     | MsgWith.LooperMsg model (lmsg, rtpListModel) ->
         rtpListModel |> mapRunningTimePointsMsg updateRtpListModel (RunningTimePointListModel.Msg.LooperMsg lmsg)
 
-    | MsgWith.TimePointGeneratorMsg model (smsg, genModel, tpStates) ->
-        (genModel, tpStates) |> mapTimePointsGeneratorMsg updateGenModel smsg
+    | MsgWith.TimePointGeneratorMsg model (smsg, genModel) ->
+        genModel |> mapTimePointsGeneratorMsg updateGenModel smsg
 
     | Msg.LooperMsg _ ->
         // skip logging of unhandled looper evt
