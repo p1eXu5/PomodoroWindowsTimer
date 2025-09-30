@@ -38,6 +38,8 @@ type ILooper =
         abstract PreloadTimePoint : unit -> unit
 
         abstract GetActiveTimePoint : unit -> ActiveTimePoint option
+        abstract GetActiveTimePointAndPlayingState : unit -> ActiveTimePointAndPlayingState option
+        abstract GetActiveAndPlayedTimePoints : unit -> ActiveAndPlayedTimePoints option
     end
 
 

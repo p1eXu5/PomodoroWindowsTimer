@@ -1,4 +1,6 @@
 ﻿# Release Notes
+## New in v3.3.5 (Released 2025/09/30)
+* Fix played time points switching
 ## New in v3.3.4 (Released 2025/09/30)
 * Close works drawer on Cancel button when there are no works
 ## New in v3.3.3 (Released 2025/09/23)

@@ -118,7 +118,7 @@ module MainModel =
             // TimePointList = TimePointListModel.init timePoints
             IsTimePointsDrawerShown = false
 
-            TimePointsDrawer = TimePointsDrawerModel.None []
+            TimePointsDrawer = TimePointsDrawerModel.None
 
             Player = PlayerModel.init userSettings
 

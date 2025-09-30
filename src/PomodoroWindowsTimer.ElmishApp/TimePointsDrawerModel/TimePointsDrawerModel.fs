@@ -5,15 +5,23 @@ open PomodoroWindowsTimer.Types
 
 [<RequireQualifiedAccess>]
 type TimePointsDrawerModel =
-    | None of RunningTimePointState list
+    | None
     | RunningTimePoints of RunningTimePointListModel
-    | TimePointsGenerator of TimePointsGeneratorModel * RunningTimePointState list
+    | TimePointsGenerator of TimePointsGeneratorModel
 and
     [<Struct>]
     RunningTimePointState =
         {
             Id: TimePointId
             IsPlayed: bool
+        }
+
+module RunningTimePointState =
+
+    let ofTimePointModel (tpModel: TimePointModel) =
+        {
+            Id = tpModel.Id
+            IsPlayed = tpModel.IsPlayed
         }
 
 
@@ -47,57 +55,46 @@ module TimePointsDrawerModel =
 
         let (|TimePointGeneratorMsg|_|) model msg =
             match msg, model with
-            | Msg.TimePointsGeneratorMsg subMsg, TimePointsDrawerModel.TimePointsGenerator (subModel, tpStates) ->
-                (subMsg, subModel, tpStates) |> Some
+            | Msg.TimePointsGeneratorMsg subMsg, TimePointsDrawerModel.TimePointsGenerator subModel ->
+                (subMsg, subModel) |> Some
             | _ -> None
 
     // ---------------------------------------------------
 
     open Elmish
 
-    /// Inits TimePointsDrawerModel.RunningTimePoints
+    /// <summary>
+    /// Initializes TimePointsDrawerModel.RunningTimePoints
+    /// </summary>
     let initWithRunningTimePoints initRunningTimePointListModel (model: TimePointsDrawerModel) =
         match model with
-        | TimePointsDrawerModel.None tpStates
-        | TimePointsDrawerModel.TimePointsGenerator (_, tpStates) ->
-            let tppListModel = initRunningTimePointListModel ()
-            let rec restoredTimePoints (tps: TimePointModel list) states res =
-                match tps, states with
-                | [], [] -> res |> List.rev |> Some
-                | tp::tpTail, state::stateTail when tp.Id = state.Id ->
-                    restoredTimePoints tpTail stateTail ({ tp with IsPlayed = state.IsPlayed } :: res)
-                | _ -> None
-
-            match restoredTimePoints tppListModel.TimePoints tpStates [] with
-            | Some l -> { tppListModel with TimePoints = l }
-            | None -> tppListModel
+        | TimePointsDrawerModel.None
+        | TimePointsDrawerModel.TimePointsGenerator _ ->
+            initRunningTimePointListModel ()
             |> TimePointsDrawerModel.RunningTimePoints
         | TimePointsDrawerModel.RunningTimePoints _ -> model
 
-    /// Inits TimePointsDrawerModel.TimePointsGenerator
+    /// <summary>
+    /// Initializes TimePointsDrawerModel.TimePointsGenerator
+    /// </summary>
     let initWithTimePointsGenerator initTimePointsGenerator (model: TimePointsDrawerModel) =
         match model with
-        | TimePointsDrawerModel.None _ ->
+        | TimePointsDrawerModel.None
+        | TimePointsDrawerModel.RunningTimePoints _ ->
             let (subModel, cmd) = initTimePointsGenerator()
-            (subModel, []) |> TimePointsDrawerModel.TimePointsGenerator
-            , Cmd.map Msg.TimePointsGeneratorMsg cmd
-
-        | TimePointsDrawerModel.RunningTimePoints rtpListModel ->
-            let states = rtpListModel.TimePoints |> List.map (fun tp -> { Id = tp.Id; IsPlayed = tp.IsPlayed })
-            let (subModel, cmd) = initTimePointsGenerator()
-            (subModel, states) |> TimePointsDrawerModel.TimePointsGenerator
+            subModel |> TimePointsDrawerModel.TimePointsGenerator
             , Cmd.map Msg.TimePointsGeneratorMsg cmd
 
         | _ -> model, Cmd.none
 
-    /// Inits TimePointsDrawerModel.None
+    /// <summary>
+    /// Initializes TimePointsDrawerModel.None
+    /// </summary>
     let initWithNone (model: TimePointsDrawerModel) =
         match model with
-        | TimePointsDrawerModel.None _ -> model
-        | TimePointsDrawerModel.TimePointsGenerator (_, states) -> states |> TimePointsDrawerModel.None
-        | TimePointsDrawerModel.RunningTimePoints rtpListModel ->
-            let states = rtpListModel.TimePoints |> List.map (fun tp -> { Id = tp.Id; IsPlayed = tp.IsPlayed })
-            states |> TimePointsDrawerModel.None
+        | TimePointsDrawerModel.None -> model
+        | TimePointsDrawerModel.RunningTimePoints _
+        | TimePointsDrawerModel.TimePointsGenerator _ -> TimePointsDrawerModel.None
 
     let runningTimePoints (model: TimePointsDrawerModel) =
         match model with
@@ -106,7 +103,7 @@ module TimePointsDrawerModel =
 
     let timePointsGenerator (model: TimePointsDrawerModel) =
         match model with
-        | TimePointsDrawerModel.TimePointsGenerator (subModel, _) -> subModel |> Some
+        | TimePointsDrawerModel.TimePointsGenerator subModel -> subModel |> Some
         | _ -> None
 
     let withRunningTimePoints subModel (_: TimePointsDrawerModel) =

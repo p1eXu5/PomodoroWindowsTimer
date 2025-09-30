@@ -2,6 +2,19 @@
 
 open System
 
+type ActiveAndPlayedTimePoints =
+    {
+        ActiveTimePoint: ActiveTimePoint
+        PlayedTimePoints: Set<TimePointId>
+        IsPlaying: bool
+    }
+
+type ActiveTimePointAndPlayingState =
+    {
+        ActiveTimePoint: ActiveTimePoint
+        IsPlaying: bool
+    }
+
 type LooperEvent =
     | TimePointReady of ActiveTimePoint * sentTime: DateTimeOffset
     | TimePointStarted of TimePointStartedEventArgs * sentTime: DateTimeOffset
@@ -38,6 +51,7 @@ module TimePointStartedEventArgs =
             SwitchingMode = switchingMode
         }
 
+    /// Sets OldActiveTimePoint equal to NewActiveTimePoint
     let ofActiveTimePoint activeTimePoint switchingMode : TimePointStartedEventArgs =
         {
             NewActiveTimePoint = activeTimePoint
